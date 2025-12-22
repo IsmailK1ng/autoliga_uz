@@ -1,0 +1,771 @@
+/* ===== CSS ПЕРЕМЕННЫЕ ===== */
+:root {
+    --card-gap: 15px;
+    --card-border-width: 8px;
+    --card-border-radius: 8px;
+    --avatar-size: 48px;
+    --icon-size: 14px;
+    --header-height: 110px;
+    --text-height: 120px;
+    --image-height: 55%;
+    --card-bg: #faf8f6;
+    --card-border-color: white;
+    --text-primary: #333;
+    --text-secondary: #666;
+    --text-muted: #6b7280;
+    --border-color: #e0e0e0;
+}
+
+/* ===== КОНТЕЙНЕРЫ ===== */
+.mxd-section {
+    padding: 60px 0;
+}
+
+.mxd-container {
+    max-width: 1200px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 0 32px;
+}
+
+.mxd-block {
+    position: relative;
+    max-width: 100%;
+}
+
+/* ===== HERO СЕКЦИЯ ===== */
+.mxd-hero-07__top {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+}
+
+.mxd-hero-07__title {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+}
+
+/* ===== MARQUEE АНИМАЦИЯ ===== */
+.marquee {
+    max-width: 100%;
+    overflow: hidden;
+}
+
+.marquee__top,
+.marquee__bottom,
+.marquee__toleft,
+.marquee__toright,
+.items__container {
+    position: relative;
+    display: flex;
+    width: max-content;
+    will-change: transform;
+}
+
+.marquee-right--gsap .marquee__toright,
+.marquee-left--gsap .marquee__toleft {
+    translate: calc(-100% + 100vw) !important;
+}
+
+.marquee.bright .marquee__text,
+.marquee.bright .marquee__image {
+    color: var(--t-bright);
+}
+
+.marquee__text {
+    margin-right: 3.6rem;
+    font-size: 10rem;
+    font-weight: var(--fw-medium);
+    color: var(--t-bright);
+    margin: 0;
+}
+
+.marquee__image {
+    flex-shrink: 0;
+    width: 4.1rem;
+    height: 4.1rem;
+}
+
+.marquee__item.item-regular {
+    width: auto;
+    height: auto;
+    border-radius: 0;
+    gap: 0;
+    background-color: transparent;
+}
+
+.mxd-hero-02-marquee .marquee__image {
+    width: 7.1rem;
+    height: 7.1rem;
+}
+
+.mxd-hero-02-marquee .marquee__image svg {
+    fill: currentColor;
+}
+
+/* ===== СЕТКА КАРТОЧЕК ===== */
+.mxd-card-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--card-gap);
+    width: 100%;
+    padding: 0rem 14rem 0rem 14rem;
+    align-items: stretch;
+}
+
+.mxd-card {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    opacity: 0;
+    transform: translateY(30px);
+    animation: cardAppear 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.mxd-card:nth-child(1) {
+    animation-delay: 0.1s;
+}
+
+.mxd-card:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.mxd-card:nth-child(3) {
+    animation-delay: 0.3s;
+}
+
+.mxd-card:nth-child(4) {
+    animation-delay: 0.4s;
+}
+
+.mxd-card:nth-child(5) {
+    animation-delay: 0.5s;
+}
+
+.mxd-card:nth-child(6) {
+    animation-delay: 0.6s;
+}
+
+@keyframes cardAppear {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ===== СОДЕРЖИМОЕ КАРТОЧКИ ===== */
+.slide-content {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    max-height: 560px;
+    background: var(--card-bg);
+    border-radius: var(--card-border-radius);
+    border: var(--card-border-width) solid var(--card-border-color);
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease, filter 0.3s ease, opacity 0.3s ease;
+    overflow: hidden;
+}
+
+/* ===== HEADER КАРТОЧКИ ===== */
+.slide-header-row {
+    display: flex;
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 0;
+    width: 100%;
+    padding: 12px 10px 30px 10px;
+    border-bottom: 1px solid var(--border-color);
+    height: var(--header-height);
+    position: relative;
+}
+
+.slide-header__wrapper {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    flex-shrink: 0;
+}
+
+
+.slide-header {
+    flex: 1;
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    min-height: 0;
+    overflow: hidden;
+}
+
+.slide-header__title {
+    display: contents;
+    text-wrap: auto;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    height: 61px;
+}
+
+.slide-header__meta {
+    position: absolute;
+    bottom: 8px;
+    right: 10px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.slide-header__icon {
+    width: var(--icon-size);
+    height: var(--icon-size);
+    fill: var(--text-muted);
+    flex-shrink: 0;
+}
+
+.slide-header__date {
+    color: var(--text-muted);
+    font-size: 14px;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+/* ===== ТЕКСТ КАРТОЧКИ ===== */
+.slide-text {
+    display: flex;
+    align-items: flex-start;
+    width: 100%;
+    padding: 7px 15px;
+    height: var(--text-height);
+    min-height: var(--text-height);
+    max-height: var(--text-height);
+    margin-top: -12px;
+    overflow: hidden;
+}
+
+.slide-text__content {
+    margin: 0;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    color: var(--text-secondary);
+    display: -webkit-box;
+    -webkit-line-clamp: 4;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-height: 100%;
+}
+
+/* ===== ИЗОБРАЖЕНИЕ КАРТОЧКИ ===== */
+.slide-image {
+    width: 100%;
+    height: var(--image-height);
+    border-radius: var(--card-border-radius);
+    overflow: hidden;
+    margin-top: auto;
+    flex-shrink: 0;
+}
+
+.slide-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* ===== HOVER ЭФФЕКТЫ ===== */
+.mxd-card-grid:hover .slide-content {
+    filter: blur(2px);
+    opacity: 0.4;
+}
+
+.mxd-card-grid:hover .mxd-card:hover .slide-content {
+    opacity: 1;
+    transform: scale(1.04);
+    filter: none;
+    z-index: 2;
+    box-shadow: 0 0 25px 10px rgba(0, 0, 0, 0.2);
+}
+
+/* ===== ПАГИНАЦИЯ (ИНТЕГРИРОВАННАЯ) ===== */
+.mxd-blog-pagination {
+    position: relative;
+    margin: 5rem 0 2.4rem;
+}
+
+.mxd-blog-pagination__inner {
+    position: relative;
+}
+
+.mxd-blog-pagination__items {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    font: normal var(--fw-medium) 1.8rem/3.3rem var(--_font-accent);
+}
+
+.blog-pagination-control {
+    position: absolute;
+    top: 0;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    font: normal var(--fw-regular) 1.8rem/1.2 var(--_font-accent);
+    color: #000000;
+    background-color: transparent;
+    cursor: pointer;
+    text-decoration: none;
+    padding: 8px 16px;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+}
+
+.blog-pagination-control:hover {
+    color: var(--t-bright);
+    background: var(--bg-card);
+    transform: scale(1.05);
+}
+
+.blog-pagination-control.prev {
+    left: 135px;
+}
+
+.blog-pagination-control.next {
+    right: 135px;
+}
+
+.blog-pagination-control.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+.blog-pagination-control .btn-caption {
+    display: none;
+}
+
+.blog-pagination-control i {
+    font-size: 2.2rem;
+    transition: transform 0.3s ease;
+}
+
+.blog-pagination-control.prev:hover i {
+    transform: translateX(-4px);
+}
+
+.blog-pagination-control.next:hover i {
+    transform: translateX(4px);
+}
+
+.blog-pagination-number {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    font: normal var(--fw-regular) 2rem/3.3rem var(--_font-accent);
+    color: #000000;
+    background: var(--bg-card);
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+}
+
+.blog-pagination-number:hover {
+    background: var(--bg-card-hover);
+    transform: scale(1.1);
+    color: var(--primary);
+}
+
+.blog-pagination-number.active {
+    font-size: 4rem;
+    font-weight: var(--fw-semibold);
+}
+
+/* ===== ТЕМНАЯ ТЕМА ===== */
+body[data-theme="dark"] .slide-content {
+    background: var(--card-bg);
+    border: 10px solid #333333;
+    box-shadow: 0 2px 15px rgba(206, 206, 206, 0.3);
+}
+
+body[data-theme="dark"] .slide-header-row {
+    border-bottom: 1px solid #444444;
+}
+
+body[data-theme="dark"] .slide-header__title,
+body[data-theme="dark"] .slide-text__content {
+    color: #000000 !important;
+}
+
+/* ===== АДАПТАЦИЯ ДЛЯ ПЛАНШЕТОВ (1200px) ===== */
+@media (max-width: 1200px) {
+    .mxd-card-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 24px;
+        padding: 0rem 2rem 0rem 2rem;
+    }
+
+    .slide-content {
+        max-height: 520px;
+    }
+
+    .marquee__text {
+        font-size: 8rem;
+    }
+
+    .slide-header h3 {
+        font-size: 1.7rem;
+    }
+
+    .blog-pagination-control.prev {
+        left: 20px;
+    }
+
+    .blog-pagination-control.next {
+        right: 20px;
+    }
+}
+
+/* ===== АДАПТАЦИЯ ДЛЯ ПЛАНШЕТОВ (1024px) ===== */
+@media (max-width: 1024px) {
+    .mxd-card-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 24px;
+        margin-top: 5rem;
+    }
+
+    .slide-content {
+        max-height: 520px;
+    }
+
+    .marquee__text {
+        font-size: 8rem;
+    }
+
+    .mxd-hero-07__top {
+        margin-top: 3rem;
+        margin-bottom: 3rem;
+        padding-top: 0;
+    }
+
+    .slide-text p {
+        font-size: 1.5rem;
+    }
+}
+
+/* ===== АДАПТАЦИЯ ДЛЯ МАЛЫХ ПЛАНШЕТОВ (768px) ===== */
+@media (max-width: 768px) {
+    :root {
+        --card-gap: 20px;
+        --card-border-width: 6px;
+        --avatar-size: 40px;
+        --header-height: 100px;
+        --text-height: 100px;
+    }
+
+    .mxd-container {
+        padding: 0 20px;
+    }
+
+    .mxd-card-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+        margin-top: 4rem;
+    }
+
+    .slide-content {
+        max-height: 500px;
+    }
+
+    .slide-header__wrapper {
+        height: 60px;
+    }
+
+    .slide-header__title {
+        font-size: 1.1rem;
+        -webkit-line-clamp: 2;
+        height: 48px;
+        max-height: 48px;
+    }
+
+    .slide-text__content {
+        font-size: 0.9rem;
+        -webkit-line-clamp: 3;
+    }
+
+    .marquee__text {
+        font-size: 6rem;
+        margin-right: 2.4rem;
+    }
+
+    .mxd-hero-02-marquee .marquee__image {
+        width: 5rem;
+        height: 5rem;
+    }
+
+    .mxd-blog-pagination {
+        margin: 4rem 0 2rem;
+    }
+
+    .mxd-blog-pagination__items {
+        gap: 0.6rem;
+        font-size: 1.6rem;
+    }
+
+    .blog-pagination-control {
+        padding: 6px 12px;
+        font-size: 1.6rem;
+    }
+
+    .blog-pagination-control .btn-caption {
+        display: block !important;
+    }
+
+    .blog-pagination-control.prev {
+        left: 0;
+    }
+
+    .blog-pagination-control.next {
+        right: 0;
+    }
+
+    .blog-pagination-control i {
+        font-size: 2rem;
+    }
+
+    .blog-pagination-number {
+        width: 38px;
+        height: 38px;
+        font-size: 1.8rem;
+    }
+
+    .blog-pagination-number.active {
+        font-size: 3.2rem;
+    }
+
+    .slide-header h3 {
+        font-size: 2rem;
+    }
+
+    .slide-text p {
+        font-size: 1.5rem;
+    }
+
+    .mxd-hero-07__top {
+        margin-top: 3rem;
+        margin-bottom: 3rem;
+        padding-top: 0;
+    }
+}
+
+/* ===== АДАПТАЦИЯ ДЛЯ МОБИЛЬНЫХ УСТРОЙСТВ (480px) ===== */
+@media (max-width: 480px) {
+    :root {
+        --card-gap: 16px;
+        --card-border-width: 4px;
+        --card-border-radius: 6px;
+        --avatar-size: 36px;
+        --icon-size: 12px;
+        --header-height: 90px;
+        --text-height: 80px;
+        --image-height: 50%;
+    }
+
+    .mxd-section {
+        padding: 40px 0;
+    }
+
+    .mxd-container {
+        padding: 0 16px;
+    }
+
+    .mxd-card-grid {
+        gap: 16px;
+        margin-top: 3rem;
+        padding: 0rem 1.5rem 0rem 1.5rem;
+    }
+
+    .slide-content {
+        max-height: 450px;
+        border: var(--card-border-width) solid var(--card-border-color);
+    }
+
+    .slide-header-row {
+        padding: 10px 8px 8px 8px;
+        height: var(--header-height);
+    }
+
+    .slide-header__wrapper {
+        gap: 10px;
+        height: 52px;
+    }
+
+    .slide-header__title {
+        font-size: 1rem;
+        line-height: 1.3;
+        -webkit-line-clamp: 2;
+        height: 42px;
+        max-height: 42px;
+    }
+
+    .slide-header__meta {
+        gap: 4px;
+        bottom: 6px;
+        right: 8px;
+    }
+
+    .slide-header__date {
+        font-size: 12px;
+    }
+
+    .slide-text {
+        padding: 6px 12px;
+        height: var(--text-height);
+        min-height: var(--text-height);
+        max-height: var(--text-height);
+        margin-top: -10px;
+    }
+
+    .slide-text__content {
+        font-size: 0.85rem;
+        line-height: 1.4;
+        -webkit-line-clamp: 3;
+    }
+
+    .marquee__text {
+        font-size: 4rem;
+        margin-right: 1.8rem;
+    }
+
+    .mxd-hero-02-marquee .marquee__image {
+        width: 3.5rem;
+        height: 3.5rem;
+    }
+
+    .mxd-blog-pagination {
+        margin: 3rem 0 1.5rem;
+    }
+
+    .mxd-blog-pagination__items {
+        gap: 0.4rem;
+        font-size: 1.4rem;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .blog-pagination-control {
+        position: static;
+        padding: 5px 10px;
+        font-size: 1.4rem;
+        border-radius: 8px;
+    }
+
+    .blog-pagination-control .btn-caption {
+        display: none;
+    }
+
+    .blog-pagination-control i {
+        font-size: 1.8rem;
+    }
+
+    .blog-pagination-number {
+        width: 34px;
+        height: 34px;
+        font-size: 1.6rem;
+        border-radius: 8px;
+    }
+
+    .blog-pagination-number.active {
+        font-size: 2.8rem;
+    }
+
+    .mxd-card-grid:hover .slide-content {
+        filter: none;
+        opacity: 1;
+    }
+
+    .mxd-card-grid:hover .mxd-card:hover .slide-content {
+        transform: none;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .mxd-card:active .slide-content {
+        transform: scale(0.98);
+    }
+
+    .slide-header h3 {
+        font-size: 1.5rem;
+    }
+
+    .slide-text p {
+        font-size: 1.2rem;
+    }
+
+    .mxd-hero-07__top {
+        margin-top: 3rem;
+        margin-bottom: 3rem;
+        padding-top: 0;
+    }
+}
+
+/* ===== АДАПТАЦИЯ ДЛЯ ОЧЕНЬ МАЛЕНЬКИХ ЭКРАНОВ (360px) ===== */
+@media (max-width: 360px) {
+    .slide-header__title {
+        font-size: 0.95rem;
+    }
+
+    .slide-text__content {
+        font-size: 0.8rem;
+    }
+
+    .marquee__text {
+        font-size: 3rem;
+    }
+
+    .mxd-hero-02-marquee .marquee__image {
+        width: 3rem;
+        height: 3rem;
+    }
+
+    .mxd-card-grid {
+        padding: 0rem 1.5rem 0rem 1.5rem;
+    }
+}
+
+/* ===== ОПТИМИЗАЦИЯ ПРОИЗВОДИТЕЛЬНОСТИ ===== */
+@media (prefers-reduced-motion: reduce) {
+    .mxd-card {
+        animation: none;
+        opacity: 1;
+        transform: none;
+    }
+
+    .slide-content,
+    .marquee__toright,
+    .marquee__toleft {
+        transition: none;
+        animation: none;
+    }
+}
+
+/* ===== УЛУЧШЕНИЯ ДЛЯ TOUCH УСТРОЙСТВ ===== */
+@media (hover: none) and (pointer: coarse) {
+
+    .blog-pagination-control,
+    .blog-pagination-number {
+        min-height: 44px;
+        min-width: 44px;
+    }
+
+    .slide-content {
+        transition: transform 0.2s ease;
+    }
+}

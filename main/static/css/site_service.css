@@ -1,0 +1,448 @@
+/* =================================
+   БАЗОВЫЕ СТИЛИ И КОНТЕЙНЕРЫ
+   ================================= */
+
+.mxd-section {
+    width: 100%;
+}
+
+.mxd-container {
+    padding: 0 12rem;
+}
+
+/* =================================
+   ЗАГОЛОВКИ И ТЕКСТОВЫЕ БЛОКИ
+   ================================= */
+
+.faw-history-title {
+    text-align: center;
+    position: relative;
+    z-index: 2;
+    font-family: var(--_font-accent);
+    margin: 3rem 0;
+}
+
+.faw-history-title h2,
+.faw-history-title h3 {
+    font-size: clamp(3rem, 5vw, 7rem);
+    margin: 0;
+    line-height: 1.2;
+}
+
+h1 {
+    font-size: 7rem;
+}
+
+/* Текстовый блок manifest */
+.mxd-hero-00__bottom {
+    position: relative;
+    width: 100%;
+    margin: 3rem 0;
+}
+
+.mxd-section.padding-grid-pre-mtext {
+    padding-bottom: 0rem;
+}
+
+.hero-00-manifest {
+    position: relative;
+    display: flex;
+    align-items: stretch;
+    justify-content: stretch;
+    width: 100%;
+    padding: 0 12rem;
+}
+
+.hero-00-manifest .mxd-manifest {
+    font-size: 3rem;
+    max-width: 100%;
+    margin: 0;
+    text-align: justify;
+}
+
+/* =================================
+   ПАРАЛЛАКС ИЗОБРАЖЕНИЯ
+   ================================= */
+
+.mxd-divider {
+    height: 80vh;
+    min-height: 500px;
+    max-height: 1145px;
+    margin: 50px 0;
+    overflow: hidden;
+    border-radius: 20px;
+}
+
+.mxd-divider__image {
+    width: 100%;
+    height: 100%;
+    position: relative;
+}
+
+.mxd-divider__image img,
+.parallax-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.parallax-img-small {
+    height: 400px;
+    overflow: hidden;
+    border-radius: 16px;
+}
+
+.parallax-img-small img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.parallax-img-small:hover img {
+    transform: scale(1.05);
+}
+
+/* =================================
+   СЕТКА КАРТОЧЕК
+   ================================= */
+
+.mxd-section.padding-blog {
+    padding: 5rem 0;
+}
+
+.mxd-blog-preview .container-fluid {
+    padding: 0;
+}
+
+.mxd-blog-preview .row {
+    display: flex;
+    gap: 2rem;
+    margin: 0;
+}
+
+.mxd-blog-preview__item {
+    flex: 1;
+    min-width: 280px;
+    padding: 0;
+}
+
+/* =================================
+   АККОРДЕОН (Стилистика из 3-го файла)
+   ================================= */
+
+.acardeon-cards_container {
+    margin: 5rem 12rem;
+}
+
+.acardeon-cards_title {
+    font-size: clamp(3rem, 4vw, 5rem);
+    font-weight: 700;
+    color: #1a1a1a;
+    margin-bottom: 3rem;
+    padding-bottom: 2rem;
+    border-bottom: 2px solid #3a3a3a;
+}
+
+.acardeon-cards_block {
+    display: flex;
+    flex-direction: column;
+}
+
+/* Скрываем чекбокс */
+.accordion-checkbox {
+    display: none;
+}
+
+.acardeon-card {
+    border-bottom: 1px solid #e9ecef;
+    background: transparent;
+}
+
+.acardeon-card:last-child {
+    border-bottom: none;
+}
+
+.acardeon-card__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 2rem 0;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.acardeon-card__header:hover {
+    opacity: 0.8;
+}
+
+.acardeon-card__title {
+    font-size: 3rem;
+    font-weight: 600;
+    color: #000;
+    margin: 0;
+    transition: color 0.3s ease;
+}
+
+/* Иконка плюс/крестик */
+.acardeon-card__icon {
+    width: 40px;
+    height: 40px;
+    padding: 5px;
+    border-radius: 50%;
+    background: #fff;
+    border: 2px solid #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    transition: all 0.3s ease;
+    flex-shrink: 0;
+}
+
+.acardeon-card__icon::before {
+    content: '';
+    width: 100%;
+    height: 100%;
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path fill="%23000" d="M19.6,9.6h-3.9c-.4,0-1.8-.2-1.8-.2-.6,0-1.1-.2-1.6-.6-.5-.3-.9-.8-1.2-1.2-.3-.4-.4-.9-.5-1.4,0,0,0-1.1-.2-1.5V.4c0-.2-.2-.4-.4-.4s-.4.2-.4.4v4.4c0,.4-.2,1.5-.2,1.5,0,.5-.2,1-.5,1.4-.3.5-.7.9-1.2,1.2s-1,.5-1.6.6c0,0-1.2,0-1.7.2H.4c-.2,0-.4.2-.4.4s.2.4.4.4h4.1c.4,0,1.7.2,1.7.2.6,0,1.1.2,1.6.6.4.3.8.7,1.1,1.1.3.5.5,1,.6,1.6,0,0,0,1.3.2,1.7v4.1c0,.2.2.4.4.4s.4-.2.4-.4v-4.1c0-.4.2-1.7.2-1.7,0-.6.2-1.1.6-1.6.3-.4.7-.8,1.1-1.1.5-.3,1-.5,1.6-.6,0,0,1.3,0,1.8-.2h3.9c.2,0,.4-.2.4-.4s-.2-.4-.4-.4h0Z"/></svg>');
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 70%;
+    transition: all 0.3s ease;
+}
+
+/* Hover эффект */
+.acardeon-card__header:hover .acardeon-card__icon {
+    background: #000;
+    border-color: #000;
+}
+
+.acardeon-card__header:hover .acardeon-card__icon::before {
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path fill="%23fff" d="M19.6,9.6h-3.9c-.4,0-1.8-.2-1.8-.2-.6,0-1.1-.2-1.6-.6-.5-.3-.9-.8-1.2-1.2-.3-.4-.4-.9-.5-1.4,0,0,0-1.1-.2-1.5V.4c0-.2-.2-.4-.4-.4s-.4.2-.4.4v4.4c0,.4-.2,1.5-.2,1.5,0,.5-.2,1-.5,1.4-.3.5-.7.9-1.2,1.2s-1,.5-1.6.6c0,0-1.2,0-1.7.2H.4c-.2,0-.4.2-.4.4s.2.4.4.4h4.1c.4,0,1.7.2,1.7.2.6,0,1.1.2,1.6.6.4.3.8.7,1.1,1.1.3.5.5,1,.6,1.6,0,0,0,1.3.2,1.7v4.1c0,.2.2.4.4.4s.4-.2.4-.4v-4.1c0-.4.2-1.7.2-1.7,0-.6.2-1.1.6-1.6.3-.4.7-.8,1.1-1.1.5-.3,1-.5,1.6-.6,0,0,1.3,0,1.8-.2h3.9c.2,0,.4-.2.4-.4s-.2-.4-.4-.4h0Z"/></svg>');
+}
+
+/* Содержимое аккордеона */
+.acardeon-card__content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s ease;
+    padding: 0;
+}
+
+/* Активное состояние */
+.accordion-checkbox:checked+.acardeon-card__header .acardeon-card__icon::before {
+    transform: rotate(45deg);
+}
+
+.accordion-checkbox:checked~.acardeon-card__content {
+    max-height: 1000px;
+    padding: 0 0 3rem 0;
+}
+
+/* Список характеристик */
+.specs-list.custom-marker {
+    list-style: none;
+    padding-left: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    margin: 2rem 0 0 0;
+}
+
+.specs-list.custom-marker li {
+    position: relative;
+    padding-left: 3.5rem;
+    color: #666;
+    line-height: 1.6;
+    font-size: clamp(1.4rem, 1.5vw, 2.5rem);
+}
+
+.specs-list.custom-marker li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.3rem;
+    width: 24px;
+    height: 24px;
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path fill="%23000" d="M19.6,9.6h-3.9c-.4,0-1.8-.2-1.8-.2-.6,0-1.1-.2-1.6-.6-.5-.3-.9-.8-1.2-1.2-.3-.4-.4-.9-.5-1.4,0,0,0-1.1-.2-1.5V.4c0-.2-.2-.4-.4-.4s-.4.2-.4.4v4.4c0,.4-.2,1.5-.2,1.5,0,.5-.2,1-.5,1.4-.3.5-.7.9-1.2,1.2s-1,.5-1.6.6c0,0-1.2,0-1.7.2H.4c-.2,0-.4.2-.4.4s.2.4.4.4h4.1c.4,0,1.7.2,1.7.2.6,0,1.1.2,1.6.6.4.3.8.7,1.1,1.1.3.5.5,1,.6,1.6,0,0,0,1.3.2,1.7v4.1c0,.2.2.4.4.4s.4-.2.4-.4v-4.1c0-.4.2-1.7.2-1.7,0-.6.2-1.1.6-1.6.3-.4.7-.8,1.1-1.1.5-.3,1-.5,1.6-.6,0,0,1.3,0,1.8-.2h3.9c.2,0,.4-.2.4-.4s-.2-.4-.4-.4h0Z"/></svg>');
+    background-repeat: no-repeat;
+    background-size: contain;
+}
+
+/* =================================
+   АДАПТИВНОСТЬ
+   ================================= */
+
+@media (max-width: 1400px) {
+
+    .mxd-container,
+    .hero-00-manifest,
+    .mxd-section-filter {
+        padding-left: 8rem;
+        padding-right: 8rem;
+    }
+
+    .acardeon-cards_container {
+        margin-left: 8rem;
+        margin-right: 8rem;
+    }
+
+    .mxd-divider {
+        height: 60vh;
+    }
+}
+
+@media (max-width: 1200px) {
+
+    .mxd-container,
+    .hero-00-manifest,
+    .mxd-section-filter {
+        padding-left: 5rem;
+        padding-right: 5rem;
+    }
+
+    .acardeon-cards_container {
+        margin-left: 5rem;
+        margin-right: 5rem;
+    }
+
+    .mxd-divider {
+        height: 55vh;
+    }
+}
+
+@media (max-width: 970px) {
+    .mxd-divider {
+        height: 50vh;
+        min-height: 400px;
+    }
+}
+
+@media (max-width: 768px) {
+
+    .mxd-container,
+    .hero-00-manifest,
+    .mxd-section-filter {
+        padding-left: 2rem;
+        padding-right: 2rem;
+    }
+
+    .acardeon-cards_container {
+        margin: 3rem 2rem;
+    }
+
+    .mxd-divider {
+        height: 45vh;
+        min-height: 350px;
+        border-radius: 12px;
+    }
+
+    .mxd-blog-preview .row {
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+
+    .parallax-img-small {
+        height: 300px;
+    }
+
+    .acardeon-card__icon {
+        width: 36px;
+        height: 36px;
+    }
+
+    .hero-00-manifest .mxd-manifest {
+        font-size: 2.5rem;
+        max-width: 100%;
+        margin: 0;
+        text-align: justify;
+    }
+
+    .mxd-container.grid-container {
+        padding: 0px 8rem;
+    }
+}
+
+@media (max-width: 627px) {
+    .mxd-divider {
+        height: 40vh;
+        min-height: 300px;
+    }
+
+    .faw-history-title {
+        margin: 3rem 0;
+    }
+
+    .hero-00-manifest .mxd-manifest {
+        font-size: 2rem;
+        max-width: 100%;
+        margin: 0;
+        text-align: justify;
+    }
+
+}
+
+
+
+
+
+/* =================================
+   ТЕМНАЯ ТЕМА
+   ================================= */
+
+body[data-theme="dark"] .section-filter .breadcrumb-ol {
+    border-bottom-color: #666;
+}
+
+body[data-theme="dark"] .section-filter .breadcrumb-ol li a {
+    color: #999;
+}
+
+body[data-theme="dark"] .section-filter .breadcrumb-ol li.active a,
+body[data-theme="dark"] .section-filter .breadcrumb-ol li a:hover {
+    color: #fff;
+}
+
+body[data-theme="dark"] .faw-history-title h2,
+body[data-theme="dark"] .faw-history-title h3 {
+    color: #fff;
+}
+
+body[data-theme="dark"] .acardeon-cards_title {
+    color: #fff;
+    border-bottom-color: #666;
+}
+
+body[data-theme="dark"] .acardeon-card {
+    border-bottom-color: #333;
+}
+
+body[data-theme="dark"] .acardeon-card__title {
+    color: #fff;
+}
+
+body[data-theme="dark"] .acardeon-card__icon {
+    background: #2a2a2a;
+    border-color: #fff;
+}
+
+body[data-theme="dark"] .acardeon-card__icon::before {
+    filter: brightness(0) invert(1);
+}
+
+body[data-theme="dark"] .acardeon-card__header:hover .acardeon-card__icon {
+    background: #fff;
+    border-color: #fff;
+}
+
+body[data-theme="dark"] .acardeon-card__header:hover .acardeon-card__icon::before {
+    filter: none;
+}
+
+body[data-theme="dark"] .specs-list.custom-marker li {
+    color: #ccc;
+}
+
+body[data-theme="dark"] .specs-list.custom-marker li::before {
+    filter: brightness(0) invert(1);
+}

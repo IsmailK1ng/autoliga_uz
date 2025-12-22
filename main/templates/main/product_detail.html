@@ -1,0 +1,702 @@
+{% load static %}
+{% load static seo_tags %}
+<!DOCTYPE html>
+<html dir="ltr" lang="{{ LANGUAGE_CODE|default:'uz' }}">
+    
+    <head>
+    <meta charset="UTF-8">
+    <script src="{% static 'js/utm-tracker.js' %}"></script>
+    <title>FAW Trucks - Mahsulot</title>
+    {% hreflang_tags %}
+    {% canonical_url %}
+    <meta name="description" content="FAW Trucks в Узбекистане">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+    <!-- Универсальный favicon -->
+    <link rel="icon" href="{% static 'images/logo/autoliga-logo.png' %}" />
+    <!-- Для Apple устройств -->
+    <link rel="apple-touch-icon" href="{% static 'images/logo/autoliga-logo.png' %}">
+
+    <!-- Подключение стилей -->
+    <link rel="stylesheet" type="text/css" href="{% static 'css/loaders/loader.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/plugins.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/main_site.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/faw_main-models.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/site_main.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/more_info.css' %}">
+
+    <!-- Google Tag Manager Xurshid 1 chi kod -->
+    <script>(function (w, d, s, l, i) {
+            w[l] = w[l] || []; w[l].push({
+                'gtm.start':
+                    new Date().getTime(), event: 'gtm.js'
+            }); var f = d.getElementsByTagName(s)[0],
+                j = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : ''; j.async = true; j.src =
+                    'https://www.googletagmanager.com/gtm.js?id=' + i + dl; f.parentNode.insertBefore(j, f);
+        })(window, document, 'script', 'dataLayer', 'GTM-M33GWKMW');</script>
+    <!-- End Google Tag Manager Xurshid 1 chi kod-->
+
+    <!-- Meta Pixel Code Xurshid 2 chi kod-->
+    <script>
+        !function (f, b, e, v, n, t, s) {
+            if (f.fbq) return; n = f.fbq = function () {
+                n.callMethod ?
+                    n.callMethod.apply(n, arguments) : n.queue.push(arguments)
+            };
+            if (!f._fbq) f._fbq = n; n.push = n; n.loaded = !0; n.version = '2.0';
+            n.queue = []; t = b.createElement(e); t.async = !0;
+            t.src = v; s = b.getElementsByTagName(e)[0];
+            s.parentNode.insertBefore(t, s)
+        }(window, document, 'script',
+            'https://connect.facebook.net/en_US/fbevents.js');
+        fbq('init', '2271244510044933');
+        fbq('track', 'PageView');
+    </script>
+
+    <noscript><img height="1" width="1" style="display:none"
+            src="https://www.facebook.com/tr?id=2271244510044933&ev=PageView&noscript=1" /></noscript>
+    <!-- End Meta Pixel Code  Xurshid 2 chi kod-->
+
+    <!-- Цвет браузера -->
+    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#FAF7F6">
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#161616">
+
+    <!-- amoCRM Pixel для автораспределения -->
+    <script type="text/javascript" id="amo_pixel_identifier_js" async="async"
+        src="https://piper.amocrm.ru/pixel/js/identifier/pixel_identifier.js"></script>
+    <script>
+        window.AMOPIXEL_IDENTIFIER_PARAMS = window.AMOPIXEL_IDENTIFIER_PARAMS || {};
+        window.AMOPIXEL_IDENTIFIER_PARAMS.onload = function (pixel_identifier) {
+            var visitor_uid = pixel_identifier.getVisitorUid();
+            if (visitor_uid) {
+                sessionStorage.setItem('amo_visitor_uid', visitor_uid);
+            }
+        };
+    </script>
+    <!-- Стили для loader -->
+    <style>
+        .page-loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+
+        .page-loader .loader {
+            font-size: 24px;
+            color: #333;
+            font-weight: 600;
+        }
+
+        .error-page {
+            min-height: 60vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .error-content {
+            text-align: center;
+            padding: 40px;
+        }
+
+        .error-content h1 {
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+
+        .error-content p {
+            font-size: 20px;
+            margin-bottom: 30px;
+            color: #666;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Google Tag Manager (noscript) -->
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-M33GWKMW" height="0" width="0"
+            style="display:none;visibility:hidden"></iframe></noscript>
+    <!-- End Google Tag Manager (noscript) -->
+     
+    <!-- Меню и шапка -->
+    {% include 'main/includes/header.html' %}
+
+    <!-- Контент страницы -->
+    <main id="mxd-page-content" class="mxd-page-content">
+
+        <!-- Секция героя -->
+        <div class="mxd-section">
+            <div class="mxd-hero-06">
+                <div class="mxd-hero-06__wrap loading-wrap">
+                    <div class="mxd-hero-06__top">
+                        <div class="mxd-hero-06__content">
+                            <div class="mxd-hero-06__data">
+                                <div class="mxd-hero-06__headline">
+                                    <div class="hero-06-headline__descr">
+                                        <div class="row g-0 more_info-block">
+                                            <div class="col-12 col-xl-12 mxd-grid-item no-margin">
+                                                <div class="mxd-section-models__title">
+                                                    <!-- Заголовок загружается через JS -->
+                                                    <h2 class="models_title">
+                                                       {% if LANGUAGE_CODE == 'ru' %}Загрузка...
+                                                       {% elif LANGUAGE_CODE == 'en' %}Loading...
+                                                       {% else %}Yuklanmoqda...{% endif %}
+                                                    </h2>
+                                                    <ul class="more_info-link">
+                                                        <li>
+                                                            <a href="#parametrs">
+                                                                {% if LANGUAGE_CODE == 'ru' %}
+                                                                    Параметры
+                                                                {% else %}
+                                                                    {% if LANGUAGE_CODE == 'en' %}
+                                                                        Parameters
+                                                                    {% else %}
+                                                                        Parametrlar
+                                                                    {% endif %}
+                                                                {% endif %}
+                                                            </a>
+                                                        </li>
+                                                        <li>
+                                                            <a href="#gallery">
+                                                                {% if LANGUAGE_CODE == 'ru' %}
+                                                                    Галерея
+                                                                {% else %}
+                                                                    {% if LANGUAGE_CODE == 'en' %}
+                                                                        Gallery
+                                                                    {% else %}
+                                                                        Galereya
+                                                                    {% endif %}
+                                                                {% endif %}
+                                                            </a>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mxd-hero-06__car">
+                                <div class="col-12 col-xl-8 mxd-grid-item no-margin">
+                                    <div class="mxd-section-title__hrdescr">
+                                        <span class="hero-05-title__row loading__item star_icon-block">
+                                            <em class="hero-05-title__item title-item-image">
+                                                <svg class="mxd-pulse" xmlns="http://www.w3.org/2000/svg" version="1.1"
+                                                    viewBox="0 0 20 20">
+                                                    <path
+                                                        d="M19.6,9.6h-3.9c-.4,0-1.8-.2-1.8-.2-.6,0-1.1-.2-1.6-.6-.5-.3-.9-.8-1.2-1.2-.3-.4-.4-.9-.5-1.4,0,0,0-1.1-.2-1.5V.4c0-.2-.2-.4-.4-.4s-.4.2-.4.4v4.4c0,.4-.2,1.5-.2,1.5,0,.5-.2,1-.5,1.4-.3.5-.7.9-1.2,1.2s-1,.5-1.6.6c0,0-1.2,0-1.7.2H.4c-.2,0-.4.2-.4.4s.2.4.4.4h4.1c.4,0,1.7.2,1.7.2.6,0,1.1.2,1.6.6.4.3.8.7,1.1,1.1.3.5.5,1,.6,1.6,0,0,0,1.3.2,1.7v4.1c0,.2.2.4.4.4s.4-.2.4-.4v-4.1c0-.4.2-1.7.2-1.7,0-.6.2-1.1.6-1.6.3-.4.7-.8,1.1-1.1.5-.3,1-.5,1.6-.6,0,0,1.3,0,1.8-.2h3.9c.2,0,.4-.2.4-.4s-.2-.4-.4-.4h0Z" />
+                                                </svg>
+                                            </em>
+                                            <em class="hero-05-title__item" style="font-size: 25px; max-width: 400px;">
+                                                <ul class="more_info-link">
+                                                    {% if LANGUAGE_CODE == 'ru' %}Сообщите о любой проблеме на дорогах
+                                                    {% elif LANGUAGE_CODE == 'en' %}Report any problems on the roads
+                                                    {% else %}Har qanday yomon yo'l muammosi to'g'risida xabar bering{% endif %}
+                                                </ul>
+                                            </em>
+                                        </span>
+                                        <a class="btn btn-anim btn-default btn-mobile-icon btn-outline slide-right-up mt-3"
+                                            href="#faw-main-contact-modal" aria-label="Narxini bilish">
+                                            <span class="btn-caption">
+                                                {% if LANGUAGE_CODE == 'ru' %}Узнать цену
+                                                {% elif LANGUAGE_CODE == 'en' %}Get a Quote
+                                                {% else %}Narxini bilish{% endif %}
+                                            </span>
+                                            <i class="ph-bold ph-arrow-up-right"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="car-img_block">
+                                    <!-- Главное изображение загружается через JS -->
+                                    <img src="{% static 'images/more_info.png' %}" class="mxd-hero-06__car-image"
+                                        alt="FAW Truck">
+                                </div>
+                                <div class="car-img_block-info">
+                                    <!-- 8 характеристик загружаются через JS -->
+                                    <div class="car-specs-grid">
+                                        <!-- Loader для характеристик -->
+                                        <div style="grid-column: 1/-1; text-align: center; padding: 20px; color: #999;">
+                                            {% if LANGUAGE_CODE == 'ru' %}Загрузка...
+                                            {% elif LANGUAGE_CODE == 'en' %}Loading...
+                                            {% else %}Yuklanmoqda...{% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Секция параметров -->
+        <div class="mxd-section padding-blog">
+            <div class="grid-container">
+
+                <!-- Хлебные крошки -->
+                <div class="mxd-block">
+                    <div class="mxd-section-more_info pre-grid">
+                        <div class="mxd-section-more_info__inner animate-card-3">
+                            <div class="mxd-grid-item">
+                                <div class="section-more_info">
+                                    <div aria-label="breadcrumb">
+                                        <ol class="breadcrumb-ol">
+                                            <li><a href="{% url 'home' %}">
+                                                    {% if LANGUAGE_CODE == 'ru' %}Главная
+                                                    {% elif LANGUAGE_CODE == 'en' %}Home
+                                                    {% else %}Bosh sahifa{% endif %}
+                                            </a></li>
+                                            <li><a href="javascript:void(0)">
+                                                    {% if LANGUAGE_CODE == 'ru' %}Модели
+                                                    {% elif LANGUAGE_CODE == 'en' %}Models
+                                                    {% else %}Modellar{% endif %}
+                                            </a></li>
+                                            <li class="active"><a href="javascript:void(0)">
+                                                    {% if LANGUAGE_CODE == 'ru' %}Загрузка...
+                                                    {% elif LANGUAGE_CODE == 'en' %}Loading...
+                                                    {% else %}Yuklanmoqda...{% endif %}
+                                            </a></li>
+                                        </ol>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Параметры (accordion) -->
+                <div class="mxd-block" id="parametrs">
+                    <div class="mxd-blog-preview">
+                        <div class="container-fluid p-0">
+                            <div class="g-0 card_block">
+                                <div class="acardeon-cards_container">
+                                    <h2 class="acardeon-cards_title">
+                                        {% if LANGUAGE_CODE == 'ru' %}Параметры
+                                        {% elif LANGUAGE_CODE == 'en' %}Parameters
+                                        {% else %}Parametrlar{% endif %}
+                                    </h2>
+                                    <!-- Accordion загружается через JS -->
+                                    <div class="acardeon-cards_block">
+                                        <div style="text-align: center; padding: 40px; color: #999;">
+                                            {% if LANGUAGE_CODE == 'ru' %}Загрузка...
+                                            {% elif LANGUAGE_CODE == 'en' %}Loading...
+                                            {% else %}Yuklanmoqda...{% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Галерея -->
+            <div class="mxd-section padding-pre-grid section-galery" id="gallery">
+                <div class="grid-container">
+                    <div class="mxd-block">
+                        <h2 class="reveal-type" style="text-align: center;">
+                            {% if LANGUAGE_CODE == 'ru' %}Галерея
+                            {% elif LANGUAGE_CODE == 'en' %}Gallery
+                            {% else %}Galereya{% endif %}
+                        </h2>
+                        <div class="mxd-demo-swiper mxd-grid-item" data-custom-init="true"
+                            style="min-height: 420px;">
+                            <!-- Галерея загружается через JS -->
+                            <div class="swiper-wrapper">
+                                <div style="text-align: center; padding: 100px; color: #999;">
+                                    {% if LANGUAGE_CODE == 'ru' %}Загрузка...
+                                    {% elif LANGUAGE_CODE == 'en' %}Loading...
+                                    {% else %}Yuklanmoqda...{% endif %}
+                                </div>
+                            </div>
+                            <!-- Кнопки навигации -->
+                            <div class="swiper-button-prev mxd-slider-btn mxd-slider-btn-round-prev v2">
+                                <a class="btn btn-round btn-round-small btn-outline slide-left anim-no-delay" href="#0">
+                                    <i class="ph ph-arrow-left"></i>
+                                </a>
+                            </div>
+                            <div class="swiper-button-next mxd-slider-btn mxd-slider-btn-round-next v2">
+                                <a class="btn btn-round btn-round-small btn-outline slide-right anim-no-delay"
+                                    href="#0">
+                                    <i class="ph ph-arrow-right"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Футер -->
+    {% include 'main/includes/footer.html' %}
+
+    <!-- Кнопка «вверх» -->
+    <a href="#0" id="to-top" class="btn btn-to-top slide-up anim-no-delay">
+        <i class="ph ph-arrow-up"></i>
+    </a>
+
+    <!-- Модальное окно с формой контакта -->
+    <div id="faw-modal" class="faw-modal">
+        <div class="faw-modal__overlay"></div>
+        <div class="faw-modal__content">
+            <button class="faw-modal__close" aria-label="Закрыть">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+
+            <div class="faw-modal__header">
+                <h2 class="faw-modal__title">
+                    {% if LANGUAGE_CODE == 'ru' %}Связаться с нами
+                    {% elif LANGUAGE_CODE == 'en' %}Contact Us
+                    {% else %}Biz bilan bog'lanish{% endif %}
+                </h2>
+                <p class="faw-modal__subtitle">
+                    {% if LANGUAGE_CODE == 'ru' %}Оставьте свои контактные данные, и мы свяжемся с вами в ближайшее время.
+                    {% elif LANGUAGE_CODE == 'en' %}Leave your contact details and we will get back to you shortly.
+                    {% else %}Aloqa ma'lumotlaringizni qoldiring, biz tez orada siz bilan bog'lanamiz.{% endif %}
+                </p>
+            </div>
+
+            <form class="faw-modal__form" id="faw-contact-form">
+                {% csrf_token %}
+                <input type="hidden" name="project_name" value="FAW Trucks">
+                <input type="hidden" name="admin_email" value="info@fawtrucks.uz">
+                <input type="hidden" name="form_subject" value="FAW Contact Form Message">
+
+                <input type="hidden" name="product" id="product-field" value="">
+
+                <div class="faw-form__group">
+                    <input type="text" name="Name" class="faw-form__input" placeholder="Ismingiz*" required>
+                </div>
+
+                <div class="faw-form__group">
+                    <select name="Region" class="faw-form__select" required>
+                        <option value="" disabled selected>
+                            {% if LANGUAGE_CODE == 'ru' %}Выберите регион*
+                            {% elif LANGUAGE_CODE == 'en' %}Select Region*
+                            {% else %}Viloyatni tanlang*{% endif %}
+                        </option>
+                        <option value="Toshkent shahri">
+                            {% if LANGUAGE_CODE == 'ru' %}г. Ташкент
+                            {% elif LANGUAGE_CODE == 'en' %}Tashkent City
+                            {% else %}Toshkent shahri{% endif %}
+                        </option>
+                        <option value="Andijon viloyati">
+                            {% if LANGUAGE_CODE == 'ru' %}Андижанская область
+                            {% elif LANGUAGE_CODE == 'en' %}Andijan Region
+                            {% else %}Andijon viloyati{% endif %}
+                        </option>
+                        <option value="Buxoro viloyati">
+                            {% if LANGUAGE_CODE == 'ru' %}Бухарская область
+                            {% elif LANGUAGE_CODE == 'en' %}Bukhara Region
+                            {% else %}Buxoro viloyati{% endif %}
+                        </option>
+                        <option value="Fargʻona viloyati">
+                            {% if LANGUAGE_CODE == 'ru' %}Ферганская область
+                            {% elif LANGUAGE_CODE == 'en' %}Fergana Region
+                            {% else %}Fargʻona viloyati{% endif %}
+                        </option>
+                        <option value="Jizzax viloyati">
+                            {% if LANGUAGE_CODE == 'ru' %}Джизакская область
+                            {% elif LANGUAGE_CODE == 'en' %}Jizzakh Region
+                            {% else %}Jizzax viloyati{% endif %}
+                        </option>
+                        <option value="Xorazm viloyati">
+                            {% if LANGUAGE_CODE == 'ru' %}Хорезмская область
+                            {% elif LANGUAGE_CODE == 'en' %}Khorezm Region
+                            {% else %}Xorazm viloyati{% endif %}
+                        </option>
+                        <option value="Namangan viloyati">
+                            {% if LANGUAGE_CODE == 'ru' %}Наманганская область
+                            {% elif LANGUAGE_CODE == 'en' %}Namangan Region
+                            {% else %}Namangan viloyati{% endif %}
+                        </option>
+                        <option value="Navoiy viloyati">
+                            {% if LANGUAGE_CODE == 'ru' %}Навоийская область
+                            {% elif LANGUAGE_CODE == 'en' %}Navoiy Region
+                            {% else %}Navoiy viloyati{% endif %}
+                        </option>
+                        <option value="Qashqadaryo viloyati">
+                            {% if LANGUAGE_CODE == 'ru' %}Кашкадарьинская область
+                            {% elif LANGUAGE_CODE == 'en' %}Kashkadarya Region
+                            {% else %}Qashqadaryo viloyati{% endif %}
+                        </option>
+                        <option value="Samarqand viloyati">
+                            {% if LANGUAGE_CODE == 'ru' %}Самаркандская область
+                            {% elif LANGUAGE_CODE == 'en' %}Samarkand Region
+                            {% else %}Samarqand viloyati{% endif %}
+                        </option>
+                        <option value="Sirdaryo viloyati">
+                            {% if LANGUAGE_CODE == 'ru' %}Сырдарьинская область
+                            {% elif LANGUAGE_CODE == 'en' %}Sirdaryo Region
+                            {% else %}Sirdaryo viloyati{% endif %}
+                        </option>
+                        <option value="Surxondaryo viloyati">
+                            {% if LANGUAGE_CODE == 'ru' %}Сурхандарьинская область
+                            {% elif LANGUAGE_CODE == 'en' %}Surkhandarya Region
+                            {% else %}Surxondaryo viloyati{% endif %}
+                        </option>
+                        <option value="Toshkent viloyati">
+                            {% if LANGUAGE_CODE == 'ru' %}Ташкентская область
+                            {% elif LANGUAGE_CODE == 'en' %}Tashkent Region
+                            {% else %}Toshkent viloyati{% endif %}
+                        </option>
+                        <option value="Qoraqalpog'iston Respublikasi">
+                            {% if LANGUAGE_CODE == 'ru' %}Республика Каракалпакстан
+                            {% elif LANGUAGE_CODE == 'en' %}Republic of Karakalpakstan
+                            {% else %}Qoraqalpog'iston Respublikasi{% endif %}
+                        </option>
+                    </select>
+                </div>
+
+                <div class="faw-form__group">
+                    <input type="tel" name="phone" class="faw-form__input" placeholder="+998 (__) ___-__-__"
+                        id="phoneInput" pattern="[+]*[0-9\s\-\(\)]*" data-default="+998" required>
+                </div>
+
+                <div class="faw-form__group">
+                    <textarea name="Message" class="faw-form__textarea"
+                        placeholder="Qanday yuk mashinasiga qiziqasiz? Qo'shimcha savollar*" rows="4"></textarea>
+                </div>
+
+                <div class="faw-form__group">
+                    <button type="submit" class="faw-form__submit">
+                        <span>
+                            {% if LANGUAGE_CODE == 'ru' %}Отправить
+                            {% elif LANGUAGE_CODE == 'en' %}Submit
+                            {% else %}Qong'iroq kutaman{% endif %}
+                        </span>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2">
+                            <line x1="7" y1="17" x2="17" y2="7"></line>
+                            <polyline points="7 7 17 7 17 17"></polyline>
+                        </svg>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Модальное окно для галереи -->
+    <div id="gallery-modal" class="gallery-modal">
+        <div class="gallery-modal__overlay"></div>
+        <div class="gallery-modal__content">
+            <button class="gallery-modal__close" aria-label="Закрыть">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+            <img id="gallery-modal-img" alt="Галерея" class="gallery-modal__img" />
+        </div>
+    </div>
+
+    <!-- Подключение скриптов -->
+    <script src="{% static 'js/libs.min.js' %}"></script>
+    <script src="{% static 'js/app.js' %}"></script>
+    <script src="{% static 'js/error-logger.js' %}"></script>
+    <script src="{% static 'js/faw.js' %}"></script>
+    <!-- Подключение Product Detail JS -->
+    <script src="{% static 'js/product_detail.js' %}"></script>
+
+    <script>
+
+        // ============ ОБРАБОТКА ФОРМЫ ============
+        let isSubmitting = false;
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const modal = document.getElementById('faw-modal');
+            const contactForm = document.getElementById('faw-contact-form');
+            const phoneInput = contactForm?.querySelector('input[name="phone"]');
+            const messageTextarea = contactForm?.querySelector('textarea[name="Message"]');
+
+            if (!contactForm) return;
+
+            let statusBlock = contactForm.querySelector('.faw-form__status');
+            if (!statusBlock) {
+                statusBlock = document.createElement('div');
+                statusBlock.className = 'faw-form__status hidden';
+                const statusText = document.createElement('p');
+                statusText.className = 'faw-form__status-text';
+                statusBlock.appendChild(statusText);
+                contactForm.prepend(statusBlock);
+            }
+            const statusText = statusBlock.querySelector('.faw-form__status-text') || statusBlock;
+
+            function openModal() {
+                modal.classList.add('active');
+                document.body.style.overflow = 'hidden';
+
+                const productField = document.getElementById('product-field');
+                if (window.currentProductTitle && productField) {
+                    productField.value = window.currentProductTitle;
+                }
+
+                if (window.currentProductTitle && messageTextarea) {
+                    messageTextarea.value = `Men ${window.currentProductTitle} modeliga qiziqaman.\n\nQo'shimcha savollar: `;
+                    messageTextarea.focus();
+                    messageTextarea.setSelectionRange(messageTextarea.value.length, messageTextarea.value.length);
+                }
+            }
+
+            function closeModal() {
+                modal.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+
+            document.querySelectorAll('a[href="#faw-main-contact-modal"]').forEach(trigger => {
+                trigger.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    openModal();
+                });
+            });
+
+            const modalClose = document.querySelector('.faw-modal__close');
+            const modalOverlay = document.querySelector('.faw-modal__overlay');
+
+            if (modalClose) modalClose.addEventListener('click', closeModal);
+            if (modalOverlay) modalOverlay.addEventListener('click', closeModal);
+
+            document.addEventListener('keydown', function (e) {
+                if (e.key === 'Escape' && modal?.classList.contains('active')) {
+                    closeModal();
+                }
+            });
+
+            if (phoneInput) {
+                phoneInput.addEventListener("input", (e) => {
+                    let value = e.target.value.replace(/\D/g, "");
+                    if (!value.startsWith("998")) value = "998" + value;
+                    if (value.length > 12) value = value.slice(0, 12);
+
+                    let formatted = "+998 ";
+                    if (value.length > 3) formatted += "(" + value.slice(3, 5);
+                    if (value.length >= 5) formatted += ") " + value.slice(5, 8);
+                    if (value.length >= 8) formatted += "-" + value.slice(8, 10);
+                    if (value.length >= 10) formatted += "-" + value.slice(10, 12);
+
+                    e.target.value = formatted;
+                });
+            }
+
+            contactForm.addEventListener("submit", async (e) => {
+                e.preventDefault();
+                if (isSubmitting) return;
+                isSubmitting = true;
+
+                const phone = phoneInput.value.replace(/\D/g, "");
+                if (phone.length !== 12) {
+                    showStatus("❌ Iltimos, telefon raqamingizni to'liq kiriting.", "error");
+                    isSubmitting = false;
+                    return;
+                }
+
+                const productField = document.getElementById('product-field');
+                const utmData = window.getUTMData();
+
+                const formData = {
+                    name: contactForm.Name.value,
+                    region: contactForm.Region.value,
+                    phone: phoneInput.value,
+                    product: productField?.value || '',
+                    message: contactForm.Message.value || '',
+                    referer: document.referrer || window.location.href,
+                    utm_data: utmData,
+                    visitor_uid: sessionStorage.getItem('amo_visitor_uid') || null
+                };
+
+                try {
+                    const response = await fetch("/api/uz/contact/", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "X-CSRFToken": contactForm.querySelector("[name=csrfmiddlewaretoken]").value,
+                        },
+                        body: JSON.stringify(formData),
+                    });
+
+                    const data = await response.json();
+
+                    if (response.ok) {
+                        (window.dataLayer = window.dataLayer || []).push({
+                            event: "lead_form_submitted"
+                        });
+
+                        showStatus("✅ Xabar yuborildi! Tez orada siz bilan bog'lanamiz.", "success");
+                        contactForm.reset();
+
+                        setTimeout(() => {
+                            closeModal();
+                            statusBlock.classList.add("hidden");
+                        }, 2000);
+                    } else {
+                        throw new Error(data.message || "Xatolik yuz berdi.");
+                    }
+                } catch (err) {
+                    console.error("Form error:", err);
+                    showStatus("❌ Xatolik yuz berdi. Iltimos, qayta urinib ko'ring.", "error");
+                } finally {
+                    isSubmitting = false;
+                }
+            });
+
+            function showStatus(message, type = "success") {
+                statusText.textContent = message;
+                statusBlock.className = `faw-form__status ${type} show`;
+                statusBlock.classList.remove("hidden");
+
+                setTimeout(() => {
+                    statusBlock.classList.remove("show");
+                    setTimeout(() => statusBlock.classList.add("hidden"), 400);
+                }, 4000);
+            }
+
+            // Галерея
+            const galleryModal = document.getElementById('gallery-modal');
+            const galleryModalImg = document.getElementById('gallery-modal-img');
+            const galleryModalClose = document.querySelector('.gallery-modal__close');
+            const galleryModalOverlay = document.querySelector('.gallery-modal__overlay');
+
+            document.addEventListener('click', function (e) {
+                if (e.target.closest('.swiper-wrapper img')) {
+                    const img = e.target.closest('.swiper-wrapper img');
+                    galleryModal.classList.add('active');
+                    galleryModalImg.src = img.src;
+                    galleryModalImg.alt = img.alt || '';
+                    document.body.style.overflow = 'hidden';
+                }
+            });
+
+            function closeGalleryModal() {
+                galleryModal.classList.remove('active');
+                galleryModalImg.src = '';
+                document.body.style.overflow = '';
+            }
+
+            if (galleryModalClose) galleryModalClose.addEventListener('click', closeGalleryModal);
+            if (galleryModalOverlay) galleryModalOverlay.addEventListener('click', closeGalleryModal);
+
+            document.addEventListener('keydown', function (e) {
+                if (e.key === 'Escape' && galleryModal?.classList.contains('active')) {
+                    closeGalleryModal();
+                }
+            });
+        });
+    </script>
+
+</body>
+
+</html>

@@ -1,0 +1,250 @@
+{% load static %}
+{% load seo_tags %} 
+<!DOCTYPE html>
+<html dir="ltr" lang="{{ LANGUAGE_CODE|default:'uz' }}">
+
+<head>
+  <meta charset="UTF-8">
+  <title>{{ news.title }} | VUM News</title>
+  {% hreflang_tags %}
+  {% canonical_url %}
+  <meta name="description" content="{{ news.desc }}">
+  <meta name="keywords" content="FAW Trucks, VUM, {{ news.title }}">
+  <meta name="author" content="VUM">
+
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <!-- Универсальный favicon -->
+  <link rel="icon" href="{% static 'images/logo/autoliga-logo.png' %}" />
+  <!-- Для Apple устройств -->
+  <link rel="apple-touch-icon" href="{% static 'images/logo/autoliga-logo.png' %}">
+
+  <!-- Open Graph -->
+  <meta property="og:image:height" content="1200">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:title" content="{{ news.title }}">
+  <meta property="og:description" content="{{ news.desc }}">
+  <meta property="og:url" content="{{ request.build_absolute_uri }}">
+  {% if news.preview_image %}
+  <meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{{ news.preview_image.url }}">
+  {% endif %}
+
+  <!-- Google Tag Manager Xurshid 1 chi kod -->
+  <script>(function (w, d, s, l, i) {
+      w[l] = w[l] || []; w[l].push({
+        'gtm.start':
+          new Date().getTime(), event: 'gtm.js'
+      }); var f = d.getElementsByTagName(s)[0],
+        j = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : ''; j.async = true; j.src =
+          'https://www.googletagmanager.com/gtm.js?id=' + i + dl; f.parentNode.insertBefore(j, f);
+    })(window, document, 'script', 'dataLayer', 'GTM-M33GWKMW');</script>
+  <!-- End Google Tag Manager Xurshid 1 chi kod-->
+
+  <!-- Meta Pixel Code Xurshid 2 chi kod-->
+  <script>
+    !function (f, b, e, v, n, t, s) {
+      if (f.fbq) return; n = f.fbq = function () {
+        n.callMethod ?
+          n.callMethod.apply(n, arguments) : n.queue.push(arguments)
+      };
+      if (!f._fbq) f._fbq = n; n.push = n; n.loaded = !0; n.version = '2.0';
+      n.queue = []; t = b.createElement(e); t.async = !0;
+      t.src = v; s = b.getElementsByTagName(e)[0];
+      s.parentNode.insertBefore(t, s)
+    }(window, document, 'script',
+      'https://connect.facebook.net/en_US/fbevents.js');
+    fbq('init', '2271244510044933');
+    fbq('track', 'PageView');
+  </script>
+
+  <noscript><img height="1" width="1" style="display:none"
+      src="https://www.facebook.com/tr?id=2271244510044933&ev=PageView&noscript=1" /></noscript>
+  <!-- End Meta Pixel Code  Xurshid 2 chi kod-->
+
+  <!-- amoCRM Pixel для автораспределения -->
+  <script type="text/javascript" id="amo_pixel_identifier_js" async="async"
+    src="https://piper.amocrm.ru/pixel/js/identifier/pixel_identifier.js"></script>
+  <script>
+    window.AMOPIXEL_IDENTIFIER_PARAMS = window.AMOPIXEL_IDENTIFIER_PARAMS || {};
+    window.AMOPIXEL_IDENTIFIER_PARAMS.onload = function (pixel_identifier) {
+      var visitor_uid = pixel_identifier.getVisitorUid();
+      if (visitor_uid) {
+        sessionStorage.setItem('amo_visitor_uid', visitor_uid);
+      }
+    };
+  </script>
+
+  <!-- Styles -->
+  <link rel="stylesheet" type="text/css" href="{% static 'css/loaders/loader.css' %}">
+  <link rel="stylesheet" type="text/css" href="{% static 'css/plugins.css' %}">
+  <link rel="stylesheet" type="text/css" href="{% static 'css/main_site.css' %}">
+  <link rel="stylesheet" type="text/css" href="{% static 'css/site_main.css' %}">
+  <link rel="stylesheet" type="text/css" href="{% static 'css/breadcrumbs.css' %}">
+  <link rel="stylesheet" type="text/css" href="{% static 'css/single-news-page.css' %}">
+
+  <!-- Browser Color -->
+  <meta name="theme-color" media="(prefers-color-scheme: light)" content="#FAF7F6">
+  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#161616">
+  <meta name="msapplication-navbutton-color" content="#161616">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+</head>
+
+<body>
+  <!-- Google Tag Manager (noscript) -->
+  <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-M33GWKMW" height="0" width="0"
+      style="display:none;visibility:hidden"></iframe></noscript>
+  <!-- End Google Tag Manager (noscript) -->
+   
+  <!-- Loader -->
+  <div id="loader" style="display: none;" class="loader">
+    <div class="loader__wrapper">
+      <div class="loader__content">
+        <div class="loader__count">
+          <span class="count__text">0</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Header -->
+  {% include 'main/includes/header.html' %}
+
+  <!-- Page Content -->
+  <div class="mxd-block loading-wrap"></div>
+
+  <!-- Breadcrumbs -->
+  <div class="mxd-block">
+    <div class="mxd-section-filter pre-grid">
+      <div class="mxd-section-filter__inner animate-card-3">
+        <div class="mxd-grid-item-1">
+          <div class="section-filter">
+            <div aria-label="breadcrumb">
+              <ol class="breadcrumb-ol">
+                <li><a href="{% url 'home' %}">{{ breadcrumbs.home }}</a></li>
+                <li><a href="{% url 'news' %}">{{ breadcrumbs.news }}</a></li>
+                <li class="active"><a href="{% url 'news_detail' news.slug %}">{{ breadcrumbs.current }}</a></li>
+              </ol>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Title -->
+  <div class="title-after-video">
+    <div class="faw-history-title fade-in">
+      <h2 class="reveal-type">{{ news.title }}</h2>
+    </div>
+    <div class="mxd-block"></div>
+  </div>
+
+  <!-- Dynamic Content Blocks -->
+  {% for block in blocks %}
+
+  <!-- YouTube Video Block -->
+  {% if block.block_type == 'youtube' and block.youtube_url %}
+  <div class="mxd-section padding-grid-pre-pinned">
+    <div class="mxd-container">
+      <div class="mxd-divider" id="parallax-divider">
+        <div class="mxd-divider__video">
+          <iframe class="video parallax-video" src="{{ block.youtube_url }}" title="YouTube video player"
+            frameborder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            referrerpolicy="strict-origin-when-cross-origin" allowfullscreen data-parallax="true">
+          </iframe>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Video File Block -->
+  {% if block.block_type == 'video' and block.video_file %}
+  <div class="mxd-section padding-grid-pre-pinned">
+    <div class="mxd-container">
+      <div class="mxd-divider">
+        <div class="mxd-divider__video">
+          <video class="video" controls preload="auto">
+            <source src="{{ block.video_file.url }}" type="video/mp4">
+          </video>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Image Block -->
+  {% if block.block_type == 'image' and block.image %}
+  <div class="mxd-section padding-pre-title">
+    <div class="mxd-container">
+      <div class="mxd-divider">
+        <div class="mxd-divider__image parallax-img">
+          <img src="{{ block.image.url }}" alt="{{ block.title|default:'Фото' }}">
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Text Block (с заголовком внутри) -->
+  {% if block.block_type == 'text' and block.text %}
+  <div class="mxd-hero-00__bottom">
+    <div class="hero-00-manifest">
+      <div class="mxd-manifest reveal-type">
+        {% if block.title %}
+        <div class="faw-history-title fade-in">
+          <h3>{{ block.title }}</h3>
+        </div>
+        {% endif %}
+        {{ block.text|safe }}
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  {% endfor %}
+
+  <!-- Footer -->
+  {% include 'main/includes/footer.html' %}
+
+  <!-- To Top Button -->
+  <a href="#0" id="to-top" class="btn btn-to-top slide-up anim-no-delay">
+    <i class="ph ph-arrow-up"></i>
+  </a>
+
+  <!-- Scripts -->
+  <script src="{% static 'js/libs.min.js' %}"></script>
+  <script src="{% static 'js/app.js' %}"></script>
+  <script src="{% static 'js/error-logger.js' %}"></script>
+  <script src="{% static 'js/faw.js' %}"></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const video = document.querySelector('.parallax-video');
+      if (video) {
+        function resetStyles() {
+          video.style.setProperty('height', '', '');
+          video.style.setProperty('transform', 'none', '');
+        }
+
+        resetStyles();
+
+        const observer = new MutationObserver((mutations) => {
+          mutations.forEach((mutation) => {
+            if (mutation.attributeName === 'style') {
+              resetStyles();
+            }
+          });
+        });
+
+        observer.observe(video, { attributes: true });
+        video.removeAttribute('data-parallax');
+      }
+    });
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,127 @@
+.login-logo,
+.register-logo {
+    display: flex;
+    justify-content: center;
+}
+
+.login-logo img {
+    width: 200px;
+    height: auto;
+}
+
+.card-body .btn-primary {
+    color: #fff;
+    background-color: #ff7230;
+    border-color: #ff7230;
+    box-shadow: none;
+}
+
+.sidebar-dark-primary .nav-sidebar>.nav-item>.nav-link.active,
+.sidebar-light-primary .nav-sidebar>.nav-item>.nav-link.active {
+    background: linear-gradient(37deg, #000000, #541f06, #6b2708);
+    color: #ffffff;
+    box-shadow: none;
+}
+
+.navbar {
+    background: linear-gradient(306deg, #000000, #541f06, #ff7230);
+}
+
+[class*=sidebar-dark-] {
+    background: linear-gradient(64deg, #000000, #541f06, #ff7230);
+}
+
+.navbar-dark .navbar-nav .nav-link {
+    color: rgb(255 255 255);
+}
+
+.navbar-dark .form-control-navbar+.input-group-append>.btn-navbar,
+.navbar-dark .form-control-navbar+.input-group-prepend>.btn-navbar {
+    background-color: black;
+    color: #fff;
+    /* border: 1; */
+    border-left: none;
+    border-color: #6c757d;
+}
+
+.navbar-dark .btn-navbar,
+.navbar-dark .form-control-navbar {
+    background-color: black;
+    /* border: 1px solid #6c757d; */
+    color: #fff;
+    border-color: #6c757d;
+    border-right: none;
+}
+
+.navbar-light .navbar-nav .nav-link {
+    color: #ffffff;
+}
+
+.img-circle {
+    box-shadow: none !important;
+    border-radius: 0;
+    filter: brightness(0) invert(1);
+}
+
+/* Общий фон всей админки */
+.content-wrapper {
+    background: url("/static/images/logo/autoliga-logo.png") no-repeat center center fixed !important;
+    background-size: 600px !important;
+}
+
+/* Затемнение фона, чтобы текст читался */
+.content-wrapper::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.10);
+    z-index: -1;
+}
+
+/* Сделаем карточки полупрозрачными */
+.card {
+    background-color: rgba(255, 255, 255, 0.85) !important;
+    border-radius: 10px !important;
+}
+
+.select2-container--admin-autocomplete .select2-selection--single .select2-selection__rendered {
+    border-radius: 2rem;
+    background: #ffffff;
+    line-height: normal !important;
+    padding: 2px 15px 5px 10px;
+    width: 94%;
+    min-height: 27px;
+}
+
+/* ========== СКРЫТЬ ИКОНКИ У МЕНЕДЖЕРОВ В ЗАЯВКАХ НА ДИЛЕРСТВО ========== */
+#changelist-form .field-manager .related-widget-wrapper-link {
+    display: none !important;
+}
+
+.select2-container--admin-autocomplete .select2-selection--single .select2-selection__clear {
+    left: 10px;
+}
+
+.navbar-dark .navbar-nav .nav-link {
+    filter: brightness(0) invert(1);
+}
+
+.accent-primary [class*=sidebar-dark-] .sidebar a:not(.dropdown-item):not(.btn-app):not(.nav-link):not(.brand-link) {
+    color: #ffffff;
+}
+
+[class*=sidebar-dark] .user-panel {
+    border-bottom: 1px solid #ffffff;
+}
+
+[class*=sidebar-dark-] .nav-header {
+    color: rgb(255 255 255);
+    margin-top: 1rem;
+}
+
+[class*=sidebar-dark-] .sidebar a {
+    color: #ffffff;
+}

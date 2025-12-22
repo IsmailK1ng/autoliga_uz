@@ -1,0 +1,288 @@
+{% load static %}
+{% load seo_tags %} 
+<!DOCTYPE html>
+<html dir="ltr" lang="{{ LANGUAGE_CODE|default:'uz' }}">
+
+<head>
+  <meta charset="UTF-8">
+  <title>FAW Trucks - Modellar</title>
+  {% hreflang_tags %}
+  {% canonical_url %}
+  <meta name="description" content="Faw Trucks в Узбекистане">
+  <meta name="keywords" content="Faw Trucks в Узбекистане">
+  <meta name="author" content="mix_design">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+  <!-- Универсальный favicon -->
+  <link rel="icon" href="{% static 'images/logo/autoliga-logo.png' %}" />
+  <!-- Для Apple устройств -->
+  <link rel="apple-touch-icon" href="{% static 'images/logo/autoliga-logo.png' %}">
+
+  <!-- Мета для Facebook -->
+  <meta property="og:image:height" content="1200">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:title" content="Faw Trucks в Узбекистане">
+  <meta property="og:description" content="Faw Trucks в Узбекистане">
+  <meta property="og:url" content="https://mixdesign.dev/themeforest/rayo">
+  <meta property="og:image" content="https://mixdesign.dev/themeforest/rayo/img/og-image.jpg">
+
+  <!-- Google Tag Manager Xurshid 1 chi kod -->
+  <script>(function (w, d, s, l, i) {
+      w[l] = w[l] || []; w[l].push({
+        'gtm.start':
+          new Date().getTime(), event: 'gtm.js'
+      }); var f = d.getElementsByTagName(s)[0],
+        j = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : ''; j.async = true; j.src =
+          'https://www.googletagmanager.com/gtm.js?id=' + i + dl; f.parentNode.insertBefore(j, f);
+    })(window, document, 'script', 'dataLayer', 'GTM-M33GWKMW');</script>
+  <!-- End Google Tag Manager Xurshid 1 chi kod-->
+
+  <!-- Meta Pixel Code Xurshid 2 chi kod-->
+  <script>
+    !function (f, b, e, v, n, t, s) {
+      if (f.fbq) return; n = f.fbq = function () {
+        n.callMethod ?
+          n.callMethod.apply(n, arguments) : n.queue.push(arguments)
+      };
+      if (!f._fbq) f._fbq = n; n.push = n; n.loaded = !0; n.version = '2.0';
+      n.queue = []; t = b.createElement(e); t.async = !0;
+      t.src = v; s = b.getElementsByTagName(e)[0];
+      s.parentNode.insertBefore(t, s)
+    }(window, document, 'script',
+      'https://connect.facebook.net/en_US/fbevents.js');
+    fbq('init', '2271244510044933');
+    fbq('track', 'PageView');
+  </script>
+
+  <noscript><img height="1" width="1" style="display:none"
+      src="https://www.facebook.com/tr?id=2271244510044933&ev=PageView&noscript=1" /></noscript>
+  <!-- End Meta Pixel Code  Xurshid 2 chi kod-->
+
+  <!-- Стили -->
+  <link rel="stylesheet" type="text/css" href="{% static 'css/loaders/loader.css' %}">
+  <link rel="stylesheet" type="text/css" href="{% static 'css/plugins.css' %}">
+  <link rel="stylesheet" type="text/css" href="{% static 'css/main_site.css' %}">
+  <link rel="stylesheet" type="text/css" href="{% static 'css/site_main.css' %}">
+  <link rel="stylesheet" type="text/css" href="{% static 'css/faw_main-models.css' %}">
+
+  <!-- Цвет браузера -->
+  <meta name="theme-color" media="(prefers-color-scheme: light)" content="#FAF7F6">
+  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#161616">
+  <meta name="msapplication-navbutton-color" content="#161616">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+  <style>
+    .loader-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 400px;
+      width: 100%;
+    }
+
+    .loader {
+      font-size: 18px;
+      color: #666;
+    }
+
+    .error-message,
+    .no-results {
+      text-align: center;
+      padding: 40px;
+      color: #999;
+      font-size: 18px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Google Tag Manager (noscript) -->
+  <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-M33GWKMW" height="0" width="0"
+      style="display:none;visibility:hidden"></iframe></noscript>
+  <!-- End Google Tag Manager (noscript) --> 
+   
+  <!-- Меню и шапка -->
+  {% include 'main/includes/header.html' %}
+
+  <!-- Контент страницы -->
+  <main id="mxd-page-content" class="mxd-page-content">
+
+    <!-- Секция героя -->
+    <div class="mxd-section">
+      <div class="mxd-hero-06">
+        <div class="mxd-hero-06__wrap loading-wrap">
+          <div class="mxd-hero-06__top">
+            <div class="mxd-hero-06__content">
+              <div class="mxd-hero-06__data">
+                <div class="mxd-hero-06__headline">
+                  <div class="hero-06-headline__descr">
+                    <div class="row g-0">
+                      <div class="col-12 col-xl-12 mxd-grid-item no-margin">
+                        <div class="mxd-section-models__title">
+                          <!-- JavaScript заменит это -->
+                          <h2 class="models_title">
+                            {% if LANGUAGE_CODE == 'ru' %}Модели{% elif LANGUAGE_CODE == 'en' %}Models{% else %}Modellar{% endif %}
+                          </h2>
+                        </div>
+                      </div>
+                      <div class="col-12 col-xl-8 mxd-grid-item no-margin">
+                        <div class="mxd-section-title__hrdescr">
+                          <span class="hero-05-title__row loading__item">
+                            <em class="hero-05-title__item title-item-image">
+                              <svg class="mxd-pulse" xmlns="http://www.w3.org/2000/svg" version="1.1"
+                                viewBox="0 0 20 20">
+                                <path
+                                  d="M19.6,9.6h-3.9c-.4,0-1.8-.2-1.8-.2-.6,0-1.1-.2-1.6-.6-.5-.3-.9-.8-1.2-1.2-.3-.4-.4-.9-.5-1.4,0,0,0-1.1-.2-1.5V.4c0-.2-.2-.4-.4-.4s-.4.2-.4.4v4.4c0,.4-.2,1.5-.2,1.5,0,.5-.2,1-.5,1.4-.3.5-.7.9-1.2,1.2s-1,.5-1.6.6c0,0-1.2,0-1.7.2H.4c-.2,0-.4.2-.4.4s.2.4.4.4h4.1c.4,0,1.7.2,1.7.2.6,0,1.1.2,1.6.6.4.3.8.7,1.1,1.1.3.5.5,1,.6,1.6,0,0,0,1.3.2,1.7v4.1c0,.2.2.4.4.4s.4-.2.4-.4v-4.1c0-.4.2-1.7.2-1.7,0-.6.2-1.1.6-1.6.3-.4.7-.8,1.1-1.1.5-.3,1-.5,1.6-.6,0,0,1.3,0,1.8-.2h3.9c.2,0,.4-.2.4-.4s-.2-.4-.4-.4h0Z" />
+                              </svg>
+                            </em>
+                            <!-- JavaScript заменит это -->
+                            <em class="hero-05-title__item" style="font-size: 24px; max-width: 400px;">
+                              Ishonchli transport yechimlari
+                            </em>
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="mxd-hero-06__img">
+                <!-- JavaScript заменит это изображение -->
+                <img src="{% static 'images/hero-default.jpg' %}" alt="FAW Trucks">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Секция продуктов -->
+    <div class="mxd-section padding-blog">
+      <div class="grid-container">
+
+        <!-- Фильтр и хлебные крошки -->
+        <div class="mxd-block">
+          <div class="mxd-section-filter pre-grid">
+            <div class="mxd-section-filter__inner animate-card-3">
+              <div class="mxd-grid-item">
+                <div class="section-filter">
+                  <!-- Хлебные крошки -->
+                  <div aria-label="breadcrumb">
+                    <ol class="breadcrumb-ol">
+                      <li><a href="{% url 'home' %}">
+                          {% if LANGUAGE_CODE == 'ru' %}Главная{% elif LANGUAGE_CODE == 'en' %}Home{% else %}Bosh sahifa{% endif %}
+                      </a></li>
+                      <li><a href="javascript:void(0)">
+                          {% if LANGUAGE_CODE == 'ru' %}Модели{% elif LANGUAGE_CODE == 'en' %}Models{% else %}Modellar{% endif %}
+                      </a></li>
+                      <!-- JavaScript заменит это -->
+                      <li class="active"><a href="javascript:void(0)">Kategoriya</a></li>
+                    </ol>
+                  </div>
+                  <div class="filter-container">
+                    <div class="filter-search">
+                      <input type="text" class="filter-search__input" placeholder="Qidirish...">
+                      <button class="filter-search__btn" aria-label="Search">
+                        <img src="{% static 'images/icons/sistem-icons/search.svg' %}" alt="Search">
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Карточки продуктов -->
+        <div class="mxd-block">
+          <div class="mxd-blog-preview">
+            <div class="container-fluid p-0">
+              <div class="g-0 card_block faw-truck-card-container">
+                <!-- Loader - JavaScript заменит на карточки -->
+                <div class="loader-container">
+                  <div class="loader">
+                    {% if LANGUAGE_CODE == 'ru' %}Загрузка...{% elif LANGUAGE_CODE == 'en' %}Loading...{% else %}Yuklanmoqda{% endif %}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Пагинация -->
+      <div class="mxd-blog-pagination">
+        <div class="mxd-blog-pagination__inner">
+          <nav class="mxd-blog-pagination__items" id="pagination">
+            <!-- JavaScript добавит кнопки пагинации -->
+          </nav>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Футер -->
+  {% include 'main/includes/footer.html' %}
+
+  <!-- Кнопка вверх -->
+  <a href="#0" id="to-top" class="btn btn-to-top slide-up anim-no-delay">
+    <i class="ph ph-arrow-up"></i>
+  </a>
+
+  <!-- Скрипты -->
+  <script src="{% static 'js/libs.min.js' %}"></script>
+  <script src="{% static 'js/app.js' %}"></script>
+  <script src="{% static 'js/error-logger.js' %}"></script>
+  <script src="{% static 'js/faw.js' %}"></script>
+  <script src="{% static 'js/production.js' %}"></script>
+
+  <script>
+    // Универсальный плавный скролл
+    (function () {
+      function getHeaderHeight() {
+        try {
+          var h = document.getElementById('header');
+          return h ? h.offsetHeight || 0 : 0;
+        } catch (e) {
+          return 0;
+        }
+      }
+
+      function scrollToElementById(id) {
+        var el = document.getElementById(id);
+        if (!el) return;
+        var headerH = getHeaderHeight();
+        var offset = 25;
+        var rect = el.getBoundingClientRect();
+        var targetY = Math.max(0, Math.round(window.pageYOffset + rect.top - headerH - offset));
+        try {
+          window.scrollTo({ top: targetY, behavior: 'smooth' });
+        } catch (e) {
+          window.scrollTo(0, targetY);
+        }
+      }
+
+      // Делегирование кликов
+      document.addEventListener('click', function (e) {
+        var a = e.target.closest && e.target.closest('a[href^="#"]');
+        if (!a) return;
+        var href = a.getAttribute('href');
+        if (!href || href === '#') return;
+        var id = href.slice(1);
+        if (!id) return;
+        if (document.getElementById(id)) {
+          e.preventDefault();
+          scrollToElementById(id);
+        }
+      }, false);
+    })();
+  </script>
+
+</body>
+
+</html>

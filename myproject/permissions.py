@@ -13,7 +13,7 @@ def setup_permissions():
     if created or not main_admins.permissions.exists():
         # Все права на main и kg
         all_permissions = Permission.objects.filter(
-            content_type__app_label__in=['main', 'kg']
+            content_type__app_label__in=['main']
         )
         main_admins.permissions.set(all_permissions)
         
@@ -46,42 +46,7 @@ def setup_permissions():
         ).exclude(codename__startswith='delete_')
         
         content_uz.permissions.set(content_permissions)
-    
-    # 2b. КОНТЕНТ KG
-    content_kg, created = Group.objects.get_or_create(name='Контент KG')
-    if created or not content_kg.permissions.exists():
-        kg_content_models = [
-            'kgvehicle', 'kgvehicleimage', 'vehiclecardspec', 
-            'kgheroslide', 'icontemplate'
-        ]
-        
-        kg_content_perms = Permission.objects.filter(
-            content_type__model__in=kg_content_models,
-            content_type__app_label='kg'
-        ).exclude(codename__startswith='delete_')
-        
-        content_kg.permissions.set(kg_content_perms)
-    
-    # 2c. КОНТЕНТ UZ+KG (весь контент)
-    content_both, created = Group.objects.get_or_create(name='Контент UZ+KG')
-    if created or not content_both.permissions.exists():
-        all_content_perms = Permission.objects.filter(
-            Q(content_type__model__in=[
-                'news', 'newsblock', 'product', 'productparameter',
-                'productfeature', 'productgallery', 'productcardspec',
-                'vacancy', 'vacancyresponsibility', 'vacancyrequirement',
-                'vacancycondition', 'vacancyidealcandidate',
-                'dealer', 'dealerservice', 'featureicon',
-                'becomeadealerpage', 'dealerrequirement'
-            ], content_type__app_label='main') |
-            Q(content_type__model__in=[
-                'kgvehicle', 'kgvehicleimage', 'vehiclecardspec',
-                'kgheroslide', 'icontemplate'
-            ], content_type__app_label='kg')
-        ).exclude(codename__startswith='delete_')
-        
-        content_both.permissions.set(all_content_perms)
-    
+
     # ============================================
     # 3. ЛИД-МЕНЕДЖЕРЫ (по странам)
     # ============================================
@@ -97,25 +62,3 @@ def setup_permissions():
         ).exclude(codename__startswith='delete_')
         
         lead_uz.permissions.set(lead_permissions)
-    
-    # 3b. ЛИДЫ KG
-    lead_kg, created = Group.objects.get_or_create(name='Лиды KG')
-    if created or not lead_kg.permissions.exists():
-        kg_lead_perms = Permission.objects.filter(
-            content_type__model='kgfeedback',
-            content_type__app_label='kg'
-        ).exclude(codename__startswith='delete_')
-        
-        lead_kg.permissions.set(kg_lead_perms)
-    
-    # 3c. ЛИДЫ UZ+KG (все заявки)
-    lead_both, created = Group.objects.get_or_create(name='Лиды UZ+KG')
-    if created or not lead_both.permissions.exists():
-        all_lead_perms = Permission.objects.filter(
-            Q(content_type__model__in=[
-                'contactform', 'jobapplication', 'becomeadealerapplication'
-            ], content_type__app_label='main') |
-            Q(content_type__model='kgfeedback', content_type__app_label='kg')
-        ).exclude(codename__startswith='delete_')
-        
-        lead_both.permissions.set(all_lead_perms)

@@ -1,10 +1,18 @@
 {% load static %}
+    <style>
+        .mxd-logo_txt {
+            font-weight: bold;
+            color: #f66e2e;
+            font-size: 4rem;
+            text-transform: uppercase;
+        }
+    </style>
     <nav id="header" class="mxd-nav__wrap" data-lenis-prevent="">
         <!-- Логотип -->
         <div class="mxd-header__logo loading__fade">
             <a href="{% url 'home' %}" class="mxd-logo">
                 <img src="{% static 'images/logo/autoliga-logo.png' %}" style="width: 70px;" class="mxd-logo__image" alt="FAW Logo">
-                
+                <span class="mxd-logo_txt">Autoliga</span>
             </a>
         </div>
 

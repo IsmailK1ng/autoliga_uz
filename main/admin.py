@@ -1,26 +1,59 @@
-from django.contrib import admin
-from django.utils.html import format_html
+# main/admin.py
+
+from django.conf import settings
+from django.contrib import admin, messages
+from django.contrib.admin.views.decorators import staff_member_required
+from django.db.models import Q, Max
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse, HttpResponseForbidden
 from django.shortcuts import render, redirect
-from django.urls import path  
+from django.urls import path
+from django.utils import timezone
+from django.utils.html import format_html
 from django import forms
-from django.http import HttpResponse, HttpResponseRedirect
-from django.contrib import messages
+
+# ========== DJANGO THIRD-PARTY ==========
 from modeltranslation.admin import TranslationTabularInline, TranslationStackedInline, TabbedTranslationAdmin
 from reversion.admin import VersionAdmin
 from reversion.models import Version
-from datetime import datetime
-from main.models import AmoCRMToken
-from main.services.amocrm.token_manager import TokenManager
-from .models import (
-    News, NewsBlock, ContactForm, Vacancy, 
-    VacancyResponsibility, VacancyRequirement, VacancyCondition, VacancyIdealCandidate,
-    JobApplication, FeatureIcon, Product, ProductParameter, ProductFeature, 
-    ProductCardSpec, ProductGallery, DealerService, Dealer,
-    BecomeADealerPage, DealerRequirement, BecomeADealerApplication,
-)
+from openpyxl.styles import Font, PatternFill, Alignment
+
+# ========== PYTHON STANDARD LIBRARY ==========
+import json
+import logging
 import openpyxl
+import os
+from datetime import datetime, timedelta
+from urllib.parse import unquote
 
+# ========== ЛОКАЛЬНЫЕ ИМПОРТЫ ==========
+from .models import (
+    News, 
+    NewsBlock, 
+    ContactForm, 
+    Vacancy, 
+    VacancyResponsibility, 
+    VacancyRequirement, 
+    VacancyCondition, 
+    VacancyIdealCandidate,
+    JobApplication, 
+    FeatureIcon, 
+    Product, 
+    ProductParameter, 
+    ProductFeature, 
+    ProductCardSpec, 
+    ProductGallery, 
+    DealerService, 
+    Dealer,
+    BecomeADealerPage, 
+    DealerRequirement, 
+    BecomeADealerApplication,
+    AmoCRMToken,
+    REGION_CHOICES
+)
+from main.services.amocrm.token_manager import TokenManager
+logger = logging.getLogger('django')
 
+# ========== НАСТРОЙКИ АДМИНКИ ==========
 admin.site.site_header = "Панель управления VUM"
 admin.site.site_title = "VUM Admin"
 admin.site.index_title = "Управление сайтами FAW"
@@ -33,13 +66,13 @@ class ContentAdminMixin:
         if request.user.is_superuser:
             return True
         
-        # Проверяем группы
+
         if request.user.groups.filter(
-            name__in=['Главные админы', 'Контент-админы', 'Контент UZ', 'Контент UZ+KG']
+            name__in=['Главные админы', 'Контент-админы', 'Контент UZ']
         ).exists():
             return True
         
-        # ✅ ПРОВЕРЯЕМ ИНДИВИДУАЛЬНЫЕ ПРАВА (любое право на просмотр контента)
+
         content_models = [
             'news', 'product', 'vacancy', 'dealer', 'dealerservice', 
             'featureicon', 'becomeadealerpage'
@@ -55,11 +88,11 @@ class ContentAdminMixin:
             return True
         
         if request.user.groups.filter(
-            name__in=['Главные админы', 'Контент-админы', 'Контент UZ', 'Контент UZ+KG']
+            name__in=['Главные админы', 'Контент-админы', 'Контент UZ']
         ).exists():
             return True
         
-        # ✅ ПРОВЕРЯЕМ ИНДИВИДУАЛЬНОЕ ПРАВО на изменение ЭТОЙ модели
+
         model_name = self.model._meta.model_name
         return request.user.has_perm(f'main.change_{model_name}')
     
@@ -69,8 +102,7 @@ class ContentAdminMixin:
         
         if request.user.groups.filter(name='Главные админы').exists():
             return True
-        
-        # ✅ ПРОВЕРЯЕМ ИНДИВИДУАЛЬНОЕ ПРАВО на удаление
+
         model_name = self.model._meta.model_name
         return request.user.has_perm(f'main.delete_{model_name}')
 
@@ -80,13 +112,13 @@ class LeadManagerMixin:
         if request.user.is_superuser:
             return True
         
-        # Проверяем группы
+
         if request.user.groups.filter(
-            name__in=['Главные админы', 'Лид-менеджеры', 'Лиды UZ', 'Лиды UZ+KG']
+            name__in=['Главные админы', 'Лид-менеджеры', 'Лиды UZ']
         ).exists():
             return True
         
-        # ✅ ПРОВЕРЯЕМ ИНДИВИДУАЛЬНЫЕ ПРАВА (любое право на просмотр заявок)
+
         lead_models = ['contactform', 'jobapplication', 'becomeadealerapplication']
         for model in lead_models:
             if request.user.has_perm(f'main.view_{model}'):
@@ -95,7 +127,7 @@ class LeadManagerMixin:
         return False
     
     def has_add_permission(self, request):
-        return False  # Заявки создаются только с фронта
+        return False 
     
     def has_delete_permission(self, request, obj=None):
         if request.user.is_superuser:
@@ -104,7 +136,7 @@ class LeadManagerMixin:
         if request.user.groups.filter(name='Главные админы').exists():
             return True
         
-        # ✅ ПРОВЕРЯЕМ ИНДИВИДУАЛЬНОЕ ПРАВО на удаление
+
         model_name = self.model._meta.model_name
         return request.user.has_perm(f'main.delete_{model_name}')
         
@@ -150,9 +182,6 @@ class CustomReversionMixin:
         return custom_urls + urls
     
     def custom_recover_list_view(self, request):
-        """Кастомное представление для списка восстановления"""
-        from reversion.models import Version
-        from django.conf import settings
         
         opts = self.model._meta
         deleted_versions = Version.objects.get_deleted(self.model)
@@ -193,9 +222,6 @@ class CustomReversionMixin:
         return render(request, 'admin/reversion/recover_list.html', context)
     
     def recover_view(self, request, version_id):
-        from reversion.models import Version
-        from django.contrib import messages
-        from django.shortcuts import redirect
         
         opts = self.model._meta
         
@@ -288,7 +314,6 @@ class NewsAdmin(ContentAdminMixin, CustomReversionMixin, VersionAdmin, TabbedTra
     
     def changelist_view(self, request, extra_context=None):
         extra_context = extra_context or {}
-        from reversion.models import Version
         deleted_count = Version.objects.get_deleted(self.model).count()
         if deleted_count > 0:
             extra_context['show_recover_button'] = True
@@ -302,7 +327,7 @@ class ContactFormAdmin(LeadManagerMixin, admin.ModelAdmin):
     change_list_template = 'main/contactform/change_list.html'
     preserve_filters = True
     
-    # Оптимизация
+
     list_select_related = ['manager']
     list_per_page = 50
     show_full_result_count = False
@@ -406,8 +431,6 @@ class ContactFormAdmin(LeadManagerMixin, admin.ModelAdmin):
     
     def retry_failed_leads(self, request, queryset):
         """Повторная отправка ошибочных заявок"""
-        from main.services.amocrm.lead_sender import LeadSender
-        import logging
         logger = logging.getLogger('django')
         
         failed_leads = queryset.filter(amocrm_status='failed')
@@ -445,7 +468,6 @@ class ContactFormAdmin(LeadManagerMixin, admin.ModelAdmin):
     
     def export_to_excel(self, request, queryset):
         """Экспорт в Excel"""
-        import logging
         logger = logging.getLogger('django')
         
         try:
@@ -463,7 +485,6 @@ class ContactFormAdmin(LeadManagerMixin, admin.ModelAdmin):
             ]
             ws.append(headers)
             
-            from openpyxl.styles import Font, PatternFill, Alignment
             header_fill = PatternFill(start_color='366092', end_color='366092', fill_type='solid')
             header_font = Font(bold=True, color='FFFFFF')
             
@@ -523,10 +544,6 @@ class ContactFormAdmin(LeadManagerMixin, admin.ModelAdmin):
     
     def get_queryset(self, request):
         """Фильтрация queryset"""
-        from django.db.models import Q
-        from datetime import datetime
-        from django.utils import timezone
-        
         qs = super().get_queryset(request)
         
         # Поиск
@@ -536,8 +553,7 @@ class ContactFormAdmin(LeadManagerMixin, admin.ModelAdmin):
                 Q(phone__icontains=search_query) | 
                 Q(amocrm_lead_id__icontains=search_query)
             )
-        
-        # Фильтры
+
         if status := request.GET.get('status', '').strip():
             qs = qs.filter(status=status)
         
@@ -553,7 +569,7 @@ class ContactFormAdmin(LeadManagerMixin, admin.ModelAdmin):
         if product := request.GET.get('product', '').strip():
             qs = qs.filter(product__icontains=product)
         
-        # Даты
+
         if date_from := request.GET.get('date_from', '').strip():
             try:
                 parsed_date = datetime.strptime(date_from, '%Y-%m-%d')
@@ -585,7 +601,7 @@ class ContactFormAdmin(LeadManagerMixin, admin.ModelAdmin):
                 """Убираем date_from и date_to из lookup параметров"""
                 lookup_params = super().get_filters_params(params)
                 
-                # Удаляем наши кастомные параметры из lookup
+
                 lookup_params.pop('date_from', None)
                 lookup_params.pop('date_to', None)
                 
@@ -611,7 +627,6 @@ class ContactFormAdmin(LeadManagerMixin, admin.ModelAdmin):
         return super().changelist_view(request, extra_context)
 
     def get_urls(self):
-        from django.urls import path
         urls = super().get_urls()
         custom_urls = [
             path('<int:object_id>/quick-update/', self.admin_site.admin_view(self.quick_update_view), name='contactform_quick_update'),
@@ -696,7 +711,6 @@ class VacancyAdmin(ContentAdminMixin, CustomReversionMixin, VersionAdmin, Tabbed
 
     def changelist_view(self, request, extra_context=None):
         extra_context = extra_context or {}
-        from reversion.models import Version
         deleted_count = Version.objects.get_deleted(self.model).count()
         if deleted_count > 0:
             extra_context['show_recover_button'] = True
@@ -791,7 +805,6 @@ class DealerServiceAdmin(ContentAdminMixin, CustomReversionMixin, VersionAdmin, 
 
     def changelist_view(self, request, extra_context=None):
         extra_context = extra_context or {}
-        from reversion.models import Version
         deleted_count = Version.objects.get_deleted(self.model).count()
         if deleted_count > 0:
             extra_context['show_recover_button'] = True
@@ -847,7 +860,6 @@ class DealerAdmin(ContentAdminMixin, CustomReversionMixin, VersionAdmin, TabbedT
 
     def changelist_view(self, request, extra_context=None):
         extra_context = extra_context or {}
-        from reversion.models import Version
         deleted_count = Version.objects.get_deleted(self.model).count()
         if deleted_count > 0:
             extra_context['show_recover_button'] = True
@@ -933,7 +945,6 @@ class BecomeADealerApplicationAdmin(LeadManagerMixin, admin.ModelAdmin):
         headers = ['№', 'ФИО', 'Компания', 'Опыт', 'Регион', 'Телефон', 'Статус', 'Приоритет', 'Менеджер', 'Дата']
         ws.append(headers)
         
-        from openpyxl.styles import Font, PatternFill, Alignment
         header_fill = PatternFill(start_color='FF9800', end_color='FF9800', fill_type='solid')
         header_font = Font(bold=True, color='FFFFFF')
         
@@ -964,123 +975,109 @@ class BecomeADealerApplicationAdmin(LeadManagerMixin, admin.ModelAdmin):
 
 # ============ ПРОДУКТЫ ============
 
-# КАСТОМНЫЙ ФИЛЬТР ДЛЯ КАТЕГОРИЙ
 class ProductCategoryFilter(admin.SimpleListFilter):
-    """Фильтр по категориям с учетом основной и дополнительных"""
+    """Фильтр по категориям"""
     title = 'категория'
     parameter_name = 'category_filter'
     
     def lookups(self, request, model_admin):
-        """Возвращаем все доступные категории"""
         return Product.CATEGORY_CHOICES
     
     def queryset(self, request, queryset):
-        """Фильтруем по основной И дополнительным категориям"""
         if self.value():
-            from django.db.models import Q
-            
-            # Ищем продукты где:
-            # 1. Основная категория совпадает
-            # 2. ИЛИ категория есть в дополнительных (через LIKE)
             return queryset.filter(
                 Q(category=self.value()) | 
                 Q(categories__contains=self.value())
             )
         return queryset
 
+
 class ProductCategoriesForm(forms.ModelForm):
-    """Форма с множественным выбором категорий"""
     selected_categories = forms.MultipleChoiceField(
         choices=Product.CATEGORY_CHOICES,
         widget=forms.CheckboxSelectMultiple,
-        required=True,  # ✅ Обязательно выбрать хотя бы одну
+        required=True, 
         label="Категории",
-        help_text="Выберите одну или несколько категорий, в которых будет отображаться продукт"
+        help_text="Выберите категории продукта"
     )
     
     class Meta:
         model = Product
-        # ✅ Исключаем старые поля из формы
         exclude = ['category', 'categories']
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        
-        # ✅ Предзаполняем выбранные категории
         if self.instance.pk:
             selected = []
-            
-            # Добавляем основную категорию
             if self.instance.category:
                 selected.append(self.instance.category)
-            
-            # Добавляем дополнительные категории
             if self.instance.categories:
                 additional = [cat.strip() for cat in self.instance.categories.split(',') if cat.strip()]
                 selected.extend(additional)
-            
-            # Убираем дубликаты
-            selected = list(dict.fromkeys(selected))
-            
-            self.fields['selected_categories'].initial = selected
+            self.fields['selected_categories'].initial = list(dict.fromkeys(selected))
     
     def clean_selected_categories(self):
-        """Валидация: должна быть выбрана хотя бы одна категория"""
         categories = self.cleaned_data.get('selected_categories', [])
-        
         if not categories:
             raise forms.ValidationError("Выберите хотя бы одну категорию")
-        
         return categories
     
     def save(self, commit=True):
         instance = super().save(commit=False)
-        
-        # ✅ Получаем выбранные категории
         selected = self.cleaned_data.get('selected_categories', [])
-        
         if selected:
-            # Первая категория становится основной
             instance.category = selected[0]
-            
-            # Остальные категории идут в дополнительные
-            if len(selected) > 1:
-                instance.categories = ','.join(selected[1:])
-            else:
-                instance.categories = ''
-        
+            instance.categories = ','.join(selected[1:]) if len(selected) > 1 else ''
         if commit:
             instance.save()
         return instance
 
+
 class ProductParameterInline(TranslationTabularInline):
+    """Параметры с фильтрацией по категории"""
     model = ProductParameter
-    extra = 1
+    extra = 0
     fields = ('category', 'text', 'order')
+    verbose_name = "Параметр"
+    verbose_name_plural = "📋 Параметры (выберите категорию для фильтрации)"
+    
+    class Media:
+        js = ('js/admin/parameter_filter.js',)
+        css = {'all': ('css/admin/parameter_filter.css',)}
+
 
 class ProductFeatureInline(TranslationTabularInline):
     model = ProductFeature
-    extra = 1
+    extra = 0
     max_num = 8
     fields = ('icon', 'name', 'order')
+    verbose_name = "Характеристика"
+    verbose_name_plural = "🔹 Характеристики с иконками"
+
 
 class ProductCardSpecInline(TranslationTabularInline):
     model = ProductCardSpec
-    extra = 1
+    extra = 0
     max_num = 4
     fields = ('icon', 'value', 'order')
+    verbose_name = "Спецификация"
+    verbose_name_plural = "📄 Характеристики карточки"
+
 
 class ProductGalleryInline(admin.TabularInline):
     model = ProductGallery
     extra = 1
     fields = ('image', 'order')
+    verbose_name = "Фото"
+    verbose_name_plural = "🖼️ Галерея"
+
 
 @admin.register(Product)
 class ProductAdmin(ContentAdminMixin, CustomReversionMixin, VersionAdmin, TabbedTranslationAdmin):
-    form = ProductCategoriesForm  # ✅ Используем кастомную форму
+    form = ProductCategoriesForm
     
     list_display = ['thumbnail', 'title', 'all_categories_display', 'is_active', 'is_featured', 'slider_order', 'order']
-    list_filter = [ProductCategoryFilter, 'is_active', 'is_featured'] 
+    list_filter = [ProductCategoryFilter, 'is_active', 'is_featured']
     search_fields = ['title', 'slug']
     list_editable = ['is_active', 'is_featured', 'slider_order', 'order']
     prepopulated_fields = {'slug': ('title',)}
@@ -1089,14 +1086,13 @@ class ProductAdmin(ContentAdminMixin, CustomReversionMixin, VersionAdmin, Tabbed
     
     list_per_page = 15
     show_full_result_count = False
-    list_select_related = []
     
     fieldsets = (
         ('Основная информация', {
             'fields': (
-                ('title', 'slug'), 
-                'selected_categories',  # ✅ Единый чеклист категорий
-                ('order', 'is_active', 'is_featured'), 
+                ('title', 'slug'),
+                'selected_categories',
+                ('order', 'is_active', 'is_featured'),
                 ('main_image', 'card_image')
             )
         }),
@@ -1122,75 +1118,89 @@ class ProductAdmin(ContentAdminMixin, CustomReversionMixin, VersionAdmin, Tabbed
             )
         return "—"
     thumbnail.short_description = "Фото"
-    
-    # ✅ Обновленный метод для отображения ВСЕХ категорий
+
     def all_categories_display(self, obj):
-        """Отображение всех категорий продукта"""
         categories = obj.get_all_categories()
-        
         if not categories:
             return "—"
-        
-        # Получаем названия категорий
         category_names = []
         for cat_slug in categories:
             for slug, name in Product.CATEGORY_CHOICES:
                 if slug == cat_slug:
                     category_names.append(name)
                     break
-        
         if category_names:
-            # Первая категория - основная (синий цвет)
             tags = []
             for idx, name in enumerate(category_names):
                 if idx == 0:
-                    # Основная категория
-                    tags.append(
-                        f'<span style="background:#1976d2;color:white;padding:4px 8px;border-radius:4px;font-size:11px;font-weight:600;">{name}</span>'
-                    )
+                    tags.append(f'<span style="background:#1976d2;color:white;padding:4px 8px;border-radius:4px;font-size:11px;font-weight:600;">{name}</span>')
                 else:
-                    # Дополнительные категории
-                    tags.append(
-                        f'<span style="background:#d3ecff;color:#006ad3;padding:4px 8px;border-radius:4px;font-size:11px;font-weight:400;">{name}</span>'
-                    )
-            
+                    tags.append(f'<span style="background:#d3ecff;color:#006ad3;padding:4px 8px;border-radius:4px;font-size:11px;font-weight:400;">{name}</span>')
             return format_html(' '.join(tags))
         return "—"
-    
     all_categories_display.short_description = "Категории"
     
     def add_to_slider(self, request, queryset):
-        """Добавить выбранные продукты в слайдер"""
         updated = queryset.update(is_featured=True)
-        self.message_user(
-            request, 
-            f'✅ {updated} продуктов добавлено в главный слайдер'
-        )
-    add_to_slider.short_description = '⭐ Добавить в главный слайдер'
+        self.message_user(request, f'✅ {updated} продуктов добавлено в слайдер')
+    add_to_slider.short_description = '⭐ Добавить в слайдер'
     
     def remove_from_slider(self, request, queryset):
-        """Убрать выбранные продукты из слайдера"""
         updated = queryset.update(is_featured=False)
-        self.message_user(
-            request, 
-            f'❌ {updated} продуктов убрано из слайдера'
-        )
+        self.message_user(request, f'❌ {updated} продуктов убрано из слайдера')
     remove_from_slider.short_description = '❌ Убрать из слайдера'
 
     def changelist_view(self, request, extra_context=None):
         extra_context = extra_context or {}
-        from reversion.models import Version
         deleted_count = Version.objects.get_deleted(self.model).count()
         if deleted_count > 0:
             extra_context['show_recover_button'] = True
             extra_context['deleted_count'] = deleted_count
-        
-        # Добавляем информацию о слайдере
         featured_count = Product.objects.filter(is_featured=True, is_active=True).count()
         extra_context['featured_count'] = featured_count
         extra_context['show_slider_info'] = True
-        
         return super().changelist_view(request, extra_context)
+    
+    def get_urls(self):
+        urls = super().get_urls()
+        custom_urls = [
+            path(
+                'api/parameter-suggestions/',
+                self.admin_site.admin_view(self.parameter_suggestions_api),
+                name='parameter_suggestions_api'
+            ),
+        ]
+        return custom_urls + urls
+
+    def parameter_suggestions_api(self, request):
+        """API для получения подсказок параметров по категории"""
+        category = request.GET.get('category', '')
+        
+        if not category:
+            return JsonResponse({'suggestions': []})
+        
+        # Получаем уникальные параметры для категории
+        from django.db.models import Count
+        
+        suggestions = ProductParameter.objects.filter(
+            category=category
+        ).values('text').annotate(
+            usage_count=Count('id')
+        ).order_by('-usage_count')[:20]
+        
+        result = []
+        seen = set()
+        
+        for item in suggestions:
+            text = item['text']
+            if text and text not in seen:
+                seen.add(text)
+                result.append({
+                    'text': text,
+                    'count': item['usage_count']
+                })
+        
+        return JsonResponse({'suggestions': result})
 
 @admin.register(AmoCRMToken)
 class AmoCRMTokenAdmin(AmoCRMAdminMixin, admin.ModelAdmin):
@@ -1199,7 +1209,6 @@ class AmoCRMTokenAdmin(AmoCRMAdminMixin, admin.ModelAdmin):
     # ========== ОТОБРАЖЕНИЕ ==========
     def token_status(self, obj):
         """Статус токена"""
-        from django.utils import timezone
         
         if not obj.access_token:
             return format_html(
@@ -1227,7 +1236,6 @@ class AmoCRMTokenAdmin(AmoCRMAdminMixin, admin.ModelAdmin):
     
     def time_left_display(self, obj):
         """Оставшееся время"""
-        from django.utils import timezone
         
         if not obj.expires_at:
             return "—"
@@ -1285,7 +1293,6 @@ class AmoCRMTokenAdmin(AmoCRMAdminMixin, admin.ModelAdmin):
     
     # ========== МАРШРУТЫ ==========
     def get_urls(self):
-        from django.urls import path
         urls = super().get_urls()
         custom_urls = [
             path('refresh/', self.admin_site.admin_view(self.refresh_token_view), name='amocrm_refresh'),
@@ -1314,8 +1321,7 @@ class AmoCRMTokenAdmin(AmoCRMAdminMixin, admin.ModelAdmin):
     
     def logs_view(self, request):
         """Показать логи ошибок amoCRM"""
-        import os
-        from django.conf import settings
+
         
         amocrm_log_path = os.path.join(settings.BASE_DIR, 'logs', 'amocrm.log')
         errors_log_path = os.path.join(settings.BASE_DIR, 'logs', 'errors.log')
@@ -1349,7 +1355,6 @@ class AmoCRMTokenAdmin(AmoCRMAdminMixin, admin.ModelAdmin):
     
     def instructions_view(self, request):
         """Показать инструкцию"""
-        from django.utils import timezone
         
         token_obj = AmoCRMToken.get_instance()
         time_left_text = None

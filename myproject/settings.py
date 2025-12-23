@@ -36,7 +36,6 @@ INSTALLED_APPS = [
     
     # Приложения проектов
     'main',  # FAW Uzbekistan
-    'kg',    # FAW Kyrgyzstan
 ]
 
 # ============ REST FRAMEWORK ============
@@ -64,7 +63,6 @@ LANGUAGES = [
     ('uz', _("O'zbek")),
     ('ru', _("Русский")),
     ('en', _("English")),
-    ('ky', _("Кыргызский")),
 ]
 
 MODELTRANSLATION_DEFAULT_LANGUAGE = 'uz' 
@@ -94,7 +92,6 @@ JAZZMIN_SETTINGS = {
     
     "topmenu_links": [
         {"name": "Сайт UZ", "url": "https://faw.uz", "new_window": True},
-        {"name": "Сайт KG", "url": "https://faw.kg", "new_window": True},
     ],
     
     "icons": {
@@ -112,18 +109,11 @@ JAZZMIN_SETTINGS = {
         "main.Vacancy": "fas fa-briefcase",
         "main.JobApplication": "fas fa-file-pdf",
         "main.Dealer": "fas fa-store",
-        "main.DealerService": "fas fa-cogs",
-        
-        "kg": "fas fa-mountain",
-        "kg.KGVehicle": "fas fa-truck",
-        "kg.KGFeedback": "fas fa-comment-dots",
-        "kg.KGHeroSlide": "fas fa-images",
-        "kg.IconTemplate": "fas fa-icons",
+        "main.DealerService": "fas fa-cogs",        
     },
     
     "order_with_respect_to": [
         "main",
-        "kg",
         "auth",
     ],
     
@@ -132,12 +122,6 @@ JAZZMIN_SETTINGS = {
             "name": "FAW Узбекистан",
             "url": "https://faw.uz",
             "icon": "fas fa-flag",
-            "new_window": True
-        }],
-        "kg": [{
-            "name": "FAW Кыргызстан", 
-            "url": "https://faw.kg",
-            "icon": "fas fa-mountain",
             "new_window": True
         }]
     },
@@ -181,7 +165,6 @@ TEMPLATES = [
         'DIRS': [
             BASE_DIR / 'templates',  
             BASE_DIR / 'main' / 'templates',
-            BASE_DIR / 'kg' / 'templates',
             BASE_DIR / 'locale',
         ],
         'APP_DIRS': True,  
@@ -231,7 +214,6 @@ STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_DIRS = [
     BASE_DIR / 'main' / 'static',
-    BASE_DIR / 'kg' / 'static',   
 ]
 
 MEDIA_URL = '/media/'
@@ -246,17 +228,11 @@ CSRF_TRUSTED_ORIGINS = [
     'http://localhost:8000',
     'https://faw.uz',
     'https://www.faw.uz',
-    'https://faw.kg',
-    'https://www.faw.kg',
-    'https://new.faw.uz',
-    'https://www.new.faw.uz',
 ]
 
 CORS_ALLOWED_ORIGINS = [
     'https://faw.uz',
     'https://www.faw.uz',
-    'https://faw.kg',
-    'https://www.faw.kg',
     'http://localhost:3000',
     'http://localhost:5173',
     'http://127.0.0.1:5173',
@@ -276,8 +252,6 @@ if not DEBUG:
     CORS_ALLOWED_ORIGINS = [
         'https://faw.uz',
         'https://www.faw.uz',
-        'https://faw.kg', 
-        'https://www.faw.kg',
         'https://new.faw.uz',
         'https://www.new.faw.uz',
     ]
@@ -287,8 +261,7 @@ if not DEBUG:
         'new.faw.uz',
         'www.new.faw.uz',
         'faw.uz', 'www.faw.uz',
-        'faw.kg', 'www.faw.kg',
-        'api.faw.uz', 'api.faw.kg'
+        'api.faw.uz',
     ]
     SECURE_SSL_REDIRECT = True
     SESSION_COOKIE_SECURE = True

@@ -119,7 +119,7 @@ function loadFallbackSlides() {
       price: "434 000 000 sum",
       power: "185 o.k.",
       mpg: "17 L/100km",
-      image: "/static/images/slider-foto_img/1.png",
+      image: "/static/images/slider-foto_img/jet1.png",
       cta: [{ type: "main", label: "Batafsil", link: "#" }]
     },
     {
@@ -128,16 +128,16 @@ function loadFallbackSlides() {
       price: "419 104 000 sum",
       power: "185 o.k.",
       mpg: "17,1 L/100km",
-      image: "/static/images/slider-foto_img/2.png",
+      image: "/static/images/slider-foto_img/jet2.png",
       cta: [{ type: "main", label: "Batafsil", link: "#" }]
     },
     {
       year: "2025",
-      title: "FAW Tiger V Pro",
+      title: "x70",
       price: "480 000 000 sum",
       power: "195 o.k.",
       mpg: "16,8 L/100km",
-      image: "/static/images/slider-foto_img/3.png",
+      image: "/static/images/slider-foto_img/jet3.png",
       cta: [{ type: "main", label: "Batafsil", link: "#" }]
     }
   ];

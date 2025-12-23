@@ -100,7 +100,6 @@ JAZZMIN_SETTINGS = {
         "auth.Group": "fas fa-users",
         
         "main": "fas fa-globe",
-        "main.News": "fas fa-newspaper",
         "main.Product": "fas fa-truck",
         "main.FeatureIcon": "fas fa-icons",
         "main.BecomeADealerPage": "fas fa-file-contract",
@@ -262,6 +261,8 @@ if not DEBUG:
         'www.new.faw.uz',
         'faw.uz', 'www.faw.uz',
         'api.faw.uz',
+        'localhost', 
+        '127.0.0.1', 
     ]
     SECURE_SSL_REDIRECT = True
     SESSION_COOKIE_SECURE = True

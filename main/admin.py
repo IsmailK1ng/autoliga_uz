@@ -74,7 +74,7 @@ class ContentAdminMixin:
         
 
         content_models = [
-            'news', 'product', 'vacancy', 'dealer', 'dealerservice', 
+            'product', 'vacancy', 'dealer', 'dealerservice', 
             'featureicon', 'becomeadealerpage'
         ]
         for model in content_models:

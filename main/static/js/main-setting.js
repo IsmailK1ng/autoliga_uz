@@ -116,7 +116,7 @@ function loadFallbackSlides() {
     {
       year: "2025",
       title: "Jetour g700",
-      price: "434 000 000 sum",
+      price: "",
       power: "210 o.k.",
       mpg: "7.5 L/100km",
       image: "/static/images/slider-foto_img/jet1.png",
@@ -125,7 +125,7 @@ function loadFallbackSlides() {
     {
       year: "2025",
       title: "Jetour Dashing",
-      price: "345 800 000 sum",
+      price: "",
       power: "156 o.k.",
       mpg: "7.6 L/100km",
       image: "/static/images/slider-foto_img/jet2.png",
@@ -134,7 +134,7 @@ function loadFallbackSlides() {
     {
       year: "2025",
       title: "Jetour x70",
-      price: "286 000 000 sum",
+      price: "",
       power: "156 o.k.",
       mpg: "8 L/100km",
       image: "/static/images/slider-foto_img/jet3.png",

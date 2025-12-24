@@ -35,7 +35,7 @@ INSTALLED_APPS = [
     'reversion',
     
     # Приложения проектов
-    'main',  # FAW Uzbekistan
+    'main',  
 ]
 
 # ============ REST FRAMEWORK ============
@@ -118,8 +118,8 @@ JAZZMIN_SETTINGS = {
     
     "custom_links": {
         "main": [{
-            "name": "FAW Узбекистан",
-            "url": "https://faw.uz",
+            "name": "Автолига.uz",
+            "url": "https://autoliga.uz",
             "icon": "fas fa-flag",
             "new_window": True
         }]
@@ -223,46 +223,31 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # ============ БЕЗОПАСНОСТЬ ============
 
 CSRF_TRUSTED_ORIGINS = [
-    'http://127.0.0.1:8000',
-    'http://localhost:8000',
-    'https://faw.uz',
-    'https://www.faw.uz',
+    'https://autoliga.uz',
+    'https://www.autoliga.uz',
 ]
 
 CORS_ALLOWED_ORIGINS = [
-    'https://faw.uz',
-    'https://www.faw.uz',
-    'http://localhost:3000',
-    'http://localhost:5173',
-    'http://127.0.0.1:5173',
-    'http://localhost:8080',
-    'https://new.faw.uz',
-    'https://www.new.faw.uz',
+    'https://autoliga.uz',
+    'https://www.autoliga.uz',
 ]
 
 CORS_ALLOW_ALL_ORIGINS = DEBUG
 
-FRONTEND_URL = config('FRONTEND_URL', default='http://localhost:3000')
 
 # ============ ПРОДАКШЕН НАСТРОЙКИ ============
 
 if not DEBUG:
     CORS_ALLOW_ALL_ORIGINS = False
     CORS_ALLOWED_ORIGINS = [
-        'https://faw.uz',
-        'https://www.faw.uz',
-        'https://new.faw.uz',
-        'https://www.new.faw.uz',
+        'https://autoliga.uz',
+        'https://www.autoliga.uz',
     ]
     ALLOWED_HOSTS = [
-        'faw.uz',
-        'www.faw.uz',
-        'new.faw.uz',
-        'www.new.faw.uz',
-        'faw.uz', 'www.faw.uz',
-        'api.faw.uz',
-        'localhost', 
-        '127.0.0.1', 
+        'autoliga.uz',
+        'www.autoliga.uz',
+        'autoliga.uz', 'www.autoliga.uz',
+        'api.autoliga.uz',
     ]
     SECURE_SSL_REDIRECT = True
     SESSION_COOKIE_SECURE = True
@@ -380,28 +365,6 @@ os.makedirs(BASE_DIR / 'logs', exist_ok=True)
 
 SILENCED_SYSTEM_CHECKS = ['ckeditor.W001']
 
-
-# ========== amoCRM настройки ==========
-AMOCRM_SUBDOMAIN = config('AMOCRM_SUBDOMAIN', default='fawtrucks')
-AMOCRM_CLIENT_ID = config('AMOCRM_CLIENT_ID')
-AMOCRM_CLIENT_SECRET = config('AMOCRM_CLIENT_SECRET')
-AMOCRM_REDIRECT_URI = config('AMOCRM_REDIRECT_URI', default='https://faw.uz')
-
-AMOCRM_PIPELINE_ID = config('AMOCRM_PIPELINE_ID', default='5811904', cast=int)
-AMOCRM_STATUS_ID = config('AMOCRM_STATUS_ID', default='50905042', cast=int)  
-
-# ID кастомных полей
-AMOCRM_FIELD_REGION = config('AMOCRM_FIELD_REGION', default='3027829', cast=int)
-AMOCRM_FIELD_PRODUCT = config('AMOCRM_FIELD_PRODUCT', default='3014844', cast=int) 
-AMOCRM_FIELD_FORMNAME = config('AMOCRM_FIELD_FORMNAME', default='2194359', cast=int)
-AMOCRM_FIELD_FORMID = config('AMOCRM_FIELD_FORMID', default='2194361', cast=int)
-AMOCRM_FIELD_REFERER = config('AMOCRM_FIELD_REFERER', default='3022633', cast=int)
-AMOCRM_FIELD_UTM = config('AMOCRM_FIELD_UTM', default='3024889', cast=int)
-AMOCRM_FIELD_MESSAGE = config('AMOCRM_FIELD_MESSAGE', default='2944145', cast=int)
-
-# ========== Telegram Bot настройки ==========
-TELEGRAM_BOT_TOKEN = config('TELEGRAM_BOT_TOKEN', default='')
-TELEGRAM_CHAT_ID = config('TELEGRAM_CHAT_ID', default='')
 
 #ЭТИ СТРОКИ для корректной работы за nginx/reverse proxy
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')

@@ -115,28 +115,28 @@ function loadFallbackSlides() {
   slides = [
     {
       year: "2025",
-      title: "FAW Tiger V 4x2",
+      title: "Jetour g700",
       price: "434 000 000 sum",
-      power: "185 o.k.",
-      mpg: "17 L/100km",
+      power: "210 o.k.",
+      mpg: "7.5 L/100km",
       image: "/static/images/slider-foto_img/jet1.png",
       cta: [{ type: "main", label: "Batafsil", link: "#" }]
     },
     {
       year: "2025",
-      title: "FAW Tiger V цельнометаллический",
-      price: "419 104 000 sum",
-      power: "185 o.k.",
-      mpg: "17,1 L/100km",
+      title: "Jetour Dashing",
+      price: "345 800 000 sum",
+      power: "156 o.k.",
+      mpg: "7.6 L/100km",
       image: "/static/images/slider-foto_img/jet2.png",
       cta: [{ type: "main", label: "Batafsil", link: "#" }]
     },
     {
       year: "2025",
-      title: "x70",
-      price: "480 000 000 sum",
-      power: "195 o.k.",
-      mpg: "16,8 L/100km",
+      title: "Jetour x70",
+      price: "286 000 000 sum",
+      power: "156 o.k.",
+      mpg: "8 L/100km",
       image: "/static/images/slider-foto_img/jet3.png",
       cta: [{ type: "main", label: "Batafsil", link: "#" }]
     }

@@ -10,18 +10,18 @@
 
   <title>
     {% if LANGUAGE_CODE == 'uz' %}
-    VUM Yangiliklar | FAW Trucks Uzbekistan
+    Autoliga Yangiliklar
     {% elif LANGUAGE_CODE == 'ru' %}
-    Новости VUM | FAW Trucks Uzbekistan
+    Новости Autoliga
     {% else %}
-    VUM News | FAW Trucks Uzbekistan
+    Autoliga News
     {% endif %}
   </title>
   {% hreflang_tags %}
   {% canonical_url %}
   <!-- Meta Tags -->
   <meta name="description"
-    content="{% if LANGUAGE_CODE == 'uz' %}VUM kompaniyasining so'nggi yangiliklari{% elif LANGUAGE_CODE == 'ru' %}Последние новости компании VUM{% else %}Latest news from VUM company{% endif %}">
+    content="{% if LANGUAGE_CODE == 'uz' %}Autoliga so'nggi yangiliklari{% elif LANGUAGE_CODE == 'ru' %}Последние новости Autoliga{% else %}Latest news from Autoliga{% endif %}">
 
   <!-- Google Tag Manager Xurshid 1 chi kod -->
   <script>(function (w, d, s, l, i) {
@@ -122,11 +122,11 @@
                 <li class="active">
                   <a href="{% url 'news' %}">
                     {% if LANGUAGE_CODE == 'uz' %}
-                    VUM yangiliklar
+                    Autoliga yangiliklar
                     {% elif LANGUAGE_CODE == 'ru' %}
-                    Новости VUM
+                    Новости Autoliga
                     {% else %}
-                    VUM News
+                    Autoliga News
                     {% endif %}
                   </a>
                 </li>
@@ -143,11 +143,11 @@
   <div class="mxd-hero-07__top">
     <h1 class="mxd-hero-07__title">
       {% if LANGUAGE_CODE == 'uz' %}
-      VUM. Yangiliklar.
+      Autoliga. Yangiliklar.
       {% elif LANGUAGE_CODE == 'ru' %}
-      VUM. Новости.
+      Autoliga. Новости.
       {% else %}
-      VUM. News.
+      Autoliga. News.
       {% endif %}
     </h1>
     <div class="mxd-hero-07__marquee loading__item">
@@ -155,7 +155,7 @@
         <div class="marquee__toright">
           <!-- Marquee Item 1 -->
           <div class="marquee__item one-line item-regular text">
-            <p class="marquee__text">VUM</p>
+            <p class="marquee__text">Autoliga</p>
             <div class="marquee__image">
               <svg version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80" fill="currentColor">
                 <path fill="currentColor"

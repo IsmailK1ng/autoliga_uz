@@ -3,9 +3,9 @@ from .models import (
     News, NewsBlock, Vacancy, 
     VacancyResponsibility, VacancyRequirement, VacancyCondition, VacancyIdealCandidate,
     Product, ProductFeature, ProductCardSpec, ProductParameter,
-    DealerService, Dealer, BecomeADealerPage, DealerRequirement, FeatureIcon,
+    ProductCategory,  # ✅ НОВОЕ
+    FeatureIcon,
 )
-
 
 # ========== НОВОСТИ ==========
 @register(News)
@@ -44,12 +44,17 @@ class VacancyIdealCandidateTranslationOptions(TranslationOptions):
     fields = ('text',)
 
 
+
+# ========== КАТЕГОРИИ ПРОДУКТОВ ==========
+@register(ProductCategory)
+class ProductCategoryTranslationOptions(TranslationOptions):
+    fields = ('name', 'description')
+
 # ========== ПРОДУКТЫ ==========
 @register(Product)
 class ProductTranslationOptions(TranslationOptions):
     fields = (
         'title',
-        # Поля для слайдера
         'slider_price',
         'slider_power',
         'slider_fuel_consumption',
@@ -67,25 +72,4 @@ class ProductCardSpecTranslationOptions(TranslationOptions):
 
 @register(ProductParameter)
 class ProductParameterTranslationOptions(TranslationOptions):
-    fields = ('text',)
-
-
-# ========== ДИЛЕРЫ ==========
-@register(DealerService)
-class DealerServiceTranslationOptions(TranslationOptions):
-    fields = ('name',)
-
-
-@register(Dealer)
-class DealerTranslationOptions(TranslationOptions):
-    fields = ('address', 'working_hours')
-
-
-@register(BecomeADealerPage)
-class BecomeADealerPageTranslationOptions(TranslationOptions):
-    fields = ('title', 'intro_text', 'subtitle', 'important_note', 'contact_address')
-
-
-@register(DealerRequirement)
-class DealerRequirementTranslationOptions(TranslationOptions):
     fields = ('text',)

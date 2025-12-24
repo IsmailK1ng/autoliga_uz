@@ -1,6 +1,6 @@
 /**
  * FAW Products - Динамическая загрузка карточек с поддержкой переводов
- * Обновлено: поддержка множественных категорий
+ * Обновлено: загрузка категорий из API
  */
 
 class ProductsManager {
@@ -13,181 +13,53 @@ class ProductsManager {
 
     // Определяем API URL в зависимости от языка
     this.apiUrl = `/api/${this.currentLanguage}/products/`;
+    this.categoriesApiUrl = `/api/${this.currentLanguage}/product-categories/`;
+    
     this.currentCategory = null;
     this.currentPage = 1;
     this.cardsPerPage = 8;
     this.allProducts = [];
     this.filteredProducts = [];
+    this.categories = []; // ✅ Категории из API
+    this.currentCategoryData = null; // ✅ Данные текущей категории
 
-    // Полная информация о категориях с переводами
-    this.categoryTranslations = {
-      'tiger_vh': {
-        uz: {
-          title: 'Tiger VH',
-          breadcrumb: 'Tiger VH',
-          slogan: 'Ikki yoqilg\'ida harakatlanuvchi texnika',
-          buttonText: 'Batafsil o\'qish'
-        },
-        ru: {
-          title: 'Tiger VH',
-          breadcrumb: 'Tiger VH',
-          slogan: 'Техника на двух видах топлива',
-          buttonText: 'Подробнее'
-        },
-        en: {
-          title: 'Tiger VH',
-          breadcrumb: 'Tiger VH',
-          slogan: 'Dual-fuel technology',
-          buttonText: 'Read more'
-        },
-        hero_image: 'images/categories/vh_models.png'
+    // Переводы для UI элементов
+    this.translations = {
+      uz: {
+        buttonText: 'Batafsil o\'qish',
+        loading: 'Yuklanmoqda...',
+        noResults: 'Mahsulotlar topilmadi',
+        error: 'Xatolik yuz berdi',
+        tryAgain: 'Keyinroq urinib ko\'ring yoki sahifani yangilang',
+        prev: 'Ortga',
+        next: 'Oldinga'
       },
-      'samosval': {
-        uz: {
-          title: 'Samosvallar',
-          breadcrumb: 'Samosvallar',
-          slogan: 'Qurilish uchun eng yaxshi yechim',
-          buttonText: 'Batafsil o\'qish'
-        },
-        ru: {
-          title: 'Самосвалы',
-          breadcrumb: 'Самосвалы',
-          slogan: 'Лучшее решение для строительства',
-          buttonText: 'Подробнее'
-        },
-        en: {
-          title: 'Dump Trucks',
-          breadcrumb: 'Dump Trucks',
-          slogan: 'Best solution for construction',
-          buttonText: 'Read more'
-        },
-        hero_image: 'images/categories/dump-truck-hero.png'
+      ru: {
+        buttonText: 'Подробнее',
+        loading: 'Загрузка...',
+        noResults: 'Товары не найдены',
+        error: 'Произошла ошибка',
+        tryAgain: 'Попробуйте позже или обновите страницу',
+        prev: 'Назад',
+        next: 'Вперёд'
       },
-      'maxsus': {
-        uz: {
-          title: 'Maxsus texnika',
-          breadcrumb: 'Maxsus texnika',
-          slogan: 'Har qanday vazifa uchun',
-          buttonText: 'Batafsil o\'qish'
-        },
-        ru: {
-          title: 'Спецтехника',
-          breadcrumb: 'Спецтехника',
-          slogan: 'Для любых задач',
-          buttonText: 'Подробнее'
-        },
-        en: {
-          title: 'Special Equipment',
-          breadcrumb: 'Special Equipment',
-          slogan: 'For any task',
-          buttonText: 'Read more'
-        },
-        hero_image: 'images/categories/special-hero.png'
-      },
-      'furgon': {
-        uz: {
-          title: 'Avtofurgonlar',
-          breadcrumb: 'Avtofurgonlar',
-          slogan: 'Yuk tashish uchun ideal',
-          buttonText: 'Batafsil o\'qish'
-        },
-        ru: {
-          title: 'Фургоны',
-          breadcrumb: 'Фургоны',
-          slogan: 'Идеально для перевозки грузов',
-          buttonText: 'Подробнее'
-        },
-        en: {
-          title: 'Vans',
-          breadcrumb: 'Vans',
-          slogan: 'Perfect for cargo transportation',
-          buttonText: 'Read more'
-        },
-        hero_image: 'images/categories/avtofurgon-hero.png'
-      },
-      'shassi': {
-        uz: {
-          title: 'Shassilar',
-          breadcrumb: 'Shassilar',
-          slogan: 'Ishonchli asos',
-          buttonText: 'Batafsil o\'qish'
-        },
-        ru: {
-          title: 'Шасси',
-          breadcrumb: 'Шасси',
-          slogan: 'Надежная основа',
-          buttonText: 'Подробнее'
-        },
-        en: {
-          title: 'Chassis',
-          breadcrumb: 'Chassis',
-          slogan: 'Reliable foundation',
-          buttonText: 'Read more'
-        },
-        hero_image: 'images/categories/chassis-hero.png'
-      },
-      'tiger_v': {
-        uz: {
-          title: 'Tiger V',
-          breadcrumb: 'Tiger V',
-          slogan: 'Kuchli va zamonaviy pikap',
-          buttonText: 'Batafsil o\'qish'
-        },
-        ru: {
-          title: 'Tiger V',
-          breadcrumb: 'Tiger V',
-          slogan: 'Мощный и современный пикап',
-          buttonText: 'Подробнее'
-        },
-        en: {
-          title: 'Tiger V',
-          breadcrumb: 'Tiger V',
-          slogan: 'Powerful and modern pickup',
-          buttonText: 'Read more'
-        },
-        hero_image: 'images/categories/tiger-v-hero.png'
-      },
-      'tiger_vr': {
-        uz: {
-          title: 'Tiger VR',
-          breadcrumb: 'Tiger VR',
-          slogan: 'Shahar ichida ishlash uchun ideal texnika',
-          buttonText: 'Batafsil o\'qish'
-        },
-        ru: {
-          title: 'Tiger VR',
-          breadcrumb: 'Tiger VR',
-          slogan: 'Идеальная техника для работы внутри города',
-          buttonText: 'Подробнее'
-        },
-        en: {
-          title: 'Tiger VR',
-          breadcrumb: 'Tiger VR',
-          slogan: 'Ideal equipment for working within the city',
-          buttonText: 'Read more'
-        },
-        hero_image: 'images/categories/tiger-vr-hero.png'
+      en: {
+        buttonText: 'Read more',
+        loading: 'Loading...',
+        noResults: 'No products found',
+        error: 'An error occurred',
+        tryAgain: 'Please try again later or refresh the page',
+        prev: 'Previous',
+        next: 'Next'
       }
     };
 
     this.init();
   }
 
-  // Определяем API URL в зависимости от текущего языка
-  getApiUrl() {
-    return `/api/${this.currentLanguage}/products/`;
-  }
-
-  // Получаем данные категории на текущем языке
-  getCategoryData(categoryKey) {
-    const category = this.categoryTranslations[categoryKey];
-    if (!category) return null;
-
-    const langData = category[this.currentLanguage] || category['uz'];
-    return {
-      ...langData,
-      hero_image: category.hero_image
-    };
+  // Получаем перевод
+  t(key) {
+    return this.translations[this.currentLanguage]?.[key] || key;
   }
 
   // Получаем cookie
@@ -203,6 +75,9 @@ class ProductsManager {
     const urlParams = new URLSearchParams(window.location.search);
     this.currentCategory = urlParams.get('category');
 
+    // ✅ Загружаем категории из API
+    await this.loadCategories();
+
     // Обновляем все элементы страницы
     this.updatePageContent();
 
@@ -213,66 +88,99 @@ class ProductsManager {
     this.initSearch();
   }
 
-  updatePageContent() {
-    if (!this.currentCategory) {
-      console.log('No category specified');
+async loadCategories() {
+    try {
+      const response = await fetch(this.categoriesApiUrl);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      this.categories = data.results || data || [];
+      
+      console.log(`✅ Загружено ${this.categories.length} категорий`);
+      
+      // ✅ Выводим структуру категории для отладки
+      if (this.categories.length > 0) {
+        console.log('📦 Структура категории:', this.categories[0]);
+      }
+
+      // Находим данные текущей категории
+      if (this.currentCategory) {
+        this.currentCategoryData = this.categories.find(
+          cat => cat.slug === this.currentCategory
+        );
+        
+        if (this.currentCategoryData) {
+          console.log('✅ Данные текущей категории:', this.currentCategoryData);
+        } else {
+          console.warn('⚠️ Категория не найдена:', this.currentCategory);
+        }
+      }
+    } catch (error) {
+      console.error('❌ Categories loading error:', error);
+      if (window.logJSError) {
+        window.logJSError('Categories loading error: ' + error.message, {
+          file: 'products.js',
+          url: this.categoriesApiUrl
+        });
+      }
+    }
+  }
+
+   updatePageContent() {
+    if (!this.currentCategory || !this.currentCategoryData) {
+      console.log('⚠️ No category specified or category data not loaded');
       return;
     }
 
-    const categoryInfo = this.getCategoryData(this.currentCategory);
-    if (!categoryInfo) {
-      console.error('Unknown category:', this.currentCategory);
-      return;
-    }
+    console.log('🔄 Обновляем контент страницы для:', this.currentCategoryData.name);
 
-    // 1. Обновляем главный заголовок
+    // 1. ✅ Обновляем заголовок
     const titleElement = document.querySelector('.models_title');
     if (titleElement) {
-      titleElement.textContent = categoryInfo.title;
+      titleElement.textContent = this.currentCategoryData.name;
+      console.log('✅ Заголовок обновлён:', this.currentCategoryData.name);
     }
 
-    // 2. Обновляем слоган
-    const sloganElement = document.querySelector('.hero-05-title__item:not(.title-item-image)');
-    if (sloganElement) {
-      sloganElement.textContent = categoryInfo.slogan;
+    // 2. ✅ Обновляем описание
+    const descriptionElement = document.querySelector('.hero-05-title__item:not(.title-item-image)');
+    if (descriptionElement && this.currentCategoryData.description) {
+      descriptionElement.textContent = this.currentCategoryData.description;
+      console.log('✅ Описание обновлено:', this.currentCategoryData.description);
+    } else {
+      console.log('⚠️ Описание не найдено или элемент отсутствует');
     }
 
-    // 3. Обновляем hero изображение
+    // 3. ✅ Обновляем HERO ИЗОБРАЖЕНИЕ
     const heroImage = document.querySelector('.mxd-hero-06__img img');
-    if (heroImage && categoryInfo.hero_image) {
-      const staticPath = `/static/${categoryInfo.hero_image}`;
-
-      // Проверяем существование изображения
-      const testImg = new Image();
-      testImg.onload = () => {
-        heroImage.src = staticPath;
-        heroImage.alt = categoryInfo.title;
-      };
-      testImg.onerror = () => {
-        // Если нет - оставляем текущее или ставим заглушку
-        console.warn(`Hero image not found: ${staticPath}`);
-      };
-      testImg.src = staticPath;
+    if (heroImage && this.currentCategoryData.hero_image_url) {
+      heroImage.src = this.currentCategoryData.hero_image_url;
+      heroImage.alt = this.currentCategoryData.name;
+      console.log('✅ Hero изображение обновлено:', this.currentCategoryData.hero_image_url);
+    } else if (heroImage && !this.currentCategoryData.hero_image_url) {
+      console.log('⚠️ Hero изображение не загружено в категорию');
+    } else {
+      console.log('⚠️ Элемент hero изображения не найден');
     }
 
-    // 4. Обновляем хлебные крошки
+    // 4. ✅ Обновляем хлебные крошки
     const breadcrumbActive = document.querySelector('.breadcrumb-ol .active a');
     if (breadcrumbActive) {
-      breadcrumbActive.textContent = categoryInfo.breadcrumb;
+      breadcrumbActive.textContent = this.currentCategoryData.name;
+      console.log('✅ Хлебные крошки обновлены');
     }
 
-    // 5. Обновляем title страницы
-    document.title = `${categoryInfo.title} - FAW Trucks`;
-
-    // Сохраняем текст кнопки для использования в карточках
-    this.buttonText = categoryInfo.buttonText;
+    // 5. ✅ Обновляем title страницы
+    document.title = `${this.currentCategoryData.name} - Autoliga`;
+    console.log('✅ Title страницы обновлён');
   }
 
   async loadProducts() {
     try {
       this.showLoader();
 
-      // ✅ Загружаем ВСЕ страницы
+      // Загружаем ВСЕ страницы
       let allProducts = [];
       let nextUrl = this.apiUrl;
 
@@ -289,10 +197,8 @@ class ProductsManager {
         const products = data.results || data.products || data || [];
         allProducts = allProducts.concat(products);
 
-        // ✅ ИСПРАВЛЕНИЕ: Приводим URL к HTTPS
-           // Приводим URL к текущему протоколу (http/https)
+        // Приводим URL к текущему протоколу
         if (data.next) {
-          // Используем относительный URL вместо абсолютного
           try {
             const url = new URL(data.next);
             nextUrl = url.pathname + url.search;
@@ -305,19 +211,13 @@ class ProductsManager {
       }
 
       this.allProducts = allProducts;
-
       console.log(`✅ Загружено ${this.allProducts.length} продуктов`);
 
-      // ФИЛЬТРУЕМ продукты по категории на фронтенде
+      // ФИЛЬТРУЕМ продукты по категории
       if (this.currentCategory) {
         this.filteredProducts = this.allProducts.filter(product => {
-          if (product.category === this.currentCategory) {
-            return true;
-          }
-          if (product.all_categories && Array.isArray(product.all_categories)) {
-            return product.all_categories.some(cat => cat.slug === this.currentCategory);
-          }
-          return false;
+          // ✅ Проверяем category.slug (не category === slug)
+          return product.category && product.category.slug === this.currentCategory;
         });
 
         console.log(`✅ Найдено ${this.filteredProducts.length} продуктов в категории "${this.currentCategory}"`);
@@ -397,7 +297,7 @@ class ProductsManager {
     const imageUrl = product.image_url || product.image || product.main_image || '';
     const productSlug = product.slug || '';
     const productTitle = product.title || product.name || 'Продукт';
-    const buttonText = this.buttonText || 'Подробнее';
+    const buttonText = this.t('buttonText');
 
     return `
       <div class="faw-truck-card">
@@ -429,7 +329,7 @@ class ProductsManager {
     pagination.innerHTML = '';
 
     // Кнопка "Назад"
-    const prevButton = this.createButton('prev', 'Ortga', this.currentPage > 1);
+    const prevButton = this.createButton('prev', this.t('prev'), this.currentPage > 1);
     prevButton.addEventListener('click', (e) => {
       e.preventDefault();
       if (this.currentPage > 1) {
@@ -458,7 +358,7 @@ class ProductsManager {
     }
 
     // Кнопка "Вперед"
-    const nextButton = this.createButton('next', 'Oldinga', this.currentPage < totalPages);
+    const nextButton = this.createButton('next', this.t('next'), this.currentPage < totalPages);
     nextButton.addEventListener('click', (e) => {
       e.preventDefault();
       if (this.currentPage < totalPages) {
@@ -513,32 +413,20 @@ class ProductsManager {
       const query = e.target.value.toLowerCase().trim();
 
       if (query === '') {
-        // ✅ Сбрасываем на отфильтрованные по категории продукты
+        // Сбрасываем на отфильтрованные по категории продукты
         if (this.currentCategory) {
           this.filteredProducts = this.allProducts.filter(product => {
-            if (product.category === this.currentCategory) {
-              return true;
-            }
-            if (product.all_categories && Array.isArray(product.all_categories)) {
-              return product.all_categories.some(cat => cat.slug === this.currentCategory);
-            }
-            return false;
+            return product.category && product.category.slug === this.currentCategory;
           });
         } else {
           this.filteredProducts = [...this.allProducts];
         }
       } else {
-        // ✅ Ищем среди уже отфильтрованных по категории продуктов
+        // Ищем среди уже отфильтрованных по категории продуктов
         const categoryFiltered = this.currentCategory
           ? this.allProducts.filter(product => {
-            if (product.category === this.currentCategory) {
-              return true;
-            }
-            if (product.all_categories && Array.isArray(product.all_categories)) {
-              return product.all_categories.some(cat => cat.slug === this.currentCategory);
-            }
-            return false;
-          })
+              return product.category && product.category.slug === this.currentCategory;
+            })
           : this.allProducts;
 
         this.filteredProducts = categoryFiltered.filter(product => {
@@ -567,7 +455,7 @@ class ProductsManager {
   showLoader() {
     const container = document.querySelector('.faw-truck-card-container');
     if (container) {
-      container.innerHTML = '<div class="loader-container"><div class="loader">Yuklanmoqda...</div></div>';
+      container.innerHTML = `<div class="loader-container"><div class="loader">${this.t('loading')}</div></div>`;
     }
   }
 
@@ -579,7 +467,7 @@ class ProductsManager {
   showNoResults() {
     const container = document.querySelector('.faw-truck-card-container');
     if (container) {
-      container.innerHTML = '<div class="no-results"><p>Mahsulotlar topilmadi</p></div>';
+      container.innerHTML = `<div class="no-results"><p>${this.t('noResults')}</p></div>`;
     }
     const pagination = document.getElementById('pagination');
     if (pagination) pagination.innerHTML = '';
@@ -590,8 +478,8 @@ class ProductsManager {
     if (container) {
       container.innerHTML = `
         <div class="error-message">
-          <p>Xatolik yuz berdi: ${message}</p>
-          <p>Keyinroq urinib ko'ring yoki sahifani yangilang.</p>
+          <p>${this.t('error')}: ${message}</p>
+          <p>${this.t('tryAgain')}</p>
         </div>
       `;
     }

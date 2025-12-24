@@ -217,14 +217,16 @@
               <div class="row g-0">
                 <div class="col-12 col-xl-12 mxd-grid-item no-margin">
                   <div class="mxd-section-title__hrtitle">
-                    <h2 class="reveal-type ">Bizning texnikalar</h2>
+                    <h2 class="reveal-type ">Bizning mashinalar</h2>
                   </div>
                 </div>
                 <div class="col-12 col-xl-8 mxd-grid-item no-margin">
                   <div class="mxd-section-title__hrdescr">
-                    <p class="">VUM tomonidan ishlab chiqariladigan FAW modellarida ishonchlilik, sifat va
-                      qulaylik birlashtirilgan. Har bir texnika biznesingiz ehtiyojiga mos keladigan darajada funksional
-                      va samarali.
+                    <p class="">
+                      {% if LANGUAGE_CODE == 'uz' %}Autoliga — bu ishonch, sifat va qulaylik uyg‘unligi. Biz taklif etayotgan avtomobillar zamonaviy texnologiyalar asosida ishlab chiqilgan bo‘lib, kundalik foydalanish va biznes uchun mos yechimlarni taqdim etadi.
+                      {% elif LANGUAGE_CODE == 'ru' %}Autoliga — это надежность, качество и удобство. Предлагаемые нами автомобили разработаны на основе современных технологий и обеспечивают функциональность и эффективность для повседневного использования и бизнеса.
+                      {% else %}Autoliga — this is reliability, quality and comfort. Our vehicles are developed based on modern technologies and provide functionality and efficiency for daily use and business.
+                      {% endif %}
                     </p>
                   </div>
                 </div>
@@ -314,7 +316,7 @@
                         </div>
                         <div class="contact-detail__content">
                           <h4 class="contact-detail__title">Telefon</h4>
-                          <a href="tel:+998712345678" class="contact-detail__value">+998 55 508 60 60</a>
+                          <a href="tel:+998712345678" class="contact-detail__value">+998 00 000 00 00</a>
                         </div>
                       </div>
 
@@ -324,7 +326,7 @@
                         </div>
                         <div class="contact-detail__content">
                           <h4 class="contact-detail__title">Email</h4>
-                          <a href="mailto:info@fawtrucks.uz" class="contact-detail__value">info@faw.uz</a>
+                          <a href="mailto:info@fawtrucks.uz" class="contact-detail__value">example@autoliga.uz</a>
                         </div>
                       </div>
 
@@ -334,7 +336,7 @@
                         </div>
                         <div class="contact-detail__content">
                           <h4 class="contact-detail__title">Manzil</h4>
-                          <p class="contact-detail__value">Toshkent shahri, Yakkasaroy tumani Abdulla Qahhor ko‘chasi, 2B
+                          <p class="contact-detail__value">Lorem ipsum dolor sit amet consectetur adipisicing.
                           </p>
                         </div>
                       </div>
@@ -422,8 +424,7 @@
                                 pattern="[+]*[0-9\s\-\(\)]*" data-default="+998" required>
                             </div>
                             <div class="col-12 mxd-grid-item ">
-                              <textarea name="message"
-                                placeholder="Qanday yuk mashinasiga qiziqasiz? Qo'shimcha savollar*"></textarea>
+                              <textarea name="message" placeholder="{% if LANGUAGE_CODE == 'uz' %}Qanday mashinasiga qiziqasiz? Qoʻshimcha savollar*{% elif LANGUAGE_CODE == 'ru' %}Какая машина вас интересует? Дополнительные вопросы*{% else %}What Car are you interested in? Additional questions*{% endif %}"></textarea>
                             </div>
                             <div class="col-12 mxd-grid-item ">
                               <button class="btn btn-anim btn-default btn-large btn-opposite slide-right-up shimmer-btn"

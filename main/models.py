@@ -144,29 +144,82 @@ class FeatureIcon(models.Model):
     def __str__(self):
         return self.name
 
+class ProductCategory(models.Model):
+    """Динамические категории продуктов"""
+    name = models.CharField("Название", max_length=100)
+    slug = models.SlugField("URL", max_length=100, unique=True)
+    description = models.TextField("Описание", blank=True, null=True)
+    hero_image = models.ImageField(
+        "Фоновое изображение", 
+        upload_to="categories/heroes/",
+        blank=True,
+        null=True,
+        help_text="Изображение для страницы категории"
+    )
+    icon = models.FileField(
+        "Иконка", 
+        upload_to="categories/icons/",
+        blank=True,
+        null=True
+    )
+    order = models.PositiveIntegerField("Порядок", default=0)
+    is_active = models.BooleanField("Активна", default=True)
+    created_at = models.DateTimeField("Дата создания", auto_now_add=True)
+    
+    class Meta:
+        verbose_name = "Контент - Марка"
+        verbose_name_plural = "Контент - Марка автомобиля"
+        ordering = ['order', 'name']
+    
+    def __str__(self):
+        return self.name
+    
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            from django.utils.text import slugify
+            from unidecode import unidecode
+            
+            name_for_slug = (
+                getattr(self, 'name_uz', None) or 
+                getattr(self, 'name_ru', None) or 
+                self.name or 
+                "category"
+            )
+            
+            base_slug = slugify(unidecode(name_for_slug))
+            slug = base_slug
+            counter = 1
+            
+            while ProductCategory.objects.filter(slug=slug).exclude(pk=self.pk).exists():
+                slug = f"{base_slug}-{counter}"
+                counter += 1
+            
+            self.slug = slug
+        
+        super().save(*args, **kwargs)
+    
+    def get_products_count(self):
+        """Количество активных продуктов в категории"""
+        return self.products.filter(is_active=True).count()
+
 class Product(models.Model):
-    """Грузовики FAW"""
-    CATEGORY_CHOICES = [
-        ('samosval', 'Samosvallar'),
-        ('maxsus', 'Maxsus texnika'),
-        ('furgon', 'Avtofurgonlar'),
-        ('shassi', 'Shassilar'),
-        ('tiger_v', 'Tiger V'),
-        ('tiger_vh', 'Tiger VH'),
-        ('tiger_vr', 'Tiger VR'),
-    ]
+    """Автомобили"""
     
     # Основные поля
     title = models.CharField("Название модели", max_length=255)
     slug = models.SlugField("URL", max_length=255, unique=True)
-    category = models.CharField("Категория", max_length=50, choices=CATEGORY_CHOICES)
-    categories = models.CharField(
-        "Категории (множественный выбор)",
-        max_length=255,
-        blank=True,
+    
+    # ✅ ИСПРАВЛЕНО: ForeignKey вместо ManyToMany
+    category = models.ForeignKey(
+        ProductCategory,
+        verbose_name="Категория",
+        related_name="products",
+        on_delete=models.SET_NULL,
         null=True,
-        help_text="Выберите категории через запятую. Например: samosval,maxsus"
+        blank=True,
+        help_text="Выберите категорию автомобиля"
     )
+    
     main_image = models.ImageField("Главное изображение", upload_to="products/main/")
     card_image = models.ImageField(
         "Изображение для карточки", 
@@ -175,7 +228,7 @@ class Product(models.Model):
         null=True
     )
     
-    # ========== НОВЫЕ ПОЛЯ ДЛЯ СЛАЙДЕРА ==========
+    # ========== ПОЛЯ ДЛЯ СЛАЙДЕРА ==========
     slider_image = models.ImageField(
         "Изображение для слайдера",
         upload_to="products/slider/",
@@ -228,12 +281,14 @@ class Product(models.Model):
     updated_at = models.DateTimeField("Дата обновления", auto_now=True)
 
     class Meta:
-        verbose_name = "Контент - Грузовик"
-        verbose_name_plural = "Контент - Грузовики FAW"
+        verbose_name = "Контент - Автомобиль"
+        verbose_name_plural = "Контент - Автомобили"
         ordering = ['order', 'title']
 
     def __str__(self):
-        return f"{self.get_category_display()} — {self.title}"
+        if self.category:
+            return f"{self.title} ({self.category.name})"
+        return self.title
     
     def get_slider_data(self):
         """Возвращает данные для слайдера в формате JSON"""
@@ -246,27 +301,6 @@ class Product(models.Model):
             'image': (self.slider_image or self.main_image).url if (self.slider_image or self.main_image) else None,
             'link': f'/products/{self.slug}/',
         }
-    
-    def get_all_categories(self):
-        """Получить все категории продукта (основную + дополнительные)"""
-        categories = [self.category]
-        
-        if self.categories:
-            additional = [cat.strip() for cat in self.categories.split(',') if cat.strip()]
-            categories.extend(additional)
-        
-        # Убираем дубликаты, сохраняя порядок
-        return list(dict.fromkeys(categories))
-        
-    def get_all_categories_display(self):
-        """Получить названия всех категорий"""
-        category_names = []
-        for cat_slug in self.get_all_categories():
-            for slug, name in self.CATEGORY_CHOICES:
-                if slug == cat_slug:
-                    category_names.append(name)
-                    break
-        return category_names
 
 class ProductParameter(models.Model):
     """Параметры грузовика"""
@@ -354,123 +388,6 @@ class ProductGallery(models.Model):
     
     def __str__(self):
         return f"Фото {self.order + 1}"
-
-# ========== 03. КОНТЕНТ - ДИЛЕРЫ ==========
-
-class BecomeADealerPage(models.Model):
-    """Страница 'Стать дилером' (Singleton)"""
-    title = models.CharField(
-        "Заголовок", 
-        max_length=255, 
-        default="Qanday qilib diler bo'lish mumkin"
-    )
-    intro_text = models.TextField("Вводный текст")
-    subtitle = models.CharField(
-        "Подзаголовок списка", 
-        max_length=255, 
-        default="Potensial diler kompaniyasining minimal tarkibi:"
-    )
-    important_note = models.TextField("Важная заметка")
-    contact_phone = models.CharField("Телефон", max_length=50, default="+998 71 234-56-78")
-    contact_email = models.EmailField("Email", default="info@faw.uz")
-    contact_address = models.TextField(
-        "Адрес", 
-        default="Toshkent, Abdulla Kaxxar ko'chasi 2А"
-    )
-    
-    class Meta:
-        verbose_name = "Контент - Страница 'Стать дилером'"
-        verbose_name_plural = "Контент - Страница 'Стать дилером'"
-    
-    def __str__(self):
-        return "Контент страницы 'Стать дилером'"
-    
-    def save(self, *args, **kwargs):
-        self.pk = 1
-        super().save(*args, **kwargs)
-    
-    @classmethod
-    def get_instance(cls):
-        obj, _ = cls.objects.get_or_create(pk=1)
-        return obj
-
-class DealerRequirement(models.Model):
-    """Требования к дилерам"""
-    page = models.ForeignKey(
-        BecomeADealerPage, 
-        on_delete=models.CASCADE, 
-        related_name='requirements'
-    )
-    text = models.CharField("Требование", max_length=500)
-    order = models.PositiveIntegerField("Порядок", default=0)
-    
-    class Meta:
-        verbose_name = "Требование"
-        verbose_name_plural = "Требования"
-        ordering = ['order']
-    
-    def __str__(self):
-        return self.text[:50]
-
-class DealerService(models.Model):
-    """Услуги дилеров"""
-    name = models.CharField("Название", max_length=100, unique=True)
-    slug = models.SlugField("URL", max_length=100, unique=True)
-    order = models.PositiveIntegerField("Порядок", default=0)
-    is_active = models.BooleanField("Активна", default=True)
-    
-    class Meta:
-        verbose_name = "Дилеры - Услуга"
-        verbose_name_plural = "Дилеры - Услуги дилеров"
-        ordering = ['order', 'name']
-    
-    def __str__(self):
-        return self.name
-
-class Dealer(models.Model):
-    """Дилеры FAW"""
-    name = models.CharField("Название", max_length=255)
-    city = models.CharField("Город", max_length=100)
-    address = models.TextField("Адрес")
-    latitude = models.DecimalField(
-        "Широта", 
-        max_digits=9, 
-        decimal_places=6, 
-        help_text="Пример: 41.311151"
-    )
-    longitude = models.DecimalField(
-        "Долгота", 
-        max_digits=9, 
-        decimal_places=6, 
-        help_text="Пример: 69.279737"
-    )
-    phone = models.CharField("Телефон", max_length=50)
-    email = models.EmailField("Email")
-    website = models.URLField("Сайт", blank=True, null=True)
-    working_hours = models.TextField(
-        "Рабочее время", 
-        help_text="Используйте <br> для переноса"
-    )
-    manager = models.CharField("Менеджер", max_length=100, blank=True, null=True)
-    services = models.ManyToManyField(
-        DealerService, 
-        verbose_name="Услуги", 
-        related_name='dealers'
-    )
-    logo = models.ImageField("Логотип", upload_to="dealers/logos/", blank=True, null=True)
-    is_active = models.BooleanField("Активен", default=True)
-    order = models.PositiveIntegerField("Порядок", default=0)
-    created_at = models.DateTimeField("Дата создания", auto_now_add=True)
-    updated_at = models.DateTimeField("Дата обновления", auto_now=True)
-    
-    class Meta:
-        verbose_name = "Дилеры - Дилер"
-        verbose_name_plural = "Дилеры - Дилеры"
-        ordering = ['order', 'city', 'name']
-    
-    def __str__(self):
-        # ✅ Улучшенный вывод для истории версий
-        return f"{self.name} ({self.city})"
 
 # ========== 04. ЗАЯВКИ ==========
 
@@ -567,36 +484,6 @@ class ContactForm(models.Model):
 
     def __str__(self):
         return f"{self.name} - {self.phone} ({self.created_at.strftime('%d.%m.%Y')})"
-
-class BecomeADealerApplication(models.Model):
-    """Заявки на дилерство"""
-    name = models.CharField("ФИО", max_length=255)
-    region = models.CharField("Регион", max_length=100, choices=REGION_CHOICES)
-    phone = models.CharField("Телефон", max_length=50)
-    message = models.TextField("Сообщение")
-    company_name = models.CharField("Компания", max_length=255, blank=True)
-    experience_years = models.PositiveIntegerField("Опыт (лет)", blank=True, null=True)
-    status = models.CharField("Статус", max_length=20, choices=STATUS_CHOICES, default='new')
-    priority = models.CharField("Приоритет", max_length=10, choices=PRIORITY_CHOICES, default='medium')
-    manager = models.ForeignKey(
-        User, 
-        null=True, 
-        blank=True, 
-        on_delete=models.SET_NULL, 
-        related_name='dealer_applications', 
-        verbose_name='Менеджер'
-    )
-    admin_comment = models.TextField("Комментарий", blank=True, null=True)
-    created_at = models.DateTimeField("Дата", auto_now_add=True)
-    
-    class Meta:
-        verbose_name = " - Заявка на дилерство"
-        verbose_name_plural = "Заявки - Заявки на дилерство"
-        ordering = ['-created_at']
-    
-    def __str__(self):
-        company = f" ({self.company_name})" if self.company_name else ""
-        return f"{self.name}{company} - {self.region}"
 
 # ========== 05. ВАКАНСИИ ==========
 

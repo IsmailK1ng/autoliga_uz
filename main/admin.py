@@ -42,11 +42,7 @@ from .models import (
     ProductFeature, 
     ProductCardSpec, 
     ProductGallery, 
-    DealerService, 
-    Dealer,
-    BecomeADealerPage, 
-    DealerRequirement, 
-    BecomeADealerApplication,
+    ProductCategory,
     AmoCRMToken,
     REGION_CHOICES
 )
@@ -54,9 +50,9 @@ from main.services.amocrm.token_manager import TokenManager
 logger = logging.getLogger('django')
 
 # ========== НАСТРОЙКИ АДМИНКИ ==========
-admin.site.site_header = "Панель управления VUM"
-admin.site.site_title = "VUM Admin"
-admin.site.index_title = "Управление сайтами FAW"
+admin.site.site_header = "Панель управления Autoliga"
+admin.site.site_title = "Autoliga Admin"
+admin.site.index_title = "Управление сайтами Autoliga"
 
 # ============ БАЗОВЫЕ МИКСИНЫ ============
 
@@ -74,8 +70,8 @@ class ContentAdminMixin:
         
 
         content_models = [
-            'product', 'vacancy', 'dealer', 'dealerservice', 
-            'featureicon', 'becomeadealerpage'
+            'product', 'vacancy',
+            'featureicon',
         ]
         for model in content_models:
             if request.user.has_perm(f'main.view_{model}'):
@@ -476,7 +472,7 @@ class ContactFormAdmin(LeadManagerMixin, admin.ModelAdmin):
             
             wb = openpyxl.Workbook()
             ws = wb.active
-            ws.title = "Заявки FAW UZ"
+            ws.title = "Заявки AutoLiga"
             
             headers = [
                 'Номер', 'ФИО', 'Телефон', 'Модель', 'Регион', 'Сообщение', 
@@ -773,265 +769,60 @@ class FeatureIconAdmin(ContentAdminMixin, admin.ModelAdmin):
         return "—"
     icon_preview.short_description = "Превью"
 
-# ============ ДИЛЕРЫ ============
-
-@admin.register(DealerService)
-class DealerServiceAdmin(ContentAdminMixin, CustomReversionMixin, VersionAdmin, TabbedTranslationAdmin):
-    list_display = ['name', 'slug', 'order', 'is_active', 'action_buttons']
-    list_editable = ['order', 'is_active']
-    search_fields = ['name']
-    prepopulated_fields = {'slug': ('name',)}
-    history_latest_first = True
-    
-    def has_delete_permission(self, request, obj=None):
-        if request.user.is_superuser:
-            return True
-        if obj and obj.slug in ['sotuv', 'servis', 'ehtiyot-qismlar']:
-            return False
-        return super().has_delete_permission(request, obj)
-    
-    def action_buttons(self, obj):
-        is_base = obj.slug in ['sotuv', 'servis', 'ehtiyot-qismlar']
-        delete_btn = '🔐' if is_base else f'<a href="/admin/main/dealerservice/{obj.id}/delete/" onclick="return confirm(\'Удалить?\')"><img src="/static/media/icon-adminpanel/recycle-bin.png" width="24" height="24"></a>'
-        
-        return format_html('''
-            <div style="display: flex; gap: 8px;">
-                <a href="{}"><img src="/static/media/icon-adminpanel/pencil.png" width="24" height="24"></a>
-                <a href="/dealers/" target="_blank"><img src="/static/media/icon-adminpanel/eyes.png" width="24" height="24"></a>
-                {}
-            </div>
-        ''', f'/admin/main/dealerservice/{obj.id}/change/', delete_btn)
-    action_buttons.short_description = "Действия"
-
-    def changelist_view(self, request, extra_context=None):
-        extra_context = extra_context or {}
-        deleted_count = Version.objects.get_deleted(self.model).count()
-        if deleted_count > 0:
-            extra_context['show_recover_button'] = True
-            extra_context['deleted_count'] = deleted_count
-        return super().changelist_view(request, extra_context)
-
-@admin.register(Dealer)
-class DealerAdmin(ContentAdminMixin, CustomReversionMixin, VersionAdmin, TabbedTranslationAdmin):
-    list_display = ['logo_preview', 'name', 'city', 'phone', 'services_list', 'is_active', 'order', 'action_buttons']
-    list_filter = ['is_active', 'city', 'services']
-    search_fields = ['name', 'city', 'address', 'manager']
-    list_editable = ['is_active', 'order']
-    readonly_fields = ['logo_preview', 'created_at', 'updated_at']
-    history_latest_first = True
-    
-    fieldsets = (
-        ('Основная информация', {'fields': ('name', 'city', 'address', 'logo', 'logo_preview')}),
-        ('Координаты', {'fields': ('latitude', 'longitude')}),
-        ('Контакты', {'fields': ('phone', 'email', 'website', 'manager')}),
-        ('Рабочее время', {'fields': ('working_hours',)}),
-        ('Услуги', {'fields': ('services',)}),
-        ('Настройки', {'fields': ('is_active', 'order', 'created_at', 'updated_at'), 'classes': ('collapse',)}),
-    )
-    
-    def formfield_for_manytomany(self, db_field, request, **kwargs):
-        if db_field.name == "services":
-            kwargs['widget'] = forms.CheckboxSelectMultiple()
-        return super().formfield_for_manytomany(db_field, request, **kwargs)
-    
-    def logo_preview(self, obj):
-        if obj.logo:
-            return format_html('<img src="{}" width="80" height="50" style="object-fit:contain;border-radius:4px;"/>', obj.logo.url)
-        return "—"
-    logo_preview.short_description = "Логотип"
-    
-    def services_list(self, obj):
-        services = obj.services.all()
-        if services:
-            tags = ' '.join([f'<span style="background:#e3f2fd;color:#1976d2;padding:4px 8px;border-radius:4px;font-size:11px;">{s.name}</span>' for s in services])
-            return format_html(tags)
-        return "—"
-    services_list.short_description = "Услуги"
-    
-    def action_buttons(self, obj):
-        return format_html('''
-            <div style="display: flex; gap: 8px;">
-                <a href="{}"><img src="/static/media/icon-adminpanel/pencil.png" width="24" height="24"></a>
-                <a href="/dealers/" target="_blank"><img src="/static/media/icon-adminpanel/eyes.png" width="24" height="24"></a>
-                <a href="{}" onclick="return confirm('Удалить?')"><img src="/static/media/icon-adminpanel/recycle-bin.png" width="24" height="24"></a>
-            </div>
-        ''', f'/admin/main/dealer/{obj.id}/change/', f'/admin/main/dealer/{obj.id}/delete/')
-    action_buttons.short_description = "Действия"
-
-    def changelist_view(self, request, extra_context=None):
-        extra_context = extra_context or {}
-        deleted_count = Version.objects.get_deleted(self.model).count()
-        if deleted_count > 0:
-            extra_context['show_recover_button'] = True
-            extra_context['deleted_count'] = deleted_count
-        return super().changelist_view(request, extra_context)
-
-# ============ СТРАНИЦА "СТАТЬ ДИЛЕРОМ" ============
-
-class DealerRequirementInline(TranslationTabularInline):
-    model = DealerRequirement
-    extra = 1
-    fields = ('text', 'order')
-
-@admin.register(BecomeADealerPage)
-class BecomeADealerPageAdmin(ContentAdminMixin, TabbedTranslationAdmin):
-    fieldsets = (
-        ('Контент', {'fields': ('title', 'intro_text', 'subtitle', 'important_note')}),
-        ('Контакты', {'fields': ('contact_phone', 'contact_email', 'contact_address')}),
-    )
-    inlines = [DealerRequirementInline]
-    
-    def has_add_permission(self, request):
-        return not BecomeADealerPage.objects.exists()
-    
-    def has_delete_permission(self, request, obj=None):
-        return False
-    
-    def changelist_view(self, request, extra_context=None):
-        obj = BecomeADealerPage.get_instance()
-        return self.changeform_view(request, str(obj.pk), '', extra_context)
-
-# ============ ЗАЯВКИ НА ДИЛЕРСТВО ============
-
-class BecomeADealerApplicationForm(forms.ModelForm):
-    class Meta:
-        model = BecomeADealerApplication
-        fields = '__all__'
-    
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        if 'manager' in self.fields:
-            self.fields['manager'].widget.can_add_related = False
-            self.fields['manager'].widget.can_change_related = False
-            self.fields['manager'].widget.can_delete_related = False
-            self.fields['manager'].widget.can_view_related = False
-
-@admin.register(BecomeADealerApplication)
-class BecomeADealerApplicationAdmin(LeadManagerMixin, admin.ModelAdmin):
-    form = BecomeADealerApplicationForm
-    list_display = ['dealer_badge', 'name', 'company_name', 'phone', 'region', 'experience_years', 'status', 'priority', 'manager', 'created_at', 'action_buttons']
-    search_fields = ['name', 'company_name', 'phone', 'message']
-    list_editable = ['status', 'priority', 'manager']
-    readonly_fields = ['created_at']
-    autocomplete_fields = ['manager']
-    date_hierarchy = 'created_at'
-    actions = ['export_to_excel']
-    
-    fieldsets = (
-        ('Заявитель', {'fields': ('name', 'company_name', 'experience_years', 'region', 'phone')}),
-        ('Сообщение', {'fields': ('message',)}),
-        ('Управление', {'fields': ('status', 'priority', 'manager', 'admin_comment', 'created_at')}),
-    )
-    
-    def dealer_badge(self, obj):
-        return format_html('<span style="background:#000;color:white;padding:4px 10px;border-radius:6px;font-size:11px;font-weight:600;">ДИЛЕРСТВО</span>')
-    dealer_badge.short_description = "Тип"
-    
-    def action_buttons(self, obj):
-        return format_html('''
-            <div style="display: flex; gap: 8px;">
-                <a href="{}"><img src="/static/media/icon-adminpanel/pencil.png" width="24" height="24"></a>
-                <a href="/become-a-dealer/" target="_blank"><img src="/static/media/icon-adminpanel/eyes.png" width="24" height="24"></a>
-                <a href="{}" onclick="return confirm('Удалить?')"><img src="/static/media/icon-adminpanel/recycle-bin.png" width="24" height="24"></a>
-            </div>
-        ''', f'/admin/main/becomeadealerapplication/{obj.id}/change/', f'/admin/main/becomeadealerapplication/{obj.id}/delete/')
-    action_buttons.short_description = "Действия"
-    
-    def export_to_excel(self, request, queryset):
-        wb = openpyxl.Workbook()
-        ws = wb.active
-        ws.title = "Заявки на дилерство"
-        
-        headers = ['№', 'ФИО', 'Компания', 'Опыт', 'Регион', 'Телефон', 'Статус', 'Приоритет', 'Менеджер', 'Дата']
-        ws.append(headers)
-        
-        header_fill = PatternFill(start_color='FF9800', end_color='FF9800', fill_type='solid')
-        header_font = Font(bold=True, color='FFFFFF')
-        
-        for cell in ws[1]:
-            cell.fill = header_fill
-            cell.font = header_font
-            cell.alignment = Alignment(horizontal='center', vertical='center')
-        
-        for idx, app in enumerate(queryset, start=1):
-            ws.append([
-                idx, app.name, app.company_name or '-', app.experience_years or '-',
-                app.get_region_display(), app.phone,
-                app.get_status_display(), app.get_priority_display(),
-                app.manager.username if app.manager else '-',
-                app.created_at.strftime('%d.%m.%Y %H:%M')
-            ])
-        
-        for column in ws.columns:
-            max_length = max(len(str(cell.value)) for cell in column)
-            ws.column_dimensions[column[0].column_letter].width = min(max_length + 2, 50)
-        
-        response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-        response['Content-Disposition'] = f'attachment; filename="dealer_applications_{datetime.now().strftime("%Y%m%d_%H%M%S")}.xlsx"'
-        wb.save(response)
-        return response
-    
-    export_to_excel.short_description = 'Экспорт в Excel'
-
 # ============ ПРОДУКТЫ ============
 
+@admin.register(ProductCategory)
+class ProductCategoryAdmin(ContentAdminMixin, TabbedTranslationAdmin):
+    list_display = ['icon_preview', 'name', 'slug', 'products_count', 'is_active', 'order']
+    list_editable = ['is_active', 'order']
+    search_fields = ['name', 'slug']
+    prepopulated_fields = {'slug': ('name',)}
+    readonly_fields = ['products_count', 'created_at']
+    
+    fieldsets = (
+        ('Основная информация', {
+            'fields': ('name', 'slug', 'description', 'is_active', 'order')
+        }),
+        ('Изображения', {
+            'fields': ('icon', 'hero_image')
+        }),
+        ('Статистика', {
+            'fields': ('products_count', 'created_at'),
+            'classes': ('collapse',)
+        }),
+    )
+    
+    def icon_preview(self, obj):
+        if obj.icon:
+            return format_html('<img src="{}" width="30" height="30"/>', obj.icon.url)
+        return "—"
+    icon_preview.short_description = "Иконка"
+    
+    def products_count(self, obj):
+        count = obj.get_products_count()
+        if count > 0:
+            return format_html(
+                '<a href="/admin/main/product/?category__id__exact={}" style="color:#007bff;font-weight:bold;">{} товаров</a>',
+                obj.id, count
+            )
+        return '0 товаров'
+    products_count.short_description = 'Продуктов'
+
+# ========== ПРОДУКТЫ (ОБНОВЛЕННЫЙ) ==========
+
 class ProductCategoryFilter(admin.SimpleListFilter):
-    """Фильтр по категориям"""
-    title = 'категория'
+    """Фильтр по марке автомобиля"""
+    title = 'Марка автомобиля'
     parameter_name = 'category_filter'
     
     def lookups(self, request, model_admin):
-        return Product.CATEGORY_CHOICES
+        categories = ProductCategory.objects.filter(is_active=True).order_by('order', 'name')
+        return [(cat.id, cat.name) for cat in categories]
     
     def queryset(self, request, queryset):
         if self.value():
-            return queryset.filter(
-                Q(category=self.value()) | 
-                Q(categories__contains=self.value())
-            )
+            return queryset.filter(category__id=self.value())  # ✅ ИСПРАВЛЕНО
         return queryset
-
-
-class ProductCategoriesForm(forms.ModelForm):
-    selected_categories = forms.MultipleChoiceField(
-        choices=Product.CATEGORY_CHOICES,
-        widget=forms.CheckboxSelectMultiple,
-        required=True, 
-        label="Категории",
-        help_text="Выберите категории продукта"
-    )
-    
-    class Meta:
-        model = Product
-        exclude = ['category', 'categories']
-    
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        if self.instance.pk:
-            selected = []
-            if self.instance.category:
-                selected.append(self.instance.category)
-            if self.instance.categories:
-                additional = [cat.strip() for cat in self.instance.categories.split(',') if cat.strip()]
-                selected.extend(additional)
-            self.fields['selected_categories'].initial = list(dict.fromkeys(selected))
-    
-    def clean_selected_categories(self):
-        categories = self.cleaned_data.get('selected_categories', [])
-        if not categories:
-            raise forms.ValidationError("Выберите хотя бы одну категорию")
-        return categories
-    
-    def save(self, commit=True):
-        instance = super().save(commit=False)
-        selected = self.cleaned_data.get('selected_categories', [])
-        if selected:
-            instance.category = selected[0]
-            instance.categories = ','.join(selected[1:]) if len(selected) > 1 else ''
-        if commit:
-            instance.save()
-        return instance
-
 
 class ProductParameterInline(TranslationTabularInline):
     """Параметры с фильтрацией по категории"""
@@ -1074,9 +865,7 @@ class ProductGalleryInline(admin.TabularInline):
 
 @admin.register(Product)
 class ProductAdmin(ContentAdminMixin, CustomReversionMixin, VersionAdmin, TabbedTranslationAdmin):
-    form = ProductCategoriesForm
-    
-    list_display = ['thumbnail', 'title', 'all_categories_display', 'is_active', 'is_featured', 'slider_order', 'order']
+    list_display = ['thumbnail', 'title', 'category_display', 'is_active', 'is_featured', 'slider_order', 'order']
     list_filter = [ProductCategoryFilter, 'is_active', 'is_featured']
     search_fields = ['title', 'slug']
     list_editable = ['is_active', 'is_featured', 'slider_order', 'order']
@@ -1091,7 +880,7 @@ class ProductAdmin(ContentAdminMixin, CustomReversionMixin, VersionAdmin, Tabbed
         ('Основная информация', {
             'fields': (
                 ('title', 'slug'),
-                'selected_categories',
+                'category',  # ✅ Теперь обычный select
                 ('order', 'is_active', 'is_featured'),
                 ('main_image', 'card_image')
             )
@@ -1119,26 +908,15 @@ class ProductAdmin(ContentAdminMixin, CustomReversionMixin, VersionAdmin, Tabbed
         return "—"
     thumbnail.short_description = "Фото"
 
-    def all_categories_display(self, obj):
-        categories = obj.get_all_categories()
-        if not categories:
-            return "—"
-        category_names = []
-        for cat_slug in categories:
-            for slug, name in Product.CATEGORY_CHOICES:
-                if slug == cat_slug:
-                    category_names.append(name)
-                    break
-        if category_names:
-            tags = []
-            for idx, name in enumerate(category_names):
-                if idx == 0:
-                    tags.append(f'<span style="background:#1976d2;color:white;padding:4px 8px;border-radius:4px;font-size:11px;font-weight:600;">{name}</span>')
-                else:
-                    tags.append(f'<span style="background:#d3ecff;color:#006ad3;padding:4px 8px;border-radius:4px;font-size:11px;font-weight:400;">{name}</span>')
-            return format_html(' '.join(tags))
-        return "—"
-    all_categories_display.short_description = "Категории"
+    def category_display(self, obj):
+        """✅ НОВОЕ: Отображение одной категории"""
+        if obj.category:
+            return format_html(
+                '<span style="background:#1976d2;color:white;padding:4px 8px;border-radius:4px;font-size:11px;font-weight:600;">{}</span>',
+                obj.category.name
+            )
+        return format_html('<span style="color:#999;">Без категории</span>')
+    category_display.short_description = "Категория"
     
     def add_to_slider(self, request, queryset):
         updated = queryset.update(is_featured=True)
@@ -1179,7 +957,6 @@ class ProductAdmin(ContentAdminMixin, CustomReversionMixin, VersionAdmin, Tabbed
         if not category:
             return JsonResponse({'suggestions': []})
         
-        # Получаем уникальные параметры для категории
         from django.db.models import Count
         
         suggestions = ProductParameter.objects.filter(

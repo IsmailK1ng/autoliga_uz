@@ -12,14 +12,11 @@ from rest_framework.permissions import AllowAny, IsAdminUser
 from django.http import HttpResponseRedirect
 from rest_framework.decorators import api_view, permission_classes
 from .models import (
-    News, ContactForm, JobApplication, Vacancy, Product,
-    Dealer, DealerService, BecomeADealerPage, BecomeADealerApplication
+    News, ContactForm, JobApplication, Vacancy, Product, ProductCategory
 )
 from .serializers import (
     NewsSerializer, ContactFormSerializer, JobApplicationSerializer, 
-    ProductCardSerializer, ProductDetailSerializer,
-    DealerSerializer, DealerServiceSerializer, 
-    BecomeADealerPageSerializer, BecomeADealerApplicationSerializer
+    ProductCardSerializer, ProductDetailSerializer, ProductCategorySerializer
 )
 import logging
 import json
@@ -96,22 +93,6 @@ def services(request):
 def product_detail(request, product_id):
     return render(request, 'main/product_detail.html', {'product_id': product_id})
 
-
-def become_a_dealer(request):
-    try:
-        page_data = BecomeADealerPage.get_instance()
-        
-        context = {
-            'page_data': page_data,
-            'requirements': page_data.requirements.all().order_by('order')
-        }
-        return render(request, 'main/become_a_dealer.html', context)
-    
-    except Exception as e:
-        logger.error(f"Ошибка на странице 'Стать дилером': {str(e)}", exc_info=True)
-        return render(request, 'main/become_a_dealer.html', {'page_data': None})
-
-
 def lizing(request):
     return render(request, 'main/lizing.html')
 
@@ -172,17 +153,17 @@ def news_detail(request, slug):
         breadcrumbs = {
             'uz': {
                 'home': 'Bosh sahifa',
-                'news': 'VUM yangiliklar',
+                'news': 'Autoliga yangiliklar',
                 'current': news.title_uz if hasattr(news, 'title_uz') else news.title
             },
             'ru': {
                 'home': 'Главная',
-                'news': 'Новости VUM',
+                'news': 'Новости Autoliga',
                 'current': news.title_ru if hasattr(news, 'title_ru') else news.title
             },
             'en': {
                 'home': 'Home',
-                'news': 'VUM News',
+                'news': 'Autoliga News',
                 'current': news.title_en if hasattr(news, 'title_en') else news.title
             }
         }
@@ -234,7 +215,6 @@ from rest_framework.permissions import AllowAny, IsAdminUser
 from rest_framework.decorators import permission_classes
 
 class ContactFormViewSet(viewsets.ModelViewSet):
-    """API для контактных форм FAW.UZ"""
     serializer_class = ContactFormSerializer
     
     # ✅ ИСПРАВЛЕНО: Разные права для разных методов
@@ -358,24 +338,26 @@ class JobApplicationViewSet(viewsets.ModelViewSet):
 
 
 class ProductViewSet(viewsets.ReadOnlyModelViewSet):
-    """API для продуктов FAW"""
+    """API для продуктов"""
     permission_classes = [AllowAny]
     lookup_field = 'slug'
     
     def get_queryset(self):
         try:
-            queryset = Product.objects.filter(is_active=True).prefetch_related(
-                'card_specs__icon',   
-                'parameters',          
-                'features__icon',     
-                'gallery'             
+            queryset = Product.objects.filter(is_active=True).select_related(
+                'category'  # ✅ ИСПРАВЛЕНО: select_related вместо prefetch_related
+            ).prefetch_related(
+                'card_specs__icon',
+                'parameters',
+                'features__icon',
+                'gallery'
             ).order_by('order', 'title')
             
-            category = self.request.query_params.get('category', None)
-            if category:
-                from django.db.models import Q
+            category_slug = self.request.query_params.get('category', None)
+            if category_slug:
                 queryset = queryset.filter(
-                    Q(category=category) | Q(categories__icontains=category)
+                    category__slug=category_slug,  # ✅ ИСПРАВЛЕНО
+                    category__is_active=True
                 )
             
             return queryset
@@ -391,151 +373,51 @@ class ProductViewSet(viewsets.ReadOnlyModelViewSet):
 def products(request):
     """Страница со списком продуктов по категориям"""
     try:
-        category = request.GET.get('category', 'tiger_vh')
+        category_slug = request.GET.get('category')
         
-        CATEGORY_DATA = {
-            'samosval': {
-                'title': 'Samosvallar',
-                'title_ru': 'Самосвалы',
-                'title_en': 'Dump Trucks',
-                'slogan': 'Kuchli va ishonchli yuk tashish uchun mo\'ljallangan samosval avtomashinalar',
-                'slogan_ru': 'Самосвальные грузовики для мощных и надежных перевозок',
-                'slogan_en': 'Dump trucks for powerful and reliable transportation',
-                'hero_image': 'images/slider-foto_img/1.png',
-                'breadcrumb': 'Samosvallar'
-            },
-            'shassi': {
-                'title': 'Shassilar',
-                'title_ru': 'Шасси',
-                'title_en': 'Chassis',
-                'slogan': 'Turli maxsus qurilmalar o\'rnatish uchun mustahkam va ishonchli shassi',
-                'slogan_ru': 'Прочное и надежное шасси для установки различного специального оборудования',
-                'slogan_en': 'Strong and reliable chassis for mounting various special equipment',
-                'hero_image': 'images/slider-foto_img/2.png',
-                'breadcrumb': 'Shassilar'
-            },
-            'furgon': {
-                'title': 'Avtofurgonlar',
-                'title_ru': 'Фургоны',
-                'title_en': 'Vans',
-                'slogan': 'Xavfsiz va qulay yuk tashish uchun yopiq kuzovli avtomobillar',
-                'slogan_ru': 'Закрытые фургоны для безопасной и удобной перевозки грузов',
-                'slogan_en': 'Enclosed vans for safe and convenient cargo transportation',
-                'hero_image': 'images/slider-foto_img/4.png',
-                'breadcrumb': 'Avtofurgonlar'
-            },
-            'maxsus': {
-                'title': 'Maxsus texnika',
-                'title_ru': 'Спецтехника',
-                'title_en': 'Special Equipment',
-                'slogan': 'Maxsus vazifalarni bajarish uchun mo\'ljallangan keng turdagi texnika',
-                'slogan_ru': 'Широкий ассортимент техники для выполнения специальных задач',
-                'slogan_en': 'Wide range of equipment for special tasks',
-                'hero_image': 'images/slider-foto_img/5.png',
-                'breadcrumb': 'Maxsus texnika'
-            },
-            'tiger_v': {
-                'title': 'FAW Tiger V',
-                'title_ru': 'FAW Tiger V',
-                'title_en': 'FAW Tiger V',
-                'slogan': 'Zamonaviy texnologiyalar bilan jihozlangan Tiger V modeli',
-                'slogan_ru': 'Модель Tiger V с современными технологиями',
-                'slogan_en': 'Tiger V model with modern technologies',
-                'hero_image': 'images/slider-foto_img/5.png',
-                'breadcrumb': 'FAW Tiger V'
-            },
-            'tiger_vr': {
-                'title': 'FAW Tiger VR',
-                'title_ru': 'FAW Tiger VR',
-                'title_en': 'FAW Tiger VR',
-                'slogan': 'Yuqori sifatli Tiger VR modeli',
-                'slogan_ru': 'Высококачественная модель Tiger VR',
-                'slogan_en': 'High-quality Tiger VR model',
-                'hero_image': 'images/slider-foto_img/5.png',
-                'breadcrumb': 'FAW Tiger VR'
-            },
-            'tiger_vh': {
-                'title': 'FAW Tiger VH',
-                'title_ru': 'FAW Tiger VH',
-                'title_en': 'FAW Tiger VH',
-                'slogan': 'Ikki yoqilg\'ida harakatlanuvchi texnika',
-                'slogan_ru': 'Техника, работающая на двух видах топлива',
-                'slogan_en': 'Equipment operating on two types of fuel',
-                'hero_image': 'images/vh_models.png',
-                'breadcrumb': 'FAW Tiger VH'
-            },
-        }
+        if category_slug:
+            category = get_object_or_404(ProductCategory, slug=category_slug, is_active=True)
+            language = getattr(request, 'LANGUAGE_CODE', 'uz')
+            
+            category_info = {
+                'id': category.id,
+                'title': getattr(category, f'name_{language}', None) or category.name,
+                'slogan': getattr(category, f'description_{language}', None) or category.description or '',
+                'hero_image': category.hero_image.url if category.hero_image else 'images/default_hero.png',
+                'breadcrumb': getattr(category, f'name_{language}', None) or category.name
+            }
+        else:
+            # Первая активная категория по умолчанию
+            category = ProductCategory.objects.filter(is_active=True).order_by('order').first()
+            if category:
+                language = getattr(request, 'LANGUAGE_CODE', 'uz')
+                category_info = {
+                    'id': category.id,
+                    'title': getattr(category, f'name_{language}', None) or category.name,
+                    'slogan': getattr(category, f'description_{language}', None) or category.description or '',
+                    'hero_image': category.hero_image.url if category.hero_image else 'images/default_hero.png',
+                    'breadcrumb': getattr(category, f'name_{language}', None) or category.name
+                }
+                category_slug = category.slug
+            else:
+                category_info = {}
+                category_slug = None
         
-        category_info = CATEGORY_DATA.get(category, CATEGORY_DATA['tiger_vh'])
+        # Получаем все категории для навигации
+        all_categories = ProductCategory.objects.filter(is_active=True).order_by('order')
         
         return render(request, 'main/products.html', {
-            'category': category,
-            'category_info': category_info
+            'category_slug': category_slug,
+            'category_info': category_info,
+            'all_categories': all_categories
         })
     except Exception as e:
         logger.error(f"Ошибка на странице продуктов: {str(e)}", exc_info=True)
         return render(request, 'main/products.html', {
-            'category': 'tiger_vh', 
-            'category_info': {}
+            'category_slug': None,
+            'category_info': {},
+            'all_categories': []
         })
-
-
-class DealerViewSet(viewsets.ReadOnlyModelViewSet):
-    """API для дилеров FAW"""
-    serializer_class = DealerSerializer
-    permission_classes = [AllowAny]
-    filter_backends = [DjangoFilterBackend, SearchFilter]
-    filterset_fields = ['city', 'services__slug']
-    search_fields = ['name', 'city', 'address']
-    
-    def get_queryset(self):
-        return Dealer.objects.filter(is_active=True).prefetch_related('services').order_by('order', 'city')
-
-
-class DealerServiceViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = DealerService.objects.filter(is_active=True).order_by('order')
-    serializer_class = DealerServiceSerializer
-    permission_classes = [AllowAny]
-
-
-class BecomeADealerPageViewSet(viewsets.ViewSet):
-    permission_classes = [AllowAny]
-    
-    def list(self, request):
-        try:
-            page = BecomeADealerPage.get_instance()
-            serializer = BecomeADealerPageSerializer(page)
-            return Response(serializer.data)
-        except Exception as e:
-            logger.error(f"Ошибка получения страницы дилерства: {str(e)}", exc_info=True)
-            return Response({'error': 'Internal error'}, status=500)
-
-
-class BecomeADealerApplicationViewSet(viewsets.ModelViewSet):
-    queryset = BecomeADealerApplication.objects.all().order_by('-created_at')
-    serializer_class = BecomeADealerApplicationSerializer
-    
-    def get_permissions(self):
-        if self.action == 'create':
-            return [AllowAny()]
-        return [IsAdminUser()]
-    
-    def create(self, request, *args, **kwargs):
-        try:
-            serializer = self.get_serializer(data=request.data)
-            serializer.is_valid(raise_exception=True)
-            self.perform_create(serializer)
-            
-            return Response({
-                'success': True,
-                'message': "Arizangiz qabul qilindi! Tez orada siz bilan bog'lanamiz."
-            }, status=status.HTTP_201_CREATED)
-        except Exception as e:
-            logger.error(f"Ошибка создания заявки на дилерство: {str(e)}", exc_info=True)
-            return Response({
-                'success': False, 
-                'message': 'Xatolik yuz berdi'
-            }, status=500)
 
 @api_view(['POST'])
 @permission_classes([AllowAny])
@@ -561,3 +443,11 @@ def log_js_error(request):
     except Exception as e:
         logger.error(f"Ошибка логирования JS ошибки: {str(e)}", exc_info=True)
         return Response({'status': 'error'}, status=500)
+    
+class ProductCategoryViewSet(viewsets.ReadOnlyModelViewSet):
+    """API для категорий продуктов"""
+    serializer_class = ProductCategorySerializer
+    permission_classes = [AllowAny]
+    
+    def get_queryset(self):
+        return ProductCategory.objects.filter(is_active=True).order_by('order')

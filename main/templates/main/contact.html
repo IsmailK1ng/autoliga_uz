@@ -149,7 +149,7 @@
                                             <div class="row g-0 contact-info__container">
                                                 <div class="col-12 col-md-6 col-xl-5 mxd-paragraph__lists-item card_border">
                                                     <div class="mxd-paragraph__lists-title">
-                                                        <p class="t-large t-bright t-caption contact-fluid__txt">Van Universal Motors</p>
+                                                        <p class="t-large t-bright t-caption contact-fluid__txt">Autoliga</p>
                                                     </div>
                                                     <div class="contact-info__details">
                                                         <div class="contact-detail">
@@ -158,7 +158,7 @@
                                                             </div>
                                                             <div class="contact-detail__content">
                                                                 <h4 class="contact-detail__title">{% if LANGUAGE_CODE == 'uz' %}Telefon{% elif LANGUAGE_CODE == 'ru' %}Телефон{% else %}Phone{% endif %}</h4>
-                                                                <a href="tel:+998555086060" class="contact-detail__value">+998 55 508 60 60</a>
+                                                                <a href="tel:+998555086060" class="contact-detail__value">+998 00 000 00 00</a>
                                                             </div>
                                                         </div>
 
@@ -168,7 +168,7 @@
                                                             </div>
                                                             <div class="contact-detail__content">
                                                                 <h4 class="contact-detail__title">Email</h4>
-                                                                <a href="mailto:info@faw.uz" class="contact-detail__value">info@faw.uz</a>
+                                                                <a href="mailto:info@faw.uz" class="contact-detail__value">example@autoliga.uz</a>
                                                             </div>
                                                         </div>
 
@@ -180,11 +180,10 @@
                                                                 <h4 class="contact-detail__title">{% if LANGUAGE_CODE == 'uz' %}Manzil{% elif LANGUAGE_CODE == 'ru' %}Адрес{% else %}Address{% endif %}</h4>
                                                                 <p class="contact-detail__value">
                                                                     {% if LANGUAGE_CODE == 'uz' %}
-                                                                    Toshkent shahri, Yakkasaroy tumani A. Qahxara koʻchasi, 2A
+                                                                    Lorem ipsum dolor sit amet consectetur.
                                                                     {% elif LANGUAGE_CODE == 'ru' %}
-                                                                    г. Ташкент, район Яккасарай, ул. А. Кахара, 2А
-                                                                    {% else %}
-                                                                    Tashkent city, Yakkasaray district, A. Kakhara street, 2A
+                                                                    Lorem ipsum dolor sit amet, consectetur adipisicing.
+                                                                    Lorem ipsum dolor sit, amet consectetur adipisicing.
                                                                     {% endif %}
                                                                 </p>
                                                             </div>
@@ -264,7 +263,7 @@
                                                         </div>
                                                         
                                                         <div class="col-12 mxd-grid-item contact-grid-item">
-                                                            <textarea name="message" placeholder="{% if LANGUAGE_CODE == 'uz' %}Qanday yuk mashinasiga qiziqasiz? Qoʻshimcha savollar*{% elif LANGUAGE_CODE == 'ru' %}Какой грузовик вас интересует? Дополнительные вопросы*{% else %}What truck are you interested in? Additional questions*{% endif %}"></textarea>
+                                                            <textarea name="message" placeholder="{% if LANGUAGE_CODE == 'uz' %}Qanday mashinasiga qiziqasiz? Qoʻshimcha savollar*{% elif LANGUAGE_CODE == 'ru' %}Какая машина вас интересует? Дополнительные вопросы*{% else %}What Car are you interested in? Additional questions*{% endif %}"></textarea>
                                                         </div>
                                                         
                                                         <div class="col-12 mxd-grid-item">
@@ -278,40 +277,6 @@
                                                 </div>
                                             </form>
                                         </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Section CTA -->
-        <div class="mxd-section overflow-hidden">
-            <div class="mxd-container">
-                <div class="mxd-block">
-                    <div class="mxd-promo">
-                        <div class="mxd-promo__inner anim-zoom-out-container">
-                            <div class="mxd-promo__bg"></div>
-                            <div class="mxd-promo__content">
-                                <div class="mxd-promo__layout">
-                                    <div class="mxd-promo__icon-section">
-                                        <span class="mxd-promo__icon">
-                                            <img src="{% static 'images/faw-logo.svg' %}" alt="FAW Icon">
-                                            <span class="mxd-promo__icon-tx reveal-type">FAW TRUCKS</span>
-                                        </span>
-                                    </div>
-                                    <div class="mxd-promo__text-section">
-                                        <span class="mxd-promo__caption reveal-type">
-                                            {% if LANGUAGE_CODE == 'uz' %}
-                                            FAW bu – ishonchli texnika. Har qanday iqlimda, har qanday yoʻlda FAW oʻzini koʻrsatadi. Buning ortida esa oʻz ishini sidqidildan bajarayotgan kuchli va jips jamoamiz turibdi. Har bir mijoz biz uchun muhim, har bir yuk – masʼuliyat. FAW jamoasi – bu tajriba, halollik va xizmatga sadoqat!
-                                            {% elif LANGUAGE_CODE == 'ru' %}
-                                            FAW — это надежная техника. В любом климате, на любой дороге FAW показывает себя. За этим стоит наша сильная и сплоченная команда, искренне выполняющая свою работу. Каждый клиент для нас важен, каждый груз — ответственность. Команда FAW — это опыт, честность и преданность делу!
-                                            {% else %}
-                                            FAW is reliable equipment. In any climate, on any road, FAW proves itself. Behind this stands our strong and cohesive team, sincerely performing their work. Every client is important to us, every cargo is a responsibility. The FAW team is experience, honesty, and dedication to service!
-                                            {% endif %}
-                                        </span>
                                     </div>
                                 </div>
                             </div>

@@ -8,8 +8,7 @@ from main.serializers_base import LanguageSerializerMixin
 
 from .models import (
     News, NewsBlock, ContactForm, JobApplication, 
-    Product, FeatureIcon, ProductCardSpec, ProductParameter, ProductFeature, ProductGallery,  
-    DealerService, Dealer, BecomeADealerPage, BecomeADealerApplication,
+    Product, FeatureIcon, ProductCardSpec, ProductParameter, ProductFeature, ProductGallery, ProductCategory,
     Vacancy, VacancyResponsibility, VacancyRequirement, VacancyCondition, VacancyIdealCandidate
 )
 
@@ -160,40 +159,27 @@ class ProductCardSerializer(serializers.ModelSerializer):
     """Карточки продуктов для списка"""
     card_specs = ProductCardSpecSerializer(many=True, read_only=True)
     image_url = serializers.SerializerMethodField()
-    category_display = serializers.CharField(source='get_category_display', read_only=True)
-    
-
-    all_categories = serializers.SerializerMethodField()
+    category = serializers.SerializerMethodField()  # ✅ ИСПРАВЛЕНО
     
     class Meta:
         model = Product
         fields = [
-            'id', 'title', 'slug', 'category', 'category_display',
-            'all_categories',  
+            'id', 'title', 'slug',
+            'category',  # ✅ Теперь одна категория
             'image_url', 'card_specs', 'is_featured', 'order'
         ]
     
-    def get_all_categories(self, obj):
-        """Возвращает все категории продукта (основную + дополнительные)"""
-        categories = [obj.category]  
-        
-        # Добавляем дополнительные
-        if obj.categories:
-            additional = [cat.strip() for cat in obj.categories.split(',') if cat.strip()]
-            categories.extend(additional)
-        
-        # Убираем дубликаты
-        categories = list(dict.fromkeys(categories))
-        
-        # Возвращаем с названиями
-        result = []
-        for cat_slug in categories:
-            for slug, name in Product.CATEGORY_CHOICES:
-                if slug == cat_slug:
-                    result.append({'slug': slug, 'name': name})
-                    break
-        
-        return result
+    def get_category(self, obj):
+        """✅ НОВОЕ: Возвращает одну категорию"""
+        if obj.category and obj.category.is_active:
+            language = self.get_current_language()
+            name = getattr(obj.category, f'name_{language}', None) or obj.category.name
+            return {
+                'id': obj.category.id,
+                'slug': obj.category.slug,
+                'name': name
+            }
+        return None
     
     def get_image_url(self, obj):
         """Возвращает URL изображения для карточки"""
@@ -204,7 +190,6 @@ class ProductCardSerializer(serializers.ModelSerializer):
                 return request.build_absolute_uri(image.url)
             return image.url
         return None
-
 
 class ProductFeatureSerializer(LanguageSerializerMixin, serializers.ModelSerializer):
     """8 характеристик с иконками"""
@@ -245,45 +230,33 @@ class ProductDetailSerializer(LanguageSerializerMixin, serializers.ModelSerializ
     gallery = ProductGallerySerializer(many=True, read_only=True)
     main_image_url = serializers.SerializerMethodField()
     card_image_url = serializers.SerializerMethodField()
-    category_display = serializers.CharField(source='get_category_display', read_only=True)
     title = serializers.SerializerMethodField()
-    
-    # ✅ Новое поле
-    all_categories = serializers.SerializerMethodField()
+    category = serializers.SerializerMethodField()  # ✅ ИСПРАВЛЕНО
     
     class Meta:
         model = Product
         fields = [
-            'id', 'title', 'slug', 'category', 'category_display',
-            'all_categories',  # ✅ добавили
+            'id', 'title', 'slug',
+            'category',  # ✅ Теперь одна категория
             'main_image_url', 'card_image_url',
             'card_specs', 'spec_groups', 'features', 'gallery',
             'is_active', 'is_featured', 'order'
         ]
     
-    def get_all_categories(self, obj):
-        """Возвращает все категории продукта с переводами"""
-        language = self.get_current_language()
-        
-        # Получаем все категории
-        categories = [obj.category]
-        if obj.categories:
-            additional = [cat.strip() for cat in obj.categories.split(',') if cat.strip()]
-            categories.extend(additional)
-        
-        # Убираем дубликаты
-        categories = list(dict.fromkeys(categories))
-        
-        # Возвращаем с названиями на нужном языке
-        result = []
-        for cat_slug in categories:
-            for slug, name in Product.CATEGORY_CHOICES:
-                if slug == cat_slug:
-                    # Здесь можно добавить переводы названий категорий если нужно
-                    result.append({'slug': slug, 'name': name})
-                    break
-        
-        return result
+    def get_category(self, obj):
+        """✅ НОВОЕ: Возвращает одну категорию с переводами"""
+        if obj.category and obj.category.is_active:
+            language = self.get_current_language()
+            name = getattr(obj.category, f'name_{language}', None) or obj.category.name
+            description = getattr(obj.category, f'description_{language}', None) or obj.category.description or ''
+            
+            return {
+                'id': obj.category.id,
+                'slug': obj.category.slug,
+                'name': name,
+                'description': description
+            }
+        return None
     
     def get_title(self, obj):
         lang = self.get_current_language()  
@@ -377,57 +350,34 @@ class ProductDetailSerializer(LanguageSerializerMixin, serializers.ModelSerializ
             return obj.card_image.url
         return None
 
-class DealerServiceSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = DealerService
-        fields = ['id', 'name', 'slug']
-
-
-class DealerSerializer(serializers.ModelSerializer):
-    services = serializers.SerializerMethodField()
-    coordinates = serializers.SerializerMethodField()
+class ProductCategorySerializer(LanguageSerializerMixin, serializers.ModelSerializer):
+    """Сериализатор для категорий продуктов"""
+    name = serializers.SerializerMethodField()
+    description = serializers.SerializerMethodField()
+    hero_image_url = serializers.SerializerMethodField()
     
     class Meta:
-        model = Dealer
-        fields = [
-            'id', 'name', 'city', 'address', 'coordinates',
-            'phone', 'email', 'website', 'working_hours',
-            'manager', 'services'
-        ]
+        model = ProductCategory
+        fields = ['id', 'slug', 'name', 'description', 'hero_image_url', 'order']  # ✅ Убрали icon_url
     
-    def get_services(self, obj):
-        return [service.name for service in obj.services.all()]
+    def get_name(self, obj):
+        """Название на текущем языке"""
+        lang = self.get_current_language()
+        return getattr(obj, f'name_{lang}', None) or obj.name
     
-    def get_coordinates(self, obj):
-        return [float(obj.latitude), float(obj.longitude)]
-
-
-class BecomeADealerPageSerializer(serializers.ModelSerializer):
-    requirements = serializers.SerializerMethodField()
+    def get_description(self, obj):
+        """Описание на текущем языке"""
+        lang = self.get_current_language()
+        return getattr(obj, f'description_{lang}', None) or obj.description or ''
     
-    class Meta:
-        model = BecomeADealerPage
-        fields = [
-            'title', 'intro_text', 'subtitle', 'important_note',
-            'requirements', 'contact_phone', 'contact_email', 'contact_address'
-        ]
-    
-    def get_requirements(self, obj):
-        return [req.text for req in obj.requirements.all().order_by('order')]
-
-
-class BecomeADealerApplicationSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = BecomeADealerApplication
-        fields = [
-            'name', 'company_name', 'experience_years', 
-            'region', 'phone', 'message'
-        ]
-    
-    def create(self, validated_data):
-        validated_data['status'] = 'new'
-        validated_data['priority'] = 'medium'
-        return super().create(validated_data)
+    def get_hero_image_url(self, obj):
+        """URL фонового изображения"""
+        if obj.hero_image:
+            request = self.context.get('request')
+            if request:
+                return request.build_absolute_uri(obj.hero_image.url)
+            return obj.hero_image.url
+        return None
     
 # ========== СЕРИАЛИЗАТОР ДЛЯ ВАКАНСИЙ ==========
 

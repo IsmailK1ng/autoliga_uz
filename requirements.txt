@@ -38,7 +38,7 @@ openpyxl==3.1.5
 Unidecode==1.4.0
 
 # ============ FILTERS & PAGINATION ============
-django-filter==25.2
+django-filter==24.3
 
 # ============ UTILITIES ============
 SQLAlchemy==2.0.43

@@ -323,6 +323,7 @@ class ContactFormAdmin(LeadManagerMixin, admin.ModelAdmin):
     change_list_template = 'main/contactform/change_list.html'
     preserve_filters = True
     
+
     list_select_related = ['manager']
     list_per_page = 50
     show_full_result_count = False
@@ -658,101 +659,101 @@ class ContactFormAdmin(LeadManagerMixin, admin.ModelAdmin):
     
 # ============ ВАКАНСИИ ============
 
-# class VacancyResponsibilityInline(TranslationStackedInline):
-#     model = VacancyResponsibility
-#     extra = 2
-#     fields = (('title', 'order'), 'text')
+class VacancyResponsibilityInline(TranslationStackedInline):
+    model = VacancyResponsibility
+    extra = 2
+    fields = (('title', 'order'), 'text')
 
-# class VacancyRequirementInline(TranslationTabularInline):
-#     model = VacancyRequirement
-#     extra = 3
-#     fields = ('text', 'order')
+class VacancyRequirementInline(TranslationTabularInline):
+    model = VacancyRequirement
+    extra = 3
+    fields = ('text', 'order')
 
-# class VacancyConditionInline(TranslationTabularInline):
-#     model = VacancyCondition
-#     extra = 3
-#     fields = ('text', 'order')
+class VacancyConditionInline(TranslationTabularInline):
+    model = VacancyCondition
+    extra = 3
+    fields = ('text', 'order')
 
-# class VacancyIdealCandidateInline(TranslationTabularInline):
-#     model = VacancyIdealCandidate
-#     extra = 3
-#     fields = ('text', 'order')
+class VacancyIdealCandidateInline(TranslationTabularInline):
+    model = VacancyIdealCandidate
+    extra = 3
+    fields = ('text', 'order')
 
-# @admin.register(Vacancy)
-# class VacancyAdmin(ContentAdminMixin, CustomReversionMixin, VersionAdmin, TabbedTranslationAdmin):
-#     list_display = ['title', 'is_active', 'applications_count', 'order', 'created_at']
-#     list_filter = ['is_active', 'created_at']
-#     search_fields = ['title', 'short_description']
-#     prepopulated_fields = {'slug': ('title',)}
-#     readonly_fields = ['created_at', 'updated_at', 'applications_count']
-#     inlines = [VacancyResponsibilityInline, VacancyRequirementInline, VacancyIdealCandidateInline, VacancyConditionInline]
-#     history_latest_first = True
+@admin.register(Vacancy)
+class VacancyAdmin(ContentAdminMixin, CustomReversionMixin, VersionAdmin, TabbedTranslationAdmin):
+    list_display = ['title', 'is_active', 'applications_count', 'order', 'created_at']
+    list_filter = ['is_active', 'created_at']
+    search_fields = ['title', 'short_description']
+    prepopulated_fields = {'slug': ('title',)}
+    readonly_fields = ['created_at', 'updated_at', 'applications_count']
+    inlines = [VacancyResponsibilityInline, VacancyRequirementInline, VacancyIdealCandidateInline, VacancyConditionInline]
+    history_latest_first = True
     
-#     fieldsets = (
-#         ('Основная информация', {'fields': ('title', 'slug', 'short_description', 'is_active', 'order')}),
-#         ('Контакты', {'fields': ('contact_info',)}),
-#         ('Статистика', {'fields': ('applications_count', 'created_at', 'updated_at'), 'classes': ('collapse',)}),
-#     )
+    fieldsets = (
+        ('Основная информация', {'fields': ('title', 'slug', 'short_description', 'is_active', 'order')}),
+        ('Контакты', {'fields': ('contact_info',)}),
+        ('Статистика', {'fields': ('applications_count', 'created_at', 'updated_at'), 'classes': ('collapse',)}),
+    )
     
-#     def applications_count(self, obj):
-#         count = obj.get_applications_count()
-#         if count > 0:
-#             return format_html(
-#                 '<a href="/admin/main/jobapplication/?vacancy__id__exact={}" style="color:#007bff;font-weight:bold;"> {} Заявок</a>',
-#                 obj.id, count
-#             )
-#         return '0 заявок'
-#     applications_count.short_description = 'Заявки'
+    def applications_count(self, obj):
+        count = obj.get_applications_count()
+        if count > 0:
+            return format_html(
+                '<a href="/admin/main/jobapplication/?vacancy__id__exact={}" style="color:#007bff;font-weight:bold;"> {} Заявок</a>',
+                obj.id, count
+            )
+        return '0 заявок'
+    applications_count.short_description = 'Заявки'
 
-#     def changelist_view(self, request, extra_context=None):
-#         extra_context = extra_context or {}
-#         deleted_count = Version.objects.get_deleted(self.model).count()
-#         if deleted_count > 0:
-#             extra_context['show_recover_button'] = True
-#             extra_context['deleted_count'] = deleted_count
-#         return super().changelist_view(request, extra_context)
+    def changelist_view(self, request, extra_context=None):
+        extra_context = extra_context or {}
+        deleted_count = Version.objects.get_deleted(self.model).count()
+        if deleted_count > 0:
+            extra_context['show_recover_button'] = True
+            extra_context['deleted_count'] = deleted_count
+        return super().changelist_view(request, extra_context)
 
-# @admin.register(JobApplication)
-# class JobApplicationAdmin(LeadManagerMixin, admin.ModelAdmin):
-#     list_display = ['vacancy', 'region', 'applicant_name', 'resume_link', 'file_size_display', 'created_at', 'is_processed_badge']
-#     list_filter = ['is_processed', 'vacancy', 'region', 'created_at']
-#     search_fields = ['applicant_name', 'applicant_phone', 'applicant_email', 'vacancy__title']
-#     readonly_fields = ['created_at', 'file_size_display', 'resume_preview']
-#     date_hierarchy = 'created_at'
-#     autocomplete_fields = ['vacancy']
+@admin.register(JobApplication)
+class JobApplicationAdmin(LeadManagerMixin, admin.ModelAdmin):
+    list_display = ['vacancy', 'region', 'applicant_name', 'resume_link', 'file_size_display', 'created_at', 'is_processed_badge']
+    list_filter = ['is_processed', 'vacancy', 'region', 'created_at']
+    search_fields = ['applicant_name', 'applicant_phone', 'applicant_email', 'vacancy__title']
+    readonly_fields = ['created_at', 'file_size_display', 'resume_preview']
+    date_hierarchy = 'created_at'
+    autocomplete_fields = ['vacancy']
     
-#     fieldsets = (
-#         ('Информация', {'fields': ('vacancy', 'region', 'created_at')}),
-#         ('Резюме', {'fields': ('resume', 'file_size_display', 'resume_preview')}),
-#         ('Контакты', {'fields': ('applicant_name', 'applicant_phone', 'applicant_email')}),
-#         ('Обработка', {'fields': ('is_processed', 'admin_comment')}),
-#     )
+    fieldsets = (
+        ('Информация', {'fields': ('vacancy', 'region', 'created_at')}),
+        ('Резюме', {'fields': ('resume', 'file_size_display', 'resume_preview')}),
+        ('Контакты', {'fields': ('applicant_name', 'applicant_phone', 'applicant_email')}),
+        ('Обработка', {'fields': ('is_processed', 'admin_comment')}),
+    )
     
-#     def resume_link(self, obj):
-#         if obj.resume:
-#             return format_html('<a href="{}" target="_blank" style="color:#007bff;font-weight:bold;"> Скачать</a>', obj.resume.url)
-#         return "—"
-#     resume_link.short_description = 'Резюме'
+    def resume_link(self, obj):
+        if obj.resume:
+            return format_html('<a href="{}" target="_blank" style="color:#007bff;font-weight:bold;"> Скачать</a>', obj.resume.url)
+        return "—"
+    resume_link.short_description = 'Резюме'
     
-#     def file_size_display(self, obj):
-#         size = obj.get_file_size()
-#         return f"{size} MB" if size else "—"
-#     file_size_display.short_description = 'Размер'
+    def file_size_display(self, obj):
+        size = obj.get_file_size()
+        return f"{size} MB" if size else "—"
+    file_size_display.short_description = 'Размер'
     
-#     def resume_preview(self, obj):
-#         if obj.resume:
-#             file_ext = obj.resume.name.split('.')[-1].lower()
-#             if file_ext in ['jpg', 'jpeg', 'png']:
-#                 return format_html('<img src="{}" width="300" style="border-radius:8px;">', obj.resume.url)
-#             return format_html('<p style="color:#888;"> {}</p>', obj.resume.name)
-#         return "—"
-#     resume_preview.short_description = 'Превью'
+    def resume_preview(self, obj):
+        if obj.resume:
+            file_ext = obj.resume.name.split('.')[-1].lower()
+            if file_ext in ['jpg', 'jpeg', 'png']:
+                return format_html('<img src="{}" width="300" style="border-radius:8px;">', obj.resume.url)
+            return format_html('<p style="color:#888;"> {}</p>', obj.resume.name)
+        return "—"
+    resume_preview.short_description = 'Превью'
     
-#     def is_processed_badge(self, obj):
-#         if obj.is_processed:
-#             return format_html('<span style="color:green;font-weight:bold;"> Рассмотрено</span>')
-#         return format_html('<span style="color:orange;font-weight:bold;"> Новая</span>')
-#     is_processed_badge.short_description = 'Статус'
+    def is_processed_badge(self, obj):
+        if obj.is_processed:
+            return format_html('<span style="color:green;font-weight:bold;"> Рассмотрено</span>')
+        return format_html('<span style="color:orange;font-weight:bold;"> Новая</span>')
+    is_processed_badge.short_description = 'Статус'
 
 # ============ ИКОНКИ ============
 
@@ -864,9 +865,10 @@ class ProductGalleryInline(admin.TabularInline):
 
 @admin.register(Product)
 class ProductAdmin(ContentAdminMixin, CustomReversionMixin, VersionAdmin, TabbedTranslationAdmin):
-    list_display = ['thumbnail', 'title', 'category_display', 'is_active', 'is_featured', 'slider_order', 'order']  
+    list_display = ['thumbnail', 'title', 'category_display', 'is_active', 'is_featured', 'slider_order', 'order']
     list_filter = [ProductCategoryFilter, 'is_active', 'is_featured']
     search_fields = ['title', 'slug']
+    list_editable = ['is_active', 'is_featured', 'slider_order', 'order']
     prepopulated_fields = {'slug': ('title',)}
     history_latest_first = True
     actions = ['add_to_slider', 'remove_from_slider']
@@ -977,8 +979,8 @@ class ProductAdmin(ContentAdminMixin, CustomReversionMixin, VersionAdmin, Tabbed
         
         return JsonResponse({'suggestions': result})
 
-# @admin.register(AmoCRMToken)
-# class AmoCRMTokenAdmin(AmoCRMAdminMixin, admin.ModelAdmin):
+@admin.register(AmoCRMToken)
+class AmoCRMTokenAdmin(AmoCRMAdminMixin, admin.ModelAdmin):
     list_display = ['token_status', 'expires_display', 'time_left_display', 'action_buttons']
     
     # ========== ОТОБРАЖЕНИЕ ==========

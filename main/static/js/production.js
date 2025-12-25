@@ -302,10 +302,9 @@ async loadCategories() {
     return `
       <div class="faw-truck-card">
         <div class="truck-image-container">
-          ${imageUrl ? `<img src="${imageUrl}" alt="${productTitle}" class="truck-image">` : ''}
+          ${imageUrl ? `<img src="${imageUrl}"  class="truck-image">` : ''}
         </div>
         <div class="truck-info">
-          <h3 class="truck-title">${productTitle}</h3>
           ${specsHTML ? `<div class="truck-specs">${specsHTML}</div>` : ''}
           <div class="truck-cta">
             <a href="/products/${productSlug}/" class="btn-details">${buttonText}</a>

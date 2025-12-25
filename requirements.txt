@@ -1,5 +1,4 @@
 # ============================================
-# FAW UZBEKISTAN + KYRGYZSTAN
 # Multi-tenant Django Admin Panel
 # ============================================
 

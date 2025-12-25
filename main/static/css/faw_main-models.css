@@ -259,16 +259,6 @@
     transition: transform 0.3s;
 }
 
-.truck-image-container::before {
-    position: absolute;
-    content: "FAW";
-    bottom: 10px;
-    left: 10px;
-    background: white;
-    padding: 5px 15px;
-    border-radius: 10px 0;
-    color: #000;
-}
 
 .truck-info {
     row-gap: 10px;

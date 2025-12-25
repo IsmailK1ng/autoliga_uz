@@ -91,7 +91,7 @@ JAZZMIN_SETTINGS = {
     "show_language_switcher": False,
     
     "topmenu_links": [
-        {"name": "Сайт UZ", "url": "#", "new_window": True},
+        {"name": "Сайт UZ", "url": "https://autoliga.uz", "new_window": True},
     ],
     
     "icons": {

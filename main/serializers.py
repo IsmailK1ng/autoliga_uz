@@ -155,24 +155,24 @@ class ProductCardSpecSerializer(serializers.ModelSerializer):
         fields = ['id', 'icon', 'value', 'order']
 
 
-class ProductCardSerializer(serializers.ModelSerializer):
+class ProductCardSerializer(LanguageSerializerMixin, serializers.ModelSerializer):
     """Карточки продуктов для списка"""
     card_specs = ProductCardSpecSerializer(many=True, read_only=True)
     image_url = serializers.SerializerMethodField()
-    category = serializers.SerializerMethodField()  # ✅ ИСПРАВЛЕНО
+    category = serializers.SerializerMethodField()
     
     class Meta:
         model = Product
         fields = [
             'id', 'title', 'slug',
-            'category',  # ✅ Теперь одна категория
+            'category',
             'image_url', 'card_specs', 'is_featured', 'order'
         ]
     
     def get_category(self, obj):
-        """✅ НОВОЕ: Возвращает одну категорию"""
+        """Возвращает одну категорию"""
         if obj.category and obj.category.is_active:
-            language = self.get_current_language()
+            language = self.get_current_language()  # ✅ Теперь работает
             name = getattr(obj.category, f'name_{language}', None) or obj.category.name
             return {
                 'id': obj.category.id,

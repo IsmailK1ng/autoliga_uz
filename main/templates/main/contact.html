@@ -10,10 +10,6 @@
     <title>{% if LANGUAGE_CODE == 'uz' %}Kontaktlar{% elif LANGUAGE_CODE == 'ru' %}Контакты{% else %}Contacts{% endif %} | FAW Trucks</title>
     {% hreflang_tags %}
     {% canonical_url %}
-    <!-- Meta Tags -->
-    <meta name="description" content="{% if LANGUAGE_CODE == 'uz' %}FAW Trucks Oʻzbekiston - aloqa maʼlumotlari{% elif LANGUAGE_CODE == 'ru' %}FAW Trucks Узбекистан - контактная информация{% else %}FAW Trucks Uzbekistan - contact information{% endif %}" />
-    <meta name="keywords" content="FAW Trucks, {% if LANGUAGE_CODE == 'uz' %}Oʻzbekiston, kontaktlar{% elif LANGUAGE_CODE == 'ru' %}Узбекистан, контакты{% else %}Uzbekistan, contacts{% endif %}" />
-    <meta name="author" content="mix_design" />
 
     <!-- Viewport Meta-->
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
@@ -22,56 +18,6 @@
     <!-- Универсальный favicon -->
     <link rel="icon" href="{% static 'images/logo/autoliga-logo.png' %}" />
     <link rel="apple-touch-icon" href="{% static 'images/logo/autoliga-logo.png' %}">
-
-    <!-- Facebook Metadata -->
-    <meta property="og:image:height" content="1200" />
-    <meta property="og:image:width" content="1200" />
-    <meta property="og:title" content="{% if LANGUAGE_CODE == 'uz' %}Kontaktlar{% elif LANGUAGE_CODE == 'ru' %}Контакты{% else %}Contacts{% endif %} | FAW Trucks" />
-    <meta property="og:description" content="{% if LANGUAGE_CODE == 'uz' %}FAW Trucks bilan bogʻlaning{% elif LANGUAGE_CODE == 'ru' %}Свяжитесь с FAW Trucks{% else %}Contact FAW Trucks{% endif %}" />
-    <meta property="og:url" content="https://fawtrucks.uz/contact" />
-    <meta property="og:image" content="{% static 'images/og-image.jpg' %}" />
-
-    <!-- Google Tag Manager -->
-    <script>(function (w, d, s, l, i) {
-            w[l] = w[l] || []; w[l].push({
-                'gtm.start':
-                    new Date().getTime(), event: 'gtm.js'
-            }); var f = d.getElementsByTagName(s)[0],
-                j = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : ''; j.async = true; j.src =
-                    'https://www.googletagmanager.com/gtm.js?id=' + i + dl; f.parentNode.insertBefore(j, f);
-        })(window, document, 'script', 'dataLayer', 'GTM-M33GWKMW');</script>
-
-    <!-- Meta Pixel Code -->
-    <script>
-        !function (f, b, e, v, n, t, s) {
-            if (f.fbq) return; n = f.fbq = function () {
-                n.callMethod ?
-                    n.callMethod.apply(n, arguments) : n.queue.push(arguments)
-            };
-            if (!f._fbq) f._fbq = n; n.push = n; n.loaded = !0; n.version = '2.0';
-            n.queue = []; t = b.createElement(e); t.async = !0;
-            t.src = v; s = b.getElementsByTagName(e)[0];
-            s.parentNode.insertBefore(t, s)
-        }(window, document, 'script',
-            'https://connect.facebook.net/en_US/fbevents.js');
-        fbq('init', '2271244510044933');
-        fbq('track', 'PageView');
-    </script>
-    <noscript><img height="1" width="1" style="display:none"
-            src="https://www.facebook.com/tr?id=2271244510044933&ev=PageView&noscript=1" /></noscript>
-
-    <!-- amoCRM Pixel -->
-    <script type="text/javascript" id="amo_pixel_identifier_js" async="async"
-        src="https://piper.amocrm.ru/pixel/js/identifier/pixel_identifier.js"></script>
-    <script>
-        window.AMOPIXEL_IDENTIFIER_PARAMS = window.AMOPIXEL_IDENTIFIER_PARAMS || {};
-        window.AMOPIXEL_IDENTIFIER_PARAMS.onload = function (pixel_identifier) {
-            var visitor_uid = pixel_identifier.getVisitorUid();
-            if (visitor_uid) {
-                sessionStorage.setItem('amo_visitor_uid', visitor_uid);
-            }
-        };
-    </script>
 
     <!-- Template Styles -->
     <link rel="stylesheet" type="text/css" href="{% static 'css/loaders/loader.css' %}" />

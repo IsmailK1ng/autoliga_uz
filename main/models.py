@@ -492,7 +492,7 @@ class Vacancy(models.Model):
     title = models.CharField("Название", max_length=255)
     slug = models.SlugField("URL", max_length=255, unique=True)
     short_description = models.TextField("Описание", max_length=500, blank=True)
-    contact_info = models.TextField("Контакты", default='Присылайте резюме на info@faw.uz')
+    contact_info = models.TextField("Контакты", default='Присылайте резюме на info@autoliga.uz')
     is_active = models.BooleanField("Активна", default=True)
     order = models.PositiveIntegerField("Порядок", default=0)
     created_at = models.DateTimeField("Дата создания", auto_now_add=True)

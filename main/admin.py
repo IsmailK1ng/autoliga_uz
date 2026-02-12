@@ -392,7 +392,7 @@ class ContactFormAdmin(LeadManagerMixin, admin.ModelAdmin):
     
     def action_buttons(self, obj):
         """Кнопки действий"""
-        view_url = f"https://fawtrucks.amocrm.ru/leads/detail/{obj.amocrm_lead_id}" if obj.amocrm_lead_id else f"/admin/main/contactform/{obj.id}/change/"
+        # view_url = f"https://fawtrucks.amocrm.ru/leads/detail/{obj.amocrm_lead_id}" if obj.amocrm_lead_id else f"/admin/main/contactform/{obj.id}/change/"
         view_title = "Открыть в amoCRM" if obj.amocrm_lead_id else "Просмотр заявки"
         
         return format_html('''
@@ -414,7 +414,7 @@ class ContactFormAdmin(LeadManagerMixin, admin.ModelAdmin):
     def amocrm_lead_link(self, obj):
         """Ссылка на лид в amoCRM"""
         if obj.amocrm_lead_id:
-            url = f"https://fawtrucks.amocrm.ru/leads/detail/{obj.amocrm_lead_id}"
+            # url = f"https://fawtrucks.amocrm.ru/leads/detail/{obj.amocrm_lead_id}"
             return format_html(
                 '<a href="{}" target="_blank" style="color:#3b82f6;font-weight:600;">Открыть в amoCRM (ID: {})</a>',
                 url, obj.amocrm_lead_id
@@ -514,7 +514,7 @@ class ContactFormAdmin(LeadManagerMixin, admin.ModelAdmin):
             response = HttpResponse(
                 content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
             )
-            response['Content-Disposition'] = f'attachment; filename="faw_uz_contacts_{datetime.now().strftime("%Y%m%d_%H%M%S")}.xlsx"'
+            # response['Content-Disposition'] = f'attachment; filename="faw_uz_contacts_{datetime.now().strftime("%Y%m%d_%H%M%S")}.xlsx"'
             wb.save(response)
             
             return response

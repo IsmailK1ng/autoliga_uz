@@ -1,8 +1,8 @@
-# 🚀 FAW SITE Backend
+# 🚀 Autoliga SITE Backend
 
 Backend проект на **Django + Django REST Framework** для сайтов:
-- 🇺🇿 **FAW.UZ** (Узбекистан)
-- 🇰🇬 **FAW.KG** (Кыргызстан)
+- 🇺🇿 **Autoliga.uz* (Узбекистан)
+
 
 Проект включает админ-панель, REST API, Swagger-документацию и мультиязычную поддержку.
 
@@ -68,8 +68,7 @@ Backend проект на **Django + Django REST Framework** для сайтов
 
 ### 1️⃣ Клонировать репозиторий
 ```bash
-git clone https://github.com/your-username/FAW_SITE-back.git
-cd FAW_SITE-back/myproject
+git clone 
 2️⃣ Создать и активировать виртуальное окружение
 Windows:
 
@@ -106,7 +105,7 @@ python manage.py migrate news 0002
 🧹 Сбор статических файлов (collectstatic)
 Если проект деплоится на сервер и нужны статики:
 
-python manage.py collectstatic
+
 
 bash
 python manage.py save_amocrm_tokens
@@ -165,8 +164,6 @@ bash
 /i18n/setlang/?language=ru
 /i18n/setlang/?language=en
 🧑‍💻 Автор
-FAW Dev Team
-📧 support@faw-site.local
 📅 2025
 
 💡 Примечания

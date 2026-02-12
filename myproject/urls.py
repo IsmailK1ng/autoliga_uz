@@ -8,9 +8,9 @@ from django.conf.urls.i18n import i18n_patterns
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 from main.views import set_language_get
 
-admin.site.site_header = "FAW Admin"
-admin.site.site_title = "FAW"
-admin.site.index_title = "Админ панель VUM Site"
+admin.site.site_header = "AUTOLIGA ADMIN"
+admin.site.site_title = "AUTOLIGA"
+admin.site.index_title = "Админ панель Autoliga Site"
 
 # ========== БАЗОВЫЕ РОУТЫ (без языка) ==========
 urlpatterns = [

@@ -1,50 +1,19 @@
+{% extends "base.html" %}
 {% load static %}
-{% load seo_tags %} 
-<!DOCTYPE html>
-<html lang="{{ LANGUAGE_CODE|default:'uz' }}" dir="ltr">
+{% load seo_tags %}
 
-<head>
-  <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
-  <title>
-    {% if LANGUAGE_CODE == 'uz' %}
-    Autoliga Yangiliklar
-    {% elif LANGUAGE_CODE == 'ru' %}
-    Новости Autoliga
-    {% else %}
-    Autoliga News
-    {% endif %}
-  </title>
-  {% hreflang_tags %}
-  {% canonical_url %}
-  <!-- Meta Tags -->
-  <meta name="description" content="{% if LANGUAGE_CODE == 'uz' %}Autoliga so'nggi yangiliklari{% elif LANGUAGE_CODE == 'ru' %}Последние новости Autoliga{% else %}Latest news from Autoliga{% endif %}">
+{% block breadcrumbs %}
+<link rel="stylesheet" href="{% static 'css/breadcrumbs.css' %}">
+{% endblock breadcrumbs %}
 
-  <!-- Универсальный favicon -->
-  <link rel="icon" href="{% static 'images/logo/autoliga-logo.png' %}" />
-  <!-- Для Apple устройств -->
-  <link rel="apple-touch-icon" href="{% static 'images/logo/autoliga-logo.png' %}">
+ {% block site_news %}
+<link rel="stylesheet" href="{% static 'css/site_news.css' %}">
+ {% endblock site_news %}
 
-  <!-- Styles -->
-  <link rel="stylesheet" href="{% static 'css/loaders/loader.css' %}">
-  <link rel="stylesheet" href="{% static 'css/plugins.css' %}">
-  <link rel="stylesheet" href="{% static 'css/main_site.css' %}">
-  <link rel="stylesheet" href="{% static 'css/site_main.css' %}">
-  <link rel="stylesheet" href="{% static 'css/breadcrumbs.css' %}">
-  <link rel="stylesheet" href="{% static 'css/site_news.css' %}">
 
-  <!-- Browser Color -->
-  <meta name="theme-color" media="(prefers-color-scheme: light)" content="#FAF7F6">
-  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#161616">
-  <meta name="msapplication-navbutton-color" content="#161616">
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-</head>
+{% block content %}
 
-<body>
-   
   <!-- Loader -->
   <div id="loader" style="display: none;" class="loader">
     <div class="loader__wrapper">
@@ -494,6 +463,4 @@
     });
   </script>
 
-</body>
-
-</html>
+{% endblock content %}

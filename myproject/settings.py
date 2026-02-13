@@ -210,27 +210,36 @@ TIME_ZONE = config('TIME_ZONE', default='Asia/Tashkent')
 # ============ СТАТИЧЕСКИЕ ФАЙЛЫ ============
 
 STATIC_URL = '/static/'
-STATIC_ROOT = '/home/autolig1/public_html/static'
+STATIC_ROOT = BASE_DIR / 'static' if DEBUG else '/home/autolig1/public_html/static'
 STATICFILES_DIRS = [
     BASE_DIR / 'main' / 'static',
 ]
 
 MEDIA_URL = '/media/'
-MEDIA_ROOT = '/home/autolig1/public_html/media'
+MEDIA_ROOT = BASE_DIR / 'media' if DEBUG else '/home/autolig1/public_html/media'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # ============ БЕЗОПАСНОСТЬ ============
 
-CSRF_TRUSTED_ORIGINS = [
-    'https://autoliga.uz',
-    'https://www.autoliga.uz',
-]
-
-CORS_ALLOWED_ORIGINS = [
-    'https://autoliga.uz',
-    'https://www.autoliga.uz',
-]
+if DEBUG:
+    CSRF_TRUSTED_ORIGINS = [
+        'http://127.0.0.1:8000',
+        'http://localhost:8000',
+    ]
+    CORS_ALLOWED_ORIGINS = [
+        'http://127.0.0.1:8000',
+        'http://localhost:8000',
+    ]
+else:
+    CSRF_TRUSTED_ORIGINS = [
+        'https://autoliga.uz',
+        'https://www.autoliga.uz',
+    ]
+    CORS_ALLOWED_ORIGINS = [
+        'https://autoliga.uz',
+        'https://www.autoliga.uz',
+    ]
 
 CORS_ALLOW_ALL_ORIGINS = DEBUG
 

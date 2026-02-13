@@ -392,7 +392,7 @@ class ContactFormAdmin(LeadManagerMixin, admin.ModelAdmin):
     
     def action_buttons(self, obj):
         """Кнопки действий"""
-        # view_url = f"https://fawtrucks.amocrm.ru/leads/detail/{obj.amocrm_lead_id}" if obj.amocrm_lead_id else f"/admin/main/contactform/{obj.id}/change/"
+        view_url = f"https://fawtrucks.amocrm.ru/leads/detail/{obj.amocrm_lead_id}" if obj.amocrm_lead_id else f"/admin/main/contactform/{obj.id}/change/"
         view_title = "Открыть в amoCRM" if obj.amocrm_lead_id else "Просмотр заявки"
         
         return format_html('''

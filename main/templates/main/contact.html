@@ -1,41 +1,18 @@
+{% extends "base.html" %}
 {% load static %}
 {% load static seo_tags %}
-<!DOCTYPE html>
-<html dir="ltr" lang="{{ LANGUAGE_CODE|default:'uz' }}">
 
-<head>
-    <meta charset="UTF-8" />
-    <script src="{% static 'js/utm-tracker.js' %}"></script>
-    <!-- Page Title -->
-    <title>{% if LANGUAGE_CODE == 'uz' %}Kontaktlar{% elif LANGUAGE_CODE == 'ru' %}Контакты{% else %}Contacts{% endif %} | FAW Trucks</title>
-    {% hreflang_tags %}
-    {% canonical_url %}
 
-    <!-- Viewport Meta-->
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+{% block breadcrumbs %}
+<link rel="stylesheet" href="{% static 'css/breadcrumbs.css' %}">
+{% endblock breadcrumbs %}
 
-    <!-- Универсальный favicon -->
-    <link rel="icon" href="{% static 'images/logo/autoliga-logo.png' %}" />
-    <link rel="apple-touch-icon" href="{% static 'images/logo/autoliga-logo.png' %}">
+{% block site_contact %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/site_contact.css' %}" />
+{% endblock site_contact %}
 
-    <!-- Template Styles -->
-    <link rel="stylesheet" type="text/css" href="{% static 'css/loaders/loader.css' %}" />
-    <link rel="stylesheet" type="text/css" href="{% static 'css/plugins.css' %}" />
-    <link rel="stylesheet" type="text/css" href="{% static 'css/main_site.css' %}" />
-    <link rel="stylesheet" type="text/css" href="{% static 'css/site_main.css' %}" />
-    <link rel="stylesheet" type="text/css" href="{% static 'css/breadcrumbs.css' %}" />
-    <link rel="stylesheet" type="text/css" href="{% static 'css/site_contact.css' %}" />
 
-    <!-- Custom Browser Color -->
-    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#FAF7F6" />
-    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#161616" />
-    <meta name="msapplication-navbutton-color" content="#161616" />
-    <meta name="mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-</head>
-
-<body>
+{% block content %}
     <!-- Google Tag Manager (noscript) -->
     <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-M33GWKMW" height="0" width="0"
             style="display:none;visibility:hidden"></iframe></noscript>
@@ -361,6 +338,5 @@
             }
         });
     </script>
-</body>
 
-</html>
+{% endblock content %}

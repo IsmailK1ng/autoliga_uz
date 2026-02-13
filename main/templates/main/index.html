@@ -1,60 +1,8 @@
+{% extends "base.html" %}
 {% load static %}
-{% load static seo_tags %}
-<!DOCTYPE html>
-<html dir="ltr" lang="{{ LANGUAGE_CODE|default:'uz' }}">
 
-<head>
-  <meta charset="UTF-8">
-  <script src="{% static 'js/utm-tracker.js' %}"></script>
-  <!-- Заголовок страницы -->
-  <title>Autoliga</title>
-  {% hreflang_tags %}
-  {% canonical_url %}
-  <!-- Мета теги -->
-  <meta name="description" content="Autoliga">
-  <meta name="keywords" content="Autoliga">
 
-  <!-- Мета viewport -->
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-
-  <!-- Универсальный favicon -->
-  <link rel="icon" href="{% static 'images/logo/autoliga-logo.png' %}" />
-  <!-- Для Apple устройств -->
-  <link rel="apple-touch-icon" href="{% static 'images/logo/autoliga-logo.png' %}">
-
-  <!-- Подключение стилей (начало) -->
-  <link rel="stylesheet" type="text/css" href="{% static 'css/loaders/loader.css' %}">
-  <link rel="stylesheet" type="text/css" href="{% static 'css/plugins.css' %}">
-  <link rel="stylesheet" type="text/css" href="{% static 'css/main_site.css' %}">
-  <link rel="stylesheet" type="text/css" href="{% static 'css/site_main.css' %}">
-  <!-- Стили Leaflet для карты в футере -->
-
-  <!-- Цвет браузера (начало) -->
-  <meta name="theme-color" media="(prefers-color-scheme: light)" content="#FAF7F6">
-  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#161616">
-  <meta name="msapplication-navbutton-color" content="#161616">
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <!-- Цвет браузера (конец) -->
-  <style>
-    #faw-main-contact-form {
-      padding-top: 120px;
-    }
-
-    .mxd-hero-06__video iframe {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      width: 110%;
-      height: 110%;
-      pointer-events: none;
-      transform: translate(-50%, -50%) scale(1.08);
-    }
-  </style>
-</head>
-
-<body>
+{% block content %}
 
   {% include 'main/includes/header.html' %}
   <!-- Контент страницы (начало) -->
@@ -716,6 +664,4 @@
   </script>
   <!-- Load Scripts End -->
 
-</body>
-
-</html>
+{% endblock content %}

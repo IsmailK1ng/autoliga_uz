@@ -60,6 +60,8 @@
 gsap.registerPlugin(ScrollTrigger);
 gsap.registerPlugin(Flip);
 
+
+
 // --------------------------------------------- //
 // Loader & Loading Animation Start
 // --------------------------------------------- //
@@ -68,6 +70,48 @@ const imgLoad = imagesLoaded(content);
 const loadingWrap = document.querySelector('.loading-wrap');
 const loadingItems = loadingWrap.querySelectorAll('.loading__item');
 const fadeInItems = document.querySelectorAll('.loading__fade');
+
+
+
+
+
+
+
+
+
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    const container = document.getElementById("mobileBrandList");
+    const leftBtn = document.getElementById("scrollLeft");
+    const rightBtn = document.getElementById("scrollRight");
+
+    if (!container) return;
+
+    const scrollAmount = 200;
+
+    function updateArrows() {
+        leftBtn.disabled = container.scrollLeft <= 0;
+        rightBtn.disabled =
+            container.scrollLeft + container.clientWidth >= container.scrollWidth - 5;
+    }
+
+    leftBtn?.addEventListener("click", function () {
+        container.scrollBy({ left: -scrollAmount, behavior: "smooth" });
+    });
+
+    rightBtn?.addEventListener("click", function () {
+        container.scrollBy({ left: scrollAmount, behavior: "smooth" });
+    });
+
+    container.addEventListener("scroll", updateArrows);
+
+    updateArrows();
+
+});
+
+
+
 
 function startLoader() {
   let counterElement = document.querySelector(".loader__count .count__text");
@@ -105,6 +149,12 @@ imgLoad.on('done', instance => {
 //     }
 //   }, 3200);
 // }
+
+
+
+
+
+
 
 function pageAppearance() {
   gsap.set(loadingItems, { opacity: 0 })

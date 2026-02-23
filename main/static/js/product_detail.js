@@ -357,26 +357,40 @@ class ProductDetail {
     }
 
     updateBreadcrumbs() {
-        const breadcrumbLinks = document.querySelectorAll('.breadcrumb-ol li a');
-        if (breadcrumbLinks.length < 3) return;
+    const breadcrumbLinks = document.querySelectorAll('.breadcrumb-ol li a');
+    if (breadcrumbLinks.length < 3) return;
 
-        const productLink = breadcrumbLinks[2];
-        if (productLink) {
-            productLink.textContent = this.product.title;
-            productLink.href = 'javascript:void(0)';
-        }
-
-        const categoryLink = breadcrumbLinks[1];
-        if (categoryLink) {
-            // Берём перевод только из локального словаря, игнорируя category_display
-            const categoryName = this.t(`categories.${this.product.category}`) || 'Models';
-
-            categoryLink.textContent = categoryName;
-            categoryLink.href = `/#models`;
-        }
-
-        document.title = `${this.product.title} - FAW Trucks`;
+    // 3-chi link = product
+    const productLink = breadcrumbLinks[2];
+    if (productLink) {
+        productLink.textContent = this.product.title;
+        productLink.href = 'javascript:void(0)';
     }
+
+    // 2-chi link = category
+    const categoryLink = breadcrumbLinks[1];
+    if (categoryLink) {
+
+        let categorySlug = '';
+
+        // Agar this.product.category object bo‘lsa slug olamiz
+        if (this.product.category && typeof this.product.category === 'object') {
+            categorySlug = this.product.category.slug || this.product.category.name || '';
+        } else {
+            categorySlug = this.product.category || '';
+        }
+
+        // Tarjima dictionary orqali nom olish
+        const categoryName = this.t(`categories.${categorySlug}`) || categorySlug || 'Models';
+
+        categoryLink.textContent = categoryName;
+        categoryLink.href = `/#models`;
+    }
+
+    // Sahifa title
+    document.title = `${this.product.title} - FAW Trucks`;
+}
+
 
     showLoader() {
         const loader = document.createElement('div');

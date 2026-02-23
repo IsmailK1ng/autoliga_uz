@@ -11,133 +11,136 @@
 <link rel="stylesheet" type="text/css" href="{% static 'css/single-news-page.css' %}">
 {% endblock single-news-page %}
 
+
+
+
+
 {% block content %}
-<!-- Loader -->
-<div id="loader" style="display: none;" class="loader">
+  <!-- Loader -->
+  <div id="loader" style="display: none;" class="loader">
     <div class="loader__wrapper">
-        <div class="loader__content">
-            <div class="loader__count">
-                <span class="count__text">0</span>
-            </div>
+      <div class="loader__content">
+        <div class="loader__count">
+          <span class="count__text">0</span>
         </div>
+      </div>
     </div>
-</div>
+  </div>
 
-<!-- Header -->
-{% include 'main/includes/header.html' %}
+  <!-- Header -->
+  {% include 'main/includes/header.html' %}
 
-<!-- Page Content -->
-<div class="mxd-block loading-wrap"></div>
+  <!-- Page Content -->
+  <div class="mxd-block loading-wrap"></div>
 
-<!-- Breadcrumbs -->
-<div class="mxd-block">
+  <!-- Breadcrumbs -->
+  <div class="mxd-block">
     <div class="mxd-section-filter pre-grid">
-        <div class="mxd-section-filter__inner animate-card-3">
-            <div class="mxd-grid-item-1">
-                <div class="section-filter">
-                    <div aria-label="breadcrumb">
-                        <ol class="breadcrumb-ol">
-                            <li><a href="{% url 'home' %}">{{ breadcrumbs.home }}</a></li>
-                            <li><a href="{% url 'news' %}">{{ breadcrumbs.news }}</a></li>
-                            <li class="active"><a href="{% url 'news_detail' news.slug %}">{{ breadcrumbs.current }}</a>
-                            </li>
-                        </ol>
-                    </div>
-                </div>
+      <div class="mxd-section-filter__inner animate-card-3">
+        <div class="mxd-grid-item-1">
+          <div class="section-filter">
+            <div aria-label="breadcrumb">
+              <ol class="breadcrumb-ol">
+                <li><a href="{% url 'home' %}">{{ breadcrumbs.home }}</a></li>
+                <li><a href="{% url 'news' %}">{{ breadcrumbs.news }}</a></li>
+                <li class="active"><a href="{% url 'news_detail' news.slug %}">{{ breadcrumbs.current }}</a></li>
+              </ol>
             </div>
+          </div>
         </div>
+      </div>
     </div>
-</div>
+  </div>
 
-<!-- Main Title -->
-<div class="title-after-video">
+  <!-- Main Title -->
+  <div class="title-after-video">
     <div class="faw-history-title fade-in">
-        <h2 class="reveal-type">{{ news.title }}</h2>
+      <h2 class="reveal-type">{{ news.title }}</h2>
     </div>
     <div class="mxd-block"></div>
-</div>
+  </div>
 
-<!-- Dynamic Content Blocks -->
-{% for block in blocks %}
+  <!-- Dynamic Content Blocks -->
+  {% for block in blocks %}
 
-<!-- YouTube Video Block -->
-{% if block.block_type == 'youtube' and block.youtube_url %}
-<div class="mxd-section padding-grid-pre-pinned">
+  <!-- YouTube Video Block -->
+  {% if block.block_type == 'youtube' and block.youtube_url %}
+  <div class="mxd-section padding-grid-pre-pinned">
     <div class="mxd-container">
-        <div class="mxd-divider" id="parallax-divider">
-            <div class="mxd-divider__video">
-                <iframe class="video parallax-video" src="{{ block.youtube_url }}" title="YouTube video player"
-                        frameborder="0"
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                        referrerpolicy="strict-origin-when-cross-origin" allowfullscreen data-parallax="true">
-                </iframe>
-            </div>
+      <div class="mxd-divider" id="parallax-divider">
+        <div class="mxd-divider__video">
+          <iframe class="video parallax-video" src="{{ block.youtube_url }}" title="YouTube video player"
+            frameborder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            referrerpolicy="strict-origin-when-cross-origin" allowfullscreen data-parallax="true">
+          </iframe>
         </div>
+      </div>
     </div>
-</div>
-{% endif %}
+  </div>
+  {% endif %}
 
-<!-- Video File Block -->
-{% if block.block_type == 'video' and block.video_file %}
-<div class="mxd-section padding-grid-pre-pinned">
+  <!-- Video File Block -->
+  {% if block.block_type == 'video' and block.video_file %}
+  <div class="mxd-section padding-grid-pre-pinned">
     <div class="mxd-container">
-        <div class="mxd-divider">
-            <div class="mxd-divider__video">
-                <video class="video" controls preload="auto">
-                    <source src="{{ block.video_file.url }}" type="video/mp4">
-                </video>
-            </div>
+      <div class="mxd-divider">
+        <div class="mxd-divider__video">
+          <video class="video" controls preload="auto">
+            <source src="{{ block.video_file.url }}" type="video/mp4">
+          </video>
         </div>
+      </div>
     </div>
-</div>
-{% endif %}
+  </div>
+  {% endif %}
 
-<!-- Image Block -->
-{% if block.block_type == 'image' and block.image %}
-<div class="mxd-section padding-pre-title">
+  <!-- Image Block -->
+  {% if block.block_type == 'image' and block.image %}
+  <div class="mxd-section padding-pre-title">
     <div class="mxd-container">
-        <div class="mxd-divider">
-            <div class="mxd-divider__image parallax-img">
-                <img src="{{ block.image.url }}" alt="{{ block.title|default:'Фото' }}">
-            </div>
+      <div class="mxd-divider">
+        <div class="mxd-divider__image parallax-img">
+          <img src="{{ block.image.url }}" alt="{{ block.title|default:'Фото' }}">
         </div>
+      </div>
     </div>
-</div>
-{% endif %}
+  </div>
+  {% endif %}
 
-<!-- Text Block (с заголовком внутри) -->
-{% if block.block_type == 'text' and block.text %}
-<div class="mxd-hero-00__bottom">
+  <!-- Text Block (с заголовком внутри) -->
+  {% if block.block_type == 'text' and block.text %}
+  <div class="mxd-hero-00__bottom">
     <div class="hero-00-manifest">
-        <div class="mxd-manifest reveal-type">
-            {% if block.title %}
-            <div class="faw-history-title fade-in">
-                <h3>{{ block.title }}</h3>
-            </div>
-            {% endif %}
-            {{ block.text|safe }}
+      <div class="mxd-manifest reveal-type">
+        {% if block.title %}
+        <div class="faw-history-title fade-in">
+          <h3>{{ block.title }}</h3>
         </div>
+        {% endif %}
+        {{ block.text|safe }}
+      </div>
     </div>
-</div>
-{% endif %}
+  </div>
+  {% endif %}
 
-{% endfor %}
+  {% endfor %}
 
-<!-- Footer -->
-{% include 'main/includes/footer.html' %}
+  <!-- Footer -->
+  {% include 'main/includes/footer.html' %}
 
-<!-- To Top Button -->
-<a href="#0" id="to-top" class="btn btn-to-top slide-up anim-no-delay">
+  <!-- To Top Button -->
+  <a href="#0" id="to-top" class="btn btn-to-top slide-up anim-no-delay">
     <i class="ph ph-arrow-up"></i>
-</a>
+  </a>
 
-<!-- Scripts -->
-<script src="{% static 'js/libs.min.js' %}"></script>
-<script src="{% static 'js/app.js' %}"></script>
-<script src="{% static 'js/error-logger.js' %}"></script>
-<script src="{% static 'js/main-setting.js' %}"></script>
+  <!-- Scripts -->
+  <script src="{% static 'js/libs.min.js' %}"></script>
+  <script src="{% static 'js/app.js' %}"></script>
+  <script src="{% static 'js/error-logger.js' %}"></script>
+  <script src="{% static 'js/main-setting.js' %}"></script>
 
-<script>
+  <script>
     document.addEventListener('DOMContentLoaded', function () {
       const video = document.querySelector('.parallax-video');
       if (video) {
@@ -160,6 +163,11 @@
         video.removeAttribute('data-parallax');
       }
     });
-</script>
+  </script>
+</body>
 
+</html>
 {% endblock content %}
+
+
+

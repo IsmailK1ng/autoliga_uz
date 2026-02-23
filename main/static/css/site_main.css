@@ -633,7 +633,7 @@ body[data-theme="dark"] .mxd-contact {
         margin: 0;
         top: 20px;
         right: 0px;
-        padding: 0 6rem;
+        padding: 0 3rem;
     }
 
 }
@@ -815,7 +815,7 @@ body[data-theme="dark"] .mxd-contact {
         z-index: 50 !important;
         /* Very low z-index to not interfere */
         /* Position elements */
-        left: 20px !important;
+        left: 10px !important;
         transform: none !important;
         -webkit-transform: none !important;
         -moz-transform: none !important;
@@ -3291,7 +3291,7 @@ body[data-theme="dark"] .contact-form-card .t-select {
 }
 
 /* ==========================================
-   TEMPLATE FORM STYLES 
+   TEMPLATE FORM STYLES
    ==========================================*/
 
 /* Contact Info Styles */

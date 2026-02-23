@@ -30,6 +30,8 @@
       color: #999;
       font-size: 18px;
     }
+
+
 </style>
 {% endblock productstyle %}
 
@@ -109,21 +111,44 @@
                             <div class="section-filter">
                                 <!-- Хлебные крошки -->
                                 <div aria-label="breadcrumb">
+
                                     <ol class="breadcrumb-ol">
-                                        <li><a href="{% url 'home' %}">
-                                            {% if LANGUAGE_CODE == 'ru' %}Главная{% elif LANGUAGE_CODE == 'en' %}Home{%
-                                            else %}Bosh sahifa{% endif %}
-                                        </a></li>
-                                        <li><a href="javascript:void(0)">
-                                            {% if LANGUAGE_CODE == 'ru' %}Модели{% elif LANGUAGE_CODE == 'en' %}Models{%
-                                            else %}Modellar{% endif %}
-                                        </a></li>
-                                        <!-- ✅ JavaScript заменит это на название категории -->
-                                        <li class="active"><a href="javascript:void(0)">
-                                            {% if LANGUAGE_CODE == 'ru' %}Категория{% elif LANGUAGE_CODE == 'en'
-                                            %}Category{% else %}Kategoriya{% endif %}
-                                        </a></li>
+                                        <li>
+                                            <a href="{% url 'home' %}">
+                                                {% if LANGUAGE_CODE == 'ru' %}
+                                                Главная
+                                                {% elif LANGUAGE_CODE == 'en' %}
+                                                Home
+                                                {% elif LANGUAGE_CODE == 'uz' %}
+                                                Bosh sahifa
+                                                {% endif %}
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a href="javascript:void(0)">
+                                                {% if LANGUAGE_CODE == 'ru' %}
+                                                Модели
+                                                {% elif LANGUAGE_CODE == 'en' %}
+                                                Models
+                                                {% elif LANGUAGE_CODE == 'uz' %}
+                                                Modellar
+                                                {% endif %}
+                                            </a>
+                                        </li>
+                                        <li class="active">
+                                            <a href="javascript:void(0)">
+                                                {% if LANGUAGE_CODE == 'ru' %}
+                                                Категория
+                                                {% elif LANGUAGE_CODE == 'en' %}
+                                                Category
+                                                {% elif LANGUAGE_CODE == 'uz' %}
+                                                Kategoriya
+                                                {% endif %}
+                                            </a>
+                                        </li>
                                     </ol>
+
+
                                 </div>
                                 <div class="filter-container">
                                     <div class="filter-search">

@@ -6,6 +6,12 @@
         font-size: 4rem;
         text-transform: uppercase;
     }
+
+    @media (max-width: 768px) {
+        .mxd-logo_txt {
+            display: none;
+        }
+    }
 </style>
 <nav id="header" class="mxd-nav__wrap" data-lenis-prevent="">
     <!-- Логотип -->
@@ -130,6 +136,14 @@
                                         </li>
                                     </ul>
                                 </li>
+                                <li class="main-menu__item">
+                                <a class="main-menu__link btn" href="{% url 'news' %}">
+                                    <span class="btn-caption">
+                                        {% if LANGUAGE_CODE == 'ru' %}Новости{% elif LANGUAGE_CODE == 'en' %}News{% else %}Yangiliklar{% endif %}
+                                    </span>
+                                </a>
+                            </li>
+
                                 <li class="main-menu__item">
                                     <a class="main-menu__link btn" href="{% url 'contact' %}">
                                         <span class="btn-caption">

@@ -8,91 +8,283 @@
   <!-- Контент страницы (начало) -->
   <main id="mxd-page-content" class="mxd-page-content">
 
-    <!-- Секция героя (начало) -->
-    <div class="mxd-section">
-      <div class="mxd-hero-06">
-        <div class="mxd-hero-06__wrap loading-wrap">
-          <div class="mxd-hero-06__top p-0 m-0">
-            <div class="mxd-hero-06__content">
-              <div class="mxd-hero-06__video">
-                <!-- <iframe
-                  src="https://www.youtube.com/embed/id9xnrstgQg?autoplay=1&mute=1&controls=0&showinfo=0&modestbranding=1&loop=1&playlist=id9xnrstgQg&rel=0"
-                  frameborder="0" allow="autoplay; encrypted-media" style="border-radius: 30px;"
-                  allowfullscreen loop="loop" muted="muted" poster="https://dummyimage.com/1920x1080/5d5d5d/838383"
-                  referrerpolicy="strict-origin-when-cross-origin"></iframe> -->
-                <!-- <iframe
-                  src="https://www.youtube.com/embed/jfWZggL9j0E?autoplay=1&rel=0&mute=1&controls=0&showinfo=0&modestbranding=1&loop=1&playlist=jfWZggL9j0E"
-                  frameborder="0" allow="autoplay; encrypted-media" style="border-radius: 30px;"
-                  allowfullscreen loop="loop" muted="muted" poster="https://dummyimage.com/1920x1080/5d5d5d/838383"
-                  referrerpolicy="strict-origin-when-cross-origin"></iframe> -->
-                  <img src="{% static 'images/autoliga.jpg' %}" alt="" class="mxd-hero-07_image">
-                <div class="hero-06-video__cover"></div>
-                <div class="hero-06-video__cover"></div>
-              </div>
-              <div class="mxd-hero-06__data">
-                <div class="mxd-hero-06__headline">
-                  <div class="hero-06-headline__descr">
-                    <div class="hero-06-headline__btn loading__item">
-                      <a href="#0" class="btn-rotating btn-rotating-blur-outline ver-04 permanent-desktop">
-                        <!-- SVG rotating text -->
-                        <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
-                          x="0px" y="0px" viewBox="0 0 160 160" style="enable-background:new 0 0 160 160;"
-                          xml:space="preserve" class="btn-rotating__text animate-rotation" data-value="360">
-                          <defs>
-                            <path id="textPath"
-                              d="M149.7,80c0,38.5-31.2,69.7-69.7,69.7S10.3,118.5,10.3,80S41.5,10.3,80,10.3S149.7,41.5,149.7,80z" />
-                          </defs>
-                          <g>
-                            <use xlink:href="#textPath" fill="none"></use>
-                            <text>
-                              <!-- button text here!!! -->
-                              <textPath xlink:href="#textPath">Autoliga — Ishonch✦Barqarorlik ✦Quvvat ✦</textPath>
-                            </text>
-                          </g>
-                        </svg>
-                        <!-- image -->
-                        <img class="btn-rotating__image" src="{% static 'images/logo/autoliga-logo.png' %}"
-                          style="filter: brightness(0) invert(1);" alt="Object">
-                      </a>
-                    </div>
-                  </div>
-                  <div class="hero-06-headline__content">
-                    <h1 class="hero-06-headline__title">Autoliga — Ishonch✦Barqarorlik ✦Quvvat ✦</h1>
-                    <div class="mxd-hero-06__marquee loading__item">
-                    </div>
-                  </div>
+
+<!-- ===== STYLE: Faqat sidebar uchun yangi stillar ===== -->
+
+
+<!-- /* style css ushbu ko'rsatilgan fileda brand sidebar ,mobile desktop variant main_sites.css start 21130 */ -->
+
+
+<div class="mxd-section">
+  <div class="mxd-hero-06">
+    <div class="mxd-hero-06__wrap loading-wrap">
+      <div class="mxd-hero-06__top p-0 m-0">
+        <div class="mxd-hero-06__content">
+
+          <!-- Orqa fon (eski) -->
+          <div class="mxd-hero-06__video">
+            <img src="{% static 'images/autoliga.jpg' %}" alt="" class="mxd-hero-07_image">
+            <div class="hero-06-video__cover"></div>
+            <div class="hero-06-video__cover"></div>
+          </div>
+
+          <!-- Rotating logo + sarlavha (eski, o'zgartirilmagan) -->
+          <div class="mxd-hero-06__data">
+            <div class="mxd-hero-06__headline">
+              <div class="hero-06-headline__descr">
+                <div class="hero-06-headline__btn loading__item">
+                  <a href="#0" class="btn-rotating btn-rotating-blur-outline ver-04 permanent-desktop">
+                    <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+                      x="0px" y="0px" viewBox="0 0 160 160" style="enable-background:new 0 0 160 160;"
+                      xml:space="preserve" class="btn-rotating__text animate-rotation" data-value="360">
+                      <defs>
+                        <path id="textPath"
+                          d="M149.7,80c0,38.5-31.2,69.7-69.7,69.7S10.3,118.5,10.3,80S41.5,10.3,80,10.3S149.7,41.5,149.7,80z" />
+                      </defs>
+                      <g>
+                        <use xlink:href="#textPath" fill="none"></use>
+                        <text>
+                          <textPath xlink:href="#textPath">Autoliga — Ishonch✦Barqarorlik ✦Quvvat ✦</textPath>
+                        </text>
+                      </g>
+                    </svg>
+                    <img class="btn-rotating__image" src="{% static 'images/logo/autoliga-logo.png' %}"
+                      style="filter: brightness(0) invert(1);" alt="Object">
+                  </a>
                 </div>
+              </div>
+              <div class="hero-06-headline__content">
+                <h1 class="hero-06-headline__title">Autoliga — Ishonch✦Barqarorlik ✦Quvvat ✦</h1>
+                <div class="mxd-hero-06__marquee loading__item"></div>
               </div>
             </div>
           </div>
-          <div class="mxd-hero-06__btn-mobile">
-            <a href="#0" class="btn-rotating btn-rotating-blur-outline ver-04 permanent-desktop">
-              <!-- SVG rotating text -->
-              <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px"
-                y="0px" viewBox="0 0 160 160" style="enable-background:new 0 0 160 160;" xml:space="preserve"
-                class="btn-rotating__text animate-rotation" data-value="360">
-                <defs>
-                  <path id="textPathDownloadCV"
-                    d="M149.7,80c0,38.5-31.2,69.7-69.7,69.7S10.3,118.5,10.3,80S41.5,10.3,80,10.3S149.7,41.5,149.7,80z" />
-                </defs>
-                <g>
-                  <use xlink:href="#textPathDownloadCV" fill="none"></use>
-                  <text>
-                    <!-- button text here!!! -->
-                    <textPath xlink:href="#textPathDownloadCV">FAW — Ishonch✦Barqarorlik✦Quvvat FAWda✦</textPath>
-                  </text>
-                </g>
-              </svg>
-              <!-- image -->
-              <img class="btn-rotating__image" src="{% static 'images/logo/autoliga-logo.png' %}" alt="Object">
-            </a>
-          </div>
+
         </div>
       </div>
+
+      <!-- Mobil btn (eski, o'zgartirilmagan) -->
+      <div class="mxd-hero-06__btn-mobile">
+        <a href="#0" class="btn-rotating btn-rotating-blur-outline ver-04 permanent-desktop">
+          <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+            x="0px" y="0px" viewBox="0 0 160 160" style="enable-background:new 0 0 160 160;" xml:space="preserve"
+            class="btn-rotating__text animate-rotation" data-value="360">
+            <defs>
+              <path id="textPathDownloadCV"
+                d="M149.7,80c0,38.5-31.2,69.7-69.7,69.7S10.3,118.5,10.3,80S41.5,10.3,80,10.3S149.7,41.5,149.7,80z" />
+            </defs>
+            <g>
+              <use xlink:href="#textPathDownloadCV" fill="none"></use>
+              <text>
+                <textPath xlink:href="#textPathDownloadCV">FAW — Ishonch✦Barqarorlik✦Quvvat FAWda✦</textPath>
+              </text>
+            </g>
+          </svg>
+          <img class="btn-rotating__image" src="{% static 'images/logo/autoliga-logo.png' %}" alt="Object">
+        </a>
+      </div>
+
+      <!-- ═══════════════════════════════════════════════
+           BU YERGA YANGI SIDEBAR QO'SHILDI
+           mxd-hero-06__wrap ichida, mxd-hero-06__top tashqarisida
+      ════════════════════════════════════════════════ -->
+
+<!-- Scroll tugmalari – faqat desktop uchun (mobil da yashirin) -->
+<div class="scroll-controls d-none d-md-flex">
+  <button class="scroll-btn" onclick="scrollSidebar('up')">↑</button>
+  <button class="scroll-btn" onclick="scrollSidebar('down')">↓</button>
+</div>
+
+<!-- Brand sidebar – faqat desktop uchun -->
+<div class="brand-sidebar d-none d-md-flex" id="brandSidebar">
+  {% for category in productCategory %}
+    {% if category.icon %}
+      <div class="brand-card"
+           data-brand="{{ category.slug }}"
+           onclick="openBrand('{{ category.slug }}', this)">
+           
+        <img src="{{ category.icon.url }}" alt="{{ category.name }}">
+      </div>
+    {% endif %}
+  {% endfor %}
+</div>
+<!-- for sikl tugadi -->
+
+<!-- MOBIL uchun pastki fixed brendlar -->
+<!-- MOBILE BRAND BAR -->
+<div class="mobile-brand-bar d-block d-md-none">
+
+  <button class="scroll-arrow left-arrow" id="scrollLeft">←</button>
+
+  <div class="mobile-brand-list" id="mobileBrandList">
+
+    {% for category in productCategory %}
+      {% if category.icon %}
+        <div class="brand-card"
+             data-brand="{{ category.slug }}"
+             onclick="openBrand('{{ category.slug }}', this)">
+          <img src="{{ category.icon.url }}" alt="{{ category.name }}">
+        </div>
+      {% endif %}
+    {% endfor %}
+
+  </div>
+
+  <button class="scroll-arrow right-arrow" id="scrollRight">→</button>
+
+</div>
+
+
+
+<!-- Model panel -->
+{% for category in productCategory %}
+<div class="model-panel" id="panel-{{ category.slug }}">
+    
+    <button class="close-btn" onclick="closePanel()">✕</button>
+
+    <div class="model-left">
+        <h2>{{ category.name }}</h2>
+
+        <div class="model-list">
+            {% for product in category.active_products %}
+            <div class="model-item"
+                onclick="changeCarImage(
+                    '{{ product.main_image.url }}', 
+                    '{{ product.slug }}',
+                    '{{ category.slug }}')">
+                {{ product.title }}
+            </div>
+            {% endfor %}
+        </div>
     </div>
+
+<!-- O'ng taraf -->
+<div class="model-right">
+    {% if category.active_products %}
+        {% with first_product=category.active_products.0 %}
+        <img id="carImage-{{ category.slug }}"
+             class="car-image"
+             src="{{ first_product.main_image.url }}"
+             alt="Car">
+        <a href="{% url 'product_detail' first_product.slug %}"
+           id="detailBtn-{{ category.slug }}"
+           class="detail-btn">
+            {% if LANGUAGE_CODE == 'uz' %}
+                Model to'g'risida batafsil
+            {% elif LANGUAGE_CODE == 'ru' %}
+                Подробнее o модели
+            {% else %}
+                Model details
+            {% endif %}
+        </a>
+        {% endwith %}
+    {% endif %}
+</div>
+
+
+
+</div>
+{% endfor %}
+          <!-- ════════ YANGI QISM TUGADI ════════ -->
+
+    </div>
+  </div>
+</div>
+<!-- Секция героя (конец) -->
+
+
+<!-- ===== JAVASCRIPT ===== -->
+
+
+
+
+
+<script>
+function changeCarImage(imageUrl, productSlug, categorySlug) {
+    const img = document.getElementById('carImage-' + categorySlug);
+    if (img) img.src = imageUrl;
+
+    const btn = document.getElementById('detailBtn-' + categorySlug);
+    if (btn) btn.href = '/products/' + productSlug + '/';
+
+    //  Active class
+    document.querySelectorAll('#panel-' + categorySlug + ' .model-item')
+        .forEach(i => i.classList.remove('active'));
+
+    event.currentTarget.classList.add('active');
+}
+
+function openBrand(slug, element) {
+    const panel = document.getElementById('panel-' + slug);
+
+    if (panel && panel.classList.contains('active')) {
+        panel.classList.remove('active');
+        element.classList.remove('active');
+        return;
+    }
+
+    document.querySelectorAll('.model-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.brand-card').forEach(el => el.classList.remove('active'));
+
+    if (panel) panel.classList.add('active');
+    element.classList.add('active');
+}
+
+function closePanel() {
+    document.querySelectorAll('.model-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.brand-card').forEach(el => el.classList.remove('active'));
+    document.body.style.overflow = '';
+}
+
+function scrollSidebar(direction) {
+    const sidebar = document.getElementById('brandSidebar');
+    if (!sidebar) return;
+    sidebar.scrollTo({
+        top: sidebar.scrollTop + (direction === 'up' ? -140 : 140),
+        behavior: 'smooth'
+    });
+}
+
+window.scrollMobileBrands = function(direction) {
+    const container = document.getElementById('mobileBrandList');
+    if (!container) return;
+    container.scrollBy({ left: direction === 'left' ? -200 : 200, behavior: 'smooth' });
+};
+</script>
+
+
+
+
+<!-- scrool sichqoncha g'ildirakida aylantirsa desktop variantda sidebar uchun -->
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const sidebar = document.getElementById("brandSidebar");
+    if (!sidebar) return;
+
+    sidebar.addEventListener("wheel", function (e) {
+        e.stopPropagation();
+        sidebar.scrollTop += e.deltaY;
+    }, { passive: true });
+});
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     <!-- Секция героя (конец) -->
 
-    <!-- Секция — превью блога (начало) -->
+  <!-- Секция — превью блога (начало) -->
     <div class="mxd-section padding-blog">
       <div class="mxd-container grid-container">
 
@@ -103,7 +295,15 @@
               <div class="row g-0">
                 <div class="col-12 col-xl-12 mxd-grid-item no-margin">
                   <div class="mxd-section-title__hrtitle">
-                    <h2 class="reveal-type ">Bizning mashinalar</h2>
+                  <h2 class="reveal-type">
+                      {% if request.LANGUAGE_CODE == 'uz' %}
+                          Bizning mashinalar
+                      {% elif request.LANGUAGE_CODE == 'ru' %}
+                          Наши автомобили
+                      {% else %}
+                          Our Cars
+                      {% endif %}
+                  </h2>
                   </div>
                 </div>
                 <div class="col-12 col-xl-8 mxd-grid-item no-margin">
@@ -119,7 +319,15 @@
                 <div class="col-12 col-xl-4 mxd-grid-item no-margin">
                   <div class="mxd-section-title__hrcontrols ">
                     <a class="btn btn-anim btn-default btn-outline slide-right-up" href="#faw-main-contact-form">
-                      <span class="btn-caption">Biz bilan bog'laning</span>
+                        <span class="btn-caption">
+                            {% if request.LANGUAGE_CODE == 'uz' %}
+                                Biz bilan bog'laning
+                            {% elif request.LANGUAGE_CODE == 'ru' %}
+                                Свяжитесь с нами
+                            {% else %}
+                                Contact Us
+                            {% endif %}
+                        </span>
                       <i class="ph-bold ph-arrow-up-right"></i>
                     </a>
                   </div>
@@ -175,15 +383,15 @@
               <div class="col-12 col-md-6 mxd-grid-item mt-0">
                 <div class="contact-info">
                   <div class="contact-info__content">
-                    <h2 class="contact-info__title ">
-                      {% if LANGUAGE_CODE == 'uz' %}
-                      Biz bilan bog'lanish
-                      {% elif LANGUAGE_CODE == 'ru' %}
-                      Связаться с нами
+                   <h2 class="contact-info__title">
+                      {% if request.LANGUAGE_CODE == 'uz' %}
+                          Biz bilan bog'lanish
+                      {% elif request.LANGUAGE_CODE == 'ru' %}
+                          Связаться с нами
                       {% else %}
-                      Contact Us
+                          Contact Us
                       {% endif %}
-                    </h2>
+                  </h2>
                     <p class="contact-info__description ">
                       {% if LANGUAGE_CODE == 'uz' %}
                       Bizning mutaxassislarimiz transportni tanlashda sizga yordam beradi va qiziqtirgan masalalar
@@ -248,7 +456,7 @@
                         <div class="container-fluid p-0">
                           <div class="row gx-0">
                             <div class="col-12 mxd-grid-item ">
-                              <input type="text" name="name" placeholder="Ismingiz*" required>
+                                <input type="text" name="name" placeholder="{% if request.LANGUAGE_CODE == 'uz' %}Ismingiz*{% elif request.LANGUAGE_CODE == 'ru' %}Ваше имя*{% else %}Your Name*{% endif %}" required>
                             </div>
                             <div class="col-12 mxd-grid-item ">
                               <select name="region" required>
@@ -662,6 +870,8 @@
     images.forEach(img => imageObserver.observe(img));
 });
   </script>
-  <!-- Load Scripts End -->
+
+
+
 
 {% endblock content %}

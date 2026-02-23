@@ -1,3 +1,9 @@
+# === SOBIROV test uchun localhost uchun settings === #
+myproject/sobirov_test_settings.py
+main/templates/main/index_test_sobirov.html
+# end sobirov settings #
+
+
 # === Python / Django ===
 *.pyc
 __pycache__/

@@ -29,8 +29,13 @@
     <!-- Подключение стилей (начало) -->
     <link rel="stylesheet" type="text/css" href="{% static 'css/loaders/loader.css' %}">
     <link rel="stylesheet" type="text/css" href="{% static 'css/plugins.css' %}">
+    <!-- <link rel="stylesheet" type="text/css" href="{% static 'css/brand-selector.css' %}">  bunday file bo'lmaganligi uchun komentga olib qo'ydim -->
     <link rel="stylesheet" type="text/css" href="{% static 'css/main_site.css' %}">
     <link rel="stylesheet" type="text/css" href="{% static 'css/site_main.css' %}">
+
+
+    
+
     {% block productcss %}
 
     {% endblock productcss %}
@@ -79,6 +84,7 @@
           transform: translate(-50%, -50%) scale(1.08);
         }
     </style>
+
 
     <!-- Дополнительные стили можно добавить в блоке extra_css -->
     {% block extra_css %}{% endblock %}

@@ -20,7 +20,6 @@ from .serializers import (
 )
 import logging
 import json
-from django.db.models import Prefetch
 
 
 logger = logging.getLogger('django')
@@ -42,22 +41,6 @@ def index(request):
             is_featured=True
         ).order_by('-slider_order', '-created_at')[:10]
         
-        productCategory = ProductCategory.objects.filter(
-            is_active=True
-        ).prefetch_related(
-            Prefetch(
-                'products',
-                queryset=Product.objects.filter(
-                    is_active=True
-                ).only('id', 'slug', 'title', 'main_image'),  # faqat kerakli fieldlar
-                to_attr='active_products'  #  cache'ga oladi
-            )
-        )
-
-
-
-
-
         slider_data = []
         for product in featured_products:
             title = getattr(product, f'title_{current_lang}', None) or product.title
@@ -86,7 +69,6 @@ def index(request):
             'news_list': news_list,
             'slider_products': json.dumps(slider_data, ensure_ascii=False),
             'featured_count': len(slider_data),
-            'productCategory': productCategory,
         }
         
         return render(request, 'main/index.html', context)

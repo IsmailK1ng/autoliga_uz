@@ -629,7 +629,7 @@ body[data-theme="dark"] .mxd-contact {
 }
 
 @media (max-width: 768px) {
-    .mxd-nav__contain {
+    .mxd-nav__contain { 
         margin: 0;
         top: 20px;
         right: 0px;

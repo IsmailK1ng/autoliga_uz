@@ -21259,25 +21259,26 @@ transform: scale(1.15) translateX(14px);
 background: rgba(255, 255, 255, 0.24);
 }
 
-.brand-card.active {
-background: linear-gradient(135deg, rgba(255, 140, 0, 0.38), rgba(255, 80, 0, 0.28));
-border-color: rgba(255, 140, 0, 0.7);
-box-shadow: 0 0 36px rgba(255, 140, 0, 0.5),
-            inset 0 0 14px rgba(255, 165, 0, 0.35);
-transform: scale(1.0) translateX(9px);
+/* ACTIVE */
+.brand-card.active{
+    background: linear-gradient(
+        135deg,
+        rgba(255,140,0,0.25),
+        rgba(255,80,0,0.18)
+    );
+    border:2px solid #FF8C00;
+    transform: scale(1.08); /* kattalashadi lekin siljimaydi */
+    z-index:2;
 }
 
-.brand-card.active::after {
-content: '';
-position: absolute;
-inset: -3px;
-border-radius: 25px;
-background: linear-gradient(45deg, #ff8c00, #ffe1d7, #ffa500, #ff8c00);
-background-size: 400% 400%;
-animation: glowBorder 4s ease infinite;
-z-index: -1;
-opacity: 0.55;
-filter: blur(6px);
+/* Glow effect ichkaridan */
+.brand-card.active::after{
+    content:'';
+    position:absolute;
+    inset:0;
+    border-radius:inherit;
+    box-shadow:0 0 20px rgba(255,140,0,0.45);
+    z-index:-1;
 }
 
 @keyframes glowBorder {
@@ -21287,7 +21288,7 @@ filter: blur(6px);
 }
 
 .brand-card img {
-width: 82%;
+width: 85%;
 transition: all 0.5s ease;
 filter: brightness(1.12) contrast(1.08);
 }
@@ -21299,20 +21300,20 @@ filter: brightness(1.12) contrast(1.08);
 
 
 .model-item {
-    padding: 14px 24px;
+    padding: 10px 18px;      /* Ichki masofani mobilga mosladik */
     border-radius: 999px;
     border: none;
-    background: rgba(255, 255, 255, 0.22);
+    background: rgba(255, 255, 255, 0.15); /* Biroq shaffofroq */
     color: white;
-    font-weight: 700;
-    font-size: 19px;
+    font-weight: 600;
+    font-size: 15px;         /* 19px dan 15px ga tushirdik (mobil uchun ideal) */
     cursor: pointer;
     transition: all 0.3s ease;
-    backdrop-filter: blur(10px);
+    backdrop-filter: blur(8px);
     white-space: nowrap;
-    min-width: 140px;
+    min-width: 100px;        /* 140px dan 100px ga tushirdik */
     text-align: center;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
 }
 
 .model-item:hover {
@@ -21323,7 +21324,7 @@ filter: brightness(1.12) contrast(1.08);
 .model-item.active {
     background: #ff8c00 !important; 
     color: white;
-    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.5);
+    /* box-shadow: 0 6px 18px rgba(0, 0, 0, 0.5); */
     transform: translateY(-2px) scale(1.03);
 }
 
@@ -21358,7 +21359,7 @@ pointer-events: auto;
 }
 
 .model-left  { width: 40%; }
-.model-right { width: 55%; text-align: center; }
+.model-right { width: 50%; text-align: center; }
 
 
 
@@ -21472,11 +21473,12 @@ bottom: 0;
 left: 0;
 right: 0;
 height: 78px;
-background: var(--bg-glass);
+/* background: var(--bg-glass); */
+/* background: #0000008e; */
 backdrop-filter: blur(10px);
 -webkit-backdrop-filter: blur(10px);
 border-top: 1px solid var(--border-glass);
-box-shadow: 0 -3px 12px rgba(0, 0, 0, 0.18);
+/* box-shadow: 0 -3px 12px rgba(0, 0, 0, 0); */
 z-index: 950;
 display: flex;
 align-items: center;
@@ -21491,10 +21493,11 @@ height: 100%;
 overflow-x: auto;
 scroll-behavior: smooth;
 -webkit-overflow-scrolling: touch;
-gap: 18px;
+gap: 16px;
 flex: 1;
-padding: 0 4px;
+padding: 0 16px;
 scrollbar-width: none;
+
 }
 
 .mobile-brand-list::-webkit-scrollbar {
@@ -21502,15 +21505,17 @@ display: none;
 }
 
 /* Mobile brand kartasi — faqat .mobile-brand-bar ichida */
-.mobile-brand-bar .brand-card {
-width: 62px;
-height: 62px;
-flex: 0 0 auto;
-background: var(--card-bg);
-border: 1px solid var(--card-border);
-border-radius: 14px;
-transform-origin: center;
-}           
+
+.mobile-brand-bar .brand-card{
+    flex: 0 0 calc((100% - 24px) / 3); /* 3 ta sig‘adi */
+    height: 78px;  /* kattaroq */
+    background-color:#ffffff;
+    border:1px solid var(--card-border);
+    border-radius:10px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}        
 
 .mobile-brand-bar .brand-card img {
 width: 82%;
@@ -21521,41 +21526,56 @@ filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.25));
 
 .mobile-brand-bar .brand-card:hover,
 .mobile-brand-bar .brand-card.active {
-transform: scale(1.12);
-background: rgba(255, 140, 0, 0.22);
-border-color: rgba(255, 140, 0, 0.45);
+    transform: none; /* scale olib tashlandi */
+    background: rgba(255, 140, 0, 0.582);
+    border-color: rgba(255, 140, 0, 0.758);
 }
 
 /* Scroll arrow tugmalari */
 .scroll-arrow {
-position: absolute;
-top: 50%;
-transform: translateY(-50%);
-width: 38px;
-height: 38px;
-border-radius: 50%;
-background: var(--arrow-bg);
-backdrop-filter: blur(8px);
--webkit-backdrop-filter: blur(8px);
-border: 1px solid var(--arrow-border);
-color: var(--arrow-color);
-font-size: 20px;
-font-weight: bold;
-display: flex;
-align-items: center;
-justify-content: center;
-cursor: pointer;
-transition: all 0.2s ease;
-z-index: 10;
-box-shadow: 0 2px 8px rgba(0, 0, 0, 0.20);
+     position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+
+    width: 42px;
+    height: 42px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+    border: 1px solid var(--arrow-border);
+    background: var(--arrow-bg);
+    color: var(--arrow-color);
+
+    font-size: 16px;
+    line-height: 1;          /* MUHIM */
+    padding: 0;              /* MUHIM */
+
+    cursor: pointer;
+    transition: all 0.3s ease;
+
 }
 
-.scroll-arrow:hover  { transform: translateY(-50%) scale(1.12); box-shadow: 0 4px 14px rgba(0, 0, 0, 0.28); }
+.left-arrow {
+    left: 6px;
+    
+}
+
+.right-arrow {
+    right: 6px;
+}
+
+.scroll-arrow:hover  { transform: translateY(-50%) scale(1.1); box-shadow: 0 4px 14px rgba(0, 0, 0, 0.28); }
 .scroll-arrow:active { transform: translateY(-50%) scale(0.94); }
 .scroll-arrow.hidden { opacity: 0; pointer-events: none; }
 
-.left-arrow  { left: 6px; }
-.right-arrow { right: 6px; }
+
+
+/*  */
+
+
 
 
 /* ══════════════════════════════════════
@@ -21722,22 +21742,32 @@ box-shadow: 0 2px 8px rgba(0, 0, 0, 0.20);
 .scroll-controls {
   display: none !important;
 }
-/* 
-/* Model panel — to'liq ekran */
-/* .model-panel {
-  position: fixed;
-  top: 10%;
-  left: 5%;
-  width: 90%;
-  min-height: auto;
-  max-height: 80vh;
-  overflow-y: auto;
-  padding: 30px 20px;
-  flex-direction: column;
-  border-radius: 24px;
-  transform: none;
-  transition: all 0.3s ease;
-} */ */
+
+.model-right {
+    position: relative;
+    overflow: hidden; /* tashqariga chiqib ketmasligi uchun */
+}
+
+.image-wrapper {
+    width: 100%;
+    height: 204px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    overflow: visible;
+
+}
+
+.car-image {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+
+    /* transform: translateY(-35px); */
+}
+
+
 
 .model-panel.active { transform: none; }
 
@@ -21779,100 +21809,94 @@ box-shadow: 0 2px 8px rgba(0, 0, 0, 0.20);
 /* ══════════════════════════════════════
   RESPONSIVE: Kichik mobil (max 480px)
 ══════════════════════════════════════ */
+/* ══════════════════════════════════════
+  RESPONSIVE: Kichik mobil (max 480px)
+══════════════════════════════════════ */
 @media (max-width: 480px) {
-.mobile-brand-bar .brand-card {
-  width: 70px;
-  height: 70px;
+  .mobile-brand-bar .brand-card {
+    width: 70px;
+    height: 70px;
+  }
+
+  /* ── Model panel — bottom sheet ── */
+  .model-panel {
+    position: fixed !important;
+    bottom: 78px;
+    left: 0;
+    right: 0;
+    top: auto !important;
+    width: 100% !important;
+    max-height: 72vh;
+    min-height: unset;
+    border-radius: 28px 28px 0 0 !important;
+    padding: 28px 20px 24px !important;
+
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch;
+    justify-content: flex-start;
+    gap: 0;
+
+    /* Panel o'zi scroll bo'lmasin */
+    overflow: hidden !important;
+
+    background: rgba(0, 0, 0, 0.25) !important;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255,255,255,0.10) !important;
+    box-shadow: 0 -12px 48px rgba(0,0,0,0.55) !important;
+
+    transform: none;
+    transition: transform 0.38s cubic-bezier(0.34, 1.3, 0.64, 1) !important;
+    pointer-events: none;
+    z-index: 999;
+  }
+
+  .model-panel.active {
+    transform: none;
+    pointer-events: auto;
+  }
 }
-
-/* ── Model panel — bottom sheet ── */
-.model-panel {
-  position: fixed !important;
-  bottom: 78px;          /* mobile-brand-bar balandligi */
-  left: 0;
-  right: 0;
-  top: auto !important;
-  width: 100% !important;
-  max-height: 72vh;
-  min-height: unset;
-  border-radius: 28px 28px 0 0 !important;
-  padding: 28px 20px 24px !important;
-
-  display: flex !important;
-  flex-direction: column !important;
-  align-items: stretch;
-  justify-content: flex-start;
-  gap: 0;
-  overflow-y: auto;
-
-  background: rgba(0, 0, 0, 0.25) !important;
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255,255,255,0.10) !important;
-  box-shadow: 0 -12px 48px rgba(0,0,0,0.55) !important;
-
-  /* transform: translateY(110%) !important;   yashirin holat */
-  transform: none;
-  transition: transform 0.38s cubic-bezier(0.34, 1.3, 0.64, 1) !important;
-  /* opacity: 1 !important; */
-  pointer-events: none;
-  z-index: 999;
-}
-
-
-
-
-.model-panel.active {
-  /* transform: translateY(0%) !important; */
-  transform: none;
-  pointer-events: auto;
-}
-
 
 @media (max-width: 768px) {
 
-/* ── Overlay (qorong'i fon) ── */
-/* ── Overlay ── */
-.panel-overlay {
-display: none;
-position: fixed;
-inset: 0;
-background: rgba(0, 0, 0, 0.52);
-z-index: 998;
-backdrop-filter: blur(2px);
--webkit-backdrop-filter: blur(2px);
-opacity: 0;
-transition: opacity 0.25s ease;
-pointer-events: none;
-}
+  .panel-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.52);
+    z-index: 998;
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+    opacity: 0;
+    transition: opacity 0.25s ease;
+    pointer-events: none;
+  }
 
   .panel-overlay.active {
     display: block;
   }
 
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to   { opacity: 1; }
-}
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
 
+  /* Drag handle */
+  .model-panel::before {
+    content: '';
+    display: block;
+    width: 44px;
+    height: 4px;
+    background: rgba(255,255,255,0.25);
+    border-radius: 999px;
+    margin: 0 auto 22px;
+    flex-shrink: 0;
+  }
 
-
-  /* ── Drag handle (yuqorida kichik chiziq) ── */
-.model-panel::before {
-  content: '';
-  display: block;
-  width: 44px;
-  height: 4px;
-  background: rgba(255,255,255,0.25);
-  border-radius: 999px;
-  margin: 0 auto 22px;
-  flex-shrink: 0;
-}
-
-/* ── Yopish tugmasi ── */
-.close-btn {
-  position: absolute !important;
-  top: 18px !important;
+  .close-btn {
+    position: absolute !important;
+    top: 18px !important;
     right: 18px !important;
     width: 34px !important;
     height: 34px !important;
@@ -21882,12 +21906,16 @@ pointer-events: none;
     box-shadow: none !important;
   }
 
-  /* ── Brand nomi (sarlavha) ── */
   .model-left {
     width: 100% !important;
-    text-align: c !important;
+    text-align: center !important;
     order: 2;
-    
+
+    display: flex !important;
+    flex-direction: column !important;
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow: hidden;
   }
 
   .model-left h2 {
@@ -21897,32 +21925,72 @@ pointer-events: none;
     font-weight: 600;
     letter-spacing: 0.5px;
     padding: 12px 0;
+    flex-shrink: 0;
   }
 
-  /* ── Model tugmalari ── */
+  /* ── Model list: 3 ustunli grid + scroll ── */
   .model-list {
-    display: flex !important;
-    flex-wrap: wrap !important;
+    /* 3/3 grid */
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr) !important;
     gap: 10px !important;
-    justify-content: flex-start !important;
-    margin-bottom: 10px;
+
+    /* Scroll */
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto !important;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+
+    /* Scrollbar */
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255,255,255,0.2) transparent;
+
+    padding-bottom: 8px;
+    margin-bottom: 1px;
   }
 
+  /* Scrollbar WebKit (Chrome/Safari) */
+  .model-list::-webkit-scrollbar {
+    width: 4px;
+  }
+  .model-list::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .model-list::-webkit-scrollbar-thumb {
+    background: rgba(255,255,255,0.2);
+    border-radius: 999px;
+  }
 
- /* ── Mashina rasmi ── */
-/* .model-right {
-    width: 55%;
-    text-align: center;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 16px;
-} */
+  /* ── Har bir model item ── */
+  .model-item {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    text-align: center !important;
 
+    padding: 12px 8px !important;
+    border-radius: 14px !important;
+    background: rgba(255,255,255,0.08) !important;
+    border: 1px solid rgba(255,255,255,0.12) !important;
+    color: #fff !important;
+    font-size: 13px !important;
+    font-weight: 500 !important;
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.15s ease;
 
-   #carImage {
+    /* Grid ichida balandlik bir xil */
+    min-height: 52px;
+    word-break: break-word;
+  }
+
+  .model-item:hover,
+  .model-item:active {
+    background: rgba(255,255,255,0.18) !important;
+    transform: scale(0.97);
+  }
+
+  #carImage {
     max-height: 190px !important;
     width: 100% !important;
     object-fit: contain !important;
@@ -21930,19 +21998,24 @@ pointer-events: none;
     transition: opacity 0.22s ease !important;
   }
 
-
-    /* ── "Batafsil" tugmasi ── */
+  /* ── Detail btn — har doim pastda qotib turadi ── */
   .detail-btn {
     display: block !important;
     width: 100% !important;
-    margin-top: 18px !important;
+    margin-top: 15px !important;
     padding: 15px 24px !important;
     font-size: 16px !important;
     font-weight: 800 !important;
-    background: #ff8c00 !important; 
+    background: #ff8c00 !important;
     border-radius: 16px !important;
     box-shadow: 0 8px 24px rgba(255,107,0,0.45) !important;
-    order: 3;
+
+    /* ✅ Asosiy fix */
+    flex-shrink: 0 !important;
+    order: 999 !important;        /* panel ichida eng oxirida */
+    position: sticky !important;
+    bottom: 0 !important;
+    z-index: 10;
   }
 
   .detail-btn:hover {
@@ -21954,17 +22027,225 @@ pointer-events: none;
 
 
 
+/* 768px */
+@media (max-width: 768px) {
 
-  .model-left h2 { font-size: 28px; }
+  /* ── Panel ── */
+  .model-panel {
+    position: fixed !important;
+    bottom: 78px;
+    left: 0;
+    right: 0;
+    top: auto !important;
+    width: 100% !important;
+    max-height: 72vh;
+    min-height: unset;
+    border-radius: 28px 28px 0 0 !important;
+    padding: 28px 20px 20px !important;
 
-  .model-btn {
-    padding: 8px 16px;
-    font-size: 14px;
-    min-width: 100px;
+    display: flex !important;
+    flex-direction: column !important;  /* yuqoridan pastga: rasm → btn → h2 → list */
+    align-items: stretch;
+    gap: 0;
+
+    overflow: hidden !important;        /* panel o'zi scroll bo'lmasin */
+
+    background: rgba(0, 0, 0, 0.25) !important;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255,255,255,0.10) !important;
+    box-shadow: 0 -12px 48px rgba(0,0,0,0.55) !important;
+    transform: none;
+    transition: transform 0.38s cubic-bezier(0.34, 1.3, 0.64, 1) !important;
+    pointer-events: none;
+    z-index: 999;
   }
 
-  #carImage      { max-height: 200px; }
+  .model-panel.active {
+    pointer-events: auto;
+  }
+
+  /* Drag handle */
+  .model-panel::before {
+    content: '';
+    display: block;
+    width: 44px;
+    height: 4px;
+    background: rgba(255,255,255,0.25);
+    border-radius: 999px;
+    margin: 0 auto 14px;
+    flex-shrink: 0;
+  }
+
+  /* ── Close btn ── */
+  .close-btn {
+    position: absolute !important;
+    top: 18px !important;
+    right: 18px !important;
+    width: 34px !important;
+    height: 34px !important;
+    font-size: 18px !important;
+    background: rgba(255,255,255,0.12) !important;
+    color: #fff !important;
+    border: none !important;
+    border-radius: 50% !important;
+    cursor: pointer;
+    z-index: 10;
+    box-shadow: none !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+  /* ══════════════════════════════
+     MODEL-RIGHT: rasm + btn
+     Panel ichida YUQORIDA qotib turadi
+  ══════════════════════════════ */
+  .model-right {
+    flex-shrink: 0 !important;       /* kichraymaydi, qotib turadi */
+    width: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 10px;
+    margin-bottom: 10px;
+    order: 1;                        /* birinchi chiqadi */
+  }
+
+  /* ── Image wrapper ── */
+  .image-wrapper {
+    width: 100% !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    padding: 0 10px;                 /* chetlarda ozgina bo'shliq */
+  }
+
+  /* ── Rasm — barcha telefonlarda sig'adi ── */
+
+  .car-image,
+  [id^="carImage-"] {
+    width: 100% !important;
+    max-width: 100% !important;      /* to'liq kenglik */
+    height: auto !important;
+    max-height: 180px !important;    /* biroz kattaroq */
+    object-fit: contain !important;
+    display: block !important;
+    filter: drop-shadow(0 10px 24px rgba(0,0,0,0.55)) !important;
+    transition: opacity 0.22s ease !important;
+  }
+
+  /* ── Detail btn — rasmdan keyin, qotib turadi ── */
+  .detail-btn {
+    flex-shrink: 0 !important;
+    display: block !important;
+    width: 100% !important;
+    padding: 14px 24px !important;
+    font-size: 15px !important;
+    font-weight: 800 !important;
+    text-align: center !important;
+    background: #ff8c00 !important;
+    color: #fff !important;
+    border-radius: 16px !important;
+    box-shadow: 0 8px 24px rgba(255,107,0,0.45) !important;
+    text-decoration: none !important;
+  }
+
+  /* ══════════════════════════════
+     MODEL-LEFT: h2 + model-list
+     Panel ichida PASTDA, list scroll bo'ladi
+  ══════════════════════════════ */
+  .model-left {
+    flex: 1 1 auto;                  /* qolgan bo'sh joyni egallaydi */
+    min-height: 0;                   /* flex scroll fix — MUHIM */
+    display: flex !important;
+    flex-direction: column !important;
+    overflow: hidden;
+    width: 100% !important;
+    order: 2;                        /* ikkinchi chiqadi */
+  }
+
+  .model-left h2 {
+    flex-shrink: 0;                  /* qotib turadi */
+    font-size: 26px !important;
+    margin-bottom: 10px !important;
+    color: #fff;
+    font-weight: 600;
+    text-align: center;
+    padding: 4px 0;
+  }
+
+  /* ── Model list: 3/3 grid + faqat shu scroll ── */
+  .model-list {
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 8px !important;
+
+    flex: 1 1 auto;
+    min-height: 0;                   /* MUHIM */
+    overflow-y: auto !important;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255,255,255,0.2) transparent;
+    padding-bottom: 4px;
+  }
+
+  .model-list::-webkit-scrollbar { width: 4px; }
+  .model-list::-webkit-scrollbar-track { background: transparent; }
+  .model-list::-webkit-scrollbar-thumb {
+    background: rgba(255,255,255,0.2);
+    border-radius: 999px;
+  }
+
+  /* ── Model item ── */
+  .model-item {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    text-align: center !important;
+    padding: 10px 6px !important;
+    border-radius: 14px !important;
+    background: rgba(255,255,255,0.08) !important;
+    border: 1px solid rgba(255,255,255,0.12) !important;
+    color: #fff !important;
+    font-size: 12px !important;
+    font-weight: 500 !important;
+    cursor: pointer;
+    min-height: 46px;
+    word-break: break-word;
+    transition: background 0.2s ease, transform 0.15s ease;
+  }
+
+  .model-item:active {
+    background: rgba(255,255,255,0.18) !important;
+    transform: scale(0.96);
+  }
+
+  /* ── Overlay ── */
+  .panel-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.52);
+    z-index: 998;
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+    opacity: 0;
+    transition: opacity 0.25s ease;
+    pointer-events: none;
+  }
+
+  .panel-overlay.active {
+    display: block;
+    opacity: 1;
+    pointer-events: auto;
+  }
 }
+
+
+
 
 
 /* ══════════════════════════════════════

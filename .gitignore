@@ -3,7 +3,7 @@ myproject/sobirov_test_settings.py
 main/templates/main/index_test_sobirov.html
 main/test_views_mainsobirov.py
 main/testserializers.py
-main/admin_test_sobirov.py
+main/admin_test_sobirov.py 
 main/models_test_sobirov.py
 main/testmodels.py
 # end sobirov settings #

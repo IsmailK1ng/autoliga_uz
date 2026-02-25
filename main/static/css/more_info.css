@@ -282,12 +282,12 @@
 }
 
 /* Содержимое аккордеона */
-.acardeon-card__content {
+/* .acardeon-card__content {
     max-height: 0;
     overflow: hidden;
     transition: max-height 0.4s ease;
     padding: 0;
-}
+} */
 
 /* Активное состояние - когда чекбокс отмечен */
 .accordion-checkbox:checked+.acardeon-card__header .acardeon-card__title {
@@ -298,10 +298,27 @@
     transform: rotate(45deg);
 }
 
-.accordion-checkbox:checked~.acardeon-card__content {
-    max-height: 500px;
+
+.accordion-checkbox:checked ~ .acardeon-card__content {
+    grid-template-rows: 1fr;
     padding: 0 0 30px 0;
 }
+
+.acardeon-card__content {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 0.4s ease;
+    overflow: hidden;
+}
+
+.acardeon-card__content > * {
+    min-height: 0;
+}
+
+
+
+
+
 
 /* Стили для списка характеристик */
 .specs-list.custom-marker {

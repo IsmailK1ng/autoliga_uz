@@ -203,20 +203,23 @@ AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
 
-# ============ ЛОКАЛИЗАЦИЯ ============
-
-TIME_ZONE = config('TIME_ZONE', default='Asia/Tashkent')
-
 # ============ СТАТИЧЕСКИЕ ФАЙЛЫ ============
 
 STATIC_URL = '/static/'
-STATIC_ROOT = '/home/autolig1/public_html/static'
 STATICFILES_DIRS = [
     BASE_DIR / 'main' / 'static',
 ]
 
 MEDIA_URL = '/media/'
-MEDIA_ROOT = '/home/autolig1/public_html/media'
+
+if DEBUG:
+    # Local development
+    STATIC_ROOT = BASE_DIR / 'staticfiles'
+    MEDIA_ROOT = BASE_DIR / 'media'
+else:
+    # Production server
+    STATIC_ROOT = '/home/autolig1/public_html/static'
+    MEDIA_ROOT = '/home/autolig1/public_html/media'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 

@@ -1,3 +1,6 @@
+
+# ushbu quyidagi models.py eski models sobirov tegmagani test uchun realniyga jadval qoshish uchun shu yerga real eski variantini paste qildim hurmat bilan sobirov
+
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils.text import slugify
@@ -6,7 +9,7 @@ from ckeditor.fields import RichTextField
 from django.utils import timezone
 from datetime import timedelta
 from django.utils.translation import gettext_lazy as _
-
+                                                                
 # ========== ОБЩИЕ CHOICES ==========
 
 REGION_CHOICES = [
@@ -302,79 +305,37 @@ class Product(models.Model):
             'link': f'/products/{self.slug}/',
         }
 
-class ParameterCategory(models.Model):
-    """
-    Категории параметров: — ДИНАМИК.
-    c помощью функции modeltranslation автоматически создаются поля name_uz, name_ru, name_en.
-    """
-    name = models.CharField("Nomi", max_length=255)
-    slug = models.SlugField(
-        "«Слуг (кодекс)»",
-        max_length=100,
-        unique=True,
-        help_text="«Например: двигатель, вес, кабина. Только латинские буквы и тире»."
-    )
-    order = models.PositiveIntegerField("Порядок", default=0)
-    is_active = models.BooleanField("Активен", default=True)
-
-    class Meta:
-        verbose_name = "Категория параметра"
-        verbose_name_plural = "Категории параметров"
-        ordering = ['order', 'name']
-
-    def __str__(self):
-        return self.name
-    def save(self, *args, **kwargs):
-        # Функция импорта позволяет преобразовывать кириллические или другие символы, не относящиеся к ASCII, в символы ASCII (unidecode) и конвертировать их в URL-совместимый "slug" (slugify).
-
-       # Автоматическая генерация Slug (аналогично ProductCategory)
-        if not self.slug:
-            from django.utils.text import slugify
-            from unidecode import unidecode
-            name_for_slug = (
-                getattr(self, 'name_uz', None) or
-                getattr(self, 'name_ru', None) or
-                self.name or
-                "param-category"
-            )
-            base_slug = slugify(unidecode(name_for_slug))
-            slug = base_slug
-            counter = 1
-            while ParameterCategory.objects.filter(slug=slug).exclude(pk=self.pk).exists():
-                slug = f"{base_slug}-{counter}"
-                counter += 1
-            self.slug = slug
-            # Результат: Если пользователь не указывает URL-адрес вручную, автоматически генерируется безопасный, ASCII-код и уникальный URL-адрес на основе имени объекта.
-        super().save(*args, **kwargs)
-
 class ProductParameter(models.Model):
-
+    """Параметры грузовика"""
+    CATEGORY_CHOICES = [
+        ('main', _('Основные параметры')),
+        ('engine', _('Двигатель')),
+        ('weight', _('Весовые параметры')),
+        ('transmission', _('Трансмиссия')),
+        ('brakes', _('Система тормозов и шин')),
+        ('comfort', _('Удобства')),
+        ('superstructure', _('Надстройка')),
+        ('cabin', _('Кабина')),
+        ('additional', _('Дополнительные параметры')),
+    ]
+    
     product = models.ForeignKey(
         Product, 
         on_delete=models.CASCADE, 
         related_name='parameters', 
         verbose_name='Продукт'
     )
-    category = models.ForeignKey(
-        ParameterCategory,
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-        related_name='parameters',
-        verbose_name='Категория параметра'
-    )
+    category = models.CharField("Категория", max_length=50, choices=CATEGORY_CHOICES)
     text = models.CharField("Параметр", max_length=500)
     order = models.PositiveIntegerField("Порядок", default=0)
     
     class Meta:
         verbose_name = "Параметр"
         verbose_name_plural = "Параметры машины"
-        ordering = ['category__order', 'order']  # ✅ TO'G'RI — ForeignKey orqali sort
-
+        ordering = ['category', 'order']
+    
     def __str__(self):
-        category_name = self.category.name if self.category else "Без категории"
-        return f"{category_name}: {self.text}"  
-
+        return f"{self.get_category_display()}: {self.text[:50]}"
 
 class ProductFeature(models.Model):
     """Характеристики с иконками"""

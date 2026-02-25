@@ -1,11 +1,5 @@
 from modeltranslation.translator import register, TranslationOptions
-from .models import (
-    News, NewsBlock, Vacancy, 
-    VacancyResponsibility, VacancyRequirement, VacancyCondition, VacancyIdealCandidate,
-    Product, ProductFeature, ProductCardSpec, ProductParameter,
-    ProductCategory,  # ✅ НОВОЕ
-    FeatureIcon,
-)
+from main.models import *
 
 # ========== НОВОСТИ ==========
 @register(News)
@@ -73,3 +67,7 @@ class ProductCardSpecTranslationOptions(TranslationOptions):
 @register(ProductParameter)
 class ProductParameterTranslationOptions(TranslationOptions):
     fields = ('text',)
+
+@register(ParameterCategory)
+class ParameterCategoryTranslationOptions(TranslationOptions):
+    fields = ('name',)      

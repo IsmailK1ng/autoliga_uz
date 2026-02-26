@@ -369,7 +369,7 @@ class ProductParameter(models.Model):
     class Meta:
         verbose_name = "Параметр"
         verbose_name_plural = "Параметры машины"
-        ordering = ['category__order', 'order']  # ✅ TO'G'RI — ForeignKey orqali sort
+        ordering = ['category__order', 'order']  
 
     def __str__(self):
         category_name = self.category.name if self.category else "Без категории"

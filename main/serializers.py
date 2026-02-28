@@ -160,13 +160,15 @@ class ProductCardSerializer(LanguageSerializerMixin, serializers.ModelSerializer
     card_specs = ProductCardSpecSerializer(many=True, read_only=True)
     image_url = serializers.SerializerMethodField()
     category = serializers.SerializerMethodField()
-    
+    slider_price = serializers.CharField(read_only=True)  # 👈 SHU YERGA QO‘SH
+
+
     class Meta:
         model = Product
         fields = [
             'id', 'title', 'slug',
             'category',
-            'image_url', 'card_specs', 'is_featured', 'order'
+            'image_url', 'card_specs', 'slider_price', 'is_featured', 'order'
         ]
     
     def get_category(self, obj):

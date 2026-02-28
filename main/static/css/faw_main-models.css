@@ -274,7 +274,7 @@
 }
 
 .truck-title {
-    font-size: 24px;
+    font-size: 60px;
     font-weight: bold;
     /* margin-bottom: 25px; */
     text-align: center;
@@ -288,7 +288,7 @@
 }
 
 .spec-item {
-    max-width: 100px;
+    max-width: 100%;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -470,6 +470,8 @@ body[data-theme="dark"] .hero-05-title__item {
     .truck-title {
         font-size: 20px;
     }
+
+    
 }
 
 /* Tablet Landscape */
@@ -802,3 +804,110 @@ body[data-theme="dark"] .hero-05-title__item {
         margin: 3rem 6.5rem;
     }
 }
+
+
+
+/* product kardtochka css */
+
+/* Konteynerni rasmga moslash */
+.truck-image-container {
+    position: relative;
+    display: flex;       /* Rasmni markazlash uchun flex ishlatamiz */
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    width: 100%;
+    min-height: 200px;   /* Rasmlar balandligi har xil bo'lsa, bir xil ushlab turadi */
+    background-color: #f8f8f8; /* Rasm orqasidagi bo'shliq oq bo'lib qolmasligi uchun */
+}
+
+/* Rasmni to'g'rilash */
+.truck-image {
+    width: 100%;
+    height: auto;
+    max-height: 250px;   /* Rasmlar juda katta bo'lib ketmasligi uchun */
+    object-fit: contain; /* Rasmni qirqmasdan konteynerga sig'diradi */
+    display: block;
+    margin: 0 auto;
+}
+
+/* Brand nomi (Badge) - rasm ustida qat'iy joylashishi */
+.brand-badge {
+    position: absolute;
+    bottom: 15px;
+    left: 15px;
+    background-color: #ffffff;
+    color: #000000;
+    padding: 6px 16px;
+    font-size: 16px;
+    font-weight: 700;
+    text-transform: uppercase;
+    border-radius: 4px;
+    z-index: 10;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Model nomi stili */
+.truck-title {
+    font-size: 24px;
+    font-weight: bold;
+    /* margin-bottom: 25px; */
+    text-align: center;
+    color: #fff;
+}
+
+/* Narx stili */
+.truck-price {
+    text-align: center;
+    margin: 5px 0;
+    padding: 8px 15px;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+/* Kartochka pastki qismi (qora fon) */
+.truck-info {
+    background-color: #23262d; /* To'q kulrang/qora fon */
+    padding-bottom: 30px;
+    border-radius: 0 0 12px 12px;
+}
+
+/* Spec-item matnlari oq bo'lishi uchun */
+.spec-value {
+    color: #ffffff;
+    font-size: 12px;
+    margin-top: 8px;
+}
+
+.truck-price span {
+    font-size: 3rem;      /* Kattaroq qilindi */
+    font-weight: 800;     /* Qalinroq */
+    color: #ffffff;          /* Rangini o‘zgartirish mumkin */
+}
+
+/* Mobile uchun moslashuv (600px gacha) */
+@media (max-width: 600px) {
+    .truck-price span {
+        font-size: 2rem;  /* Kichikroq, mobilga mos */
+    }
+}
+
+/* Agar kichikroq mobil (400px gacha) */
+@media (max-width: 400px) {
+    .truck-price span {
+        font-size: 1.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .truck-price span {
+        font-size: 18px;
+    }
+}
+
+.truck-price {
+    display: none; /* Narx hozircha ko'rinmaydi */
+}
+
+

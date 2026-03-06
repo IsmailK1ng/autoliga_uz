@@ -447,8 +447,7 @@ class ContactForm(models.Model):
         null=True,
         help_text="Какую модель автомобиля интересует клиента"
     )
-    
-    
+
     referer = models.URLField(
         "Referer (откуда пришёл)",
         max_length=500,
@@ -685,4 +684,59 @@ class AmoCRMToken(models.Model):
             return True
         
         # Обновляем за 1 час до истечения
-        return timezone.now() + timedelta(hours=1) >= self.expires_at
+        return timezone.now() + timedelta(hours=1) >= self.expires_at\
+        
+
+# ========== Bot telegram   ==========
+class TelegramUser(models.Model):
+    """Telegram botdan kelgan foydalanuvchilar"""
+    
+    telegram_id = models.BigIntegerField(
+        "Telegram ID",
+        unique=True,
+        db_index=True
+    )
+    username = models.CharField(
+        "Username",
+        max_length=100,
+        blank=True,
+        null=True
+    )
+    first_name = models.CharField(
+        "Ismi",
+        max_length=150,
+        blank=True,
+        null=True
+    )
+    age = models.IntegerField("Yosh", blank=True, null=True)
+    
+    phone = models.CharField(
+        "Telefon",
+        max_length=20,
+        blank=True,
+        null=True
+    )
+    region = models.CharField(
+        "Viloyat",
+        max_length=200,
+        blank=True,
+        null=True
+    )
+    language = models.CharField(
+        "Til",
+        max_length=10,
+        blank=True,
+        null=True
+    )
+    created_at = models.DateTimeField(
+        "Ro'yxatdan o'tgan sana",
+        auto_now_add=True
+    )
+
+    class Meta:
+        verbose_name = "Telegram foydalanuvchi"
+        verbose_name_plural = "Telegram foydalanuvchilar"
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"@{self.username or self.telegram_id} - {self.phone or '-'}"        

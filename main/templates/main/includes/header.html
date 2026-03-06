@@ -30,6 +30,11 @@
                     {% if LANGUAGE_CODE == 'ru' %}Главная{% elif LANGUAGE_CODE == 'en' %}Home{% else %}Bosh sahifa{% endif %}
                 </a>
             </li>
+            <li class="desktop-menu__item ">
+                <a href="{% url 'dealers' %}" class="desktop-menu__link">
+                    {% if LANGUAGE_CODE == 'ru' %}Дилеры{% elif LANGUAGE_CODE == 'en' %}Dealers{% else %}Dilerlar   {% endif %}
+                </a>
+            </li>
             <li class="desktop-menu__item">
                 <a href="javascript:void(0)" class="desktop-menu__link">
                     {% if LANGUAGE_CODE == 'ru' %}Бренды{% elif LANGUAGE_CODE == 'en' %}Brands{% else %}Brendlar{% endif %}
@@ -117,6 +122,13 @@
                                     <a class="main-menu__link btn" href="{% url 'home' %}">
                                         <span class="btn-caption">
                                             {% if LANGUAGE_CODE == 'ru' %}Главная{% elif LANGUAGE_CODE == 'en' %}Home{% else %}Bosh sahifa{% endif %}
+                                        </span>
+                                    </a>
+                                </li>
+                                <li class="main-menu__item">
+                                    <a class="main-menu__link btn" href="{% url 'dealers' %}">
+                                        <span class="btn-caption">
+                                            {% if LANGUAGE_CODE == 'ru' %}Дилеры{% elif LANGUAGE_CODE == 'en' %}Dealers{% else %}Dilerlar{% endif %}
                                         </span>
                                     </a>
                                 </li>

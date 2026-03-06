@@ -14,4 +14,5 @@ urlpatterns = [
     # path('about/', views.about, name='about'),
     # path('become-a-dealer/', views.become_a_dealer, name='become_a_dealer'),
     # path('api/log-js-error/', views.log_js_error, name='log_js_error'),
+    path('dealers/', views.dealers, name='dealers'),
 ]   

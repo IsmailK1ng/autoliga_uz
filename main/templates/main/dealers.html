@@ -40,15 +40,15 @@
                         <ol class="breadcrumb-ol">
                             <li><a href="{% url 'home' %}">{% if LANGUAGE_CODE == 'uz' %}Bosh sahifa{% elif LANGUAGE_CODE == 'ru' %}Главная{% else %}Home{% endif %}</a></li>
                             <li class="active">
-                                <a href="{% url 'contact' %}">{% if LANGUAGE_CODE == 'uz' %}Kontaktlar{% elif LANGUAGE_CODE == 'ru' %}Контакты{% else %}Contacts{% endif %}</a>
-                            </li>
+                                <a href="{% url 'dealers' %}">{% if LANGUAGE_CODE == 'uz' %}Dilerlar{% elif LANGUAGE_CODE == 'ru' %}Дилеры{% else %}Dealers{% endif %}</a>
+                            </li>                 
                         </ol>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-
+    
 
 
         <!-- Section - Text Block Start -->
@@ -73,6 +73,11 @@
             </div>
         </div>
     </div>
+
+
+
+
+
 
 
     <!-- Footer -->

@@ -6,14 +6,6 @@ Backend проект на **Django + Django REST Framework** для сайтов
 
 Проект включает админ-панель, REST API, Swagger-документацию и мультиязычную поддержку.
 
-# Django settings
-DEBUG=True
-SECRET_KEY=django-insecure-1234567890abcdef
-DB_NAME=autoliga_uz
-DB_USER=postgres
-DB_PASSWORD=010507
-DB_HOST=127.0.0.1
-DB_PORT=5432
 
 
 Telegram bot .env sayt .env ichiga daniylar qoyildi
@@ -25,7 +17,7 @@ DATABASE_URL=postgresql://postgres:password@localhost:5432/database_name -->
 
 ---
 
-## 🧩 Стек технологий
+## 🧩 Стек технологийgit 
 
 - **Python 3.13**
 - **Django 5.2.7**

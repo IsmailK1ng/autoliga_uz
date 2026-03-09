@@ -10,9 +10,9 @@ Backend проект на **Django + Django REST Framework** для сайтов
 
 Telegram bot .env sayt .env ichiga daniylar qoyildi
 # Telegram bot settings
-<!-- BOT_TOKEN=860********************************************
+ BOT_TOKEN=860********************************************
 ADMIN_ID=57********
-DATABASE_URL=postgresql://postgres:password@localhost:5432/database_name -->
+DATABASE_URL=postgresql://postgres:password@localhost:5432/database_name 
 
 
 ---

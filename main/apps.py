@@ -16,7 +16,8 @@ class MainConfig(AppConfig):
         def start_bot():
             import asyncio
             import sys
-            sys.path.insert(0, 'Autoliga_uz')
+            bot_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'Autoliga_Botfile')
+            sys.path.insert(0, bot_dir)
             from bot import main as bot_main
 
             # Yangi event loop yaratamiz — signal muammosini hal qiladi

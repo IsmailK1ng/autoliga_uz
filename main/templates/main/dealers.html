@@ -76,8 +76,8 @@
                     </div>
 
                     <!-- Map -->
-                    <div class="dealers-map-wrapper">
-                        <div id="map"></div>
+                    <div class="dealers-map-wrapper" data-lenis-prevent>
+                        <div id="map" data-lenis-prevent></div>
 
                         <!-- Desktop dealer card (overlay) -->
                         <div class="dealer-info-card hidden" id="dealerCard">
@@ -443,6 +443,19 @@
         simplemaps_countrymap.hooks.refresh_complete = attachLocationClicks;
         // complete allaqachon yongan bo'lishi mumkin — darhol ham chaqiramiz
         setTimeout(attachLocationClicks, 200);
+
+        // Xarita ustida mouse wheel bilan zoom qilganda sahifa scroll bo'lmasin
+        (function() {
+            const mapEl = document.getElementById('map');
+
+            // capture:true — barcha passive listenerlardan OLDIN ishlaydi
+            // Bu passive listener'lar preventDefault ni bloklay olmasligini ta'minlaydi
+            document.addEventListener('wheel', function(e) {
+                if (mapEl.contains(e.target)) {
+                    e.preventDefault();
+                }
+            }, { passive: false, capture: true });
+        })();
 
         // ── MOBILE: Dealer ro'yxati ────────────────────────────────
         const mobDealerList = document.getElementById('mobDealerList');

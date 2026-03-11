@@ -1239,7 +1239,7 @@ class DealerAdmin(ContentAdminMixin, TabbedTranslationAdmin):
         }),
         ("Xarita koordinatalari", {
             'fields': ('latitude', 'longitude'),
-            'description': '📍 Google Maps da diler manzilini toping → o\'ng tugma → "Bu yerning koordinatalari" → nusxa oling.',
+            'description': '📍 Google Maps da diler manzilini toping → "joylashuvni koordinatalarini toping" → nusxa oling.',
         }),
         ("Ijtimoiy tarmoqlar", {
             'fields': ('instagram', 'telegram', 'facebook', 'youtube'),

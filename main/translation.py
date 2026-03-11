@@ -71,3 +71,8 @@ class ProductParameterTranslationOptions(TranslationOptions):
 @register(ParameterCategory)
 class ParameterCategoryTranslationOptions(TranslationOptions):
     fields = ('name',)      
+
+# ========== DILERLAR ==========
+@register(Dealer)
+class DealerTranslationOptions(TranslationOptions):
+    fields = ('name', 'address', 'working_hours')

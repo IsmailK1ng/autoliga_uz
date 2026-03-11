@@ -1,14 +1,74 @@
 from aiogram import Bot, Dispatcher, types, F
 from aiogram.filters import Command
+from aiogram.fsm.context import FSMContext
+from aiogram.fsm.state import State, StatesGroup
+from aiogram.fsm.storage.memory import MemoryStorage
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, ReplyKeyboardRemove, FSInputFile
 import asyncio
+import html as html_module
 import os
+import time
 from database import Base, engine, SessionLocal
 from models.contact_form import TelegramUser
 from config import BOT_TOKEN, ADMIN_ID, MEDIA_ROOT
 from sqlalchemy import text as sql_text
 
 bot = Bot(token=BOT_TOKEN)
+
+
+import re
+def sanitize_name(text):
+    if not isinstance(text, str):
+        return None
+
+    text = text.strip()
+
+    if len(text) < 2:
+        return None  
+
+    if len(text) > 30:
+        return None 
+
+    if not re.fullmatch(r"[A-Za-zА-Яа-яЁёЎўҚқҒғҲҳ\s\-]{2,30}", text):
+        return None  # raqam, emoji yoki boshqa belgilar
+
+    return text
+# ================= DEALER REGION LABELS =================
+
+DEALER_REGION_LABELS = {
+    "uz": {
+        "qoraqalpogiston":  "Qoraqalpog'iston Respublikasi",
+        "xorazm":           "Xorazm viloyati",
+        "buxoro":           "Buxoro viloyati",
+        "navoiy":           "Navoiy viloyati",
+        "samarqand":        "Samarqand viloyati",
+        "qashqadaryo":      "Qashqadaryo viloyati",
+        "surxondaryo":      "Surxondaryo viloyati",
+        "jizzax":           "Jizzax viloyati",
+        "sirdaryo":         "Sirdaryo viloyati",
+        "toshkent-viloyati":"Toshkent viloyati",
+        "toshkent-shahri":  "Toshkent shahri",
+        "namangan":         "Namangan viloyati",
+        "andijon":          "Andijon viloyati",
+        "fargona":          "Farg'ona viloyati",
+    },
+    "ru": {
+        "qoraqalpogiston":  "Республика Каракалпакстан",
+        "xorazm":           "Хорезмская область",
+        "buxoro":           "Бухарская область",
+        "navoiy":           "Навоийская область",
+        "samarqand":        "Самаркандская область",
+        "qashqadaryo":      "Кашкадарьинская область",
+        "surxondaryo":      "Сурхандарьинская область",
+        "jizzax":           "Джизакская область",
+        "sirdaryo":         "Сырдарьинская область",
+        "toshkent-viloyati":"Ташкентская область",
+        "toshkent-shahri":  "город Ташкент",
+        "namangan":         "Наманганская область",
+        "andijon":          "Андижанская область",
+        "fargona":          "Ферганская область",
+    },
+}
 
 # ================= REGIONS =================
 
@@ -47,6 +107,19 @@ UZ_REGIONS = {
     }
 }
 
+# ================= FSM STATES =================
+
+class RegStates(StatesGroup):
+    first_name = State()
+    age = State()
+    region = State()
+    district = State()
+    phone = State()
+
+class NavStates(StatesGroup):
+    choose_brand = State()
+    choose_car = State()
+
 # ================= KEYBOARDS =================
 
 LANG_KEYBOARD = ReplyKeyboardMarkup(
@@ -67,8 +140,8 @@ ADMIN_KEYBOARD = ReplyKeyboardMarkup(
 MESSAGES = {
     "uz": {
         "choose_lang": "Tilni tanlang 🌐",
-        "send_phone": "Telefoningizni yuboring 📞", 
-        "send_first_name": "Ismingizni kiriting", 
+        "send_phone": "Telefoningizni yuboring 📞",
+        "send_first_name": "Ismingizni kiriting",
         "send_age": "Yoshingizni kiriting (masalan: 25)",
         "wrong_age": "Yosh noto'g'ri ❌\nFaqat raqam kiriting",
         "choose_region": "Viloyatingizni tanlang",
@@ -83,6 +156,17 @@ MESSAGES = {
         "choose_model": "Model tanlang:",
         "back_btn": "🔙 Orqaga",
         "dealers_title": "🏢 Dilerlik markazlari:\n\nYaqin orada ko'proq ma'lumot qo'shiladi.\n\nSaytimizga tashrif buyuring: autoliga.uz/dealers/",
+        "change_lang_btn": "🌐 Tilni o'zgartirish",
+        "lang_changed": "Til o'zgartirildi ✅\nAsosiy menyu:",
+        "unsupported": "Iltimos faqat matn yuboring ✍️",
+        "invalid_name": (
+            "❌ Ism noto'g'ri kiritildi!\n\n"
+            "✅ Qoidalar:\n"
+            "• Faqat harflar (lotin yoki kirill)\n"
+            "• Kamida 2 ta harf\n"
+            "• Ko'pi bilan 30 ta harf\n"
+            "• Raqam, emoji, belgilar yo'q"
+        ),
     },
     "ru": {
         "choose_lang": "Выберите язык 🌐",
@@ -102,21 +186,36 @@ MESSAGES = {
         "choose_model": "Выберите модель:",
         "back_btn": "🔙 Назад",
         "dealers_title": "🏢 Дилерские центры:\n\nПодробная информация скоро будет добавлена.\n\nПосетите наш сайт: autoliga.uz/dealers/",
+        "change_lang_btn": "🌐 Сменить язык",
+        "lang_changed": "Язык изменён ✅\nГлавное меню:",
+        "unsupported": "Пожалуйста, отправляйте только текст ✍️",
+        "invalid_name": (
+            "❌ Имя введено неверно!\n\n"
+            "✅ Правила:\n"
+            "• Только буквы (латиница или кириллица)\n"
+            "• Минимум 2 буквы\n"
+            "• Максимум 30 букв\n"
+            "• Цифры, эмодзи, символы запрещены"
+        ),
     }
 }
+
+CHANGE_LANG_BTNS = {MESSAGES["uz"]["change_lang_btn"], MESSAGES["ru"]["change_lang_btn"]}
 
 
 def get_main_menu_keyboard(lang: str) -> ReplyKeyboardMarkup:
     if lang == "ru":
         return ReplyKeyboardMarkup(
             keyboard=[
-                [KeyboardButton(text="🚗 Автомобили"), KeyboardButton(text="🏢 Дилерские центры")]
+                [KeyboardButton(text="🚗 Автомобили"), KeyboardButton(text="🏢 Дилерские центры")],
+                [KeyboardButton(text=MESSAGES["ru"]["change_lang_btn"])],
             ],
             resize_keyboard=True
         )
     return ReplyKeyboardMarkup(
         keyboard=[
-            [KeyboardButton(text="🚗 Mashinalar"), KeyboardButton(text="🏢 Dilerlik markazlari")]
+            [KeyboardButton(text="🚗 Mashinalar"), KeyboardButton(text="🏢 Dilerlik markazlari")],
+            [KeyboardButton(text=MESSAGES["uz"]["change_lang_btn"])],
         ],
         resize_keyboard=True
     )
@@ -125,150 +224,246 @@ def get_main_menu_keyboard(lang: str) -> ReplyKeyboardMarkup:
 
 Base.metadata.create_all(bind=engine)
 
-dp = Dispatcher()
+dp = Dispatcher(storage=MemoryStorage())
 
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
+# Foydalanuvchi tili: tezkor lookup uchun xotirada saqlanadi (DB dan yuklanadi)
+user_lang: dict = {}
 
-user_state = {}
-user_lang = {}
-user_data = {}  # stores extra context: brand_id, brand_name, car list
+# ================= LANG SAFETY =================
+
+ALLOWED_LANGS = {"uz", "ru"}
+
+def _safe_lang(lang: str) -> str:
+    """SQL injection oldini olish: faqat ruxsat etilgan til kodlari."""
+    return lang if lang in ALLOWED_LANGS else "uz"
+
+# ================= CACHE =================
+
+_brands_cache: dict = {}
+BRANDS_CACHE_TTL = 60  # sekund
 
 # ================= DB HELPERS =================
 
-def db_get_brands():
-    db = next(get_db())
+def _coalesce(primary, fallback):
+    return primary if primary else fallback
+
+
+def db_get_brands(lang: str = "uz"):
+    lang = _safe_lang(lang)
+    now = time.monotonic()
+    cached = _brands_cache.get(lang)
+    if cached and now - cached["ts"] < BRANDS_CACHE_TTL:
+        return cached["data"]
+    db = SessionLocal()
     try:
         rows = db.execute(sql_text(
-            'SELECT id, name FROM main_productcategory '
+            f'SELECT id, name_{lang}, name FROM main_productcategory '
             'WHERE is_active = TRUE ORDER BY "order", name'
         )).fetchall()
-        return [{"id": r[0], "name": r[1]} for r in rows]
+        result = [{"id": r[0], "name": _coalesce(r[1], r[2])} for r in rows]
+        _brands_cache[lang] = {"data": result, "ts": now}
+        return result
     except Exception:
         return []
+    finally:
+        db.close()
 
-def db_get_cars(brand_id: int):
-    db = next(get_db())
+
+def db_get_cars(brand_id: int, lang: str = "uz"):
+    lang = _safe_lang(lang)
+    db = SessionLocal()
     try:
         rows = db.execute(sql_text(
-            'SELECT id, title FROM main_product '
+            f'SELECT id, title_{lang}, title FROM main_product '
             'WHERE category_id = :cid AND is_active = TRUE ORDER BY "order", title'
         ), {"cid": brand_id}).fetchall()
-        return [{"id": r[0], "title": r[1]} for r in rows]
+        return [{"id": r[0], "title": _coalesce(r[1], r[2])} for r in rows]
     except Exception:
         return []
+    finally:
+        db.close()
 
-def db_get_car_detail(car_id: int):
-    db = next(get_db())
+
+def db_get_dealers(lang: str = "uz"):
+    lang = _safe_lang(lang)
+    db = SessionLocal()
+    try:
+        rows = db.execute(sql_text(
+            f'SELECT name_{lang}, name, region, address_{lang}, address, phone, working_hours_{lang}, working_hours '
+            'FROM main_dealer WHERE is_active = TRUE ORDER BY "order", name'
+        )).fetchall()
+        return [
+            {
+                "name":    _coalesce(r[0], r[1]),
+                "region":  r[2],
+                "address": _coalesce(r[3], r[4]),
+                "phone":   r[5],
+                "hours":   _coalesce(r[6], r[7]),
+            }
+            for r in rows
+        ]
+    except Exception:
+        return []
+    finally:
+        db.close()
+
+
+def db_get_car_detail(car_id: int, lang: str = "uz"):
+    lang = _safe_lang(lang)
+    db = SessionLocal()
     try:
         car = db.execute(sql_text(
-            "SELECT title, main_image, card_image, slider_price, slider_year, "
-            "slider_power, slider_fuel_consumption "
+            f"SELECT title_{lang}, title, main_image, card_image, "
+            f"slider_price_{lang}, slider_price, slider_year, "
+            f"slider_power_{lang}, slider_power, "
+            f"slider_fuel_consumption_{lang}, slider_fuel_consumption "
             "FROM main_product WHERE id = :id"
         ), {"id": car_id}).fetchone()
         if not car:
             return None
 
         features = db.execute(sql_text(
-            'SELECT name FROM main_productfeature '
+            f'SELECT name_{lang}, name FROM main_productfeature '
             'WHERE product_id = :id ORDER BY "order" LIMIT 6'
         ), {"id": car_id}).fetchall()
 
         return {
-            "title": car[0],
-            "main_image": car[1],
-            "card_image": car[2],
-            "price": car[3],
-            "year": car[4],
-            "power": car[5],
-            "fuel": car[6],
-            "features": [f[0] for f in features],
+            "title": _coalesce(car[0], car[1]),
+            "main_image": car[2],
+            "card_image": car[3],
+            "price": _coalesce(car[4], car[5]),
+            "year": car[6],
+            "power": _coalesce(car[7], car[8]),
+            "fuel": _coalesce(car[9], car[10]),
+            "features": [_coalesce(f[0], f[1]) for f in features],
         }
     except Exception:
         return None
+    finally:
+        db.close()
+
 
 def build_car_caption(car: dict, lang: str) -> str:
-    lines = [f"<b>{car['title']}</b>"]
+    lines = [f"<b>{html_module.escape(car['title'])}</b>"]
     if car.get("year"):
-        lines.append(f"📅 {car['year']}")
+        lines.append(f"📅 {html_module.escape(str(car['year']))}")
     if car.get("price"):
-        lines.append(f"💰 {car['price']}")
+        lines.append(f"💰 {html_module.escape(str(car['price']))}")
     if car.get("power"):
-        lines.append(f"⚡ {car['power']}")
+        lines.append(f"⚡ {html_module.escape(str(car['power']))}")
     if car.get("fuel"):
-        lines.append(f"⛽ {car['fuel']}")
+        lines.append(f"⛽ {html_module.escape(str(car['fuel']))}")
     if car.get("features"):
         lines.append("")
         for feat in car["features"]:
-            lines.append(f"• {feat}")
+            lines.append(f"• {html_module.escape(feat)}")
     return "\n".join(lines)
+
 
 def get_image_path(relative_path: str) -> str | None:
     if not relative_path:
         return None
-    full_path = os.path.join(MEDIA_ROOT, relative_path)
+    safe_path = os.path.normpath(relative_path).lstrip("/\\")
+    full_path = os.path.join(MEDIA_ROOT, safe_path)
+    if not full_path.startswith(os.path.abspath(MEDIA_ROOT)):
+        return None
     return full_path if os.path.exists(full_path) else None
+
+
+
+# ================= MEDIA BLOCKER =================
+
+@dp.message(~F.text & ~F.contact)
+async def block_unsupported_media(message: types.Message):
+    lang = user_lang.get(message.from_user.id, "uz")
+    await message.answer(MESSAGES[lang]["unsupported"])
 
 # ================= START =================
 
 @dp.message(Command("start"))
-async def start(message: types.Message):
-    db = next(get_db())
-    user = db.query(TelegramUser).filter(TelegramUser.telegram_id == message.from_user.id).first()
+async def start(message: types.Message, state: FSMContext):
+    db = SessionLocal()
+    try:
+        user = db.query(TelegramUser).filter(TelegramUser.telegram_id == message.from_user.id).first()
+        has_profile = bool(user and user.phone and user.first_name)
+        lang = (user.language or "uz") if user else "uz"
+    finally:
+        db.close()
 
     if message.from_user.id == ADMIN_ID:
         await message.answer("👑 Admin panel", reply_markup=ADMIN_KEYBOARD)
         return
 
-    if not user:
-        user_state[message.from_user.id] = "lang"
+    if not has_profile:
+        await state.clear()
         await message.answer(MESSAGES["uz"]["choose_lang"], reply_markup=LANG_KEYBOARD)
     else:
-        lang = user.language or "uz"
         user_lang[message.from_user.id] = lang
-        user_state.pop(message.from_user.id, None)
+        await state.clear()
         await message.answer(MESSAGES[lang]["welcome_back"], reply_markup=get_main_menu_keyboard(lang))
 
 
-# LANGUAGE
+# ================= TIL O'ZGARTIRISH (asosiy menyudan) =================
+
+@dp.message(F.text.in_(CHANGE_LANG_BTNS))
+async def request_lang_change(message: types.Message, state: FSMContext):
+    await state.clear()
+    await message.answer(
+        MESSAGES["uz"]["choose_lang"] + " / " + MESSAGES["ru"]["choose_lang"],
+        reply_markup=LANG_KEYBOARD
+    )
+
+
+# ================= LANGUAGE (ro'yxatdan o'tish va til o'zgartirish) =================
+
 @dp.message(F.text.startswith("🇺🇿") | F.text.startswith("🇷🇺"))
-async def choose_language(message: types.Message):
-    db = next(get_db())
+async def choose_language(message: types.Message, state: FSMContext):
+    uid = message.from_user.id
     lang = "uz" if message.text.startswith("🇺🇿") else "ru"
-    user_lang[message.from_user.id] = lang
+    user_lang[uid] = lang
 
-    user = db.query(TelegramUser).filter(TelegramUser.telegram_id == message.from_user.id).first()
-    if not user:
-        user = TelegramUser(telegram_id=message.from_user.id)
-        db.add(user)
+    db = SessionLocal()
+    try:
+        user = db.query(TelegramUser).filter(TelegramUser.telegram_id == uid).first()
+        if not user:
+            user = TelegramUser(telegram_id=uid)
+            db.add(user)
+        user.language = lang
+        user.username = message.from_user.username
+        db.commit()
+        has_profile = bool(user.phone and user.first_name)
+    finally:
+        db.close()
 
-    user.language = lang
-    user.username = message.from_user.username
-    db.commit()
-    user_state[message.from_user.id] = "first_name"
+    if has_profile:
+        await state.clear()
+        await message.answer(MESSAGES[lang]["lang_changed"], reply_markup=get_main_menu_keyboard(lang))
+    else:
+        await state.set_state(RegStates.first_name)
+        await message.answer(MESSAGES[lang]["send_first_name"], reply_markup=ReplyKeyboardRemove())
 
-    await message.answer(MESSAGES[lang]["send_first_name"], reply_markup=ReplyKeyboardRemove())
 
+# ================= CONTACT =================
 
-# CONTACT — телефон собирается последним шагом регистрации
 @dp.message(F.contact)
-async def save_phone(message: types.Message):
-    db = next(get_db())
+async def save_phone(message: types.Message, state: FSMContext):
     lang = user_lang.get(message.from_user.id, "uz")
 
     if message.contact.user_id != message.from_user.id:
         await message.answer("❌")
         return
 
-    user = db.query(TelegramUser).filter(TelegramUser.telegram_id == message.from_user.id).first()
-    user.phone = message.contact.phone_number
-    db.commit()
+    db = SessionLocal()
+    try:
+        user = db.query(TelegramUser).filter(TelegramUser.telegram_id == message.from_user.id).first()
+        if not user:
+            return
+        user.phone = message.contact.phone_number
+        db.commit()
+    finally:
+        db.close()
 
-    user_state.pop(message.from_user.id, None)
+    await state.clear()
     await message.answer(
         MESSAGES[lang]["saved"] + "\n\n" + MESSAGES[lang]["main_menu"],
         reply_markup=get_main_menu_keyboard(lang)
@@ -279,22 +474,37 @@ async def save_phone(message: types.Message):
 
 @dp.message(F.text == "📋 Foydalanuvchilar ro'yxati", F.from_user.id == ADMIN_ID)
 async def show_users(message: types.Message):
-    db = next(get_db())
-    users = db.query(TelegramUser).all()
+    db = SessionLocal()
+    try:
+        users = db.query(TelegramUser).all()
+        # ORM obyektlari session yopilgandan keyin ham ishlaydi (eager load)
+        user_cards = [
+            (
+                u.telegram_id,
+                u.first_name or "-",
+                u.age,
+                u.phone or "-",
+                u.language or "-",
+                u.region or "-",
+            )
+            for u in users
+        ]
+    finally:
+        db.close()
 
-    if not users:
+    if not user_cards:
         await message.answer("Foydalanuvchilar yo'q ❌")
         return
 
     chunks = []
-    current = f"📋 <b>Foydalanuvchilar ro'yxati</b> — jami: {len(users)} ta\n\n"
+    current = f"📋 <b>Foydalanuvchilar ro'yxati</b> — jami: {len(user_cards)} ta\n\n"
 
-    for i, user in enumerate(users, 1):
+    for i, (tg_id, fname, age, phone, language, region) in enumerate(user_cards, 1):
         card = (
-            f"<b>#{i}</b> | 🆔 <code>{user.telegram_id}</code>\n"
-            f"👤 {user.first_name or '-'}   🎂 {user.age or '-'}\n"
-            f"📞 {user.phone or '-'}\n"
-            f"🌍 {user.language or '-'}   🏙 {user.region or '-'}\n"
+            f"<b>#{i}</b> | 🆔 <code>{tg_id}</code>\n"
+            f"👤 {html_module.escape(fname)}   🎂 {age or '-'}\n"
+            f"📞 {html_module.escape(phone)}\n"
+            f"🌍 {language}   🏙 {html_module.escape(region)}\n"
             f"━━━━━━━━━━━━━━━\n"
         )
         if len(current) + len(card) > 4000:
@@ -312,19 +522,26 @@ async def show_users(message: types.Message):
 
 @dp.message(F.text == "📊 Statistika", F.from_user.id == ADMIN_ID)
 async def show_stats(message: types.Message):
-    db = next(get_db())
-    users = db.query(TelegramUser).all()
+    db = SessionLocal()
+    try:
+        users = db.query(TelegramUser).all()
+        stats = [
+            (u.language, bool(u.phone), bool(u.phone and u.first_name and u.region), u.region)
+            for u in users
+        ]
+    finally:
+        db.close()
 
-    total = len(users)
-    uz_count = sum(1 for u in users if u.language == "uz")
-    ru_count = sum(1 for u in users if u.language == "ru")
-    with_phone = sum(1 for u in users if u.phone)
-    complete = sum(1 for u in users if u.phone and u.first_name and u.region)
+    total = len(stats)
+    uz_count = sum(1 for s in stats if s[0] == "uz")
+    ru_count = sum(1 for s in stats if s[0] == "ru")
+    with_phone = sum(1 for s in stats if s[1])
+    complete = sum(1 for s in stats if s[2])
 
-    region_counts = {}
-    for u in users:
-        if u.region:
-            base = u.region.split(",")[0].strip()
+    region_counts: dict = {}
+    for s in stats:
+        if s[3]:
+            base = s[3].split(",")[0].strip()
             region_counts[base] = region_counts.get(base, 0) + 1
     top_regions = sorted(region_counts.items(), key=lambda x: x[1], reverse=True)[:5]
 
@@ -340,7 +557,7 @@ async def show_stats(message: types.Message):
     if top_regions:
         text += "\n🏙 Top viloyatlar:\n"
         for region, count in top_regions:
-            text += f"   • {region}: <b>{count}</b>\n"
+            text += f"   • {html_module.escape(region)}: <b>{count}</b>\n"
 
     await message.answer(text, parse_mode="HTML")
 
@@ -348,16 +565,16 @@ async def show_stats(message: types.Message):
 # ================= MAIN MENU HANDLERS =================
 
 @dp.message(F.text.in_({"🚗 Mashinalar", "🚗 Автомобили"}))
-async def show_brands(message: types.Message):
+async def show_brands(message: types.Message, state: FSMContext):
     lang = user_lang.get(message.from_user.id, "uz")
-    brands = db_get_brands()
+    brands = db_get_brands(lang)
 
     if not brands:
         await message.answer(MESSAGES[lang]["no_cars"])
         return
 
-    user_data[message.from_user.id] = {"brands": {b["name"]: b["id"] for b in brands}}
-    user_state[message.from_user.id] = "choose_brand"
+    await state.set_state(NavStates.choose_brand)
+    await state.update_data(brands={b["name"]: b["id"] for b in brands})
 
     rows = [[KeyboardButton(text=b["name"])] for b in brands]
     rows.append([KeyboardButton(text=MESSAGES[lang]["back_btn"])])
@@ -368,86 +585,138 @@ async def show_brands(message: types.Message):
 @dp.message(F.text.in_({"🏢 Dilerlik markazlari", "🏢 Дилерские центры"}))
 async def show_dealers(message: types.Message):
     lang = user_lang.get(message.from_user.id, "uz")
-    await message.answer(MESSAGES[lang]["dealers_title"])
+    dealers = db_get_dealers(lang)
+
+    if not dealers:
+        await message.answer(MESSAGES[lang]["dealers_title"])
+        return
+
+    header = "🏢 <b>Dilerlik markazlari:</b>\n\n" if lang == "uz" else "🏢 <b>Дилерские центры:</b>\n\n"
+    lines = []
+    for d in dealers:
+        block = f"<b>{html_module.escape(d['name'])}</b>"
+        if d['region']:
+            region_label = DEALER_REGION_LABELS.get(lang, {}).get(d['region'], d['region'])
+            block += f"\n📍 {html_module.escape(region_label)}"
+        if d['address']:
+            block += f"\n🏠 {html_module.escape(d['address'])}"
+        if d['phone']:
+            block += f"\n📞 {html_module.escape(d['phone'])}"
+        if d['hours']:
+            block += f"\n🕐 {html_module.escape(d['hours'])}"
+        lines.append(block)
+
+    text = header + "\n\n".join(lines)
+    await message.answer(text, parse_mode="HTML")
 
 
 # ================= CATCH-ALL: registration + navigation states =================
 
 @dp.message()
-async def register_process(message: types.Message):
-    db = next(get_db())
+async def register_process(message: types.Message, state: FSMContext):
+
     uid = message.from_user.id
-    user = db.query(TelegramUser).filter(TelegramUser.telegram_id == uid).first()
-    state = user_state.get(uid)
+    current_state = await state.get_state()
     lang = user_lang.get(uid, "uz")
     back_btn = MESSAGES[lang]["back_btn"]
 
+    # media bloklash
+    if not message.text:
+        await message.answer(MESSAGES[lang]["unsupported"])
+        return
+
+    text = message.text.strip()
+
+
+
+
+    
     # ---- BACK button ----
-    if message.text == back_btn:
-        if state == "choose_brand":
-            user_state.pop(uid, None)
+    if text == back_btn:
+        if current_state == NavStates.choose_brand:
+            await state.clear()
             await message.answer(MESSAGES[lang]["main_menu"], reply_markup=get_main_menu_keyboard(lang))
-        elif state == "choose_car":
-            # Go back to brands
-            brands = db_get_brands()
-            user_data[uid] = {"brands": {b["name"]: b["id"] for b in brands}}
-            user_state[uid] = "choose_brand"
+
+        elif current_state == NavStates.choose_car:
+            brands = db_get_brands(lang)
+
+            await state.set_state(NavStates.choose_brand)
+            await state.update_data(brands={b["name"]: b["id"] for b in brands})
+
             rows = [[KeyboardButton(text=b["name"])] for b in brands]
             rows.append([KeyboardButton(text=back_btn)])
+
             kb = ReplyKeyboardMarkup(keyboard=rows, resize_keyboard=True)
+
             await message.answer(MESSAGES[lang]["choose_brand"], reply_markup=kb)
+
         else:
-            user_state.pop(uid, None)
+            await state.clear()
             await message.answer(MESSAGES[lang]["main_menu"], reply_markup=get_main_menu_keyboard(lang))
+
         return
 
     # ---- BRAND selection ----
-    if state == "choose_brand":
-        brands_map = user_data.get(uid, {}).get("brands", {})
-        if message.text not in brands_map:
+    if current_state == NavStates.choose_brand:
+
+        data = await state.get_data()
+        brands_map = data.get("brands", {})
+
+        if text not in brands_map:
             await message.answer(MESSAGES[lang]["choose_from_list"])
             return
 
-        brand_id = brands_map[message.text]
-        cars = db_get_cars(brand_id)
+        brand_id = brands_map[text]
+
+        cars = db_get_cars(brand_id, lang)
+
         if not cars:
             await message.answer(MESSAGES[lang]["no_cars"])
             return
 
-        user_data[uid] = {
-            "brands": brands_map,
-            "brand_id": brand_id,
-            "brand_name": message.text,
-            "cars": {c["title"]: c["id"] for c in cars},
-        }
-        user_state[uid] = "choose_car"
+        await state.set_state(NavStates.choose_car)
+
+        await state.update_data(
+            brands=brands_map,
+            brand_id=brand_id,
+            brand_name=text,
+            cars={c["title"]: c["id"] for c in cars},
+        )
 
         rows = [[KeyboardButton(text=c["title"])] for c in cars]
         rows.append([KeyboardButton(text=back_btn)])
+
         kb = ReplyKeyboardMarkup(keyboard=rows, resize_keyboard=True)
+
         await message.answer(
-            f"{message.text} — {MESSAGES[lang]['choose_model']}",
+            f"{html_module.escape(text)} — {MESSAGES[lang]['choose_model']}",
             reply_markup=kb
         )
+
         return
 
     # ---- CAR selection ----
-    if state == "choose_car":
-        cars_map = user_data.get(uid, {}).get("cars", {})
-        if message.text not in cars_map:
+    if current_state == NavStates.choose_car:
+
+        data = await state.get_data()
+        cars_map = data.get("cars", {})
+
+        if text not in cars_map:
             await message.answer(MESSAGES[lang]["choose_from_list"])
             return
 
-        car_id = cars_map[message.text]
-        car = db_get_car_detail(car_id)
+        car_id = cars_map[text]
+
+        car = db_get_car_detail(car_id, lang)
+
         if not car:
             await message.answer("❌")
             return
 
         caption = build_car_caption(car, lang)
 
-        # Try to send with photo
         image_path = get_image_path(car["card_image"] or car["main_image"])
+
         if image_path:
             await message.answer_photo(
                 photo=FSInputFile(image_path),
@@ -456,57 +725,110 @@ async def register_process(message: types.Message):
             )
         else:
             await message.answer(caption, parse_mode="HTML")
+
         return
 
     # ---- REGISTRATION flow ----
-    if not user:
-        return
+    db = SessionLocal()
 
-    if state == "first_name":
-        user.first_name = message.text
-        db.commit()
-        user_state[uid] = "age"
-        await message.answer(MESSAGES[lang]["send_age"])
+    try:
 
-    elif state == "age":
-        if message.text.isdigit() and 5 <= int(message.text) <= 100:
-            user.age = int(message.text)
+        user = db.query(TelegramUser).filter(TelegramUser.telegram_id == uid).first()
+
+        if not user:
+            return
+
+        # ---- FIRST NAME ----
+        if current_state == RegStates.first_name:
+
+            name = sanitize_name(message.text)
+
+           
+            if not name:
+                await message.answer(MESSAGES[lang]["invalid_name"])
+                return
+
+            user.first_name = name
             db.commit()
-            user_state[uid] = "region"
+
+            await state.set_state(RegStates.age)
+            await message.answer(MESSAGES[lang]["send_age"])
+
+        # ---- AGE ----
+        elif current_state == RegStates.age:
+
+            if text.isdigit() and 5 <= int(text) <= 100:
+
+                user.age = int(text)
+                db.commit()
+
+                await state.set_state(RegStates.region)
+
+                regions = UZ_REGIONS.get(lang, UZ_REGIONS["uz"])
+
+                region_kb = ReplyKeyboardMarkup(
+                    keyboard=[[KeyboardButton(text=r)] for r in regions.keys()],
+                    resize_keyboard=True
+                )
+
+                await message.answer(MESSAGES[lang]["choose_region"], reply_markup=region_kb)
+
+            else:
+                await message.answer(MESSAGES[lang]["wrong_age"])
+
+
+        # ---- REGION ----
+        elif current_state == RegStates.region:
+
             regions = UZ_REGIONS.get(lang, UZ_REGIONS["uz"])
-            region_kb = ReplyKeyboardMarkup(
-                keyboard=[[KeyboardButton(text=r)] for r in regions.keys()],
-                resize_keyboard=True
-            )
-            await message.answer(MESSAGES[lang]["choose_region"], reply_markup=region_kb)
-        else:
-            await message.answer(MESSAGES[lang]["wrong_age"])
 
-    elif state == "region":
-        regions = UZ_REGIONS.get(lang, UZ_REGIONS["uz"])
-        if message.text in regions:
-            user.region = message.text
+            if text in regions:
+
+                user.region = text
+                db.commit()
+
+                districts = regions[text]
+
+                district_kb = ReplyKeyboardMarkup(
+                    keyboard=[[KeyboardButton(text=d)] for d in districts],
+                    resize_keyboard=True
+                )
+
+                await state.set_state(RegStates.district)
+
+                await message.answer(MESSAGES[lang]["choose_district"], reply_markup=district_kb)
+
+            else:
+                await message.answer(MESSAGES[lang]["choose_from_list"])
+
+
+        # ---- DISTRICT ----
+        elif current_state == RegStates.district:
+
+            regions = UZ_REGIONS.get(lang, UZ_REGIONS["uz"])
+
+            region_name = (user.region or "").split(",")[0].strip()
+
+            valid_districts = regions.get(region_name, [])
+
+            if text not in valid_districts:
+                await message.answer(MESSAGES[lang]["choose_from_list"])
+                return
+
+            user.region = f"{user.region}, {text}"
             db.commit()
-            districts = regions[message.text]
-            district_kb = ReplyKeyboardMarkup(
-                keyboard=[[KeyboardButton(text=d)] for d in districts],
+
+            await state.set_state(RegStates.phone)
+
+            kb = ReplyKeyboardMarkup(
+                keyboard=[[KeyboardButton(text="📞 Telefon yuborish", request_contact=True)]],
                 resize_keyboard=True
             )
-            user_state[uid] = "district"
-            await message.answer(MESSAGES[lang]["choose_district"], reply_markup=district_kb)
-        else:
-            await message.answer(MESSAGES[lang]["choose_from_list"])
 
-    elif state == "district":
-        user.region = f"{user.region}, {message.text}"
-        db.commit()
-        user_state[uid] = "phone"
-        kb = ReplyKeyboardMarkup(
-            keyboard=[[KeyboardButton(text="📞 Telefon yuborish", request_contact=True)]],
-            resize_keyboard=True
-        )
-        await message.answer(MESSAGES[lang]["send_phone"], reply_markup=kb)
+            await message.answer(MESSAGES[lang]["send_phone"], reply_markup=kb)
 
+    finally:
+        db.close()
 
 # ================= RUN =================
 

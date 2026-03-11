@@ -12,7 +12,7 @@ from rest_framework.permissions import AllowAny, IsAdminUser
 from django.http import HttpResponseRedirect
 from rest_framework.decorators import api_view, permission_classes
 from .models import (
-    News, ContactForm, JobApplication, Vacancy, Product, ProductCategory
+    News, ContactForm, JobApplication, Vacancy, Product, ProductCategory, Dealer
 )
 from .serializers import (
     NewsSerializer, ContactFormSerializer, JobApplicationSerializer, 
@@ -130,7 +130,41 @@ def news(request):
 
 
 def dealers(request):
-    return render(request, 'main/dealers.html')
+    dealers_qs = Dealer.objects.filter(is_active=True).order_by('order', 'name')
+    dealers_data = []
+    for d in dealers_qs:
+        # modeltranslation: d.name joriy tilga qarab qaytaradi.
+        # Agar bo'sh bo'lsa, boshqa tillardan olish
+        name = (d.name or
+                getattr(d, 'name_uz', '') or
+                getattr(d, 'name_ru', '') or
+                getattr(d, 'name_en', '') or '')
+        address = (d.address or
+                   getattr(d, 'address_uz', '') or
+                   getattr(d, 'address_ru', '') or
+                   getattr(d, 'address_en', '') or '')
+        working_hours = (d.working_hours or
+                         getattr(d, 'working_hours_uz', '') or
+                         getattr(d, 'working_hours_ru', '') or
+                         getattr(d, 'working_hours_en', '') or '')
+        dealers_data.append({
+            'id': d.id,
+            'name': name,
+            'region': d.region,
+            'address': address,
+            'phone': d.phone or '',
+            'working_hours': working_hours,
+            'instagram': d.instagram or '',
+            'telegram': d.telegram or '',
+            'facebook': d.facebook or '',
+            'youtube': d.youtube or '',
+            'logo': d.logo.url if d.logo else '',
+            'lat': float(d.latitude) if d.latitude else None,
+            'lng': float(d.longitude) if d.longitude else None,
+        })
+    return render(request, 'main/dealers.html', {
+        'dealers_json': json.dumps(dealers_data, ensure_ascii=False),
+    })
 
 
 def jobs(request):

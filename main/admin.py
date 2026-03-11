@@ -1216,3 +1216,36 @@ class AmoCRMTokenAdmin(AmoCRMAdminMixin, admin.ModelAdmin):
             'time_left_text': time_left_text,
         }
         return render(request, 'main/amocrm_instructions.html', context)
+    
+# ========== DILERLAR ==========
+
+@admin.register(Dealer)
+class DealerAdmin(ContentAdminMixin, TabbedTranslationAdmin):
+    list_display = ('name', 'region', 'phone', 'is_active', 'order')
+    list_filter = ('region', 'is_active')
+    list_editable = ('is_active', 'order')
+    search_fields = ('name', 'address', 'phone')
+    ordering = ('order', 'name')
+    fieldsets = (
+        ("Asosiy ma'lumotlar", {
+            'fields': (
+                'name_uz', 'name_ru', 'name_en',
+                'region',
+                'address_uz', 'address_ru', 'address_en',
+                'phone',
+                'working_hours_uz', 'working_hours_ru', 'working_hours_en',
+                'logo',
+            )
+        }),
+        ("Xarita koordinatalari", {
+            'fields': ('latitude', 'longitude'),
+            'description': '📍 Google Maps da diler manzilini toping → o\'ng tugma → "Bu yerning koordinatalari" → nusxa oling.',
+        }),
+        ("Ijtimoiy tarmoqlar", {
+            'fields': ('instagram', 'telegram', 'facebook', 'youtube'),
+            'classes': ('collapse',),
+        }),
+        ("Sozlamalar", {
+            'fields': ('is_active', 'order'),
+        }),
+    )

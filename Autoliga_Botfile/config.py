@@ -1,9 +1,16 @@
 import os
 from dotenv import load_dotenv
 
-load_dotenv(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".env"))
+# Loyiha rootini aniqlaymiz (Autoliga_Botfile papkasi tashqarisi)
+PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+# Root papkadan .env yuklash
+load_dotenv(os.path.join(PROJECT_ROOT, ".env"))
 
 BOT_TOKEN = os.getenv("BOT_TOKEN")
-ADMIN_ID = int(os.getenv("ADMIN_ID"))
+ADMIN_ID = int(os.getenv("ADMIN_ID", "0"))  
 DATABASE_URL = os.getenv("DATABASE_URL")
-MEDIA_ROOT = os.getenv("MEDIA_ROOT", os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "media"))
+MEDIA_ROOT = os.getenv(
+    "MEDIA_ROOT",
+    os.path.join(PROJECT_ROOT, "media")  # agar .env da bo'lmasa
+)

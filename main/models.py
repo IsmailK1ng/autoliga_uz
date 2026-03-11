@@ -685,7 +685,59 @@ class AmoCRMToken(models.Model):
         
         # Обновляем за 1 час до истечения
         return timezone.now() + timedelta(hours=1) >= self.expires_at\
-        
+
+# ========== 07. DILERLAR ==========
+
+DEALER_REGION_CHOICES = [
+    ('qoraqalpogiston', "Qoraqalpog'iston Respublikasi"),
+    ('xorazm', 'Xorazm viloyati'),
+    ('buxoro', 'Buxoro viloyati'),
+    ('navoiy', 'Navoiy viloyati'),
+    ('samarqand', 'Samarqand viloyati'),
+    ('qashqadaryo', 'Qashqadaryo viloyati'),
+    ('surxondaryo', 'Surxondaryo viloyati'),
+    ('jizzax', 'Jizzax viloyati'),
+    ('sirdaryo', 'Sirdaryo viloyati'),
+    ('toshkent-viloyati', 'Toshkent viloyati'),
+    ('toshkent-shahri', 'Toshkent shahri'),
+    ('namangan', 'Namangan viloyati'),
+    ('andijon', 'Andijon viloyati'),
+    ('fargona', "Farg'ona viloyati"),
+]
+
+class Dealer(models.Model):
+    """Rasmiy diler markazlari"""
+    name = models.CharField("Nomi", max_length=255)
+    region = models.CharField("Viloyat", max_length=50, choices=DEALER_REGION_CHOICES)
+    address = models.CharField("Manzil", max_length=500, blank=True)
+    phone = models.CharField("Telefon", max_length=100, blank=True)
+    working_hours = models.CharField("Ish vaqti", max_length=100, blank=True, help_text="Masalan: Du-Yak 9:00 - 18:00")
+    instagram = models.URLField("Instagram", blank=True, null=True)
+    telegram = models.URLField("Telegram", blank=True, null=True)
+    facebook = models.URLField("Facebook", blank=True, null=True)
+    youtube = models.URLField("YouTube", blank=True, null=True)
+    logo = models.ImageField("Logo", upload_to="dealers/logos/", blank=True, null=True)
+    latitude = models.DecimalField(
+        "Kenglik (Latitude)", max_digits=9, decimal_places=6,
+        blank=True, null=True,
+        help_text="Google Maps dan oling. Misol: 41.299496"
+    )
+    longitude = models.DecimalField(
+        "Uzunlik (Longitude)", max_digits=9, decimal_places=6,
+        blank=True, null=True,
+        help_text="Google Maps dan oling. Misol: 69.240073"
+    )
+    is_active = models.BooleanField("Faol", default=True)
+    order = models.PositiveIntegerField("Tartib", default=0)
+
+    class Meta:
+        verbose_name = " - Diler"
+        verbose_name_plural = "Dilerlar - Diler markazlari"
+        ordering = ['order', 'name']
+
+    def __str__(self):
+        return f"{self.name} ({self.get_region_display()})"
+
 
 # ========== Bot telegram   ==========
 class TelegramUser(models.Model):
@@ -739,4 +791,6 @@ class TelegramUser(models.Model):
         ordering = ['-created_at']
 
     def __str__(self):
-        return f"@{self.username or self.telegram_id} - {self.phone or '-'}"        
+        return f"@{self.username or self.telegram_id} - {self.phone or '-'}"    
+
+

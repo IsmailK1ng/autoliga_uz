@@ -47,15 +47,16 @@
     <div class="mxd-section padding-default dealers-section">
         <div class="mxd-container">
 
-            <div class="dealers-page-title">
-                <h1>{% if LANGUAGE_CODE == 'uz' %}Autoliga rasmiy dilerlar{% elif LANGUAGE_CODE == 'ru' %}Официальные дилеры Autoliga{% else %}Autoliga Official Dealers{% endif %}</h1>
-            </div>
-
             {% if dealers_json != '[]' %}
+
+            <!-- Mobile title (hidden on desktop) -->
+            <h1 class="dealers-page-heading dealers-heading-mobile">{% if LANGUAGE_CODE == 'uz' %}Autoliga rasmiy dilerlar{% elif LANGUAGE_CODE == 'ru' %}Официальные дилеры Autoliga{% else %}Autoliga Official Dealers{% endif %}</h1>
+
             <div class="dealers-layout">
 
-                <!-- ═══ DESKTOP SIDEBAR ═══ -->
+                <!-- ═══ LEFT SIDEBAR: Title + Dropdown ═══ -->
                 <div class="dealers-sidebar">
+                    <h1 class="dealers-page-heading dealers-heading-desktop">{% if LANGUAGE_CODE == 'uz' %}Autoliga rasmiy dilerlar{% elif LANGUAGE_CODE == 'ru' %}Официальные дилеры Autoliga{% else %}Autoliga Official Dealers{% endif %}</h1>
                     <button class="dealer-all-btn" id="dealerAllBtn">
                         <span>{% if LANGUAGE_CODE == 'uz' %}Barchasi{% elif LANGUAGE_CODE == 'ru' %}Все{% else %}All{% endif %}</span>
                         <i class="ph ph-caret-down" id="allBtnCaret"></i>
@@ -118,9 +119,9 @@
                     <div class="col-12 col-xl-5 mxd-grid-item no-margin">
                         <div class="mxd-block__name">
                             <div class="faw-history-title fade-in">
-                                <h2>{% if LANGUAGE_CODE == 'uz' %}Hozircha diler markazlari mavjud emas. Tez orada Autoliga rasmiy dilerlari ro'yxati shu sahifada e'lon qilinadi.
-                                {% elif LANGUAGE_CODE == 'ru' %}На данный момент дилерские центры отсутствуют. В ближайшее время список официальных дилеров Autoliga будет опубликован на этой странице.
-                                {% else %}Currently there are no dealer centers available. The list of official Autoliga dealers will be published on this page soon.
+                                <h2>{% if LANGUAGE_CODE == 'uz' %}Hozircha diler markazlari mavjud emas. 
+                                {% elif LANGUAGE_CODE == 'ru' %}На данный момент дилерские центры отсутствуют.
+                                {% else %}Currently there are no dealer centers available. 
                                 {% endif %}</h2>
                             </div>
                         </div>

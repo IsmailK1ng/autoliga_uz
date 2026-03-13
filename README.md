@@ -15,6 +15,10 @@ ADMIN_ID=57********
 DATABASE_URL=postgresql://postgres:password@localhost:5432/database_name 
 
 
+
+ pip install django-ratelimit django-simple-captcha Pillow
+
+
 ---
 
 ## 🧩 Стек технологийgit 

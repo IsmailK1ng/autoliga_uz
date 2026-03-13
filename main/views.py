@@ -12,11 +12,12 @@ from rest_framework.permissions import AllowAny, IsAdminUser
 from django.http import HttpResponseRedirect
 from rest_framework.decorators import api_view, permission_classes
 from .models import (
-    News, ContactForm, JobApplication, Vacancy, Product, ProductCategory, Dealer
+    News, ContactForm, JobApplication, Vacancy, Product, ProductCategory, Dealer, Review
 )
 from .serializers import (
-    NewsSerializer, ContactFormSerializer, JobApplicationSerializer, 
-    ProductCardSerializer, ProductDetailSerializer, ProductCategorySerializer
+    NewsSerializer, ContactFormSerializer, JobApplicationSerializer,
+    ProductCardSerializer, ProductDetailSerializer, ProductCategorySerializer,
+    ReviewListSerializer, ReviewCreateSerializer
 )
 import logging
 import json
@@ -87,6 +88,7 @@ def index(request):
             'slider_products': json.dumps(slider_data, ensure_ascii=False),
             'featured_count': len(slider_data),
             'productCategory': productCategory,
+            'RECAPTCHA_SITE_KEY': getattr(settings, 'RECAPTCHA_SITE_KEY', ''),
         }
         
         return render(request, 'main/index.html', context)
@@ -500,6 +502,44 @@ class ProductCategoryViewSet(viewsets.ReadOnlyModelViewSet):
     """API для категорий продуктов"""
     serializer_class = ProductCategorySerializer
     permission_classes = [AllowAny]
-    
+
     def get_queryset(self):
         return ProductCategory.objects.filter(is_active=True).order_by('order')
+
+
+class ReviewViewSet(viewsets.GenericViewSet):
+    """API для отзывов клиентов"""
+    permission_classes = [AllowAny]
+
+    def get_serializer_class(self):
+        if self.action == 'create':
+            return ReviewCreateSerializer
+        return ReviewListSerializer
+
+    def get_queryset(self):
+        return Review.objects.filter(status='approved').order_by('-created_at')
+
+    def list(self, request, *args, **kwargs):
+        """GET: список одобренных отзывов с пагинацией"""
+        from rest_framework.pagination import PageNumberPagination
+
+        class ReviewPagination(PageNumberPagination):
+            page_size = 4
+            page_size_query_param = 'page_size'
+            max_page_size = 20
+
+        paginator = ReviewPagination()
+        queryset = self.get_queryset()
+        page = paginator.paginate_queryset(queryset, request)
+        serializer = self.get_serializer(page, many=True)
+        return paginator.get_paginated_response(serializer.data)
+
+    def create(self, request, *args, **kwargs):
+        """POST: создание нового отзыва (с reCAPTCHA)"""
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response({
+            'success': True,
+            'message': 'Спасибо! Ваш отзыв отправлен на проверку. После модерации он появится на сайте.'
+        }, status=status.HTTP_201_CREATED)

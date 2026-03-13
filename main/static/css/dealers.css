@@ -62,19 +62,30 @@
         }
 
         /* ═══ DEALERS PAGE ═══ */
-        .dealers-section { padding-top: 40px; padding-bottom: 80px; }
-        .dealers-page-title { margin-bottom: 32px; }
-        .dealers-page-title h1 { font-size: 2rem; font-weight: 700; color: #1a1a1a; }
+        .mxd-section.padding-default.dealers-section {
+            padding-top: 25px;
+            padding-bottom: 30px;
+        }
+
+        .dealers-page-heading {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin: 0 0 16px 0;
+        }
+        /* Desktop: show sidebar title, hide mobile title */
+        .dealers-heading-mobile { display: none; }
+        .dealers-heading-desktop { display: block; }
 
         /* ── Desktop layout ─────────────────────────── */
         .dealers-layout {
             display: grid;
-            grid-template-columns: 220px 1fr;
+            grid-template-columns: 280px 1fr;
             gap: 24px;
             align-items: start;
         }
 
-        /* Desktop sidebar */
+        /* Left sidebar: title + dropdown */
         .dealers-sidebar {
             display: flex;
             flex-direction: column;
@@ -125,8 +136,11 @@
         /* Map */
         .dealers-map-area { position: relative; }
         .dealers-map-wrapper { position: relative; }
-        #map { width: 100%; border-radius: 12px; background: #f9f9f9; overflow: hidden; touch-action: none; }
+        .dealers-map-wrapper { border-radius: 12px; overflow: hidden; }
+        #map { width: 100%; max-height: 750px; background: #f9f9f9; touch-action: none; overflow: hidden; }
         #map * { touch-action: none; }
+        #map svg { width: 100% !important; height: 85% !important; }
+
 
         /* Desktop dealer card (overlay on map) */
         .dealer-info-card {
@@ -197,7 +211,9 @@
 
         /* ══ MOBILE ≤ 768px ══════════════════════════════════ */
         @media (max-width: 768px) {
-            .dealers-page-title h1 { font-size: 1.4rem; }
+            .dealers-page-heading { font-size: 1.4rem; }
+            .dealers-heading-mobile { display: block; margin-bottom: 10px; }
+            .dealers-heading-desktop { display: none; }
 
             /* Desktop sidebar - yashiriladi */
             .dealers-sidebar { display: none; }
@@ -261,8 +277,10 @@
                 font-weight: 600;
             }
 
-            /* Map - kichikroq */
-            #map { border-radius: 10px; }
+            /* Map */
+            .dealers-map-wrapper { border-radius: 10px; }
+            #map { height: auto; overflow: visible; }
+            #map svg { width: 100% !important; height: auto !important; }
 
             /* Desktop card - yashiriladi */
             .dealer-info-card { display: none !important; }

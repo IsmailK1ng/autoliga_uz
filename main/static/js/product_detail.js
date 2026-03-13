@@ -367,28 +367,47 @@ class ProductDetail {
         productLink.href = 'javascript:void(0)';
     }
 
-    // 2-chi link = category
-    const categoryLink = breadcrumbLinks[1];
-    if (categoryLink) {
+// 2-chi link = category
+const categoryLink = breadcrumbLinks[1];
 
-        let categorySlug = '';
+if (categoryLink) {
 
-        // Agar this.product.category object bo‘lsa slug olamiz
-        if (this.product.category && typeof this.product.category === 'object') {
-            categorySlug = this.product.category.slug || this.product.category.name || '';
+    let categoryName = "Models";
+
+    if (this.product.category && typeof this.product.category === "object") {
+
+        categoryName =
+            this.product.category.name ||
+            this.product.category.slug ||
+            "Models";
+
+    } else if (this.product.category) {
+
+        const key = `categories.${this.product.category}`;
+        const translated = this.t(key);
+
+        if (translated && translated !== key) {
+
+            categoryName = translated;
+
         } else {
-            categorySlug = this.product.category || '';
+
+            // slugni chiroyli ko‘rinishga o‘tkazish
+            categoryName = this.product.category
+                .replace(/-/g, " ")
+                .replace(/\b\w/g, c => c.toUpperCase());
+
         }
 
-        // Tarjima dictionary orqali nom olish
-        const categoryName = this.t(`categories.${categorySlug}`) || categorySlug || 'Models';
-
-        categoryLink.textContent = categoryName;
-        categoryLink.href = `/#models`;
     }
 
-    // Sahifa title
-    document.title = `${this.product.title} - FAW Trucks`;
+    categoryLink.textContent = categoryName;
+    categoryLink.href = "/#models";
+
+}
+
+// Sahifa title
+document.title = `${this.product.title} - FAW Trucks`;
 }
 
 

@@ -43,7 +43,20 @@ INSTALLED_APPS = [
     
     # Приложения проектов
     'main',  
+
+    'captcha', 
+    # 'django_ratelimit'  # Redis kerak, hozir ishlatilmaydi
 ]
+
+# CAPTCHA sozlamalari
+CAPTCHA_LENGTH = 6
+CAPTCHA_FONT_SIZE = 30
+CAPTCHA_IMAGE_SIZE = (120, 40)
+CAPTCHA_NOISE_FUNCTIONS = ('captcha.helpers.noise_arcs', 'captcha.helpers.noise_dots')
+
+# ============ GOOGLE RECAPTCHA V3 ============
+RECAPTCHA_SITE_KEY = config('RECAPTCHA_SITE_KEY', default='')
+RECAPTCHA_SECRET_KEY = config('RECAPTCHA_SECRET_KEY', default='')
 
 # ============ REST FRAMEWORK ============
 
@@ -115,7 +128,8 @@ JAZZMIN_SETTINGS = {
         "main.Vacancy": "fas fa-briefcase",
         "main.JobApplication": "fas fa-file-pdf",
         "main.Dealer": "fas fa-store",
-        "main.DealerService": "fas fa-cogs",        
+        "main.DealerService": "fas fa-cogs",
+        "main.Review": "fas fa-comments",
     },
     
     "order_with_respect_to": [
@@ -198,6 +212,15 @@ DATABASES = {
         'PASSWORD': config('DB_PASSWORD'),
         'HOST': config('DB_HOST', default='localhost'),
         'PORT': config('DB_PORT', default='5432'),
+    }
+}
+
+# ============ CACHE ============
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
+        'LOCATION': 'django_cache_table',
     }
 }
 

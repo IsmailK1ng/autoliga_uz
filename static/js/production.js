@@ -274,45 +274,97 @@ async loadCategories() {
     });
   }
 
+  // createCardHTML(product) {
+  //   // Проверяем наличие спецификаций
+  //   let specsHTML = '';
+  //   if (product.card_specs && Array.isArray(product.card_specs)) {
+  //     specsHTML = product.card_specs
+  //       .sort((a, b) => (a.order || 0) - (b.order || 0))
+  //       .map(spec => {
+  //         const iconUrl = spec.icon?.icon_url || spec.icon_url || '';
+  //         const iconName = spec.icon?.name || spec.name || '';
+  //         const specValue = spec.value || '';
+  //         return `
+  //           <div class="spec-item">
+  //             ${iconUrl ? `<img class="spec-icon" src="${iconUrl}" alt="${iconName}">` : ''}
+  //             <span class="spec-value">${specValue}</span>
+  //           </div>
+  //         `;
+  //       }).join('');
+  //   }
+
+  //   // Формируем URL изображения
+  //   const imageUrl = product.image_url || product.image || product.main_image || '';
+  //   const productSlug = product.slug || '';
+  //   const productTitle = product.title || product.name || 'Продукт';
+  //   const buttonText = this.t('buttonText');
+
+  //   return `
+  //     <div class="faw-truck-card">
+  //       <div class="truck-image-container">
+  //         ${imageUrl ? `<img src="${imageUrl}"  class="truck-image">` : ''}
+  //       </div>
+  //       <div class="truck-info">
+  //         ${specsHTML ? `<div class="truck-specs">${specsHTML}</div>` : ''}
+  //         <div class="truck-cta">
+  //           <a href="/products/${productSlug}/" class="btn-details">${buttonText}</a>
+  //         </div>
+  //       </div>
+  //     </div>
+  //   `;
+  // }
+
   createCardHTML(product) {
-    // Проверяем наличие спецификаций
-    let specsHTML = '';
-    if (product.card_specs && Array.isArray(product.card_specs)) {
-      specsHTML = product.card_specs
-        .sort((a, b) => (a.order || 0) - (b.order || 0))
-        .map(spec => {
-          const iconUrl = spec.icon?.icon_url || spec.icon_url || '';
-          const iconName = spec.icon?.name || spec.name || '';
-          const specValue = spec.value || '';
-          return `
-            <div class="spec-item">
-              ${iconUrl ? `<img class="spec-icon" src="${iconUrl}" alt="${iconName}">` : ''}
-              <span class="spec-value">${specValue}</span>
+      // 1. Texnik xususiyatlar (Ikonkalar)
+      let specsHTML = '';
+      if (product.card_specs && Array.isArray(product.card_specs)) {
+        specsHTML = product.card_specs
+          .sort((a, b) => (a.order || 0) - (b.order || 0))
+          .map(spec => {
+            const iconUrl = spec.icon?.icon_url || spec.icon_url || '';
+            const specValue = spec.value || '';
+            return `
+              <div class="spec-item">
+                ${iconUrl ? `<img class="spec-icon" src="${iconUrl}" alt="">` : ''}
+                <span class="spec-value">${specValue}</span>
+              </div>
+            `;
+          }).join('');
+      }
+
+      // 2. Ma'lumotlarni tayyorlash
+      const imageUrl = product.image_url || product.image || product.main_image || '';
+      const productSlug = product.slug || '';
+      const buttonText = this.t('buttonText');
+      const brandName = product.category ? product.category.name : '';
+      const productTitle = product.title || product.name || '';
+      
+      // ✅ Narx: Agar slider_price bo'lsa shuni oladi, bo'lmasa price
+      const displayPrice = product.slider_price || product.slider_price || '';
+
+      return `
+        <div class="faw-truck-card">
+          <div class="truck-image-container">
+            ${brandName ? `<div class="brand-badge">${brandName}</div>` : ''}
+            ${imageUrl ? `<img src="${imageUrl}" class="truck-image">` : ''}
+          </div>
+          
+          <div class="truck-info">
+            <h3 class="truck-title">${productTitle}</h3>
+            
+        
+            <div class="truck-price">
+                <span>${displayPrice}</span>
             </div>
-          `;
-        }).join('');
-    }
-
-    // Формируем URL изображения
-    const imageUrl = product.image_url || product.image || product.main_image || '';
-    const productSlug = product.slug || '';
-    const productTitle = product.title || product.name || 'Продукт';
-    const buttonText = this.t('buttonText');
-
-    return `
-      <div class="faw-truck-card">
-        <div class="truck-image-container">
-          ${imageUrl ? `<img src="${imageUrl}"  class="truck-image">` : ''}
-        </div>
-        <div class="truck-info">
-          ${specsHTML ? `<div class="truck-specs">${specsHTML}</div>` : ''}
-          <div class="truck-cta">
-            <a href="/products/${productSlug}/" class="btn-details">${buttonText}</a>
+            ${specsHTML ? `<div class="truck-specs">${specsHTML}</div>` : ''}
+            
+            <div class="truck-cta">
+              <a href="/products/${productSlug}/" class="btn-details">${buttonText}</a>
+            </div>
           </div>
         </div>
-      </div>
-    `;
-  }
+      `;
+    }
 
   createPagination() {
     const pagination = document.getElementById('pagination');

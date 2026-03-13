@@ -629,11 +629,11 @@ body[data-theme="dark"] .mxd-contact {
 }
 
 @media (max-width: 768px) {
-    .mxd-nav__contain {
+    .mxd-nav__contain { 
         margin: 0;
         top: 20px;
         right: 0px;
-        padding: 0 6rem;
+        padding: 0 3rem;
     }
 
 }
@@ -815,7 +815,7 @@ body[data-theme="dark"] .mxd-contact {
         z-index: 50 !important;
         /* Very low z-index to not interfere */
         /* Position elements */
-        left: 20px !important;
+        left: 10px !important;
         transform: none !important;
         -webkit-transform: none !important;
         -moz-transform: none !important;
@@ -2143,9 +2143,9 @@ body:not([data-theme]) .language-option:hover {
 .mxd-footer__fullwidth-text {
     width: 100%;
     max-width: 100%;
-    padding: 4rem 2rem;
+    padding: 1rem 2rem;
     text-align: center;
-    margin-top: 5rem;
+    margin-top: 2rem;
     margin-bottom: 0;
     z-index: unset;
 }
@@ -3291,7 +3291,7 @@ body[data-theme="dark"] .contact-form-card .t-select {
 }
 
 /* ==========================================
-   TEMPLATE FORM STYLES 
+   TEMPLATE FORM STYLES
    ==========================================*/
 
 /* Contact Info Styles */

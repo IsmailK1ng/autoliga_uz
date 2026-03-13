@@ -739,6 +739,67 @@ class Dealer(models.Model):
         return f"{self.name} ({self.get_region_display()})"
 
 
+# ========== 08. ОТЗЫВЫ КЛИЕНТОВ ==========
+
+REVIEW_STATUS_CHOICES = [
+    ('pending', 'На модерации'),
+    ('approved', 'Одобрен'),
+    ('rejected', 'Отклонён'),
+]
+
+class Review(models.Model):
+    """Отзывы клиентов на сайте"""
+    name = models.CharField("Имя клиента", max_length=150)
+    rating = models.PositiveSmallIntegerField(
+        "Оценка",
+        default=5,
+        help_text="От 1 до 5"
+    )
+    text = models.TextField("Текст отзыва", max_length=2000)
+    avatar = models.ImageField(
+        "Фото аватара",
+        upload_to="reviews/avatars/%Y/%m/",
+        blank=True,
+        null=True,
+        help_text="Максимум 5 МБ, JPG/PNG"
+    )
+    status = models.CharField(
+        "Статус",
+        max_length=20,
+        choices=REVIEW_STATUS_CHOICES,
+        default='pending',
+        db_index=True
+    )
+    is_verified = models.BooleanField(
+        "Проверен",
+        default=False,
+        help_text="Отображать значок «Проверено» рядом с именем"
+    )
+    admin_comment = models.TextField(
+        "Комментарий модератора",
+        blank=True,
+        null=True,
+        help_text="Внутренний комментарий, не показывается на сайте"
+    )
+    ip_address = models.GenericIPAddressField(
+        "IP адрес",
+        blank=True,
+        null=True,
+        help_text="IP адрес отправителя"
+    )
+    created_at = models.DateTimeField("Дата отправки", auto_now_add=True)
+    moderated_at = models.DateTimeField("Дата модерации", blank=True, null=True)
+
+    class Meta:
+        verbose_name = "Отзыв клиента"
+        verbose_name_plural = "Отзывы клиентов"
+        ordering = ['-created_at']
+
+    def __str__(self):
+        status_icon = {'pending': '🕐', 'approved': '✅', 'rejected': '❌'}.get(self.status, '')
+        return f"{status_icon} {self.name} — {'★' * self.rating} ({self.created_at.strftime('%d.%m.%Y')})"
+
+
 # ========== Bot telegram   ==========
 class TelegramUser(models.Model):
     """Telegram botdan kelgan foydalanuvchilar"""

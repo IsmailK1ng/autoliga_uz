@@ -342,7 +342,6 @@ def db_get_car_detail(car_id: int, lang: str = "uz"):
     finally:
         db.close()
 
-
 def build_car_caption(car: dict, lang: str) -> str:
     lines = [f"<b>{html_module.escape(car['title'])}</b>"]
     if car.get("year"):

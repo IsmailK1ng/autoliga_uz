@@ -1249,3 +1249,69 @@ class DealerAdmin(ContentAdminMixin, TabbedTranslationAdmin):
             'fields': ('is_active', 'order'),
         }),
     )
+
+
+# ========== ОТЗЫВЫ КЛИЕНТОВ ==========
+
+@admin.register(Review)
+class ReviewAdmin(admin.ModelAdmin):
+    list_display = ('name', 'rating_stars', 'status_badge', 'is_verified', 'created_at', 'moderated_at')
+    list_filter = ('status', 'rating', 'is_verified', 'created_at')
+    list_editable = ('is_verified',)
+    search_fields = ('name', 'text')
+    readonly_fields = ('ip_address', 'created_at', 'moderated_at', 'avatar_preview')
+    ordering = ('-created_at',)
+    actions = ['approve_reviews', 'reject_reviews']
+    list_per_page = 30
+
+    fieldsets = (
+        ("Информация об отзыве", {
+            'fields': ('name', 'rating', 'text', 'avatar', 'avatar_preview')
+        }),
+        ("Модерация", {
+            'fields': ('status', 'is_verified', 'admin_comment'),
+            'description': '⚠️ Только одобренные отзывы отображаются на сайте'
+        }),
+        ("Системная информация", {
+            'fields': ('ip_address', 'created_at', 'moderated_at'),
+            'classes': ('collapse',),
+        }),
+    )
+
+    def rating_stars(self, obj):
+        return format_html(
+            '<span style="color:#F7941D;font-size:16px;">{}</span>',
+            '★' * obj.rating + '☆' * (5 - obj.rating)
+        )
+    rating_stars.short_description = "Оценка"
+
+    def status_badge(self, obj):
+        colors = {'pending': '#FF9800', 'approved': '#4CAF50', 'rejected': '#f44336'}
+        labels = {'pending': 'На модерации', 'approved': 'Одобрен', 'rejected': 'Отклонён'}
+        return format_html(
+            '<span style="background:{};color:#fff;padding:3px 10px;border-radius:12px;font-size:12px;">{}</span>',
+            colors.get(obj.status, '#999'),
+            labels.get(obj.status, obj.status)
+        )
+    status_badge.short_description = "Статус"
+
+    def avatar_preview(self, obj):
+        if obj.avatar:
+            return format_html('<img src="{}" style="max-width:150px;max-height:150px;border-radius:50%;">', obj.avatar.url)
+        return "Нет фото"
+    avatar_preview.short_description = "Превью аватара"
+
+    def approve_reviews(self, request, queryset):
+        count = queryset.update(status='approved', is_verified=True, moderated_at=timezone.now())
+        self.message_user(request, f"✅ Одобрено отзывов: {count}", messages.SUCCESS)
+    approve_reviews.short_description = "✅ Одобрить выбранные отзывы"
+
+    def reject_reviews(self, request, queryset):
+        count = queryset.update(status='rejected', moderated_at=timezone.now())
+        self.message_user(request, f"❌ Отклонено отзывов: {count}", messages.WARNING)
+    reject_reviews.short_description = "❌ Отклонить выбранные отзывы"
+
+    def save_model(self, request, obj, form, change):
+        if change and 'status' in form.changed_data:
+            obj.moderated_at = timezone.now()
+        super().save_model(request, obj, form, change)

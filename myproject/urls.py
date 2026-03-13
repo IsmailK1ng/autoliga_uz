@@ -34,6 +34,10 @@ urlpatterns += i18n_patterns(
     prefix_default_language=False  
 )
 
+urlpatterns += [
+    path('captcha/', include('captcha.urls'))
+    ]
+
 # ========== МЕДИА И СТАТИКА (только DEBUG) ==========
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

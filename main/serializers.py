@@ -7,9 +7,10 @@ logger = logging.getLogger('django')
 from main.serializers_base import LanguageSerializerMixin
 
 from .models import (
-    News, NewsBlock, ContactForm, JobApplication, 
+    News, NewsBlock, ContactForm, JobApplication,
     Product, FeatureIcon, ProductCardSpec, ProductParameter, ProductFeature, ProductGallery, ProductCategory,
-    Vacancy, VacancyResponsibility, VacancyRequirement, VacancyCondition, VacancyIdealCandidate
+    Vacancy, VacancyResponsibility, VacancyRequirement, VacancyCondition, VacancyIdealCandidate,
+    Review
 )
 
 
@@ -420,12 +421,111 @@ class VacancySerializer(LanguageSerializerMixin, serializers.ModelSerializer):
         ]
     
     def get_ideal_candidates(self, obj):
-        lang = self.get_current_language()  
+        lang = self.get_current_language()
         candidates = obj.ideal_candidates.all().order_by('order')
         return [
             {
-                'id': item.id, 
+                'id': item.id,
                 'text': getattr(item, f'text_{lang}', None) or item.text or ''
-            } 
+            }
             for item in candidates
         ]
+
+
+# ========== ОТЗЫВЫ КЛИЕНТОВ ==========
+
+class ReviewListSerializer(serializers.ModelSerializer):
+    """Сериализатор для отображения одобренных отзывов"""
+    avatar_url = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Review
+        fields = ['id', 'name', 'rating', 'text', 'avatar_url', 'is_verified', 'created_at']
+
+    def get_avatar_url(self, obj):
+        if obj.avatar:
+            request = self.context.get('request')
+            if request:
+                return request.build_absolute_uri(obj.avatar.url)
+            return obj.avatar.url
+        return None
+
+
+class ReviewCreateSerializer(serializers.ModelSerializer):
+    """Сериализатор для создания отзыва с reCAPTCHA"""
+    recaptcha_token = serializers.CharField(write_only=True, required=True)
+
+    class Meta:
+        model = Review
+        fields = ['name', 'rating', 'text', 'avatar', 'recaptcha_token']
+
+    def validate_rating(self, value):
+        if value < 1 or value > 5:
+            raise serializers.ValidationError("Оценка должна быть от 1 до 5")
+        return value
+
+    def validate_avatar(self, value):
+        if value is None:
+            return value
+        # Размер: максимум 5 МБ
+        if value.size > 5 * 1024 * 1024:
+            raise serializers.ValidationError("Максимальный размер фото — 5 МБ")
+        # Разрешённые расширения
+        allowed_ext = ['jpg', 'jpeg', 'png', 'webp']
+        ext = value.name.rsplit('.', 1)[-1].lower() if '.' in value.name else ''
+        if ext not in allowed_ext:
+            raise serializers.ValidationError("Допустимые форматы: JPG, PNG, WEBP")
+        # Проверка реального содержимого (magic bytes)
+        header = value.read(16)
+        value.seek(0)
+        # JPEG: FF D8 FF, PNG: 89 50 4E 47, WEBP: 52 49 46 46 ... 57 45 42 50
+        is_jpeg = header[:3] == b'\xff\xd8\xff'
+        is_png = header[:4] == b'\x89PNG'
+        is_webp = header[:4] == b'RIFF' and header[8:12] == b'WEBP'
+        if not (is_jpeg or is_png or is_webp):
+            raise serializers.ValidationError("Файл повреждён или не является изображением")
+        # Генерация безопасного имени
+        import uuid
+        safe_name = f"{uuid.uuid4().hex}.{ext}"
+        value.name = safe_name
+        return value
+
+    def validate_recaptcha_token(self, value):
+        import requests
+        from django.conf import settings
+        secret_key = getattr(settings, 'RECAPTCHA_SECRET_KEY', '')
+        if not secret_key:
+            logger.warning("RECAPTCHA_SECRET_KEY не настроен, пропуск проверки")
+            return value
+        try:
+            resp = requests.post(
+                'https://www.google.com/recaptcha/api/siteverify',
+                data={'secret': secret_key, 'response': value},
+                timeout=5
+            )
+            result = resp.json()
+            if not result.get('success'):
+                raise serializers.ValidationError("Проверка reCAPTCHA не пройдена")
+            # Для reCAPTCHA v3 — проверяем score
+            score = result.get('score', 1.0)
+            if score < 0.3:
+                raise serializers.ValidationError("Подозрительная активность")
+        except requests.RequestException:
+            logger.error("Ошибка подключения к reCAPTCHA API", exc_info=True)
+            # В случае ошибки сети — пропускаем (не блокируем пользователя)
+        return value
+
+    def create(self, validated_data):
+        validated_data.pop('recaptcha_token', None)
+        request = self.context.get('request')
+        if request:
+            # Сохраняем IP
+            x_forwarded = request.META.get('HTTP_X_FORWARDED_FOR')
+            if x_forwarded:
+                validated_data['ip_address'] = x_forwarded.split(',')[0].strip()
+            else:
+                validated_data['ip_address'] = request.META.get('REMOTE_ADDR')
+        validated_data['status'] = 'pending'
+        return super().create(validated_data)
+
+

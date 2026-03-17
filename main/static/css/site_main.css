@@ -1541,19 +1541,72 @@ body:not([data-theme]) .language-option:hover {
 
 .faw-price-label,
 .faw-power-label,
-.faw-mpg-label {
+.faw-mpg-label,
+.faw-spec-label {
     display: block;
-    font-size: 2rem;
-    color: #888;
-    margin-bottom: 2px;
-    font-weight: normal;
-    letter-spacing: .5px;
+    font-size: 1.1rem;
+    color: #999;
+    margin-bottom: 6px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
 }
 
 .faw-price-value {
     font-size: 2.5rem;
     color: #000;
     font-weight: bold;
+}
+
+/* New spec cards */
+.faw-specs-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin: 28px auto;
+    max-width: 620px;
+}
+
+.faw-spec-card {
+    background: #f7f8fa;
+    border-radius: 16px;
+    padding: 20px 16px;
+    text-align: center;
+    transition: transform 0.2s, box-shadow 0.2s;
+    border: 1px solid rgba(0,0,0,0.06);
+}
+
+.faw-spec-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+}
+
+.faw-spec-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    background: #e8f0fe;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 12px;
+    color: #003e7d;
+}
+
+.faw-spec-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #172d43;
+    line-height: 1.2;
+}
+
+.faw-spec-price {
+    color: #000;
+}
+
+.faw-spec-power,
+.faw-spec-mpg {
+    color: #003e7d;
 }
 
 /* Responsive: slider adjustments */
@@ -2066,6 +2119,33 @@ body:not([data-theme]) .language-option:hover {
     min-width: 100px;
 }
 
+/* Responsive for spec cards */
+@media (max-width: 600px) {
+    .faw-specs-grid {
+        grid-template-columns: 1fr;
+        gap: 10px;
+        max-width: 320px;
+    }
+    .faw-spec-card {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 14px 18px;
+        text-align: left;
+    }
+    .faw-spec-icon {
+        margin: 0;
+        flex-shrink: 0;
+    }
+    .faw-spec-card .faw-spec-label {
+        margin-bottom: 2px;
+        font-size: 1rem;
+    }
+    .faw-spec-card .faw-spec-value {
+        font-size: 1.3rem;
+    }
+}
+
 .faw-slider-buttons {
     display: flex;
     gap: 18px;
@@ -2091,7 +2171,7 @@ body:not([data-theme]) .language-option:hover {
 
 /* Footer title styles */
 .footer-title {
-    font-size: 8rem;
+    font-size: 6rem;
     font-weight: bold;
     /* color: var(--color-contrast); */
     text-align: center;
@@ -2466,7 +2546,8 @@ body[data-theme="dark"] .faw-year {
 
 body[data-theme="dark"] .faw-price-label,
 body[data-theme="dark"] .faw-power-label,
-body[data-theme="dark"] .faw-mpg-label {
+body[data-theme="dark"] .faw-mpg-label,
+body[data-theme="dark"] .faw-spec-label {
     color: #ACACAC !important;
 }
 
@@ -2477,6 +2558,25 @@ body[data-theme="dark"] .faw-price-value {
 body[data-theme="dark"] .faw-power-value,
 body[data-theme="dark"] .faw-mpg-value {
     color: #ffffff !important;
+}
+
+body[data-theme="dark"] .faw-spec-card {
+    background: #1e1e1e !important;
+    border-color: rgba(255,255,255,0.08) !important;
+}
+
+body[data-theme="dark"] .faw-spec-icon {
+    background: #2a2a2a !important;
+    color: #4da3ff !important;
+}
+
+body[data-theme="dark"] .faw-spec-value {
+    color: #fff !important;
+}
+
+body[data-theme="dark"] .faw-spec-power,
+body[data-theme="dark"] .faw-spec-mpg {
+    color: #4da3ff !important;
 }
 
 body[data-theme="dark"] .faw-btn {

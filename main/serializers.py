@@ -10,7 +10,7 @@ from .models import (
     News, NewsBlock, ContactForm, JobApplication,
     Product, FeatureIcon, ProductCardSpec, ProductParameter, ProductFeature, ProductGallery, ProductCategory,
     Vacancy, VacancyResponsibility, VacancyRequirement, VacancyCondition, VacancyIdealCandidate,
-    Review
+    Review, TestDriveRequest
 )
 
 
@@ -467,9 +467,9 @@ class ReviewCreateSerializer(serializers.ModelSerializer):
     def validate_avatar(self, value):
         if value is None:
             return value
-        # Размер: максимум 5 МБ
-        if value.size > 5 * 1024 * 1024:
-            raise serializers.ValidationError("Максимальный размер фото — 5 МБ")
+        # Размер: максимум 100 KB
+        if value.size > 100 * 1024:
+            raise serializers.ValidationError("Максимальный размер фото — 100 KB")
         # Разрешённые расширения
         allowed_ext = ['jpg', 'jpeg', 'png', 'webp']
         ext = value.name.rsplit('.', 1)[-1].lower() if '.' in value.name else ''
@@ -478,12 +478,14 @@ class ReviewCreateSerializer(serializers.ModelSerializer):
         # Проверка реального содержимого (magic bytes)
         header = value.read(16)
         value.seek(0)
-        # JPEG: FF D8 FF, PNG: 89 50 4E 47, WEBP: 52 49 46 46 ... 57 45 42 50
+
         is_jpeg = header[:3] == b'\xff\xd8\xff'
         is_png = header[:4] == b'\x89PNG'
         is_webp = header[:4] == b'RIFF' and header[8:12] == b'WEBP'
+
         if not (is_jpeg or is_png or is_webp):
             raise serializers.ValidationError("Файл повреждён или не является изображением")
+
         # Генерация безопасного имени
         import uuid
         safe_name = f"{uuid.uuid4().hex}.{ext}"
@@ -529,3 +531,85 @@ class ReviewCreateSerializer(serializers.ModelSerializer):
         return super().create(validated_data)
 
 
+# ========== ТЕСТ-ДРАЙВ ==========
+
+class TestDriveSerializer(serializers.ModelSerializer):
+    """Сериализатор для заявок на тест-драйв"""
+
+    class Meta:
+        model = TestDriveRequest
+        fields = [
+            'name', 'phone', 'dealer', 'product',
+            'preferred_date', 'preferred_time', 'agree_terms',
+            'referer', 'utm_data', 'visitor_uid',
+        ]
+
+    def validate_agree_terms(self, value):
+        if not value:
+            raise serializers.ValidationError("Необходимо согласие на обработку данных")
+        return value
+
+    def validate_preferred_date(self, value):
+        from datetime import date
+        if value < date.today():
+            raise serializers.ValidationError("Нельзя выбрать прошедшую дату")
+        return value
+
+    def create(self, validated_data):
+        import json
+        request = self.context.get('request')
+        if request:
+            x_forwarded = request.META.get('HTTP_X_FORWARDED_FOR')
+            if x_forwarded:
+                validated_data['ip_address'] = x_forwarded.split(',')[0].strip()
+            else:
+                validated_data['ip_address'] = request.META.get('REMOTE_ADDR')
+
+            if not validated_data.get('referer'):
+                referer = request.META.get('HTTP_REFERER')
+                if referer:
+                    validated_data['referer'] = referer
+
+            utm_from_body = validated_data.get('utm_data')
+            if utm_from_body and isinstance(utm_from_body, dict):
+                validated_data['utm_data'] = json.dumps(utm_from_body, ensure_ascii=False)
+
+        validated_data['status'] = 'new'
+        return super().create(validated_data)
+
+
+# ========== BOT API SERIALIZERS ==========
+
+from .models import TelegramUser, Dealer
+
+class BotTelegramUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TelegramUser
+        fields = ['id', 'telegram_id', 'username', 'first_name', 'age', 'phone', 'region', 'language', 'created_at']
+        read_only_fields = ['id', 'created_at']
+
+class BotDealerSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Dealer
+        fields = ['id', 'name', 'address', 'phone', 'region']
+
+class BotBrandSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProductCategory
+        fields = ['id', 'name']
+
+class BotCarSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Product
+        fields = ['id', 'title', 'main_image', 'card_image',
+                  'slider_price', 'slider_year', 'slider_power', 'slider_fuel_consumption']
+
+class BotTestDriveSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TestDriveRequest
+        fields = ['name', 'phone', 'dealer', 'product', 'preferred_date', 'preferred_time', 'agree_terms']
+
+    def create(self, validated_data):
+        validated_data['status'] = 'new'
+        validated_data['referer'] = 'telegram_bot'
+        return super().create(validated_data)

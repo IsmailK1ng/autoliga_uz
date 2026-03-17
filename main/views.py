@@ -11,14 +11,18 @@ from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAdminUser
 from django.http import HttpResponseRedirect
 from rest_framework.decorators import api_view, permission_classes
+from rest_framework.throttling import AnonRateThrottle
 from .models import (
-    News, ContactForm, JobApplication, Vacancy, Product, ProductCategory, Dealer, Review
+    News, ContactForm, JobApplication, Vacancy, Product, ProductCategory, Dealer, Review, TestDriveRequest, BranchManager
 )
 from .serializers import (
     NewsSerializer, ContactFormSerializer, JobApplicationSerializer,
     ProductCardSerializer, ProductDetailSerializer, ProductCategorySerializer,
-    ReviewListSerializer, ReviewCreateSerializer
+    ReviewListSerializer, ReviewCreateSerializer, TestDriveSerializer,
+    BotTelegramUserSerializer, BotDealerSerializer, BotBrandSerializer,
+    BotCarSerializer, BotTestDriveSerializer,
 )
+from .models import TelegramUser
 import logging
 import json
 from django.db.models import Prefetch
@@ -83,12 +87,18 @@ def index(request):
             
             slider_data.append(slider_item)
         
+        # Менеджеры для секции "Наша команда"
+        team_managers = BranchManager.objects.filter(
+            is_active=True
+        ).select_related('dealer').order_by('order', 'id')
+
         context = {
             'news_list': news_list,
             'slider_products': json.dumps(slider_data, ensure_ascii=False),
             'featured_count': len(slider_data),
             'productCategory': productCategory,
             'RECAPTCHA_SITE_KEY': getattr(settings, 'RECAPTCHA_SITE_KEY', ''),
+            'team_managers': team_managers,
         }
         
         return render(request, 'main/index.html', context)
@@ -166,6 +176,32 @@ def dealers(request):
         })
     return render(request, 'main/dealers.html', {
         'dealers_json': json.dumps(dealers_data, ensure_ascii=False),
+    })
+
+
+def team(request):
+    """Страница команды — менеджеры по филиалам"""
+    dealers_with_managers = Dealer.objects.filter(
+        is_active=True,
+        managers__is_active=True
+    ).prefetch_related('managers').distinct().order_by('order', 'name')
+    return render(request, 'main/team.html', {
+        'dealers': dealers_with_managers,
+    })
+
+
+def test_drive(request):
+    """Страница записи на тест-драйв"""
+    products = Product.objects.filter(is_active=True).order_by('order', 'title')
+    products_data = [{'id': p.id, 'title': p.title} for p in products]
+
+    dealers = Dealer.objects.filter(is_active=True).order_by('order', 'name')
+    dealers_data = [{'id': d.id, 'name': d.name, 'address': d.address or ''} for d in dealers]
+
+    return render(request, 'main/test_drive.html', {
+        'products_json': json.dumps(products_data, ensure_ascii=False),
+        'dealers_json': json.dumps(dealers_data, ensure_ascii=False),
+        'RECAPTCHA_SITE_KEY': getattr(settings, 'RECAPTCHA_SITE_KEY', ''),
     })
 
 
@@ -507,6 +543,34 @@ class ProductCategoryViewSet(viewsets.ReadOnlyModelViewSet):
         return ProductCategory.objects.filter(is_active=True).order_by('order')
 
 
+class ReviewCreateThrottle(AnonRateThrottle):
+    """1 ta IP dan kuniga faqat 1 ta comment"""
+    scope = 'review_create'
+
+    THROTTLE_MESSAGES = {
+        'uz': "Siz allaqachon sharh qoldirgansiz. {wait} dan keyin qayta urinib ko'ring.",
+        'ru': "Вы уже оставили отзыв. Попробуйте снова через {wait}.",
+        'en': "You have already left a review. Please try again in {wait}.",
+    }
+
+    def get_cache_key(self, request, view):
+        x_forwarded = request.META.get('HTTP_X_FORWARDED_FOR')
+        if x_forwarded:
+            ip = x_forwarded.split(',')[0].strip()
+        else:
+            ip = request.META.get('REMOTE_ADDR')
+        return self.cache_format % {
+            'scope': self.scope,
+            'ident': ip,
+        }
+
+    def wait(self):
+        return super().wait()
+
+    def throttle_failure(self):
+        return False
+
+
 class ReviewViewSet(viewsets.GenericViewSet):
     """API для отзывов клиентов"""
     permission_classes = [AllowAny]
@@ -515,6 +579,10 @@ class ReviewViewSet(viewsets.GenericViewSet):
         if self.action == 'create':
             return ReviewCreateSerializer
         return ReviewListSerializer
+
+    def get_throttles(self):
+        # Throttle create ichida qo'lda tekshiriladi (3 tilda xabar uchun)
+        return []
 
     def get_queryset(self):
         return Review.objects.filter(status='approved').order_by('-created_at')
@@ -535,7 +603,35 @@ class ReviewViewSet(viewsets.GenericViewSet):
         return paginator.get_paginated_response(serializer.data)
 
     def create(self, request, *args, **kwargs):
-        """POST: создание нового отзыва (с reCAPTCHA)"""
+        """POST: создание нового отзыва (с reCAPTCHA + rate limit)"""
+        # Throttle tekshirish
+        throttle = ReviewCreateThrottle()
+        if not throttle.allow_request(request, self):
+            wait = throttle.wait()
+            lang = getattr(request, 'LANGUAGE_CODE', 'uz')
+            if lang not in ReviewCreateThrottle.THROTTLE_MESSAGES:
+                lang = 'uz'
+            # Kutish vaqtini formatlaymiz
+            if wait is not None:
+                hours = int(wait // 3600)
+                minutes = int((wait % 3600) // 60)
+                if hours > 0:
+                    wait_str = f"{hours} soat {minutes} minut" if lang == 'uz' else \
+                               f"{hours} ч {minutes} мин" if lang == 'ru' else \
+                               f"{hours}h {minutes}m"
+                else:
+                    wait_str = f"{minutes} minut" if lang == 'uz' else \
+                               f"{minutes} мин" if lang == 'ru' else \
+                               f"{minutes}m"
+            else:
+                wait_str = "1 soat" if lang == 'uz' else \
+                           "1 час" if lang == 'ru' else "1 hour"
+            message = ReviewCreateThrottle.THROTTLE_MESSAGES[lang].format(wait=wait_str)
+            return Response({
+                'success': False,
+                'message': message,
+            }, status=status.HTTP_429_TOO_MANY_REQUESTS)
+
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
@@ -543,3 +639,240 @@ class ReviewViewSet(viewsets.GenericViewSet):
             'success': True,
             'message': 'Спасибо! Ваш отзыв отправлен на проверку. После модерации он появится на сайте.'
         }, status=status.HTTP_201_CREATED)
+
+
+class TestDriveViewSet(viewsets.GenericViewSet):
+    """API для заявок на тест-драйв"""
+    serializer_class = TestDriveSerializer
+    permission_classes = [AllowAny]
+
+    def get_queryset(self):
+        return TestDriveRequest.objects.all().order_by('-created_at')
+
+    def create(self, request, *args, **kwargs):
+        """POST: создание заявки на тест-драйв"""
+        # Kunlik limit: 1 telefon raqamdan 2 ta test-drayv
+        phone = request.data.get('phone', '')
+        if phone:
+            from django.utils import timezone
+            today = timezone.now().date()
+            today_count = TestDriveRequest.objects.filter(
+                phone=phone, created_at__date=today
+            ).count()
+            if today_count >= 2:
+                return Response({
+                    'success': False,
+                    'message': 'Kuniga 2 tadan ortiq test-drayv ariza yuborib bo\'lmaydi.',
+                }, status=status.HTTP_429_TOO_MANY_REQUESTS)
+
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        test_drive_obj = serializer.save()
+
+        # Отправка в Telegram
+        try:
+            from main.services.telegram import TelegramNotificationSender
+            TelegramNotificationSender.send_test_drive_notification(test_drive_obj)
+        except Exception as e:
+            logger.error(f"Ошибка Telegram для тест-драйва #{test_drive_obj.id}: {e}", exc_info=True)
+
+        return Response({
+            'success': True,
+            'message': 'OK',
+        }, status=status.HTTP_201_CREATED)
+
+
+# ========== BOT API ==========
+
+from rest_framework.views import APIView
+from rest_framework.permissions import BasePermission
+from django.core.cache import cache
+
+
+class IsBotAuthenticated(BasePermission):
+    """Bot API token tekshirish.
+    Header: Authorization: Bearer <BOT_API_TOKEN>
+    """
+    def has_permission(self, request, view):
+        token = settings.BOT_API_TOKEN
+        if not token:
+            # Token sozlanmagan — development da ruxsat berish
+            return settings.DEBUG
+        auth = request.META.get('HTTP_AUTHORIZATION', '')
+        return auth == f'Bearer {token}'
+
+
+class BotUserView(APIView):
+    """GET ?telegram_id=123 — получить пользователя, POST — создать/обновить"""
+    permission_classes = [IsBotAuthenticated]
+
+    def get(self, request):
+        tg_id = request.query_params.get('telegram_id')
+        if not tg_id:
+            return Response({'error': 'telegram_id required'}, status=400)
+        try:
+            user = TelegramUser.objects.get(telegram_id=int(tg_id))
+            return Response(BotTelegramUserSerializer(user).data)
+        except TelegramUser.DoesNotExist:
+            return Response({'exists': False}, status=404)
+
+    def post(self, request):
+        tg_id = request.data.get('telegram_id')
+        if not tg_id:
+            return Response({'error': 'telegram_id required'}, status=400)
+        user, created = TelegramUser.objects.get_or_create(telegram_id=int(tg_id))
+        for field in ('username', 'first_name', 'age', 'phone', 'region', 'language'):
+            val = request.data.get(field)
+            if val is not None:
+                setattr(user, field, val)
+        user.save()
+        return Response(BotTelegramUserSerializer(user).data, status=200 if not created else 201)
+
+
+class BotBrandsView(APIView):
+    """GET ?lang=uz — список брендов"""
+    permission_classes = [IsBotAuthenticated]
+
+    def get(self, request):
+        lang = request.query_params.get('lang', 'uz')
+        cache_key = f'bot:brands:{lang}'
+        data = cache.get(cache_key)
+        if data is None:
+            brands = ProductCategory.objects.filter(is_active=True).order_by('order', 'name')
+            data = [{'id': b.id, 'name': getattr(b, f'name_{lang}', None) or b.name} for b in brands]
+            cache.set(cache_key, data, timeout=600)  # 10 minut
+        return Response(data)
+
+
+class BotCarsView(APIView):
+    """GET ?brand_id=1&lang=uz — список машин бренда"""
+    permission_classes = [IsBotAuthenticated]
+
+    def get(self, request):
+        brand_id = request.query_params.get('brand_id')
+        lang = request.query_params.get('lang', 'uz')
+        if not brand_id:
+            return Response({'error': 'brand_id required'}, status=400)
+        cache_key = f'bot:cars:{brand_id}:{lang}'
+        data = cache.get(cache_key)
+        if data is None:
+            cars = Product.objects.filter(category_id=int(brand_id), is_active=True).order_by('order', 'title')
+            data = [{'id': c.id, 'title': getattr(c, f'title_{lang}', None) or c.title} for c in cars]
+            cache.set(cache_key, data, timeout=600)
+        return Response(data)
+
+
+class BotCarDetailView(APIView):
+    """GET ?car_id=1&lang=uz — детали машины"""
+    permission_classes = [IsBotAuthenticated]
+
+    def get(self, request):
+        car_id = request.query_params.get('car_id')
+        lang = request.query_params.get('lang', 'uz')
+        if not car_id:
+            return Response({'error': 'car_id required'}, status=400)
+        cache_key = f'bot:car:{car_id}:{lang}'
+        data = cache.get(cache_key)
+        if data is None:
+            try:
+                c = Product.objects.get(id=int(car_id))
+            except Product.DoesNotExist:
+                return Response({'error': 'not found'}, status=404)
+
+            title = getattr(c, f'title_{lang}', None) or c.title
+            price = getattr(c, f'slider_price_{lang}', None) or c.slider_price
+            power = getattr(c, f'slider_power_{lang}', None) or c.slider_power
+            fuel = getattr(c, f'slider_fuel_consumption_{lang}', None) or c.slider_fuel_consumption
+
+            features = c.features.all().order_by('order')[:6]
+            feat_list = [getattr(f, f'name_{lang}', None) or f.name for f in features]
+
+            data = {
+                'title': title,
+                'main_image': c.main_image.url if c.main_image else None,
+                'card_image': c.card_image.url if c.card_image else None,
+                'price': price,
+                'year': c.slider_year,
+                'power': power,
+                'fuel': fuel,
+                'features': feat_list,
+            }
+            cache.set(cache_key, data, timeout=600)
+        return Response(data)
+
+
+class BotDealersView(APIView):
+    """GET ?lang=uz — список дилеров"""
+    permission_classes = [IsBotAuthenticated]
+
+    def get(self, request):
+        lang = request.query_params.get('lang', 'uz')
+        cache_key = f'bot:dealers:{lang}'
+        data = cache.get(cache_key)
+        if data is None:
+            dealers = Dealer.objects.filter(is_active=True).order_by('order', 'name')
+            data = []
+            for d in dealers:
+                data.append({
+                    'id': d.id,
+                    'name': getattr(d, f'name_{lang}', None) or d.name,
+                    'region': d.region,
+                    'address': getattr(d, f'address_{lang}', None) or d.address,
+                    'phone': d.phone,
+                    'hours': getattr(d, f'working_hours_{lang}', None) or d.working_hours,
+                })
+            cache.set(cache_key, data, timeout=600)
+        return Response(data)
+
+
+class BotTestDriveView(APIView):
+    """POST — создать заявку на тест-драйв из бота"""
+    permission_classes = [IsBotAuthenticated]
+
+    def get(self, request):
+        """GET — список дилеров и продуктов для формы"""
+        lang = request.query_params.get('lang', 'uz')
+        dealers = Dealer.objects.filter(is_active=True).order_by('order', 'name')
+        products = Product.objects.filter(is_active=True).order_by('order', 'title')
+        return Response({
+            'dealers': [{'id': d.id, 'name': getattr(d, f'name_{lang}', None) or d.name} for d in dealers],
+            'products': [{'id': p.id, 'title': getattr(p, f'title_{lang}', None) or p.title} for p in products],
+            'time_slots': ['10:00', '10:30', '11:00', '11:30', '12:00', '12:30',
+                           '13:00', '13:30', '14:00', '14:30', '15:00', '15:30',
+                           '16:00', '16:30', '17:00'],
+        })
+
+    def post(self, request):
+        # Kunlik limit: 1 telefon raqamdan 2 ta test-drayv
+        phone = request.data.get('phone', '')
+        if phone:
+            from django.utils import timezone
+            today = timezone.now().date()
+            today_count = TestDriveRequest.objects.filter(
+                phone=phone, created_at__date=today
+            ).count()
+            if today_count >= 2:
+                return Response({
+                    'success': False,
+                    'error': 'daily_limit',
+                    'message': 'Kuniga 2 tadan ortiq test-drayv ariza yuborib bo\'lmaydi.'
+                }, status=429)
+
+        serializer = BotTestDriveSerializer(data=request.data)
+        if serializer.is_valid():
+            obj = serializer.save()
+            try:
+                from main.services.telegram import TelegramNotificationSender
+                TelegramNotificationSender.send_test_drive_notification(obj)
+            except Exception as e:
+                logger.error(f"Telegram notification error: {e}", exc_info=True)
+            return Response({'success': True, 'id': obj.id}, status=201)
+        return Response({'success': False, 'errors': serializer.errors}, status=400)
+ 
+
+
+
+
+
+
+ 

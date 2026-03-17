@@ -8,7 +8,7 @@ main/models_test_sobirov.py
 main/testmodels.py
 Autoliga_uz/.venv/
 # end sobirov settings #
-
+task.txt
 
 # === Python / Django ===
 *.pyc

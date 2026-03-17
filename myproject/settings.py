@@ -69,6 +69,16 @@ REST_FRAMEWORK = {
     ],
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 20,
+    'DEFAULT_THROTTLE_CLASSES': [
+        'rest_framework.throttling.AnonRateThrottle',
+    ],
+    'DEFAULT_THROTTLE_RATES': {
+        'anon': '100/minute',
+        'review_create': '1/hour',
+    },
+    'DEFAULT_RENDERER_CLASSES': [
+        'rest_framework.renderers.JSONRenderer',
+    ],
 }
 
 # ============ ЯЗЫКОВЫЕ НАСТРОЙКИ ============
@@ -161,19 +171,30 @@ JAZZMIN_UI_TWEAKS = {
 # ============ MIDDLEWARE ============
 
 MIDDLEWARE = [
+    'myproject.middleware.RequestSizeLimitMiddleware',   # 1. Katta requestlarni erta bloklash
+    'myproject.middleware.RateLimitMiddleware',           # 2. Rate limit + IP auto-block
     'django.middleware.security.SecurityMiddleware',
+    'myproject.middleware.SecurityHeadersMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
-    'django.middleware.locale.LocaleMiddleware',  
-    'myproject.middleware.ForceRussianMiddleware', 
+    'django.middleware.locale.LocaleMiddleware',
+    'myproject.middleware.ForceRussianMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'myproject.middleware.RefreshUserPermissionsMiddleware', 
+    'myproject.middleware.AdminBruteForceMiddleware',     # Auth keyin (login natijasini bilish uchun)
+    'myproject.middleware.RefreshUserPermissionsMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'reversion.middleware.RevisionMiddleware',
 ]
+
+# ============ RATE LIMIT RULES ============
+RATE_LIMIT_RULES = {
+    '/api/bot/': {'limit': 60, 'window': 60},       # Bot API: 60/min
+    '/api/': {'limit': 100, 'window': 60},           # Public API: 100/min
+    '/admin/login/': {'limit': 5, 'window': 300},    # Admin login: 5/5min
+}
 
 ROOT_URLCONF = 'myproject.urls'
 
@@ -216,13 +237,32 @@ DATABASES = {
 }
 
 # ============ CACHE ============
+# Production uchun Redis o'rnatib, .env ga REDIS_URL qo'shing:
+#   pip install django-redis
+#   REDIS_URL=redis://127.0.0.1:6379/1
 
-CACHES = {
-    'default': {
-        'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
-        'LOCATION': 'django_cache_table',
+REDIS_URL = config('REDIS_URL', default='')
+
+if REDIS_URL:
+    CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.redis.RedisCache',
+            'LOCATION': REDIS_URL,
+            'KEY_PREFIX': 'autoliga',
+            'TIMEOUT': 300,
+        }
     }
-}
+else:
+    CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+            'LOCATION': 'autoliga-cache',
+            'TIMEOUT': 300,
+        }
+    }
+
+# Bot API token authentication
+BOT_API_TOKEN = config('BOT_API_TOKEN', default='')
 
 # ============ ВАЛИДАЦИЯ ПАРОЛЕЙ ============
 
@@ -285,7 +325,6 @@ if not DEBUG:
     ALLOWED_HOSTS = [
         'autoliga.uz',
         'www.autoliga.uz',
-        'autoliga.uz', 'www.autoliga.uz',
         'api.autoliga.uz',
     ]
     SECURE_SSL_REDIRECT = True
@@ -294,6 +333,33 @@ if not DEBUG:
     SECURE_BROWSER_XSS_FILTER = True
     SECURE_CONTENT_TYPE_NOSNIFF = True
     X_FRAME_OPTIONS = 'DENY'
+
+    # HSTS — brauzer faqat HTTPS dan foydalanishga majbur qiladi
+    SECURE_HSTS_SECONDS = 31536000  # 1 yil
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
+
+    # Cookie xavfsizligi
+    SESSION_COOKIE_HTTPONLY = True
+    CSRF_COOKIE_HTTPONLY = True
+    SESSION_COOKIE_SAMESITE = 'Lax'
+    CSRF_COOKIE_SAMESITE = 'Lax'
+    SESSION_COOKIE_AGE = 86400  # 1 kun (default 2 hafta juda ko'p)
+
+    # Referrer Policy
+    SECURE_REFERRER_POLICY = 'strict-origin-when-cross-origin'
+
+    # Permissions Policy
+    PERMISSIONS_POLICY = {
+        'camera': [],
+        'microphone': [],
+        'geolocation': [],
+        'payment': [],
+        'usb': [],
+        'magnetometer': [],
+        'gyroscope': [],
+        'accelerometer': [],
+    }
 
 # ============ ЯЗЫКОВЫЕ COOKIES ============
 
@@ -357,9 +423,18 @@ LOGGING = {
             'encoding': 'utf-8',
         },
         'console': {
-            'level': 'WARNING', 
+            'level': 'WARNING',
             'class': 'logging.StreamHandler',
             'formatter': 'verbose',
+        },
+        'security_file': {
+            'level': 'WARNING',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': BASE_DIR / 'logs' / 'security.log',
+            'maxBytes': 1024 * 1024 * 5,   # 5 MB
+            'backupCount': 3,
+            'formatter': 'verbose',
+            'encoding': 'utf-8',
         },
     },
     'root': {
@@ -392,8 +467,13 @@ LOGGING = {
             'level': 'WARNING',
             'propagate': False,
         },
-        'myproject': { 
+        'myproject': {
             'handlers': ['errors_file'],
+            'level': 'WARNING',
+            'propagate': False,
+        },
+        'security': {
+            'handlers': ['security_file'],
             'level': 'WARNING',
             'propagate': False,
         },

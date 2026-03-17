@@ -2087,17 +2087,18 @@ body:not([data-theme]) .language-option:hover {
 
 .faw-btn:hover {
     background: #003e7d;
-}
+}   
 
 /* Footer title styles */
 .footer-title {
     font-size: 8rem;
     font-weight: bold;
-    color: var(--color-contrast);
+    /* color: var(--color-contrast); */
     text-align: center;
     margin: 0;
     letter-spacing: 0.1em;
     text-transform: uppercase;
+    color: #f66e2e;
 }
 
 /* Карта: занимать всю карточку, убрать границы/артефакты */

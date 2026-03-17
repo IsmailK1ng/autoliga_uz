@@ -1315,3 +1315,84 @@ class ReviewAdmin(admin.ModelAdmin):
         if change and 'status' in form.changed_data:
             obj.moderated_at = timezone.now()
         super().save_model(request, obj, form, change)
+
+
+# ========== ТЕСТ-ДРАЙВ ==========
+
+@admin.register(TestDriveRequest)
+class TestDriveRequestAdmin(admin.ModelAdmin):
+    list_display = ['name', 'phone', 'product', 'dealer', 'preferred_date', 'preferred_time', 'status', 'created_at']
+    list_filter = ['status', 'dealer', 'preferred_date', 'created_at']
+    search_fields = ['name', 'phone']
+    list_editable = ['status']
+    readonly_fields = ['ip_address', 'referer', 'utm_data', 'visitor_uid', 'created_at', 'updated_at']
+    ordering = ['-created_at']
+
+    fieldsets = (
+        ('Клиент', {
+            'fields': ('name', 'phone', 'dealer', 'product')
+        }),
+        ('Дата и время', {
+            'fields': ('preferred_date', 'preferred_time')
+        }),
+        ('Статус', {
+            'fields': ('status', 'admin_comment')
+        }),
+        ('Техническая информация', {
+            'classes': ('collapse',),
+            'fields': ('ip_address', 'referer', 'utm_data', 'visitor_uid', 'created_at', 'updated_at')
+        }),
+    )
+
+    actions = ['mark_confirmed', 'mark_completed', 'mark_cancelled']
+
+    def mark_confirmed(self, request, queryset):
+        count = queryset.update(status='confirmed')
+        self.message_user(request, f"Подтверждено: {count}", messages.SUCCESS)
+    mark_confirmed.short_description = "Подтвердить выбранные"
+
+    def mark_completed(self, request, queryset):
+        count = queryset.update(status='completed')
+        self.message_user(request, f"Завершено: {count}", messages.SUCCESS)
+    mark_completed.short_description = "Отметить как завершённые"
+
+    def mark_cancelled(self, request, queryset):
+        count = queryset.update(status='cancelled')
+        self.message_user(request, f"Отменено: {count}", messages.WARNING)
+    mark_cancelled.short_description = "Отменить выбранные"
+
+
+# ========== КОМАНДА — МЕНЕДЖЕРЫ ==========
+
+@admin.register(BranchManager)
+class BranchManagerAdmin(TabbedTranslationAdmin):
+    list_display = ['full_name', 'position', 'dealer', 'phone', 'is_active', 'order']
+    list_filter = ['dealer', 'is_active']
+    list_editable = ['is_active', 'order']
+    search_fields = ['full_name', 'phone']
+    ordering = ['dealer__order', 'order']
+
+    fieldsets = (
+        (None, {
+            'fields': ('full_name', 'position', 'photo', 'dealer', 'phone')
+        }),
+        ('Настройки', {
+            'fields': ('is_active', 'order')
+        }),
+    )
+
+
+@admin.register(TelegramUser)
+class TelegramUserAdmin(admin.ModelAdmin):
+    list_display = ['telegram_id', 'username', 'first_name', 'phone', 'region', 'language', 'age', 'created_at']
+    list_filter = ['region', 'language', 'created_at']
+    search_fields = ['username', 'first_name', 'phone', 'telegram_id']
+    readonly_fields = ['telegram_id', 'username', 'first_name', 'phone', 'region', 'language', 'age', 'created_at']
+    ordering = ['-created_at']
+    list_per_page = 50
+
+
+
+
+
+    

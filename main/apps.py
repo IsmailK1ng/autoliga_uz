@@ -9,6 +9,7 @@ class MainConfig(AppConfig):
 
     def ready(self):
         import main.admin
+        import main.signals
 
         if os.environ.get('RUN_MAIN') != 'true':
             return

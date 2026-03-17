@@ -76,3 +76,8 @@ class ParameterCategoryTranslationOptions(TranslationOptions):
 @register(Dealer)
 class DealerTranslationOptions(TranslationOptions):
     fields = ('name', 'address', 'working_hours')
+
+# ========== КОМАНДА ==========
+@register(BranchManager)
+class BranchManagerTranslationOptions(TranslationOptions):
+    fields = ('full_name', 'position')

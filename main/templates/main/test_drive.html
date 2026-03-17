@@ -1,0 +1,434 @@
+{% extends "base.html" %}
+{% load static %}
+{% load static seo_tags %}
+
+{% block breadcrumbs %}
+<link rel="stylesheet" href="{% static 'css/breadcrumbs.css' %}">
+{% endblock breadcrumbs %}
+
+{% block site_contact %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/test_drive.css' %}" />
+{% endblock site_contact %}
+
+{% block content %}
+    <!-- Google Tag Manager (noscript) -->
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-M33GWKMW" height="0" width="0"
+            style="display:none;visibility:hidden"></iframe></noscript>
+
+    <!-- Loader -->
+    <div id="loader" style="display: none" class="loader">
+        <div class="loader__wrapper">
+            <div class="loader__content">
+                <div class="loader__count">
+                    <span class="count__text">0</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Header -->
+    {% include 'main/includes/header.html' %}
+
+    <div class="mxd-block loading-wrap"></div>
+
+    <!-- Breadcrumbs -->
+    <div class="mxd-section-filter pre-grid">
+        <div class="mxd-section-filter__inner animate-card-3">
+            <div class="mxd-grid-item-1">
+                <div class="section-filter">
+                    <div aria-label="breadcrumb">
+                        <ol class="breadcrumb-ol">
+                            <li><a href="{% url 'home' %}">{% if LANGUAGE_CODE == 'uz' %}Bosh sahifa{% elif LANGUAGE_CODE == 'ru' %}Главная{% else %}Home{% endif %}</a></li>
+                            <li class="active">
+                                <a href="{% url 'test_drive' %}">{% if LANGUAGE_CODE == 'uz' %}Test-drayvga yozilish{% elif LANGUAGE_CODE == 'ru' %}Запись на тест-драйв{% else %}Book a test drive{% endif %}</a>
+                            </li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Форма тест-драйва -->
+    <main id="mxd-page-content" class="mxd-page-content inner-page-content">
+        <div class="mxd-section td-section">
+            <div class="mxd-container grid-container">
+                <div class="td-form-card">
+                    <h1 class="td-form-title">
+                        {% if LANGUAGE_CODE == 'uz' %}Test-drayvga yozilish
+                        {% elif LANGUAGE_CODE == 'ru' %}Запись на тест-драйв
+                        {% else %}Book a test drive{% endif %}
+                    </h1>
+
+                    <!-- Статус -->
+                    <div class="td-form-status" id="tdFormStatus"></div>
+
+                    <form id="testDriveForm" novalidate>
+                        {% csrf_token %}
+                        <div class="td-form-grid">
+                            <!-- ФИО -->
+                            <div class="td-form-group">
+                                <label>{% if LANGUAGE_CODE == 'uz' %}FISh{% elif LANGUAGE_CODE == 'ru' %}ФИО{% else %}Full name{% endif %}*</label>
+                                <input type="text" name="name" required
+                                    placeholder="{% if LANGUAGE_CODE == 'uz' %}Ismingizni kiriting{% elif LANGUAGE_CODE == 'ru' %}Введите ваше имя{% else %}Enter your name{% endif %}" />
+                            </div>
+
+                            <!-- Телефон -->
+                            <div class="td-form-group">
+                                <label>{% if LANGUAGE_CODE == 'uz' %}Telefon raqami{% elif LANGUAGE_CODE == 'ru' %}Номер телефона{% else %}Phone number{% endif %}*</label>
+                                <input type="tel" name="phone" id="tdPhone" required
+                                    placeholder="+998 (__) ___-__-__" data-default="+998" />
+                            </div>
+
+                            <!-- Дилер центр -->
+                            <div class="td-form-group">
+                                <label>{% if LANGUAGE_CODE == 'uz' %}Diler markaz{% elif LANGUAGE_CODE == 'ru' %}Дилерский центр{% else %}Dealer center{% endif %}*</label>
+                                <div class="td-select-wrapper">
+                                    <select name="dealer" id="tdDealer" required>
+                                        <option value="" disabled selected>{% if LANGUAGE_CODE == 'uz' %}Diler markazni tanlang{% elif LANGUAGE_CODE == 'ru' %}Выберите дилерский центр{% else %}Select dealer center{% endif %}</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Модель -->
+                            <div class="td-form-group">
+                                <label>{% if LANGUAGE_CODE == 'uz' %}Modelni tanlash{% elif LANGUAGE_CODE == 'ru' %}Выбор модели{% else %}Select model{% endif %}*</label>
+                                <div class="td-select-wrapper">
+                                    <select name="product" id="tdProduct" required>
+                                        <option value="" disabled selected>{% if LANGUAGE_CODE == 'uz' %}Modelni tanlang{% elif LANGUAGE_CODE == 'ru' %}Выберите модель{% else %}Select model{% endif %}</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Дата (Календарь) -->
+                            <div class="td-form-group">
+                                <label>{% if LANGUAGE_CODE == 'uz' %}Sana{% elif LANGUAGE_CODE == 'ru' %}Дата{% else %}Date{% endif %}*</label>
+                                <div class="td-calendar" id="tdCalendar">
+                                    <div class="td-calendar-header">
+                                        <button type="button" id="calPrev">&lsaquo;</button>
+                                        <span id="calMonthYear"></span>
+                                        <button type="button" id="calNext">&rsaquo;</button>
+                                    </div>
+                                    <div class="td-calendar-weekdays">
+                                        {% if LANGUAGE_CODE == 'uz' %}
+                                        <div>Du</div><div>Se</div><div>Ch</div><div>Pa</div><div>Ju</div><div>Sh</div><div>Ya</div>
+                                        {% elif LANGUAGE_CODE == 'ru' %}
+                                        <div>ПН</div><div>ВТ</div><div>СР</div><div>ЧТ</div><div>ПТ</div><div>СБ</div><div>ВС</div>
+                                        {% else %}
+                                        <div>MO</div><div>TU</div><div>WE</div><div>TH</div><div>FR</div><div>SA</div><div>SU</div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="td-calendar-days" id="calDays"></div>
+                                </div>
+                                <input type="hidden" name="preferred_date" id="tdDate" />
+                            </div>
+
+                            <!-- Время -->
+                            <div class="td-form-group">
+                                <label>{% if LANGUAGE_CODE == 'uz' %}Vaqti{% elif LANGUAGE_CODE == 'ru' %}Время{% else %}Time{% endif %}*</label>
+                                <div class="td-time-slots" id="tdTimeSlots">
+                                    <div class="td-time-slot" data-time="10:00">10:00</div>
+                                    <div class="td-time-slot" data-time="10:30">10:30</div>
+                                    <div class="td-time-slot" data-time="11:00">11:00</div>
+                                    <div class="td-time-slot" data-time="11:30">11:30</div>
+                                    <div class="td-time-slot" data-time="12:00">12:00</div>
+                                    <div class="td-time-slot" data-time="12:30">12:30</div>
+                                    <div class="td-time-slot" data-time="13:00">13:00</div>
+                                    <div class="td-time-slot" data-time="13:30">13:30</div>
+                                    <div class="td-time-slot" data-time="14:00">14:00</div>
+                                    <div class="td-time-slot" data-time="14:30">14:30</div>
+                                    <div class="td-time-slot" data-time="15:00">15:00</div>
+                                    <div class="td-time-slot" data-time="15:30">15:30</div>
+                                    <div class="td-time-slot" data-time="16:00">16:00</div>
+                                    <div class="td-time-slot" data-time="16:30">16:30</div>
+                                    <div class="td-time-slot" data-time="17:00">17:00</div>
+                                </div>
+                                <input type="hidden" name="preferred_time" id="tdTime" />
+                            </div>
+
+                            <!-- Согласие + Кнопка -->
+                            <div class="td-form-group full-width">
+                                <div class="td-agree">
+                                    <input type="checkbox" name="agree_terms" id="tdAgree" required />
+                                    <label for="tdAgree">
+                                        {% if LANGUAGE_CODE == 'uz' %}Men <a href="#">shaxsiy ma'lumotlarni qayta ishlash shartlariga</a> roziman.
+                                        {% elif LANGUAGE_CODE == 'ru' %}Я согласен с <a href="#">условиями обработки персональных данных</a>.
+                                        {% else %}I agree to the <a href="#">terms of personal data processing</a>.{% endif %}
+                                    </label>
+                                </div>
+
+                                <div class="td-submit-wrapper">
+                                    <button type="submit" class="td-submit-btn" id="tdSubmitBtn">
+                                        {% if LANGUAGE_CODE == 'uz' %}Ro'yxatdan o'tish
+                                        {% elif LANGUAGE_CODE == 'ru' %}Записаться
+                                        {% else %}Book now{% endif %}
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    {% include 'main/includes/footer.html' %}
+
+    <!-- To Top Button -->
+    <a href="#0" id="to-top" class="btn btn-to-top slide-up anim-no-delay">
+        <i class="ph ph-arrow-up"></i>
+    </a>
+
+    <!-- Scripts -->
+    <script src="{% static 'js/libs.min.js' %}"></script>
+    <script src="{% static 'js/app.js' %}"></script>
+    <script src="{% static 'js/error-logger.js' %}"></script>
+    <script src="{% static 'js/main-setting.js' %}"></script>
+
+    <script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const form = document.getElementById("testDriveForm");
+        const statusEl = document.getElementById("tdFormStatus");
+        const phoneInput = document.getElementById("tdPhone");
+        const dateInput = document.getElementById("tdDate");
+        const timeInput = document.getElementById("tdTime");
+        const submitBtn = document.getElementById("tdSubmitBtn");
+        const currentLang = document.documentElement.lang || 'uz';
+
+        // === Переводы ===
+        const T = {
+            uz: {
+                phoneErr: "Iltimos, telefon raqamini to'liq kiriting.",
+                dateErr: "Iltimos, sanani tanlang.",
+                timeErr: "Iltimos, vaqtni tanlang.",
+                agreeErr: "Shaxsiy ma'lumotlarni qayta ishlashga rozilik kerak.",
+                success: "Muvaffaqiyatli! Tez orada siz bilan bog'lanamiz.",
+                error: "Xatolik yuz berdi. Qayta urinib ko'ring.",
+                sending: "Yuborilmoqda..."
+            },
+            ru: {
+                phoneErr: "Пожалуйста, введите полный номер телефона.",
+                dateErr: "Пожалуйста, выберите дату.",
+                timeErr: "Пожалуйста, выберите время.",
+                agreeErr: "Необходимо согласие на обработку данных.",
+                success: "Успешно! Мы свяжемся с вами в ближайшее время.",
+                error: "Произошла ошибка. Попробуйте ещё раз.",
+                sending: "Отправка..."
+            },
+            en: {
+                phoneErr: "Please enter your full phone number.",
+                dateErr: "Please select a date.",
+                timeErr: "Please select a time.",
+                agreeErr: "You must agree to the data processing terms.",
+                success: "Success! We will contact you soon.",
+                error: "An error occurred. Please try again.",
+                sending: "Sending..."
+            }
+        };
+        const t = T[currentLang] || T['uz'];
+
+        // === Названия месяцев ===
+        const MONTHS = {
+            uz: ["Yanvar","Fevral","Mart","Aprel","May","Iyun","Iyul","Avgust","Sentyabr","Oktyabr","Noyabr","Dekabr"],
+            ru: ["Январь","Февраль","Март","Апрель","Май","Июнь","Июль","Август","Сентябрь","Октябрь","Ноябрь","Декабрь"],
+            en: ["January","February","March","April","May","June","July","August","September","October","November","December"]
+        };
+        const months = MONTHS[currentLang] || MONTHS['uz'];
+
+        // === Загрузка дилеров ===
+        const dealersData = {{ dealers_json|safe }};
+        const dealerSelect = document.getElementById("tdDealer");
+        dealersData.forEach(d => {
+            const opt = document.createElement("option");
+            opt.value = d.id;
+            opt.textContent = d.name + (d.address ? ' — ' + d.address : '');
+            dealerSelect.appendChild(opt);
+        });
+
+        // === Загрузка продуктов ===
+        const productsData = {{ products_json|safe }};
+        const productSelect = document.getElementById("tdProduct");
+        productsData.forEach(p => {
+            const opt = document.createElement("option");
+            opt.value = p.id;
+            opt.textContent = p.title;
+            productSelect.appendChild(opt);
+        });
+
+        // === Маска телефона ===
+        phoneInput.addEventListener("input", (e) => {
+            let value = e.target.value.replace(/\D/g, "");
+            if (!value.startsWith("998")) value = "998" + value;
+            if (value.length > 12) value = value.slice(0, 12);
+            let f = "+998 ";
+            if (value.length > 3) f += "(" + value.slice(3, 5);
+            if (value.length >= 5) f += ") " + value.slice(5, 8);
+            if (value.length >= 8) f += "-" + value.slice(8, 10);
+            if (value.length >= 10) f += "-" + value.slice(10, 12);
+            e.target.value = f;
+        });
+
+        // === Календарь ===
+        const today = new Date();
+        let calYear = today.getFullYear();
+        let calMonth = today.getMonth();
+        let selectedDate = null;
+
+        function renderCalendar() {
+            const daysContainer = document.getElementById("calDays");
+            const monthYearEl = document.getElementById("calMonthYear");
+            daysContainer.innerHTML = "";
+            monthYearEl.textContent = months[calMonth] + ", " + calYear;
+
+            const firstDay = new Date(calYear, calMonth, 1).getDay();
+            const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
+            // Понедельник = 0
+            const startOffset = (firstDay === 0) ? 6 : firstDay - 1;
+
+            for (let i = 0; i < startOffset; i++) {
+                const el = document.createElement("div");
+                el.className = "td-calendar-day empty";
+                daysContainer.appendChild(el);
+            }
+
+            for (let day = 1; day <= daysInMonth; day++) {
+                const el = document.createElement("div");
+                el.className = "td-calendar-day";
+                el.textContent = day;
+
+                const thisDate = new Date(calYear, calMonth, day);
+                const todayMidnight = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+
+                if (thisDate < todayMidnight) {
+                    el.classList.add("disabled");
+                } else {
+                    if (thisDate.getTime() === todayMidnight.getTime()) {
+                        el.classList.add("today");
+                    }
+                    if (selectedDate &&
+                        selectedDate.getFullYear() === calYear &&
+                        selectedDate.getMonth() === calMonth &&
+                        selectedDate.getDate() === day) {
+                        el.classList.add("selected");
+                    }
+                    el.addEventListener("click", () => {
+                        selectedDate = new Date(calYear, calMonth, day);
+                        const y = selectedDate.getFullYear();
+                        const m = String(selectedDate.getMonth() + 1).padStart(2, '0');
+                        const d = String(selectedDate.getDate()).padStart(2, '0');
+                        dateInput.value = `${y}-${m}-${d}`;
+                        renderCalendar();
+                    });
+                }
+                daysContainer.appendChild(el);
+            }
+        }
+
+        document.getElementById("calPrev").addEventListener("click", () => {
+            calMonth--;
+            if (calMonth < 0) { calMonth = 11; calYear--; }
+            // Не давать уходить в прошлое
+            if (calYear < today.getFullYear() || (calYear === today.getFullYear() && calMonth < today.getMonth())) {
+                calMonth = today.getMonth();
+                calYear = today.getFullYear();
+            }
+            renderCalendar();
+        });
+
+        document.getElementById("calNext").addEventListener("click", () => {
+            calMonth++;
+            if (calMonth > 11) { calMonth = 0; calYear++; }
+            renderCalendar();
+        });
+
+        renderCalendar();
+
+        // === Временные слоты ===
+        document.querySelectorAll(".td-time-slot").forEach(slot => {
+            slot.addEventListener("click", () => {
+                document.querySelectorAll(".td-time-slot").forEach(s => s.classList.remove("selected"));
+                slot.classList.add("selected");
+                timeInput.value = slot.dataset.time;
+            });
+        });
+
+        // === Отправка формы ===
+        let isSubmitting = false;
+
+        form.addEventListener("submit", async (e) => {
+            e.preventDefault();
+            if (isSubmitting) return;
+
+            // Валидация
+            const phone = phoneInput.value.replace(/\D/g, "");
+            if (phone.length !== 12) return showStatus(t.phoneErr, "error");
+            if (!dateInput.value) return showStatus(t.dateErr, "error");
+            if (!timeInput.value) return showStatus(t.timeErr, "error");
+            if (!document.getElementById("tdAgree").checked) return showStatus(t.agreeErr, "error");
+
+            isSubmitting = true;
+            submitBtn.disabled = true;
+            submitBtn.textContent = t.sending;
+
+            const utmData = typeof window.getUTMData === 'function' ? window.getUTMData() : null;
+
+            const formData = {
+                name: form.name.value,
+                phone: phoneInput.value,
+                dealer: parseInt(dealerSelect.value) || null,
+                product: parseInt(productSelect.value) || null,
+                preferred_date: dateInput.value,
+                preferred_time: timeInput.value,
+                agree_terms: true,
+                referer: document.referrer || window.location.href,
+                utm_data: utmData,
+                visitor_uid: sessionStorage.getItem('amo_visitor_uid') || null,
+            };
+
+            try {
+                const response = await fetch("/api/" + currentLang + "/test-drive/", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRFToken": form.querySelector("[name=csrfmiddlewaretoken]").value,
+                    },
+                    body: JSON.stringify(formData),
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.success) {
+                    (window.dataLayer = window.dataLayer || []).push({ event: "test_drive_submitted" });
+                    showStatus(t.success, "success");
+                    form.reset();
+                    selectedDate = null;
+                    dateInput.value = "";
+                    timeInput.value = "";
+                    document.querySelectorAll(".td-time-slot").forEach(s => s.classList.remove("selected"));
+                    renderCalendar();
+                } else {
+                    throw new Error(data.message || t.error);
+                }
+            } catch (err) {
+                console.error("Test drive form error:", err);
+                showStatus(err.message || t.error, "error");
+            } finally {
+                isSubmitting = false;
+                submitBtn.disabled = false;
+                submitBtn.textContent = "{% if LANGUAGE_CODE == 'uz' %}Ro'yxatdan o'tish{% elif LANGUAGE_CODE == 'ru' %}Записаться{% else %}Book now{% endif %}";
+            }
+        });
+
+        function showStatus(msg, type) {
+            statusEl.textContent = msg;
+            statusEl.className = "td-form-status " + type;
+            window.scrollTo({ top: statusEl.offsetTop - 100, behavior: 'smooth' });
+            if (type === "success") {
+                setTimeout(() => { statusEl.className = "td-form-status"; }, 6000);
+            }
+        }
+    });
+    </script>
+
+{% endblock content %}

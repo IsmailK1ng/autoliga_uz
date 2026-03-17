@@ -1,0 +1,300 @@
+{% extends "base.html" %}
+{% load static %}
+{% load static seo_tags %}
+
+{% block breadcrumbs %}
+<link rel="stylesheet" href="{% static 'css/breadcrumbs.css' %}">
+{% endblock breadcrumbs %}
+
+{% block site_contact %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/team.css' %}" />
+{% endblock site_contact %}
+
+{% block content %}
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-M33GWKMW" height="0" width="0"
+            style="display:none;visibility:hidden"></iframe></noscript>
+
+    <div id="loader" style="display: none" class="loader">
+        <div class="loader__wrapper">
+            <div class="loader__content">
+                <div class="loader__count">
+                    <span class="count__text">0</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% include 'main/includes/header.html' %}
+
+    <div class="mxd-block loading-wrap"></div>
+
+    <!-- Breadcrumbs -->
+    <div class="mxd-section-filter pre-grid">
+        <div class="mxd-section-filter__inner animate-card-3">
+            <div class="mxd-grid-item-1">
+                <div class="section-filter">
+                    <div aria-label="breadcrumb">
+                        <ol class="breadcrumb-ol">
+                            <li><a href="{% url 'home' %}">{% if LANGUAGE_CODE == 'uz' %}Bosh sahifa{% elif LANGUAGE_CODE == 'ru' %}Главная{% else %}Home{% endif %}</a></li>
+                            <li class="active">
+                                <a href="{% url 'team' %}">{% if LANGUAGE_CODE == 'uz' %}Bizning jamoa{% elif LANGUAGE_CODE == 'ru' %}Наша команда{% else %}Our team{% endif %}</a>
+                            </li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Контент -->
+    <main id="mxd-page-content" class="mxd-page-content inner-page-content">
+        <div class="mxd-section team-section">
+            <div class="mxd-container grid-container">
+
+                <h1 class="team-page-title">
+                    {% if LANGUAGE_CODE == 'uz' %}Bizning jamoa
+                    {% elif LANGUAGE_CODE == 'ru' %}Наша команда
+                    {% else %}Our team{% endif %}
+                </h1>
+                <p class="team-page-subtitle">
+                    {% if LANGUAGE_CODE == 'uz' %}Har bir filialimizda sizni professional mutaxassislar kutib oladi
+                    {% elif LANGUAGE_CODE == 'ru' %}В каждом нашем филиале вас встретят профессионалы своего дела
+                    {% else %}Professional specialists are waiting for you at each of our branches{% endif %}
+                </p>
+
+                {% if dealers %}
+                    {% for dealer in dealers %}
+                    <div class="team-branch">
+                        <div class="team-branch-header">
+                            <img src="{% static 'images/logo/autoliga-logo.png' %}" alt="Autoliga" class="team-branch-logo" />
+                            <div>
+                                <h2 class="team-branch-name">{{ dealer.name }}</h2>
+                                {% if dealer.address %}
+                                <p class="team-branch-address">
+                                    <i class="ph ph-map-pin"></i> {{ dealer.address }}
+                                </p>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="team-slider" data-slider>
+                            <button class="team-slider-arrow team-slider-prev" data-prev aria-label="Previous">
+                                <i class="ph-bold ph-caret-left"></i>
+                            </button>
+                            <div class="team-slider-viewport">
+                                <div class="team-slider-track">
+                                    {% for manager in dealer.managers.all %}
+                                    {% if manager.is_active %}
+                                    <div class="team-card"
+                                         data-name="{{ manager.full_name }}"
+                                         data-position="{{ manager.position }}"
+                                         data-phone="{{ manager.phone }}"
+                                         data-photo="{% if manager.photo %}{{ manager.photo.url }}{% endif %}"
+                                         data-dealer="{{ dealer.name }}">
+                                        {% if manager.photo %}
+                                        <img src="{{ manager.photo.url }}" alt="{{ manager.full_name }}" class="team-card-photo" loading="lazy" />
+                                        {% else %}
+                                        <div class="team-card-photo" style="display:flex;align-items:center;justify-content:center;">
+                                            <i class="ph ph-user" style="font-size:4rem;color:#d0d5dd;"></i>
+                                        </div>
+                                        {% endif %}
+                                        <div class="team-card-info">
+                                            <h3 class="team-card-name">{{ manager.full_name }}</h3>
+                                            <p class="team-card-position">{{ manager.position }}</p>
+                                        </div>
+                                    </div>
+                                    {% endif %}
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            <button class="team-slider-arrow team-slider-next" data-next aria-label="Next">
+                                <i class="ph-bold ph-caret-right"></i>
+                            </button>
+                            <div class="team-slider-dots" data-dots></div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="team-empty">
+                        <div class="team-empty-icon">
+                            <i class="ph ph-users-three"></i>
+                        </div>
+                        <p class="team-empty-text">
+                            {% if LANGUAGE_CODE == 'uz' %}Ma'lumotlar tez orada qo'shiladi
+                            {% elif LANGUAGE_CODE == 'ru' %}Информация скоро появится
+                            {% else %}Information coming soon{% endif %}
+                        </p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </main>
+
+    <!-- Модал: детальная карточка менеджера -->
+    <div id="teamModal" class="team-modal" onclick="if(event.target===this)this.style.display='none'">
+        <div class="team-modal-content">
+            <button class="team-modal-close" onclick="document.getElementById('teamModal').style.display='none'">&times;</button>
+            <div class="team-modal-body">
+                <div class="team-modal-photo-wrap" id="tmPhotoWrap">
+                    <img id="tmPhoto" src="" alt="" class="team-modal-photo" />
+                </div>
+                <div class="team-modal-info">
+                    <h2 class="team-modal-name" id="tmName"></h2>
+                    <p class="team-modal-position" id="tmPosition"></p>
+                    <p class="team-modal-dealer" id="tmDealer"><i class="ph ph-buildings"></i> <span></span></p>
+                    <a href="" class="team-modal-phone-btn" id="tmPhone" style="display:none;">
+                        <i class="ph ph-phone"></i>
+                        {% if LANGUAGE_CODE == 'uz' %}Qo'ng'iroq qilish{% elif LANGUAGE_CODE == 'ru' %}Позвонить{% else %}Call{% endif %}
+                        <span class="team-modal-phone-num" id="tmPhoneNum"></span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% include 'main/includes/footer.html' %}
+
+    <a href="#0" id="to-top" class="btn btn-to-top slide-up anim-no-delay">
+        <i class="ph ph-arrow-up"></i>
+    </a>
+
+    <script src="{% static 'js/libs.min.js' %}"></script>
+    <script src="{% static 'js/app.js' %}"></script>
+    <script src="{% static 'js/error-logger.js' %}"></script>
+    <script src="{% static 'js/main-setting.js' %}"></script>
+
+    <script>
+    /* Открытие модала */
+    function openTeamModal(card) {
+        var name = card.dataset.name;
+        var position = card.dataset.position;
+        var phone = card.dataset.phone;
+        var photo = card.dataset.photo;
+        var dealer = card.dataset.dealer;
+
+        document.getElementById('tmName').textContent = name;
+        document.getElementById('tmPosition').textContent = position;
+        document.getElementById('tmDealer').querySelector('span').textContent = dealer;
+
+        var photoWrap = document.getElementById('tmPhotoWrap');
+        var photoEl = document.getElementById('tmPhoto');
+        if (photo) {
+            photoEl.src = photo;
+            photoEl.alt = name;
+            photoWrap.style.display = 'block';
+        } else {
+            photoWrap.style.display = 'none';
+        }
+
+        var phoneBtn = document.getElementById('tmPhone');
+        if (phone) {
+            phoneBtn.href = 'tel:' + phone;
+            document.getElementById('tmPhoneNum').textContent = phone;
+            phoneBtn.style.display = 'inline-flex';
+        } else {
+            phoneBtn.style.display = 'none';
+        }
+
+        document.getElementById('teamModal').style.display = 'flex';
+    }
+
+    /* Pagination slider */
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('[data-slider]').forEach(function(slider) {
+            var track = slider.querySelector('.team-slider-track');
+            var prevBtn = slider.querySelector('[data-prev]');
+            var nextBtn = slider.querySelector('[data-next]');
+            var dotsWrap = slider.querySelector('[data-dots]');
+            var cards = track.querySelectorAll('.team-card');
+            if (!cards.length) return;
+
+            var currentPage = 0;
+            var cardWidth = 0;
+            var gap = 20;
+            var visibleCards = 1;
+            var totalPages = 1;
+
+            function calcLayout() {
+                var vw = slider.querySelector('.team-slider-viewport').offsetWidth;
+                cardWidth = cards[0].offsetWidth;
+                gap = 20;
+                visibleCards = Math.floor((vw + gap) / (cardWidth + gap));
+                if (visibleCards < 1) visibleCards = 1;
+                totalPages = Math.max(1, Math.ceil(cards.length / visibleCards));
+                if (currentPage >= totalPages) currentPage = totalPages - 1;
+            }
+
+            function renderDots() {
+                dotsWrap.innerHTML = '';
+                for (var i = 0; i < totalPages; i++) {
+                    var dot = document.createElement('button');
+                    dot.className = 'team-slider-dot' + (i === currentPage ? ' active' : '');
+                    dot.dataset.page = i;
+                    dot.addEventListener('click', function() {
+                        currentPage = parseInt(this.dataset.page);
+                        goToPage();
+                    });
+                    dotsWrap.appendChild(dot);
+                }
+            }
+
+            function goToPage() {
+                var offset = currentPage * visibleCards * (cardWidth + gap);
+                var maxOffset = track.scrollWidth - track.parentElement.offsetWidth;
+                if (offset > maxOffset) offset = maxOffset;
+                track.style.transform = 'translateX(-' + offset + 'px)';
+                renderDots();
+                updateArrows();
+            }
+
+            function updateArrows() {
+                prevBtn.style.opacity = currentPage === 0 ? '0.3' : '1';
+                prevBtn.style.pointerEvents = currentPage === 0 ? 'none' : 'auto';
+                nextBtn.style.opacity = currentPage >= totalPages - 1 ? '0.3' : '1';
+                nextBtn.style.pointerEvents = currentPage >= totalPages - 1 ? 'none' : 'auto';
+            }
+
+            prevBtn.addEventListener('click', function() {
+                if (currentPage > 0) { currentPage--; goToPage(); }
+            });
+            nextBtn.addEventListener('click', function() {
+                if (currentPage < totalPages - 1) { currentPage++; goToPage(); }
+            });
+
+            // Touch/swipe support
+            var touchStartX = 0, touchDragged = false;
+            track.addEventListener('touchstart', function(e) {
+                touchStartX = e.touches[0].clientX;
+                touchDragged = false;
+            }, { passive: true });
+            track.addEventListener('touchmove', function(e) {
+                if (Math.abs(e.touches[0].clientX - touchStartX) > 20) touchDragged = true;
+            }, { passive: true });
+            track.addEventListener('touchend', function(e) {
+                if (!touchDragged) return;
+                var diff = e.changedTouches[0].clientX - touchStartX;
+                if (diff < -40 && currentPage < totalPages - 1) { currentPage++; goToPage(); }
+                else if (diff > 40 && currentPage > 0) { currentPage--; goToPage(); }
+            });
+
+            // Click on card opens modal
+            cards.forEach(function(card) {
+                card.addEventListener('click', function() {
+                    openTeamModal(card);
+                });
+            });
+
+            // Init
+            calcLayout();
+            goToPage();
+
+            // Recalc on resize
+            window.addEventListener('resize', function() {
+                calcLayout();
+                goToPage();
+            });
+        });
+    });
+    </script>
+
+{% endblock content %}

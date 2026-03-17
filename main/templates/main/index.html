@@ -202,6 +202,158 @@
 
     <!-- Секция героя (конец) -->
 
+    <!-- Секция — Наша команда (START) -->
+    {% if team_managers %}
+    <div class="mxd-section ht-section">
+      <div class="mxd-container" style="max-width:1200px;margin:0 auto;padding:0 20px;">
+        <h2 class="home-team-title">{% if request.LANGUAGE_CODE == 'uz' %}Bizning jamoa{% elif request.LANGUAGE_CODE == 'ru' %}Наша команда{% else %}Our team{% endif %}</h2>
+        <p class="home-team-subtitle">{% if request.LANGUAGE_CODE == 'uz' %}Har bir filialimizda sizni professional mutaxassislar kutib oladi{% elif request.LANGUAGE_CODE == 'ru' %}В каждом нашем филиале вас встретят профессионалы своего дела{% else %}Professional specialists are waiting for you at each of our branches{% endif %}</p>
+      </div>
+
+      <!-- Бесконечная лента -->
+      <div class="ht-marquee" id="homeTeamMarquee">
+        <div class="ht-marquee-track" id="homeTeamTrack">
+          {% for m in team_managers %}
+          <div class="ht-card" onclick="openHomeTeamModal(this)"
+               data-name="{{ m.full_name }}"
+               data-position="{{ m.position }}"
+               data-phone="{{ m.phone }}"
+               data-photo="{% if m.photo %}{{ m.photo.url }}{% endif %}"
+               data-dealer="{{ m.dealer.name }}">
+            <div class="ht-card-img">
+              {% if m.photo %}
+              <img src="{{ m.photo.url }}" alt="{{ m.full_name }}" loading="lazy" />
+              {% else %}
+              <div class="ht-card-img-placeholder"><i class="ph ph-user"></i></div>
+              {% endif %}
+            </div>
+            <div class="ht-card-info">
+              <h3 class="ht-card-name">{{ m.full_name }}</h3>
+              <p class="ht-card-position">{{ m.position }}</p>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div style="text-align:center;padding:0 20px;">
+        <a href="{% url 'team' %}" class="home-team-cta-btn">{% if request.LANGUAGE_CODE == 'uz' %}Barcha jamoani ko'rish{% elif request.LANGUAGE_CODE == 'ru' %}Вся команда{% else %}View all team{% endif %}</a>
+      </div>
+    </div>
+
+    <!-- Team Detail Modal (home) -->
+    <div id="homeTeamModal" class="home-team-modal" onclick="if(event.target===this)this.style.display='none'">
+      <div class="home-team-modal-content">
+        <button class="home-team-modal-close" onclick="document.getElementById('homeTeamModal').style.display='none'">&times;</button>
+        <div class="home-team-modal-body">
+          <div class="home-team-modal-photo-wrap" id="htmPhotoWrap">
+            <img id="htmPhoto" src="" alt="" class="home-team-modal-photo" />
+          </div>
+          <div class="home-team-modal-info">
+            <h2 class="home-team-modal-name" id="htmName"></h2>
+            <p class="home-team-modal-position" id="htmPosition"></p>
+            <p class="home-team-modal-dealer" id="htmDealer"><i class="ph ph-buildings"></i> <span></span></p>
+            <a href="" class="home-team-modal-phone-btn" id="htmPhone" style="display:none;">
+              <i class="ph ph-phone"></i>
+              {% if request.LANGUAGE_CODE == 'uz' %}Qo'ng'iroq qilish{% elif request.LANGUAGE_CODE == 'ru' %}Позвонить{% else %}Call{% endif %}
+              <span class="home-team-modal-phone-num" id="htmPhoneNum"></span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+
+    <script>
+    function openHomeTeamModal(card) {
+      var name = card.dataset.name, position = card.dataset.position, phone = card.dataset.phone, photo = card.dataset.photo, dealer = card.dataset.dealer;
+      document.getElementById('htmName').textContent = name;
+      document.getElementById('htmPosition').textContent = position;
+      document.getElementById('htmDealer').querySelector('span').textContent = dealer;
+      var photoWrap = document.getElementById('htmPhotoWrap'), photoEl = document.getElementById('htmPhoto');
+      if (photo) { photoEl.src = photo; photoEl.alt = name; photoWrap.style.display = 'block'; } else { photoWrap.style.display = 'none'; }
+      var phoneBtn = document.getElementById('htmPhone');
+      if (phone) { phoneBtn.href = 'tel:' + phone; document.getElementById('htmPhoneNum').textContent = phone; phoneBtn.style.display = 'inline-flex'; } else { phoneBtn.style.display = 'none'; }
+      document.getElementById('homeTeamModal').style.display = 'flex';
+    }
+    // Duplicate cards for infinite marquee
+    (function() {
+      var track = document.getElementById('homeTeamTrack');
+      if (!track) return;
+      var cards = track.innerHTML;
+      track.innerHTML = cards + cards;
+    })();
+    // Drag/swipe scroll для team marquee
+    (function() {
+      var marquee = document.getElementById('homeTeamMarquee');
+      var track = document.getElementById('homeTeamTrack');
+      if (!marquee || !track) return;
+      var isDown = false, startX = 0, scrollOffset = 0, currentOffset = 0, animRunning = true, dragged = false;
+
+      function pauseAnim() {
+        if (animRunning) {
+          var matrix = new DOMMatrix(getComputedStyle(track).transform);
+          currentOffset = matrix.m41;
+          track.style.animation = 'none';
+          track.style.transform = 'translateX(' + currentOffset + 'px)';
+          animRunning = false;
+        }
+      }
+      function resumeAnim() {
+        var tw = track.scrollWidth / 2;
+        var n = currentOffset % tw;
+        if (n > 0) n -= tw;
+        var pct = Math.abs(n) / tw;
+        track.style.animation = 'none';
+        track.style.transform = '';
+        void track.offsetHeight;
+        track.style.animation = 'htMarquee 30s linear infinite';
+        track.style.animationDelay = '-' + (pct * 30) + 's';
+        animRunning = true;
+      }
+
+      marquee.style.cursor = 'grab';
+      marquee.addEventListener('mousedown', function(e) { isDown = true; dragged = false; startX = e.clientX; pauseAnim(); scrollOffset = currentOffset; marquee.style.cursor = 'grabbing'; });
+      document.addEventListener('mousemove', function(e) {
+        if (!isDown) return;
+        var d = e.clientX - startX;
+        if (Math.abs(d) > 5) dragged = true;
+        currentOffset = scrollOffset + d;
+        var tw = track.scrollWidth / 2;
+        if (currentOffset > 0) currentOffset -= tw;
+        if (currentOffset < -tw) currentOffset += tw;
+        track.style.transform = 'translateX(' + currentOffset + 'px)';
+      });
+      document.addEventListener('mouseup', function() {
+        if (!isDown) return;
+        isDown = false;
+        marquee.style.cursor = 'grab';
+        setTimeout(function() { dragged = false; }, 10);
+        setTimeout(function() { if (!isDown) resumeAnim(); }, 2000);
+      });
+      marquee.addEventListener('touchstart', function(e) { isDown = true; dragged = false; startX = e.touches[0].clientX; pauseAnim(); scrollOffset = currentOffset; }, { passive: true });
+      marquee.addEventListener('touchmove', function(e) {
+        if (!isDown) return;
+        var d = e.touches[0].clientX - startX;
+        if (Math.abs(d) > 5) dragged = true;
+        currentOffset = scrollOffset + d;
+        var tw = track.scrollWidth / 2;
+        if (currentOffset > 0) currentOffset -= tw;
+        if (currentOffset < -tw) currentOffset += tw;
+        track.style.transform = 'translateX(' + currentOffset + 'px)';
+      }, { passive: true });
+      marquee.addEventListener('touchend', function() { isDown = false; setTimeout(function() { dragged = false; }, 10); setTimeout(function() { if (!isDown) resumeAnim(); }, 2000); });
+
+      // Блокируем клик если было перетаскивание
+      track.addEventListener('click', function(e) {
+        if (dragged) { e.preventDefault(); e.stopPropagation(); }
+      }, true);
+    })();
+    </script>
+    {% endif %}
+    <!-- Секция — Наша команда (END) -->
+
   <!-- Секция — превью блога (начало) -->
     <div class="mxd-section padding-blog">
       <div class="mxd-container grid-container">
@@ -293,25 +445,19 @@
     <div class="mxd-section">
       <div class="mxd-container" style="max-width:1200px;margin:0 auto;padding:0 20px;">
         <h2 class="reviews-title">{% if request.LANGUAGE_CODE == 'uz' %}Mijozlarimiz nima deydi{% elif request.LANGUAGE_CODE == 'ru' %}Что говорят наши клиенты{% else %}What our clients say{% endif %}</h2>
+      </div>
 
-        <!-- Desktop: slider with arrows -->
-        <div class="reviews-slider-wrap">
-          <button class="reviews-arrow reviews-arrow-left" id="reviewsArrowLeft" aria-label="Назад">&#8592;</button>
-          <div class="reviews-slider" id="reviewsSlider">
-            <div class="reviews-grid" id="reviewsGrid"></div>
-          </div>
-          <button class="reviews-arrow reviews-arrow-right" id="reviewsArrowRight" aria-label="Вперёд">&#8594;</button>
-        </div>
+      <!-- Marquee reviews -->
+      <div class="reviews-marquee" id="reviewsSlider">
+        <div class="reviews-marquee-track" id="reviewsGrid"></div>
+      </div>
 
-        <!-- Mobile scroll dots -->
-        <div class="reviews-dots" id="reviewsDots"></div>
+      <!-- Loading spinner -->
+      <div id="reviewsLoading" style="text-align:center;padding:40px 0;">
+        <div style="display:inline-block;width:36px;height:36px;border:3px solid #ddd;border-top-color:#F7941D;border-radius:50%;animation:reviewsSpin .7s linear infinite;"></div>
+      </div>
 
-        <!-- Loading spinner -->
-        <div id="reviewsLoading" style="text-align:center;padding:40px 0;">
-          <div style="display:inline-block;width:36px;height:36px;border:3px solid #ddd;border-top-color:#F7941D;border-radius:50%;animation:reviewsSpin .7s linear infinite;"></div>
-        </div>
-
-        <!-- "Оставить комментарий" Button -->
+      <div class="mxd-container" style="max-width:1200px;margin:0 auto;padding:0 20px;">
         <div class="reviews-cta">
           <button class="reviews-cta-btn" id="openReviewFormBtn">{% if request.LANGUAGE_CODE == 'uz' %}Fikr qoldirish{% elif request.LANGUAGE_CODE == 'ru' %}Оставить комментарий{% else %}Leave a review{% endif %}</button>
         </div>
@@ -395,514 +541,7 @@
       </div>
     </div>
 
-    <style>
-    @keyframes reviewsSpin { to { transform: rotate(360deg); } }
 
-    /* ===== Reviews Section ===== */
-    .reviews-title {
-      font-size: 32px;
-      font-weight: 700;
-      color: var(--t-bright, #161616);
-      margin-bottom: 32px;
-    }
-
-    /* Slider wrapper with arrows */
-    .reviews-slider-wrap {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      position: relative;
-    }
-    .reviews-arrow {
-      flex-shrink: 0;
-      width: 44px;
-      height: 44px;
-      border-radius: 50%;
-      border: 2px solid #ddd;
-      background: #fff;
-      font-size: 20px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all .2s;
-      color: var(--t-bright, #161616);
-    }
-    .reviews-arrow:hover {
-      border-color: #F7941D;
-      color: #F7941D;
-    }
-    .reviews-arrow:disabled {
-      opacity: .3;
-      cursor: default;
-    }
-    .reviews-slider {
-      flex: 1;
-      overflow: hidden;
-    }
-    .reviews-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      grid-template-rows: 220px 220px;
-      grid-auto-flow: column;
-      gap: 16px;
-      transition: transform .4s ease;
-    }
-
-    /* Review Card */
-    .review-card {
-      background: linear-gradient(135deg, #FFF8EE 0%, #FFF3E0 100%);
-      border-radius: 16px;
-      padding: 24px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      transition: box-shadow .2s;
-      min-width: 0;
-      height: 220px;
-      box-sizing: border-box;
-    }
-    .review-card:hover {
-      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-    }
-    .review-card-header {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      flex-shrink: 0;
-    }
-    .review-avatar {
-      flex-shrink: 0;
-      cursor: pointer;
-      border-radius: 50%;
-      overflow: hidden;
-      width: 40px;
-      height: 40px;
-    }
-    .review-avatar img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      border-radius: 50%;
-    }
-    .review-avatar-clickable {
-      width: 50px;
-      height: 50px;
-    }
-    .review-user-info {
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-    }
-    .review-user-name {
-      font-size: 15px;
-      font-weight: 600;
-      color: var(--t-bright, #161616);
-    }
-    .review-verified {
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      font-size: 12px;
-      color: #4CAF50;
-    }
-    .review-stars {
-      display: flex;
-      gap: 2px;
-      flex-shrink: 0;
-    }
-    .review-stars .star {
-      color: #F7941D;
-      font-size: 16px;
-    }
-    .review-stars .star.empty {
-      color: #ddd;
-    }
-    .review-date {
-      font-size: 12px;
-      color: var(--t-muted, #585858);
-      flex-shrink: 0;
-    }
-    .review-text {
-      font-size: 13px;
-      line-height: 1.5;
-      color: var(--t-medium, #303030);
-      display: -webkit-box;
-      -webkit-line-clamp: 2;
-      line-clamp: 2;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
-      flex: 1;
-      min-height: 0;
-    }
-    .review-more-btn {
-      align-self: flex-end;
-      background: #F7941D;
-      color: #fff;
-      border: none;
-      border-radius: 8px;
-      padding: 5px 14px;
-      font-size: 12px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: background .2s;
-      margin-top: auto;
-      flex-shrink: 0;
-    }
-    .review-more-btn:hover {
-      background: #e5850f;
-    }
-
-    /* Scroll dots (mobile only) */
-    .reviews-dots {
-      display: none;
-    }
-
-    /* CTA */
-    .reviews-cta {
-      text-align: center;
-      margin-top: 32px;
-      margin-bottom: 10px;
-    }
-    .reviews-cta-btn {
-      background: transparent;
-      color: var(--t-bright, #161616);
-      border: 2px solid var(--t-bright, #161616);
-      border-radius: 12px;
-      padding: 14px 36px;
-      font-size: 16px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all .2s;
-    }
-    .reviews-cta-btn:hover {
-      background: var(--t-bright, #161616);
-      color: #fff;
-    }
-
-    /* ===== Avatar Image Modal ===== */
-    .avatar-image-modal {
-      position: relative;
-      max-width: 400px;
-      max-height: 400px;
-      border-radius: 16px;
-      overflow: hidden;
-      background: #fff;
-      animation: reviewModalIn .25s ease;
-    }
-    .avatar-image-modal img {
-      display: block;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      border-radius: 16px;
-    }
-    .avatar-image-modal .review-modal-close {
-      position: absolute;
-      top: 8px;
-      right: 8px;
-      background: rgba(0,0,0,0.5);
-      color: #fff;
-      border-radius: 50%;
-      width: 32px;
-      height: 32px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 20px;
-    }
-
-    /* ===== Modals ===== */
-    .review-modal-overlay {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.5);
-      z-index: 9999;
-      justify-content: center;
-      align-items: center;
-      padding: 20px;
-    }
-    .review-modal-overlay.active {
-      display: flex;
-    }
-    .review-modal {
-      background: #fff;
-      border-radius: 20px;
-      padding: 32px;
-      position: relative;
-      max-height: 90vh;
-      overflow-y: auto;
-      animation: reviewModalIn .25s ease;
-    }
-    @keyframes reviewModalIn {
-      from { opacity: 0; transform: translateY(20px) scale(.97); }
-      to { opacity: 1; transform: translateY(0) scale(1); }
-    }
-    .review-modal-close {
-      position: absolute;
-      top: 16px;
-      right: 16px;
-      background: none;
-      border: none;
-      font-size: 28px;
-      cursor: pointer;
-      color: #888;
-      line-height: 1;
-      transition: color .2s;
-    }
-    .review-modal-close:hover {
-      color: #333;
-    }
-
-    /* Detail Modal */
-    .review-detail-modal {
-      width: 100%;
-      max-width: 560px;
-    }
-    .review-detail-header {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      margin-bottom: 12px;
-    }
-    .review-detail-stars {
-      display: flex;
-      gap: 2px;
-      margin-bottom: 4px;
-    }
-    .review-detail-stars .star {
-      color: #F7941D;
-      font-size: 20px;
-    }
-    .review-detail-stars .star.empty {
-      color: #ddd;
-    }
-    .review-detail-date {
-      font-size: 13px;
-      color: var(--t-muted, #585858);
-      margin-bottom: 16px;
-    }
-    .review-detail-text {
-      font-size: 15px;
-      line-height: 1.65;
-      color: var(--t-medium, #303030);
-    }
-
-    /* Form Modal */
-    .review-form-modal {
-      width: 100%;
-      max-width: 480px;
-    }
-    .review-form-title {
-      font-size: 22px;
-      font-weight: 700;
-      margin-bottom: 20px;
-      color: var(--t-bright, #161616);
-    }
-    .review-form-group {
-      margin-bottom: 18px;
-    }
-    .review-form-label {
-      display: block;
-      font-size: 14px;
-      font-weight: 600;
-      color: var(--t-bright, #161616);
-      margin-bottom: 6px;
-    }
-    .review-form-input,
-    .review-form-textarea {
-      width: 100%;
-      border: 1.5px solid #ddd;
-      border-radius: 10px;
-      padding: 12px 14px;
-      font-size: 15px;
-      color: var(--t-bright, #161616);
-      outline: none;
-      transition: border-color .2s;
-      font-family: inherit;
-      box-sizing: border-box;
-    }
-    .review-form-input:focus,
-    .review-form-textarea:focus {
-      border-color: #F7941D;
-    }
-    .review-form-textarea {
-      resize: vertical;
-      min-height: 100px;
-    }
-    .review-form-stars {
-      display: flex;
-      gap: 4px;
-    }
-    .star-pick {
-      font-size: 32px;
-      color: #ddd;
-      cursor: pointer;
-      transition: color .15s;
-      user-select: none;
-    }
-    .star-pick.active {
-      color: #F7941D;
-    }
-    .review-upload-area {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-    .review-upload-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      border: 1.5px solid #F7941D;
-      border-radius: 10px;
-      padding: 8px 18px;
-      font-size: 14px;
-      font-weight: 600;
-      color: #F7941D;
-      cursor: pointer;
-      transition: all .2s;
-    }
-    .review-upload-btn:hover {
-      background: #FFF3E0;
-    }
-    .review-upload-filename {
-      font-size: 13px;
-      color: var(--t-muted, #585858);
-    }
-    .review-submit-btn {
-      width: 100%;
-      background: #F7941D;
-      color: #fff;
-      border: none;
-      border-radius: 14px;
-      padding: 16px;
-      font-size: 17px;
-      font-weight: 700;
-      cursor: pointer;
-      transition: background .2s;
-      margin-top: 6px;
-    }
-    .review-submit-btn:hover {
-      background: #e5850f;
-    }
-    .review-success-msg {
-      background: #E8F5E9;
-      border-radius: 12px;
-      padding: 14px 18px;
-      display: flex;
-      align-items: flex-start;
-      gap: 10px;
-      margin-bottom: 20px;
-      font-size: 14px;
-      color: #2E7D32;
-      line-height: 1.4;
-    }
-    .review-success-msg svg {
-      flex-shrink: 0;
-      margin-top: 1px;
-    }
-    .review-error-msg {
-      background: #FFEBEE;
-      border-radius: 12px;
-      padding: 14px 18px;
-      margin-bottom: 20px;
-      font-size: 14px;
-      color: #c62828;
-      line-height: 1.4;
-    }
-    .review-submit-btn:disabled {
-      opacity: .6;
-      cursor: not-allowed;
-    }
-
-    /* ===== Mobile ===== */
-    @media (max-width: 768px) {
-      .reviews-title {
-        font-size: 24px;
-        margin-bottom: 20px;
-      }
-      .reviews-arrow {
-        display: none;
-      }
-      .reviews-slider {
-        overflow-x: auto;
-        overflow-y: hidden;
-        -webkit-overflow-scrolling: touch;
-        scroll-snap-type: x mandatory;
-        scroll-behavior: smooth;
-        scrollbar-width: none;
-      }
-      .reviews-slider::-webkit-scrollbar {
-        display: none;
-      }
-      .reviews-grid {
-        grid-template-columns: none;
-        grid-template-rows: none;
-        grid-auto-flow: column;
-        grid-auto-columns: 82vw;
-        display: grid;
-        gap: 14px;
-      }
-      .review-card {
-        padding: 18px;
-        scroll-snap-align: center;
-        height: 250px;
-        gap: 6px;
-      }
-      .review-card .review-text {
-        -webkit-line-clamp: 4;
-        line-clamp: 4;
-        font-size: 13px;
-        line-height: 1.45;
-      }
-      .review-card .review-stars .star {
-        font-size: 14px;
-      }
-      .review-card .review-date {
-        font-size: 11px;
-      }
-      .review-modal {
-        padding: 24px 18px;
-        border-radius: 16px;
-      }
-      .review-detail-modal,
-      .review-form-modal {
-        max-width: 100%;
-      }
-      .review-form-title {
-        font-size: 19px;
-      }
-      .star-pick {
-        font-size: 28px;
-      }
-      .review-submit-btn {
-        padding: 14px;
-        font-size: 16px;
-      }
-      .avatar-image-modal {
-        max-width: 90vw;
-        max-height: 90vw;
-      }
-      .reviews-dots {
-        display: flex;
-        justify-content: center;
-        gap: 8px;
-        margin-top: 14px;
-      }
-      .reviews-dot {
-        width: 8px;
-        height: 8px;
-        border-radius: 50%;
-        background: #ddd;
-        transition: background .3s, transform .3s;
-      }
-      .reviews-dot.active {
-        background: #F7941D;
-        transform: scale(1.3);
-      }
-    }
-    </style>
 
     <!-- reCAPTCHA v3 -->
     <script src="https://www.google.com/recaptcha/api.js?render={{ RECAPTCHA_SITE_KEY }}"></script>
@@ -913,12 +552,7 @@
       var LANG = '{{ request.LANGUAGE_CODE|default:"uz" }}';
       var API_BASE = '/api/' + LANG + '/reviews/';
       var RECAPTCHA_SITE_KEY = '{{ RECAPTCHA_SITE_KEY }}';
-      var CARDS_PER_PAGE = 4;
-      var currentPage = 0;
-      var totalPages = 1;
       var reviews = [];
-      var apiNextUrl = null;
-      var apiPrevUrl = null;
 
       // ===== HELPERS =====
       function getCookie(name) {
@@ -969,17 +603,9 @@
 
       // ===== DOM =====
       var grid = document.getElementById('reviewsGrid');
-      var arrowLeft = document.getElementById('reviewsArrowLeft');
-      var arrowRight = document.getElementById('reviewsArrowRight');
       var loading = document.getElementById('reviewsLoading');
-      var slider = document.getElementById('reviewsSlider');
-      var dotsContainer = document.getElementById('reviewsDots');
 
-      function isMobile() {
-        return window.innerWidth <= 768;
-      }
-
-      // ===== RENDER CARDS =====
+      // ===== RENDER CARDS (marquee) =====
       function renderCards() {
         grid.innerHTML = '';
         reviews.forEach(function(r, i) {
@@ -999,135 +625,83 @@
             '<button class="review-more-btn" data-index="' + i + '">' + detailBtnText + '</button>';
           grid.appendChild(card);
         });
-        updateSlider();
-        buildDots();
-        autoSlideIdx = 0;
-        startAutoSlide();
-      }
-
-      // ===== MOBILE DOTS =====
-      function buildDots() {
-        dotsContainer.innerHTML = '';
-        if (!isMobile() || reviews.length <= 1) return;
-        reviews.forEach(function(_, i) {
-          var dot = document.createElement('span');
-          dot.className = 'reviews-dot' + (i === 0 ? ' active' : '');
-          dot.addEventListener('click', function() {
-            var cards = grid.querySelectorAll('.review-card');
-            if (cards[i]) cards[i].scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
-          });
-          dotsContainer.appendChild(dot);
-        });
-      }
-
-      // Track scroll to update active dot
-      slider.addEventListener('scroll', function() {
-        if (!isMobile()) return;
-        var cards = grid.querySelectorAll('.review-card');
-        if (!cards.length) return;
-        var sliderLeft = slider.scrollLeft;
-        var cardWidth = cards[0].offsetWidth + 14; // card width + gap
-        var activeIdx = Math.round(sliderLeft / cardWidth);
-        var dots = dotsContainer.querySelectorAll('.reviews-dot');
-        dots.forEach(function(d, i) {
-          d.classList.toggle('active', i === activeIdx);
-        });
-      });
-
-      // ===== MOBILE AUTO-SLIDE =====
-      var autoSlideTimer = null;
-      var autoSlideIdx = 0;
-      var userTouching = false;
-
-      function startAutoSlide() {
-        stopAutoSlide();
-        if (!isMobile()) return;
-        var cards = grid.querySelectorAll('.review-card');
-        if (cards.length <= 1) return;
-        autoSlideTimer = setInterval(function() {
-          if (userTouching) return;
-          var cards = grid.querySelectorAll('.review-card');
-          if (!cards.length) return;
-          autoSlideIdx++;
-          if (autoSlideIdx >= cards.length) autoSlideIdx = 0;
-          cards[autoSlideIdx].scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
-        }, 3500);
-      }
-
-      function stopAutoSlide() {
-        if (autoSlideTimer) { clearInterval(autoSlideTimer); autoSlideTimer = null; }
-      }
-
-      slider.addEventListener('touchstart', function() {
-        userTouching = true;
-        stopAutoSlide();
-      }, { passive: true });
-
-      slider.addEventListener('touchend', function() {
-        userTouching = false;
-        // Restart auto-slide after 5s of no touch
-        setTimeout(function() {
-          if (!userTouching) {
-            // Sync autoSlideIdx with current scroll position
-            var cards = grid.querySelectorAll('.review-card');
-            if (cards.length) {
-              var cardWidth = cards[0].offsetWidth + 14;
-              autoSlideIdx = Math.round(slider.scrollLeft / cardWidth);
-            }
-            startAutoSlide();
-          }
-        }, 5000);
-      }, { passive: true });
-
-      // ===== SLIDER PAGINATION =====
-      function updateSlider() {
-        var allCards = grid.querySelectorAll('.review-card');
-        if (isMobile()) {
-          allCards.forEach(function(c) { c.style.display = ''; });
-          grid.style.transform = '';
-          slider.scrollLeft = 0;
-          return;
-        }
-        allCards.forEach(function(c, i) {
-          c.style.display = (i < CARDS_PER_PAGE) ? '' : 'none';
-        });
-        grid.style.transform = '';
-        arrowLeft.disabled = !apiPrevUrl;
-        arrowRight.disabled = !apiNextUrl;
+        // Дублируем карточки для бесконечного marquee
+        var cards = grid.innerHTML;
+        grid.innerHTML = cards + cards;
       }
 
       // ===== API FETCH =====
       function fetchReviews(url) {
         loading.style.display = 'block';
-        grid.style.opacity = '0.5';
         fetch(url)
           .then(function(r) { return r.json(); })
           .then(function(data) {
             reviews = data.results || [];
-            apiNextUrl = data.next;
-            apiPrevUrl = data.previous;
-            totalPages = Math.ceil((data.count || 0) / CARDS_PER_PAGE);
             renderCards();
             loading.style.display = 'none';
-            grid.style.opacity = '1';
           })
           .catch(function() {
             loading.style.display = 'none';
-            grid.style.opacity = '1';
           });
       }
 
-      // Initial load
-      fetchReviews(API_BASE + '?page_size=' + CARDS_PER_PAGE);
+      // Загружаем побольше для ленты
+      fetchReviews(API_BASE + '?page_size=12');
 
-      arrowLeft.addEventListener('click', function() {
-        if (apiPrevUrl) fetchReviews(apiPrevUrl);
-      });
-      arrowRight.addEventListener('click', function() {
-        if (apiNextUrl) fetchReviews(apiNextUrl);
-      });
+      // ===== DRAG/SWIPE для reviews marquee =====
+      (function() {
+        var marquee = document.getElementById('reviewsSlider');
+        var track = document.getElementById('reviewsGrid');
+        if (!marquee || !track) return;
+        var isDown = false, startX = 0, scrollOffset = 0, currentOffset = 0, animRunning = true;
+        marquee.style.cursor = 'grab';
 
-      window.addEventListener('resize', updateSlider);
+        function pauseAnim() {
+          if (animRunning) {
+            var matrix = new DOMMatrix(getComputedStyle(track).transform);
+            currentOffset = matrix.m41;
+            track.style.animation = 'none';
+            track.style.transform = 'translateX(' + currentOffset + 'px)';
+            animRunning = false;
+          }
+        }
+        function resumeAnim() {
+          var tw = track.scrollWidth / 2;
+          if (tw <= 0) return;
+          var n = currentOffset % tw;
+          if (n > 0) n -= tw;
+          var pct = Math.abs(n) / tw;
+          track.style.animation = 'none';
+          track.style.transform = '';
+          void track.offsetHeight;
+          track.style.animation = 'reviewsMarquee 40s linear infinite';
+          track.style.animationDelay = '-' + (pct * 40) + 's';
+          animRunning = true;
+        }
+
+        marquee.addEventListener('mousedown', function(e) { isDown = true; startX = e.clientX; pauseAnim(); scrollOffset = currentOffset; marquee.style.cursor = 'grabbing'; });
+        document.addEventListener('mousemove', function(e) {
+          if (!isDown) return;
+          currentOffset = scrollOffset + (e.clientX - startX);
+          var tw = track.scrollWidth / 2;
+          if (tw > 0) { if (currentOffset > 0) currentOffset -= tw; if (currentOffset < -tw) currentOffset += tw; }
+          track.style.transform = 'translateX(' + currentOffset + 'px)';
+        });
+        document.addEventListener('mouseup', function() {
+          if (!isDown) return;
+          isDown = false; marquee.style.cursor = 'grab';
+          setTimeout(function() { if (!isDown) resumeAnim(); }, 2000);
+        });
+        marquee.addEventListener('touchstart', function(e) { isDown = true; startX = e.touches[0].clientX; pauseAnim(); scrollOffset = currentOffset; }, { passive: true });
+        marquee.addEventListener('touchmove', function(e) {
+          if (!isDown) return;
+          currentOffset = scrollOffset + (e.touches[0].clientX - startX);
+          var tw = track.scrollWidth / 2;
+          if (tw > 0) { if (currentOffset > 0) currentOffset -= tw; if (currentOffset < -tw) currentOffset += tw; }
+          track.style.transform = 'translateX(' + currentOffset + 'px)';
+        }, { passive: true });
+        marquee.addEventListener('touchend', function() { isDown = false; setTimeout(function() { if (!isDown) resumeAnim(); }, 2000); });
+      })();
 
       // ===== DETAIL MODAL =====
       var detailOverlay = document.getElementById('reviewDetailOverlay');

@@ -852,6 +852,122 @@ class TelegramUser(models.Model):
         ordering = ['-created_at']
 
     def __str__(self):
-        return f"@{self.username or self.telegram_id} - {self.phone or '-'}"    
+        return f"@{self.username or self.telegram_id} - {self.phone or '-'}"
 
 
+# ========== 09. ТЕСТ-ДРАЙВ ==========
+
+TEST_DRIVE_STATUS_CHOICES = [
+    ('new', 'Новая'),
+    ('confirmed', 'Подтверждена'),
+    ('completed', 'Завершена'),
+    ('cancelled', 'Отменена'),
+]
+
+TIME_SLOT_CHOICES = [
+    ('10:00', '10:00'),
+    ('10:30', '10:30'),
+    ('11:00', '11:00'),
+    ('11:30', '11:30'),
+    ('12:00', '12:00'),
+    ('12:30', '12:30'),
+    ('13:00', '13:00'),
+    ('13:30', '13:30'),
+    ('14:00', '14:00'),
+    ('14:30', '14:30'),
+    ('15:00', '15:00'),
+    ('15:30', '15:30'),
+    ('16:00', '16:00'),
+    ('16:30', '16:30'),
+    ('17:00', '17:00'),
+]
+
+class TestDriveRequest(models.Model):
+    """Заявки на тест-драйв"""
+    name = models.CharField("ФИО", max_length=255)
+    phone = models.CharField("Телефон", max_length=50)
+    dealer = models.ForeignKey(
+        Dealer,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        verbose_name="Дилерский центр",
+        related_name='test_drive_requests'
+    )
+    product = models.ForeignKey(
+        Product,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        verbose_name="Модель автомобиля",
+        related_name='test_drive_requests'
+    )
+    preferred_date = models.DateField("Желаемая дата")
+    preferred_time = models.CharField(
+        "Желаемое время",
+        max_length=5,
+        choices=TIME_SLOT_CHOICES
+    )
+    agree_terms = models.BooleanField("Согласие на обработку данных", default=False)
+
+    status = models.CharField(
+        "Статус",
+        max_length=20,
+        choices=TEST_DRIVE_STATUS_CHOICES,
+        default='new',
+        db_index=True
+    )
+    admin_comment = models.TextField("Комментарий менеджера", blank=True, null=True)
+    ip_address = models.GenericIPAddressField("IP адрес", blank=True, null=True)
+
+    referer = models.URLField("Referer", max_length=500, blank=True, null=True)
+    utm_data = models.TextField("UTM метки", blank=True, null=True)
+    visitor_uid = models.CharField("amoCRM Visitor UID", max_length=100, blank=True, null=True)
+
+    created_at = models.DateTimeField("Дата создания", auto_now_add=True)
+    updated_at = models.DateTimeField("Дата обновления", auto_now=True)
+
+    class Meta:
+        verbose_name = "Заявки - Тест-драйв"
+        verbose_name_plural = "Заявки - Тест-драйвы"
+        ordering = ['-created_at']
+
+    def __str__(self):
+        product_name = self.product.title if self.product else "—"
+        dealer_name = self.dealer.name if self.dealer else "—"
+        return f"{self.name} — {product_name} @ {dealer_name} ({self.preferred_date} {self.preferred_time})"
+
+
+# ========== 10. КОМАНДА — МЕНЕДЖЕРЫ ФИЛИАЛОВ ==========
+
+class BranchManager(models.Model):
+    """Менеджеры филиалов (дилерских центров)"""
+    full_name = models.CharField("ФИО", max_length=255)
+    position = models.CharField(
+        "Должность",
+        max_length=100,
+        help_text="Например: Старший менеджер, Руководитель филиала"
+    )
+    photo = models.ImageField(
+        "Фото",
+        upload_to="team/managers/%Y/",
+        help_text="Рекомендуемый размер: 400x400px, квадратное фото"
+    )
+    dealer = models.ForeignKey(
+        Dealer,
+        on_delete=models.CASCADE,
+        verbose_name="Филиал (дилерский центр)",
+        related_name='managers'
+    )
+    phone = models.CharField("Телефон", max_length=50, blank=True)
+    is_active = models.BooleanField("Активен", default=True)
+    order = models.PositiveIntegerField("Порядок", default=0)
+    created_at = models.DateTimeField("Дата добавления", auto_now_add=True)
+
+    class Meta:
+        verbose_name = "Команда - Менеджер"
+        verbose_name_plural = "Команда - Менеджеры филиалов"
+        ordering = ['dealer__order', 'order', 'full_name']
+
+    def __str__(self):
+        return f"{self.full_name} — {self.position} ({self.dealer.name})"

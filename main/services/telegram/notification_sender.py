@@ -139,6 +139,54 @@ class TelegramNotificationSender:
         
         return message
     
+    @classmethod
+    def send_test_drive_notification(cls, td):
+        """Отправить уведомление о новой заявке на тест-драйв"""
+        try:
+            bot_token = settings.TELEGRAM_BOT_TOKEN
+            chat_id = settings.TELEGRAM_CHAT_ID
+
+            if not bot_token or not chat_id:
+                logger.warning("Telegram настройки не заданы в .env")
+                return
+
+            message = f"🏎 Новая заявка на тест-драйв #{td.id}\n"
+            message += f"\n👤 Клиент: {td.name}"
+            message += f"\n📞 Телефон: {td.phone}"
+
+            if td.dealer:
+                message += f"\n🏢 Дилер: {td.dealer.name}"
+                if td.dealer.address:
+                    message += f"\n📍 Адрес: {td.dealer.address}"
+
+            if td.product:
+                message += f"\n🚗 Модель: {td.product.title}"
+
+            message += f"\n📅 Дата: {td.preferred_date.strftime('%d.%m.%Y')}"
+            message += f"\n🕐 Время: {td.preferred_time}"
+
+            tz = pytz.timezone(settings.TIME_ZONE)
+            created_time = td.created_at.astimezone(tz).strftime('%d.%m.%Y в %H:%M')
+            message += f"\n\n⏰ {created_time}"
+
+            url = f"https://api.telegram.org/bot{bot_token}/sendMessage"
+            payload = {
+                "chat_id": chat_id,
+                "text": message,
+                "parse_mode": "HTML",
+                "disable_web_page_preview": True,
+            }
+
+            response = requests.post(url, json=payload, timeout=5)
+
+            if response.status_code == 200:
+                logger.info(f"Telegram уведомление отправлено для тест-драйва #{td.id}")
+            else:
+                logger.error(f"Ошибка Telegram {response.status_code} для тест-драйва #{td.id}: {response.text[:200]}")
+
+        except Exception as e:
+            logger.error(f"Ошибка Telegram для тест-драйва #{td.id}: {str(e)}", exc_info=True)
+
     @staticmethod
     def _build_keyboard(contact_form):
         """Создание inline-кнопок"""

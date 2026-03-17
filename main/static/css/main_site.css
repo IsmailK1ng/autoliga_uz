@@ -23302,7 +23302,7 @@ body[data-theme="dark"] .home-team-cta-btn:hover {
 
 /* Review Card */
 .review-card {
-  background: linear-gradient(135deg, #FFF8EE 0%, #FFF3E0 100%);
+  background: linear-gradient(135deg, #f3f3f3 0%, #f8f4ef 100%);
   border-radius: 16px;
   padding: 24px;
   display: flex;

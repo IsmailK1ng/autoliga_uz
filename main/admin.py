@@ -1219,6 +1219,13 @@ class AmoCRMTokenAdmin(AmoCRMAdminMixin, admin.ModelAdmin):
     
 # ========== DILERLAR ==========
 
+class DealerImageInline(admin.TabularInline):
+    model = DealerImage
+    extra = 1
+    fields = ('image', 'caption_uz', 'caption_ru', 'caption_en', 'order')
+    ordering = ('order',)
+
+
 @admin.register(Dealer)
 class DealerAdmin(ContentAdminMixin, TabbedTranslationAdmin):
     list_display = ('name', 'region', 'phone', 'is_active', 'order')
@@ -1226,6 +1233,7 @@ class DealerAdmin(ContentAdminMixin, TabbedTranslationAdmin):
     list_editable = ('is_active', 'order')
     search_fields = ('name', 'address', 'phone')
     ordering = ('order', 'name')
+    inlines = [DealerImageInline]
     fieldsets = (
         ("Asosiy ma'lumotlar", {
             'fields': (
@@ -1236,6 +1244,10 @@ class DealerAdmin(ContentAdminMixin, TabbedTranslationAdmin):
                 'working_hours_uz', 'working_hours_ru', 'working_hours_en',
                 'logo',
             )
+        }),
+        ("Tavsif", {
+            'fields': ('description_uz', 'description_ru', 'description_en'),
+            'classes': ('collapse',),
         }),
         ("Xarita koordinatalari", {
             'fields': ('latitude', 'longitude'),

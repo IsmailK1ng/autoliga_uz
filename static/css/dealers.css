@@ -193,6 +193,26 @@
         }
         .dealer-card-socials a:hover { background: #F07800; color: #fff; }
 
+        /* Detail link in dealer card */
+        .dealer-card-detail-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 8px;
+            padding: 8px 16px;
+            background: #F07800;
+            color: #fff;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: background 0.15s;
+            width: 100%;
+            justify-content: center;
+        }
+        .dealer-card-detail-link:hover { background: #d96a00; }
+        .dealer-card-detail-link i { font-size: 14px; }
+
         /* ── Mobile region bar (hidden on desktop) ── */
         .mobile-region-bar { display: none; }
 
@@ -379,6 +399,26 @@
                 text-decoration: none; transition: background 0.15s, color 0.15s;
             }
             .mob-dealer-socials a:hover { background: #F07800; color: #fff; }
+
+            /* Mobile detail link */
+            .mob-dealer-detail-link {
+                display: inline-flex;
+                align-items: center;
+                gap: 6px;
+                margin-top: 12px;
+                padding: 10px 20px;
+                background: #F07800;
+                color: #fff;
+                border-radius: 8px;
+                font-size: 13px;
+                font-weight: 600;
+                text-decoration: none;
+                transition: background 0.15s;
+                width: 100%;
+                justify-content: center;
+            }
+            .mob-dealer-detail-link:hover { background: #d96a00; }
+            .mob-dealer-detail-link i { font-size: 14px; }
         }
 
 

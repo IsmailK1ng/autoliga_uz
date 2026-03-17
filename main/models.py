@@ -727,6 +727,10 @@ class Dealer(models.Model):
         blank=True, null=True,
         help_text="Google Maps dan oling. Misol: 69.240073"
     )
+    description = models.TextField(
+        "Tavsif", blank=True,
+        help_text="Diler markazi haqida qisqacha ma'lumot"
+    )
     is_active = models.BooleanField("Faol", default=True)
     order = models.PositiveIntegerField("Tartib", default=0)
 
@@ -737,6 +741,35 @@ class Dealer(models.Model):
 
     def __str__(self):
         return f"{self.name} ({self.get_region_display()})"
+
+    def get_absolute_url(self):
+        from django.urls import reverse
+        return reverse('dealer_detail', kwargs={'pk': self.pk})
+
+
+class DealerImage(models.Model):
+    """Diler markazi fotogalereyasi"""
+    dealer = models.ForeignKey(
+        Dealer,
+        on_delete=models.CASCADE,
+        related_name='images',
+        verbose_name="Diler markazi"
+    )
+    image = models.ImageField(
+        "Rasm",
+        upload_to="dealers/gallery/%Y/",
+        help_text="Salon rasmi. Tavsiya: 1200x800px"
+    )
+    caption = models.CharField("Sarlavha", max_length=255, blank=True)
+    order = models.PositiveIntegerField("Tartib", default=0)
+
+    class Meta:
+        verbose_name = "Diler rasmi"
+        verbose_name_plural = "Diler rasmlari"
+        ordering = ['order']
+
+    def __str__(self):
+        return f"{self.dealer.name} — rasm #{self.order}"
 
 
 # ========== 08. ОТЗЫВЫ КЛИЕНТОВ ==========

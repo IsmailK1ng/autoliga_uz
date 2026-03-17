@@ -75,7 +75,11 @@ class ParameterCategoryTranslationOptions(TranslationOptions):
 # ========== DILERLAR ==========
 @register(Dealer)
 class DealerTranslationOptions(TranslationOptions):
-    fields = ('name', 'address', 'working_hours')
+    fields = ('name', 'address', 'working_hours', 'description')
+
+@register(DealerImage)
+class DealerImageTranslationOptions(TranslationOptions):
+    fields = ('caption',)
 
 # ========== КОМАНДА ==========
 @register(BranchManager)

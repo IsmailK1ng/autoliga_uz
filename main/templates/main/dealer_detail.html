@@ -1,0 +1,265 @@
+{% extends "base.html" %}
+{% load static %}
+{% load static seo_tags %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/breadcrumbs.css' %}">
+<link rel="stylesheet" href="{% static 'css/dealer_detail.css' %}">
+{% endblock extra_css %}
+
+{% block title %}
+    {{ dealer.name }} - Autoliga Uzbekistan
+{% endblock title %}
+
+{% block content %}
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-M33GWKMW" height="0" width="0"
+            style="display:none;visibility:hidden"></iframe></noscript>
+
+    {% include 'main/includes/header.html' %}
+    <div class="mxd-block loading-wrap"></div>
+
+    <!-- Breadcrumbs -->
+    <div class="mxd-section-filter pre-grid">
+        <div class="mxd-section-filter__inner animate-card-3">
+            <div class="mxd-grid-item-1">
+                <div class="section-filter">
+                    <div aria-label="breadcrumb">
+                        <ol class="breadcrumb-ol">
+                            <li><a href="{% url 'home' %}">{% if LANGUAGE_CODE == 'uz' %}Bosh sahifa{% elif LANGUAGE_CODE == 'ru' %}Главная{% else %}Home{% endif %}</a></li>
+                            <li><a href="{% url 'dealers' %}">{% if LANGUAGE_CODE == 'uz' %}Dilerlar{% elif LANGUAGE_CODE == 'ru' %}Дилеры{% else %}Dealers{% endif %}</a></li>
+                            <li class="active"><a href="">{{ dealer.name }}</a></li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dealer Detail Section -->
+    <div class="mxd-section padding-default dealer-detail-section">
+        <div class="mxd-container">
+
+            <!-- Hero: Name + Address -->
+            <div class="dd-hero">
+                <div class="dd-hero-info">
+                    {% if dealer.logo %}
+                        <img src="{{ dealer.logo.url }}" alt="{{ dealer.name }}" class="dd-hero-logo">
+                    {% endif %}
+                    <div>
+                        <h1 class="dd-hero-title">{{ dealer.name }}</h1>
+                        {% if dealer.address %}
+                            <p class="dd-hero-address"><i class="ph ph-map-pin"></i> {{ dealer.address }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="dd-hero-actions">
+                    {% if dealer.phone %}
+                        <a href="tel:{{ dealer.phone|cut:' ' }}" class="dd-btn dd-btn-primary">
+                            <i class="ph ph-phone"></i>
+                            <span>{{ dealer.phone }}</span>
+                        </a>
+                    {% endif %}
+                    <div class="dd-hero-socials">
+                        {% if dealer.instagram %}
+                            <a href="{{ dealer.instagram }}" target="_blank" rel="noopener noreferrer" class="dd-social-link"><i class="ph ph-instagram-logo"></i></a>
+                        {% endif %}
+                        {% if dealer.telegram %}
+                            <a href="{{ dealer.telegram }}" target="_blank" rel="noopener noreferrer" class="dd-social-link"><i class="ph ph-telegram-logo"></i></a>
+                        {% endif %}
+                        {% if dealer.facebook %}
+                            <a href="{{ dealer.facebook }}" target="_blank" rel="noopener noreferrer" class="dd-social-link"><i class="ph ph-facebook-logo"></i></a>
+                        {% endif %}
+                        {% if dealer.youtube %}
+                            <a href="{{ dealer.youtube }}" target="_blank" rel="noopener noreferrer" class="dd-social-link"><i class="ph ph-youtube-logo"></i></a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Gallery -->
+            {% if images %}
+            <div class="dd-section">
+                <h2 class="dd-section-title">
+                    {% if LANGUAGE_CODE == 'uz' %}Fotogalereya{% elif LANGUAGE_CODE == 'ru' %}Фотогалерея{% else %}Photo Gallery{% endif %}
+                </h2>
+                <div class="dd-gallery">
+                    <div class="dd-gallery-main">
+                        <img src="{{ images.0.image.url }}" alt="{{ images.0.caption|default:dealer.name }}" id="galleryMainImg" class="dd-gallery-main-img">
+                    </div>
+                    {% if images|length > 1 %}
+                    <div class="dd-gallery-thumbs">
+                        {% for img in images %}
+                        <div class="dd-gallery-thumb {% if forloop.first %}active{% endif %}" data-src="{{ img.image.url }}">
+                            <img src="{{ img.image.url }}" alt="{{ img.caption|default:dealer.name }}">
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Info + Team Grid -->
+            <div class="dd-content-grid">
+
+                <!-- Left: Info Cards -->
+                <div class="dd-info-left">
+                    {% if dealer.description %}
+                    <div class="dd-card">
+                        <h3 class="dd-card-title">
+                            <i class="ph ph-info"></i>
+                            {% if LANGUAGE_CODE == 'uz' %}Biz haqimizda{% elif LANGUAGE_CODE == 'ru' %}О нас{% else %}About Us{% endif %}
+                        </h3>
+                        <p class="dd-card-text">{{ dealer.description|linebreaksbr }}</p>
+                    </div>
+                    {% endif %}
+
+                    <div class="dd-card">
+                        <h3 class="dd-card-title">
+                            <i class="ph ph-clock"></i>
+                            {% if LANGUAGE_CODE == 'uz' %}Ish vaqti{% elif LANGUAGE_CODE == 'ru' %}Время работы{% else %}Working Hours{% endif %}
+                        </h3>
+                        {% if dealer.working_hours %}
+                            <p class="dd-card-text dd-hours">{{ dealer.working_hours }}</p>
+                        {% else %}
+                            <p class="dd-card-text dd-hours-muted">
+                                {% if LANGUAGE_CODE == 'uz' %}Ma'lumot kiritilmagan{% elif LANGUAGE_CODE == 'ru' %}Не указано{% else %}Not specified{% endif %}
+                            </p>
+                        {% endif %}
+                    </div>
+
+                    <div class="dd-card">
+                        <h3 class="dd-card-title">
+                            <i class="ph ph-map-pin"></i>
+                            {% if LANGUAGE_CODE == 'uz' %}Manzil{% elif LANGUAGE_CODE == 'ru' %}Адрес{% else %}Address{% endif %}
+                        </h3>
+                        {% if dealer.address %}
+                            <p class="dd-card-text">{{ dealer.address }}</p>
+                        {% endif %}
+                        {% if dealer.phone %}
+                            <p class="dd-card-text dd-phone-row">
+                                <i class="ph ph-phone"></i>
+                                <a href="tel:{{ dealer.phone|cut:' ' }}">{{ dealer.phone }}</a>
+                            </p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Right: Team -->
+                {% if managers %}
+                <div class="dd-info-right">
+                    <h3 class="dd-card-title dd-team-title">
+                        <i class="ph ph-users-three"></i>
+                        {% if LANGUAGE_CODE == 'uz' %}Bizning jamoa{% elif LANGUAGE_CODE == 'ru' %}Наша команда{% else %}Our Team{% endif %}
+                    </h3>
+                    <div class="dd-team-grid">
+                        {% for m in managers %}
+                        <div class="dd-team-card" data-name="{{ m.full_name }}" data-position="{{ m.position }}" data-phone="{{ m.phone }}" data-photo="{{ m.photo.url }}">
+                            <img src="{{ m.photo.url }}" alt="{{ m.full_name }}" class="dd-team-photo">
+                            <div class="dd-team-info">
+                                <h4 class="dd-team-name">{{ m.full_name }}</h4>
+                                <p class="dd-team-position">{{ m.position }}</p>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+
+            </div>
+
+            <!-- Team Modal -->
+            {% if managers %}
+            <div class="dd-modal" id="teamModal">
+                <div class="dd-modal-content">
+                    <button class="dd-modal-close" id="modalClose">&times;</button>
+                    <div class="dd-modal-body">
+                        <div class="dd-modal-photo-wrap">
+                            <img src="" alt="" class="dd-modal-photo" id="modalPhoto">
+                        </div>
+                        <div class="dd-modal-info">
+                            <h3 class="dd-modal-name" id="modalName"></h3>
+                            <p class="dd-modal-position" id="modalPosition"></p>
+                            <a href="#" class="dd-modal-phone-btn" id="modalPhoneBtn">
+                                <i class="ph ph-phone"></i>
+                                <span id="modalPhone"></span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Back Button -->
+            <div class="dd-back">
+                <a href="{% url 'dealers' %}" class="dd-back-btn">
+                    <i class="ph ph-arrow-left"></i>
+                    {% if LANGUAGE_CODE == 'uz' %}Barcha dilerlar{% elif LANGUAGE_CODE == 'ru' %}Все дилеры{% else %}All Dealers{% endif %}
+                </a>
+            </div>
+
+        </div>
+    </div>
+
+    {% include 'main/includes/footer.html' %}
+
+    <a href="#0" id="to-top" class="btn btn-to-top slide-up anim-no-delay">
+        <i class="ph ph-arrow-up"></i>
+    </a>
+
+    <script src="{% static 'js/libs.min.js' %}"></script>
+    <script src="{% static 'js/app.js' %}"></script>
+    <script src="{% static 'js/error-logger.js' %}"></script>
+    <script src="{% static 'js/main-setting.js' %}"></script>
+
+    <script>
+    (function() {
+        // ── Gallery ──────────────────────────────
+        const mainImg = document.getElementById('galleryMainImg');
+        if (mainImg) {
+            document.querySelectorAll('.dd-gallery-thumb').forEach(thumb => {
+                thumb.addEventListener('click', function() {
+                    document.querySelectorAll('.dd-gallery-thumb').forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    mainImg.src = this.dataset.src;
+                });
+            });
+        }
+
+        // ── Team Modal ──────────────────────────
+        const modal = document.getElementById('teamModal');
+        if (modal) {
+            document.querySelectorAll('.dd-team-card').forEach(card => {
+                card.addEventListener('click', function() {
+                    document.getElementById('modalPhoto').src = this.dataset.photo;
+                    document.getElementById('modalName').textContent = this.dataset.name;
+                    document.getElementById('modalPosition').textContent = this.dataset.position;
+                    const phoneBtn = document.getElementById('modalPhoneBtn');
+                    const phoneText = document.getElementById('modalPhone');
+                    if (this.dataset.phone) {
+                        phoneBtn.href = 'tel:' + this.dataset.phone.replace(/\s/g, '');
+                        phoneText.textContent = this.dataset.phone;
+                        phoneBtn.style.display = 'inline-flex';
+                    } else {
+                        phoneBtn.style.display = 'none';
+                    }
+                    modal.style.display = 'flex';
+                    document.body.style.overflow = 'hidden';
+                });
+            });
+
+            document.getElementById('modalClose').addEventListener('click', closeModal);
+            modal.addEventListener('click', function(e) {
+                if (e.target === modal) closeModal();
+            });
+
+            function closeModal() {
+                modal.style.display = 'none';
+                document.body.style.overflow = '';
+            }
+        }
+
+    })();
+    </script>
+
+{% endblock content %}

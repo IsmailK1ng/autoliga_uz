@@ -13,7 +13,7 @@ from django.http import HttpResponseRedirect
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.throttling import AnonRateThrottle
 from .models import (
-    News, ContactForm, JobApplication, Vacancy, Product, ProductCategory, Dealer, Review, TestDriveRequest, BranchManager
+    News, ContactForm, JobApplication, Vacancy, Product, ProductCategory, Dealer, DealerImage, Review, TestDriveRequest, BranchManager
 )
 from .serializers import (
     NewsSerializer, ContactFormSerializer, JobApplicationSerializer,
@@ -173,6 +173,7 @@ def dealers(request):
             'logo': d.logo.url if d.logo else '',
             'lat': float(d.latitude) if d.latitude else None,
             'lng': float(d.longitude) if d.longitude else None,
+            'detail_url': d.get_absolute_url(),
         })
     return render(request, 'main/dealers.html', {
         'dealers_json': json.dumps(dealers_data, ensure_ascii=False),
@@ -187,6 +188,23 @@ def team(request):
     ).prefetch_related('managers').distinct().order_by('order', 'name')
     return render(request, 'main/team.html', {
         'dealers': dealers_with_managers,
+    })
+
+
+def dealer_detail(request, pk):
+    """Diler markazi batafsil sahifasi"""
+    dealer = get_object_or_404(
+        Dealer.objects.prefetch_related('images', 'managers'),
+        pk=pk,
+        is_active=True
+    )
+    images = dealer.images.all().order_by('order')
+    managers = dealer.managers.filter(is_active=True).order_by('order', 'full_name')
+
+    return render(request, 'main/dealer_detail.html', {
+        'dealer': dealer,
+        'images': images,
+        'managers': managers,
     })
 
 

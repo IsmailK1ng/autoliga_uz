@@ -102,6 +102,10 @@
                                     <i class="ph ph-clock"></i><span></span>
                                 </div>
                                 <div class="dealer-card-socials" id="cardSocials"></div>
+                                <a href="#" class="dealer-card-detail-link" id="cardDetailLink">
+                                    {% if LANGUAGE_CODE == 'uz' %}Batafsil{% elif LANGUAGE_CODE == 'ru' %}Подробнее{% else %}Details{% endif %}
+                                    <i class="ph ph-arrow-right"></i>
+                                </a>
                             </div>
                         </div>
                     </div>
@@ -501,6 +505,7 @@
                         ${dealer.phone ? `<div class="mob-dealer-detail-row"><i class="ph ph-phone"></i><a href="tel:${dealer.phone.replace(/\s/g,'')}">${dealer.phone}</a></div>` : ''}
                         ${dealer.working_hours ? `<div class="mob-dealer-detail-row"><i class="ph ph-clock"></i><span>${dealer.working_hours}</span></div>` : ''}
                         ${buildSocialsHtml(dealer)}
+                        ${dealer.detail_url ? `<a href="${dealer.detail_url}" class="mob-dealer-detail-link">{% if LANGUAGE_CODE == 'uz' %}Batafsil{% elif LANGUAGE_CODE == 'ru' %}Подробнее{% else %}Details{% endif %} <i class="ph ph-arrow-right"></i></a>` : ''}
                     </div>`;
 
                 item.querySelector('.mob-dealer-item-header').addEventListener('click', () => {
@@ -587,6 +592,14 @@
                     socials.appendChild(a);
                 }
             });
+
+            const detailLink = document.getElementById('cardDetailLink');
+            if (dealer.detail_url) {
+                detailLink.href = dealer.detail_url;
+                detailLink.style.display = 'inline-flex';
+            } else {
+                detailLink.style.display = 'none';
+            }
 
             card.classList.remove('hidden');
             card.style.display = 'block';

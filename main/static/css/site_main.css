@@ -1315,15 +1315,26 @@ body:not([data-theme]) .language-option:hover {
     }
 }
 
-.faw-bg {
-    position: absolute;
-    border-top-left-radius: 40px;
-    border-top-right-radius: 40px;
-    overflow: hidden;
-    left: 0;
-    top: 0;
+/* ===== FAW Slider Section ===== */
+:root {
+    --faw-slide-duration: 0.65s;
+    --faw-slide-opacity-duration: 0.4s;
+}
+
+.faw-slider-section {
+    position: relative;
     width: 100%;
-    height: 380px;
+    overflow: hidden;
+    border-radius: 28px;
+}
+
+/* Background */
+.faw-slider-section > .faw-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
     z-index: 0;
 }
 
@@ -1334,839 +1345,593 @@ body:not([data-theme]) .language-option:hover {
     object-position: center;
 }
 
-:root {
-    --faw-slide-duration: 0.65s;
-    --faw-slide-opacity-duration: 0.4s;
-    --faw-slide-img-duration: var(--faw-slide-duration);
-}
-
-.faw-slider-container {
-    z-index: 1;
-    margin: 0 auto;
-    padding-top: 220px;
-    background: transparent;
-}
-
-.faw-slider-main {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    min-height: 320px;
-    width: 100%;
-}
-
-.faw-slider-arrow {
-    background: rgb(0, 0, 0);
-    border: none;
+/* Arrows — absolute on section edges */
+.faw-slider-section > .faw-slider-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 20;
+    background: rgba(255, 255, 255, 0.30);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 2px solid rgba(255, 255, 255, 0.45);
     border-radius: 50%;
-    width: 48px;
-    height: 48px;
-    font-size: 3rem;
-    color: #ffffff;
+    width: 52px;
+    height: 52px;
+    color: #444;
     cursor: pointer;
-    box-shadow: 0 0px 15px 10px aliceblue;
-    transition: background 0.18s;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding-bottom: 5px;
-    margin: 0 18px;
-    z-index: 2;
-    position: relative;
+    transition: background 0.2s, transform 0.2s;
+    padding: 0;
 }
 
-.right-btn {
-    z-index: 1;
+.faw-slider-arrow.left-btn {
+    left: 20px;
 }
 
-.right-btn::before {
-    content: "";
-    position: absolute;
-    top: -250px;
-    background: #ff131300;
-    width: 1000%;
-    height: 800%;
-    z-index: -1;
+.faw-slider-arrow.right-btn {
+    right: 20px;
 }
 
-.left-btn {
-    z-index: 1;
-}
-
-.left-btn::before {
-    content: "";
-    position: absolute;
-    top: -250px;
-    background: #ff131300;
-    width: 1000%;
-    height: 800%;
-    z-index: -1;
+.faw-slider-arrow:hover {
+    background: rgba(255, 255, 255, 0.55);
+    transform: translateY(-50%) scale(1.06);
 }
 
 .faw-slider-arrow:disabled {
-    opacity: 0.45;
+    opacity: 0.3;
     pointer-events: none;
 }
 
-.faw-slider-images {
+/* Inner content — flex row */
+.faw-slider-inner {
     position: relative;
-    width: 720px;
-    height: 225px;
-    /* увеличено с 150px до 225px */
-    overflow: visible;
-    display: flex;
-    align-items: flex-end;
-    justify-content: center;
-}
-
-.faw-slide {
-    position: absolute;
-    bottom: 0;
-    left: 50%;
-    opacity: 0;
     z-index: 1;
-    transition:
-        transform var(--faw-slide-duration, 0.65s) cubic-bezier(0.5, 0, 0.25, 1),
-        opacity var(--faw-slide-opacity-duration, 0.36s);
-    pointer-events: none;
-    filter: none;
-}
-
-.faw-slide img,
-.faw-slide svg {
-    width: 100%;
-    height: auto;
-    display: block;
-    transition: transform var(--faw-slide-img-duration, 300ms) ease;
-}
-
-.faw-slide.center {
-    width: 100%;
-    height: 225px;
-    transition: all var(--faw-slide-duration, 0.65s) cubic-bezier(0.25, 0.46, 0.45, 0.94);
-    transform: translateX(-50%) translateY(-60%) scale(1);
-    z-index: 3;
-    opacity: 1;
-    pointer-events: auto;
-    filter: none;
-}
-
-.faw-slide.left {
-    width: 210px;
-    height: 110px;
-    transform: translateX(-280%) translateY(-60%) scale(0.85) perspective(500px) rotateY(17deg);
-    z-index: 2;
-    opacity: 0.85;
-    /* исправлено с 1.65 на 0.65 */
-    filter: blur(0.5px) grayscale(18%);
-    transition: all var(--faw-slide-duration, 0.65s) cubic-bezier(0.25, 0.46, 0.45, 0.94);
-}
-
-.faw-slide.right {
-    width: 210px;
-    height: 110px;
-    transform: translateX(180%) translateY(-60%) scale(0.85) perspective(500px) rotateY(-17deg);
-    z-index: 2;
-    opacity: 0.85;
-    /* исправлено с 1.65 на 0.65 */
-    filter: blur(0.5px) grayscale(18%);
-    transition: all var(--faw-slide-duration, 0.65s) cubic-bezier(0.25, 0.46, 0.45, 0.94);
-}
-
-.faw-slide.transitioning {
-    transition:
-        transform var(--faw-slide-duration, 0.65s) cubic-bezier(0.5, 0, 0.25, 1),
-        opacity var(--faw-slide-opacity-duration, 0.36s) cubic-bezier(0.5, 0, 0.25, 1);
-}
-
-/* Анимации движения как у FAW */
-.faw-slide.moving-left {
-    transform: translateX(-280%) translateY(-60%) scale(0.85) perspective(500px) rotateY(17deg) !important;
-    opacity: 0.65 !important;
-    width: 210px !important;
-    height: 110px !important;
-    transition: all var(--faw-slide-duration, 0.65s) cubic-bezier(0.25, 0.46, 0.45, 0.94) !important;
-}
-
-.faw-slide.moving-right {
-    transform: translateX(180%) translateY(-60%) scale(0.85) perspective(500px) rotateY(-17deg) !important;
-    opacity: 0.65 !important;
-    width: 210px !important;
-    height: 110px !important;
-    transition: all var(--faw-slide-duration, 0.65s) cubic-bezier(0.25, 0.46, 0.45, 0.94) !important;
-}
-
-
-.faw-slide.moving-center {
-    transform: translateX(-50%) translateY(-60%) scale(1) !important;
-    opacity: 1 !important;
-    width: 100% !important;
-    height: 225px !important;
-    z-index: 3 !important;
-    filter: none !important;
-    transition: all var(--faw-slide-duration, 0.65s) cubic-bezier(0.25, 0.46, 0.45, 0.94) !important;
-}
-
-.faw-slide.moving-right-in {
-    transform: translateX(180%) translateY(-60%) scale(0.85) perspective(500px) rotateY(-17deg) !important;
-    transition: all var(--faw-slide-duration, 0.65s) cubic-bezier(0.25, 0.46, 0.45, 0.94) !important;
-}
-
-.faw-slide.moving-left-in {
-    transform: translateX(-280%) translateY(-60%) scale(0.85) perspective(500px) rotateY(17deg) !important;
-    transition: all var(--faw-slide-duration, 0.65s) cubic-bezier(0.25, 0.46, 0.45, 0.94) !important;
-}
-
-.faw-slider-info {
-    padding: 20px 16px 40px 16px;
+    display: flex;
+    align-items: center;
+    gap: 30px;
+    max-width: 1400px;
     margin: 0 auto;
-    max-width: 700px;
-    text-align: center;
+    padding: 60px 90px;
+    min-height: 520px;
     box-sizing: border-box;
-    margin-bottom: 10px;
+}
+
+/* Left — info card */
+.faw-slider-section .faw-slider-info {
+    flex: 0 0 400px;
+    max-width: 400px;
+    z-index: 5;
+}
+
+/* Glass card */
+.faw-info-card {
+    background: rgba(255, 255, 255, 0.65);
+    backdrop-filter: blur(28px);
+    -webkit-backdrop-filter: blur(28px);
+    border-radius: 24px;
+    border: 1px solid rgba(255, 255, 255, 0.55);
+    padding: 34px 30px 30px;
+    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.07);
 }
 
 .faw-title {
-    font-size: 3.5rem;
-    font-weight: bold;
-    color: #172d43;
-    letter-spacing: .5px;
+    font-size: 2.3rem;
+    font-weight: 800;
+    color: #111;
+    letter-spacing: 0.4px;
+    margin: 0 0 2px;
+    line-height: 1.15;
 }
 
 .faw-year {
-    font-size: 3rem;
-    color: #222;
-    margin-bottom: 2px;
+    font-size: 1.5rem;
+    color: #444;
+    margin-bottom: 18px;
+    font-weight: 500;
 }
 
-.faw-price-label,
-.faw-power-label,
-.faw-mpg-label,
-.faw-spec-label {
+.faw-price-section {
+    border-top: 1px solid rgba(0, 0, 0, 0.08);
+    padding-top: 14px;
+    margin-bottom: 18px;
+}
+
+.faw-price-label {
     display: block;
-    font-size: 1.1rem;
-    color: #999;
-    margin-bottom: 6px;
+    font-size: 1rem;
+    color: #777;
     font-weight: 600;
     letter-spacing: 1.5px;
     text-transform: uppercase;
+    margin-bottom: 4px;
 }
 
 .faw-price-value {
-    font-size: 2.5rem;
-    color: #000;
-    font-weight: bold;
+    font-size: 2rem;
+    color: #111;
+    font-weight: 800;
+    line-height: 1.2;
 }
 
-/* New spec cards */
-.faw-specs-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 16px;
-    margin: 28px auto;
-    max-width: 620px;
+/* Spec boxes */
+.faw-specs-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 22px;
 }
 
-.faw-spec-card {
-    background: #f7f8fa;
-    border-radius: 16px;
-    padding: 20px 16px;
-    text-align: center;
-    transition: transform 0.2s, box-shadow 0.2s;
-    border: 1px solid rgba(0,0,0,0.06);
-}
-
-.faw-spec-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+.faw-spec-box {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(255, 255, 255, 0.65);
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    border-radius: 14px;
+    padding: 12px 14px;
 }
 
 .faw-spec-icon {
-    width: 44px;
-    height: 44px;
-    border-radius: 12px;
+    width: 42px;
+    height: 42px;
+    border-radius: 11px;
     background: #e8f0fe;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin: 0 auto 12px;
+    flex-shrink: 0;
     color: #003e7d;
 }
 
+.faw-spec-icon svg,
+.faw-spec-icon img {
+    width: 22px;
+    height: 22px;
+    object-fit: contain;
+}
+
+/* Ikonlar oq rangda — light rejimda qora qilamiz */
+.faw-spec-icon img {
+    filter: brightness(0);
+}
+
+.faw-spec-label {
+    display: block;
+    font-size: 0.82rem;
+    color: #888;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 1px;
+}
+
 .faw-spec-value {
-    font-size: 1.5rem;
+    font-size: 1.3rem;
     font-weight: 700;
     color: #172d43;
     line-height: 1.2;
 }
 
-.faw-spec-price {
-    color: #000;
+/* Detail button */
+.faw-btn-detail {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: #f66e2e;
+    color: #fff;
+    border: none;
+    border-radius: 14px;
+    font-size: 1.35rem;
+    padding: 14px 34px;
+    cursor: pointer;
+    font-weight: 700;
+    text-decoration: none;
+    transition: background 0.2s, transform 0.15s;
+    letter-spacing: 0.3px;
 }
 
-.faw-spec-power,
-.faw-spec-mpg {
-    color: #003e7d;
+.faw-btn-detail:hover {
+    background: #e05a1a;
+    transform: translateY(-2px);
+    color: #fff;
 }
 
-/* Responsive: slider adjustments */
-@media (max-width: 1300px) {
-
-    /* Slightly reduce center image and bring side slides closer */
-    .faw-slide.center {
-        height: 215px;
-        transform: translateX(-50%) translateY(-58%) scale(0.8);
-    }
-
-    .faw-slide.left {
-        width: 190px;
-        height: 100px;
-        transform: translateX(-245%) translateY(-58%) scale(0.88) perspective(460px) rotateY(15deg);
-        opacity: 0.9;
-    }
-
-    .faw-slide.right {
-        width: 190px;
-        height: 100px;
-        transform: translateX(145%) translateY(-58%) scale(0.88) perspective(460px) rotateY(-15deg);
-        opacity: 0.9;
-    }
-
-    /* Hide arrows visually (but keep in DOM for accessibility/keyboard) */
-    .faw-slider-arrow {
-        opacity: 0;
-        transition: opacity 0.25s ease;
-    }
-
-    /* Ensure moving classes animate to the adjusted positions on <=1300px */
-    .faw-slide.moving-left {
-        transform: translateX(-245%) translateY(-58%) scale(0.88) perspective(460px) rotateY(15deg) !important;
-        width: 190px !important;
-        height: 100px !important;
-    }
-
-    .faw-slide.moving-right {
-        transform: translateX(145%) translateY(-58%) scale(0.88) perspective(460px) rotateY(-15deg) !important;
-        width: 190px !important;
-        height: 100px !important;
-    }
-
-    .faw-slide.moving-center {
-        transform: translateX(-50%) translateY(-58%) scale(0.8) !important;
-        height: 215px !important;
-        width: 100% !important;
-    }
+.faw-btn-detail span {
+    font-size: 1.5rem;
+    font-weight: 400;
 }
 
-@media (max-width: 991px) {
-    .faw-slider-images {
-        width: 520px;
-        height: 190px;
-    }
-
-    .faw-slide.center {
-        height: 190px;
-        transform: translateX(-50%) translateY(-55%) scale(1);
-    }
-
-    .faw-slide.left,
-    .faw-slide.right {
-        width: 160px;
-        height: 90px;
-        transform: translateY(-55%) scale(0.85);
-    }
-
-    .faw-slide.left {
-        transform: translateX(-240%) translateY(-55%) scale(0.85) perspective(420px) rotateY(14deg);
-    }
-
-    .faw-slide.right {
-        transform: translateX(140%) translateY(-55%) scale(0.85) perspective(420px) rotateY(-14deg);
-    }
-
-    .faw-slider-arrow {
-        width: 42px;
-        height: 42px;
-        font-size: 2.4rem;
-        margin: 0 12px;
-    }
-
-    /* Ensure moving classes animate to the same positions/sizes on <=991px */
-    .faw-slide.moving-left {
-        transform: translateX(-240%) translateY(-55%) scale(0.85) perspective(420px) rotateY(14deg) !important;
-        opacity: 0.65 !important;
-        width: 160px !important;
-        height: 90px !important;
-        transition: all var(--faw-slide-duration, 0.65s) cubic-bezier(0.25, 0.46, 0.45, 0.94) !important;
-    }
-
-    .faw-slide.moving-right {
-        transform: translateX(140%) translateY(-55%) scale(0.85) perspective(420px) rotateY(-14deg) !important;
-        opacity: 0.65 !important;
-        width: 160px !important;
-        height: 90px !important;
-        transition: all var(--faw-slide-duration, 0.65s) cubic-bezier(0.25, 0.46, 0.45, 0.94) !important;
-    }
-
-    .faw-slide.moving-center {
-        transform: translateX(-50%) translateY(-55%) scale(1) !important;
-        opacity: 1 !important;
-        width: 100% !important;
-        height: 190px !important;
-        z-index: 3 !important;
-        transition: all var(--faw-slide-duration, 0.65s) cubic-bezier(0.25, 0.46, 0.45, 0.94) !important;
-    }
+/* Right — car image */
+.faw-slider-car {
+    flex: 1;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 380px;
 }
 
-/*
-   Переносим эти резкие уменьшения на меньшие экраны.
-   Ранее блок был на 900px — из-за этого при ширинах ~900px элементы становились очень маленькими.
-   Меняем на 768px: между 769px и 900px дизайн будет как для планшета/десктопа, а сильное сжатие включится только ниже 768px.
-*/
-@media (max-width: 768px) {
-    .faw-slider-container {
-        max-width: 99vw;
-        padding-top: 120px;
-    }
-
-    .faw-slider-main {
-        min-height: 260px;
-    }
-
-    .faw-bg {
-        height: 315px;
-    }
-
-    .faw-slider-images {
-        width: 97vw;
-        max-width: 99vw;
-        height: 190px;
-    }
-
-    /* Для экранов <=768: сделать центральную карточку крупнее (поведение похоже на мобильном, но центр увеличен) */
-    .faw-slide.center {
-        width: 100% !important;
-        height: 190px !important;
-        transform: translateX(-50%) translateY(-50%) scale(1) !important;
-        opacity: 1 !important;
-        pointer-events: auto !important;
-    }
-
-    /* Скрываем боковые слайды за экраном, но оставляем их кликабельными — поведение как на мобильных */
-    .faw-slide.left {
-        opacity: 0 !important;
-        pointer-events: auto !important;
-        visibility: visible !important;
-        transform: translateX(-120vw) translateY(-50%) scale(0.8) !important;
-        width: 108px !important;
-        height: 54px !important;
-    }
-
-    .faw-slide.right {
-        opacity: 0 !important;
-        pointer-events: auto !important;
-        visibility: visible !important;
-        transform: translateX(120vw) translateY(-50%) scale(0.8) !important;
-        width: 108px !important;
-        height: 54px !important;
-    }
-
-    /* Переопределяем поведение moving-* для экранов <=768, чтобы слайды въезжали корректно */
-    .faw-slider-images .faw-slide.moving-left {
-        transform: translateX(-30vw) translateY(-28%) scale(0.85) perspective(420px) rotateY(14deg) !important;
-        opacity: 0.1 !important;
-        width: 108px !important;
-        height: 54px !important;
-        transition: all var(--faw-slide-duration, 0.65s) cubic-bezier(0.25, 0.46, 0.45, 0.94) !important;
-    }
-
-    .faw-slider-images .faw-slide.moving-right {
-        transform: translateX(20vw) translateY(-28%) scale(0.85) perspective(420px) rotateY(-14deg) !important;
-        opacity: 0.1 !important;
-        width: 108px !important;
-        height: 54px !important;
-        transition: all var(--faw-slide-duration, 0.65s) cubic-bezier(0.25, 0.46, 0.45, 0.94) !important;
-    }
-
-    .faw-slider-images .faw-slide.moving-center {
-        transform: translateX(-50%) translateY(-28%) scale(1) !important;
-        opacity: 1 !important;
-        width: 100% !important;
-        height: 190px !important;
-        z-index: 3 !important;
-        transition: all var(--faw-slide-duration, 0.65s) cubic-bezier(0.25, 0.46, 0.45, 0.94) !important;
-    }
-
-    .faw-slider-images .faw-slide.moving-right-in {
-        transform: translateX(120vw) translateY(-28%) scale(0.8) perspective(420px) rotateY(-14deg) !important;
-        opacity: 0 !important;
-        transition: all var(--faw-slide-duration, 0.65s) cubic-bezier(0.25, 0.46, 0.45, 0.94) !important;
-    }
-
-    .faw-slider-images .faw-slide.moving-left-in {
-        transform: translateX(-120vw) translateY(-28%) scale(0.8) perspective(420px) rotateY(14deg) !important;
-        opacity: 0 !important;
-        transition: all var(--faw-slide-duration, 0.65s) cubic-bezier(0.25, 0.46, 0.45, 0.94) !important;
-    }
-
-    .faw-slider-info {
-        padding: 18px 2vw 28px 2vw;
-        max-width: 99vw;
-    }
-
-    .faw-title {
-        font-size: 2rem;
-    }
+.faw-slider-images {
+    position: relative;
+    width: 100%;
+    height: 380px;
 }
 
-@media (max-width: 730px) {
-    .faw-slider-main {
-        justify-content: center;
+.faw-slide {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity var(--faw-slide-opacity-duration, 0.4s) ease,
+                transform var(--faw-slide-duration, 0.65s) cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    pointer-events: none;
+}
+
+.faw-slide img,
+.faw-slide svg {
+    max-width: 100%;
+    max-height: 380px;
+    width: auto;
+    height: auto;
+    display: block;
+    object-fit: contain;
+}
+
+.faw-slide.center {
+    opacity: 1;
+    z-index: 3;
+    pointer-events: auto;
+    transform: translateX(0) scale(1);
+}
+
+.faw-slide.left {
+    opacity: 0;
+    z-index: 1;
+    transform: translateX(-100%) scale(0.85);
+}
+
+.faw-slide.right {
+    opacity: 0;
+    z-index: 1;
+    transform: translateX(100%) scale(0.85);
+}
+
+/* Animation classes */
+.faw-slide.moving-center {
+    opacity: 1 !important;
+    z-index: 3 !important;
+    transform: translateX(0) scale(1) !important;
+    transition: all var(--faw-slide-duration, 0.65s) cubic-bezier(0.25, 0.46, 0.45, 0.94) !important;
+}
+
+.faw-slide.moving-left {
+    opacity: 0 !important;
+    transform: translateX(-100%) scale(0.85) !important;
+    transition: all var(--faw-slide-duration, 0.65s) cubic-bezier(0.25, 0.46, 0.45, 0.94) !important;
+}
+
+.faw-slide.moving-right {
+    opacity: 0 !important;
+    transform: translateX(100%) scale(0.85) !important;
+    transition: all var(--faw-slide-duration, 0.65s) cubic-bezier(0.25, 0.46, 0.45, 0.94) !important;
+}
+
+.faw-slide.moving-left-in {
+    opacity: 0 !important;
+    transform: translateX(-100%) scale(0.85) !important;
+    transition: all var(--faw-slide-duration, 0.65s) cubic-bezier(0.25, 0.46, 0.45, 0.94) !important;
+}
+
+.faw-slide.moving-right-in {
+    opacity: 0 !important;
+    transform: translateX(100%) scale(0.85) !important;
+    transition: all var(--faw-slide-duration, 0.65s) cubic-bezier(0.25, 0.46, 0.45, 0.94) !important;
+}
+
+/* ===== Responsive ===== */
+
+@media (max-width: 1200px) {
+    .faw-slider-inner {
+        padding: 50px 80px;
+        gap: 24px;
     }
 
-    .faw-slider-images {
-        width: calc(100% - 40px);
+    .faw-slider-section .faw-slider-info {
+        flex: 0 0 360px;
         max-width: 360px;
-        height: 300px;
-        margin: 0 auto;
-    }
-
-    /* На мобильных: показываем центральный слайд, но боковые остаются за экраном
-       — важное изменение: не прячем боковые слайды полностью (чтобы анимация работала
-       корректно и клики по ним можно было перехватить). Вместо visibility:hidden
-       перемещаем их off-canvas и оставляем pointer-events для обработки кликов. */
-
-    .faw-slide.left {
-        /* левый слайд уходит влево за предел экрана (viewport-relative) */
-        opacity: 0 !important;
-        pointer-events: auto !important;
-        visibility: visible !important;
-        transform: translateX(-120vw) translateY(-50%) scale(0.8) !important;
-        width: 108px !important;
-        height: 54px !important;
-    }
-
-    .faw-slide.right {
-        /* правый слайд уходит вправо за предел экрана (viewport-relative) */
-        opacity: 0 !important;
-        pointer-events: auto !important;
-        visibility: visible !important;
-        transform: translateX(120vw) translateY(-50%) scale(0.8) !important;
-        width: 108px !important;
-        height: 54px !important;
-    }
-
-    /* Центр остаётся видимым */
-    .faw-slide.center {
-        width: 100% !important;
-        height: 160px !important;
-        transform: translateX(-50%) translateY(-50%) scale(1.2) !important;
-        opacity: 1 !important;
-        pointer-events: auto !important;
-    }
-
-    /* Переопределяем поведение moving-* на мобильных: повышаем специфичность */
-    .faw-slider-images .faw-slide.moving-left {
-        /* видимая позиция для левого слайда при анимации (viewport-relative) */
-        transform: translateX(-30vw) translateY(-50%) scale(0.85) perspective(420px) rotateY(14deg) !important;
-        opacity: 0 !important;
-        width: 108px !important;
-        height: 54px !important;
-        transition: all var(--faw-slide-duration, 0.65s) cubic-bezier(0.25, 0.46, 0.45, 0.94) !important;
-    }
-
-    .faw-slider-images .faw-slide.moving-right {
-        /* видимая позиция для правого слайда при анимации (viewport-relative) */
-        transform: translateX(20vw) translateY(-50%) scale(0.85) perspective(420px) rotateY(-14deg) !important;
-        opacity: 0 !important;
-        width: 108px !important;
-        height: 54px !important;
-        transition: all var(--faw-slide-duration, 0.65s) cubic-bezier(0.25, 0.46, 0.45, 0.94) !important;
-    }
-
-    .faw-slider-images .faw-slide.moving-center {
-        transform: translateX(-50%) translateY(-50%) scale(1) !important;
-        opacity: 1 !important;
-        width: 100% !important;
-        height: 160px !important;
-        z-index: 3 !important;
-        transition: all var(--faw-slide-duration, 0.65s) cubic-bezier(0.25, 0.46, 0.45, 0.94) !important;
-    }
-
-    /* incoming (въезд) позиции: начинаем за пределами экрана, чтобы элементы въезжали */
-    .faw-slider-images .faw-slide.moving-right-in {
-        transform: translateX(120vw) translateY(-50%) scale(0.8) perspective(420px) rotateY(-14deg) !important;
-        opacity: 0 !important;
-        transition: all var(--faw-slide-duration, 0.65s) cubic-bezier(0.25, 0.46, 0.45, 0.94) !important;
-    }
-
-    .faw-slider-images .faw-slide.moving-left-in {
-        transform: translateX(-120vw) translateY(-50%) scale(0.8) perspective(420px) rotateY(14deg) !important;
-        opacity: 0 !important;
-        transition: all var(--faw-slide-duration, 0.65s) cubic-bezier(0.25, 0.46, 0.45, 0.94) !important;
-    }
-
-    .faw-slider-info {
-        padding: 18px 2vw 28px 2vw;
-        max-width: 99vw;
     }
 
     .faw-title {
         font-size: 2rem;
     }
-}
 
-@media (max-width: 500px) {
-
-    .faw-slide::before {
-        content: none !important;
-    }
-
-    /* КОМПАКТНЫЙ 2D СЛАЙДЕР НА ГРАНИЦЕ ФОНОВ */
-
-    .faw-bg {
-        height: 160px;
-        /* Уменьшено еще больше */
-    }
-
-    .faw-slider-container {
-        padding-top: 0px;
-        /* Убираем верхний отступ */
-        position: relative;
-        z-index: 5;
-    }
-
-    .faw-slider-images {
-        height: 120px;
-        /* Компактная высота */
-        overflow: visible;
-        /* Разрешаем выход за границы */
-        position: absolute;
-        bottom: 30px;
-        /* Позиционируем на границе фонов */
-        left: 50%;
-        transform: translateX(-50%);
-        width: 100%;
-        z-index: 10;
-        /* Машины поверх всего */
-    }
-
-    .faw-slider-main {
-        min-height: 180px !important;
-        /* Минимальная высота */
-        position: relative;
-        z-index: 10;
-        /* Слайдер поверх всего */
-    }
-
-    .faw-slider-info {
-        padding-top: 80px !important;
-        /* Отступ сверху для машины */
-        background: white;
-        position: relative;
-        z-index: 1;
-        /* Информация под машинами */
-        margin-top: 0px;
-    }
-
-    /* ЖЕСТКОЕ ПЕРЕОПРЕДЕЛЕНИЕ ВСЕХ СТИЛЕЙ ДЛЯ УСТРАНЕНИЯ ПРЫЖКОВ */
-
-    /* Базовые позиции для всех слайдов */
-    .faw-slide,
-    .faw-slide.center,
-    .faw-slide.left,
-    .faw-slide.right,
-    .faw-slider-images .faw-slide,
-    .faw-slider-images .faw-slide.center,
-    .faw-slider-images .faw-slide.left,
-    .faw-slider-images .faw-slide.right {
-        width: 100% !important;
-        height: 100px !important;
-        /* Компактная высота */
-        opacity: 1 !important;
-        pointer-events: auto !important;
-        z-index: 15 !important;
-        /* Машины поверх всего */
-        transition: transform 0.6s ease !important;
-        perspective: none !important;
-        filter: none !important;
-        scale: 1 !important;
-        position: absolute;
-        bottom: 0;
-        /* Привязываем к низу контейнера */
-    }
-
-    /* Центральный слайд */
-    .faw-slide.center,
-    .faw-slider-images .faw-slide.center {
-        transform: translateX(-50%) translateY(0%) !important;
-        /* Убираем вертикальное смещение */
-        z-index: 20 !important;
-        /* Центральная машина еще выше */
-    }
-
-    /* Левый слайд */
-    .faw-slide.left,
-    .faw-slider-images .faw-slide.left {
-        transform: translateX(-170%) translateY(0%) !important;
-    }
-
-    /* Правый слайд */
-    .faw-slide.right,
-    .faw-slider-images .faw-slide.right {
-        transform: translateX(70%) translateY(0%) !important;
-    }
-
-    /* АНИМАЦИОННЫЕ КЛАССЫ - НА ГРАНИЦЕ ФОНОВ */
-    .faw-slider-images .faw-slide.moving-left,
-    .faw-slider-images .faw-slide.moving-left.center,
-    .faw-slider-images .faw-slide.moving-left.left,
-    .faw-slider-images .faw-slide.moving-left.right {
-        transform: translateX(-170%) translateY(0%) !important;
-        width: 100% !important;
-        height: 100px !important;
-        z-index: 15 !important;
-        transition: transform 0.6s ease !important;
-    }
-
-    .faw-slider-images .faw-slide.moving-right,
-    .faw-slider-images .faw-slide.moving-right.center,
-    .faw-slider-images .faw-slide.moving-right.left,
-    .faw-slider-images .faw-slide.moving-right.right {
-        transform: translateX(70%) translateY(0%) !important;
-        width: 100% !important;
-        height: 100px !important;
-        z-index: 15 !important;
-        transition: transform 0.6s ease !important;
-    }
-
-    .faw-slider-images .faw-slide.moving-center,
-    .faw-slider-images .faw-slide.moving-center.center,
-    .faw-slider-images .faw-slide.moving-center.left,
-    .faw-slider-images .faw-slide.moving-center.right {
-        transform: translateX(-50%) translateY(0%) !important;
-        width: 100% !important;
-        height: 100px !important;
-        z-index: 20 !important;
-        transition: transform 0.6s ease !important;
-    }
-
-    .faw-slider-images .faw-slide.moving-right-in,
-    .faw-slider-images .faw-slide.moving-right-in.center,
-    .faw-slider-images .faw-slide.moving-right-in.left,
-    .faw-slider-images .faw-slide.moving-right-in.right {
-        transform: translateX(150%) translateY(0%) !important;
-        width: 100% !important;
-        height: 100px !important;
-        z-index: 15 !important;
-        transition: transform 0.6s ease !important;
-    }
-
-    .faw-slider-images .faw-slide.moving-left-in,
-    .faw-slider-images .faw-slide.moving-left-in.center,
-    .faw-slider-images .faw-slide.moving-left-in.left,
-    .faw-slider-images .faw-slide.moving-left-in.right {
-        transform: translateX(-250%) translateY(0%) !important;
-        width: 100% !important;
-        height: 100px !important;
-        z-index: 15 !important;
-        transition: transform 0.6s ease !important;
+    .faw-price-value {
+        font-size: 1.8rem;
     }
 }
 
-@media (max-width: 450px) {
-    .faw-slider-container {
-        padding-top: 40px;
-    }
-
-    .faw-bg {
-        height: 210px;
-    }
-
-    .faw-info-row {
+@media (max-width: 992px) {
+    .faw-slider-inner {
+        padding: 40px 70px;
+        min-height: 440px;
         gap: 20px;
     }
 
+    .faw-slider-section .faw-slider-info {
+        flex: 0 0 300px;
+        max-width: 300px;
+    }
+
+    .faw-info-card {
+        padding: 26px 22px 24px;
+        border-radius: 20px;
+    }
+
+    .faw-title {
+        font-size: 1.7rem;
+    }
+
+    .faw-year {
+        font-size: 1.25rem;
+        margin-bottom: 14px;
+    }
+
+    .faw-price-value {
+        font-size: 1.55rem;
+    }
+
+    .faw-spec-value {
+        font-size: 1.15rem;
+    }
+
+    .faw-btn-detail {
+        font-size: 1.15rem;
+        padding: 12px 26px;
+    }
+
+    .faw-slider-car {
+        min-height: 300px;
+    }
+
     .faw-slider-images {
-        height: 235px;
+        height: 300px;
     }
 
-    .faw-slide.center {
-        height: 100px !important;
+    .faw-slide img, .faw-slide svg {
+        max-height: 300px;
+    }
+
+    .faw-slider-arrow {
+        width: 44px;
+        height: 44px;
+    }
+
+    .faw-slider-arrow.left-btn {
+        left: 14px;
+    }
+
+    .faw-slider-arrow.right-btn {
+        right: 14px;
     }
 }
 
-.faw-power-value,
-.faw-mpg-value {
-    font-size: 2.5rem;
-    color: #003e7d;
-    font-weight: bold;
-    margin-bottom: 0;
-}
-
-.faw-info-row {
-    display: flex;
-    justify-content: center;
-    gap: 38px;
-    align-items: baseline;
-    margin-top: 25px;
-    margin-bottom: 28px;
-    flex-wrap: wrap;
-}
-
-.faw-info-col {
-    text-align: left;
-    min-width: 100px;
-}
-
-/* Responsive for spec cards */
-@media (max-width: 600px) {
-    .faw-specs-grid {
-        grid-template-columns: 1fr;
-        gap: 10px;
-        max-width: 320px;
+/* ===== Mobile ===== */
+@media (max-width: 768px) {
+    .faw-slider-section {
+        border-radius: 18px;
     }
-    .faw-spec-card {
-        display: flex;
-        align-items: center;
-        gap: 14px;
-        padding: 14px 18px;
-        text-align: left;
+
+    .faw-slider-inner {
+        flex-direction: column !important;
+        padding: 20px 16px !important;
+        min-height: auto !important;
+        gap: 12px !important;
     }
+
+    /* Rasm yuqorida */
+    .faw-slider-section .faw-slider-car {
+        order: -1;
+        min-height: 220px;
+        width: 100%;
+    }
+
+    .faw-slider-images {
+        height: 220px;
+    }
+
+    .faw-slide img, .faw-slide svg {
+        max-height: 220px;
+    }
+
+    /* Ma'lumotlar pastda */
+    .faw-slider-section .faw-slider-info {
+        flex: none !important;
+        max-width: 100% !important;
+        width: 100%;
+    }
+
+    .faw-info-card {
+        padding: 18px 16px 16px;
+        border-radius: 16px;
+    }
+
+    .faw-title {
+        font-size: 1.5rem;
+    }
+
+    .faw-year {
+        font-size: 1.1rem;
+        margin-bottom: 10px;
+    }
+
+    .faw-price-section {
+        padding-top: 10px;
+        margin-bottom: 12px;
+    }
+
+    .faw-price-value {
+        font-size: 1.35rem;
+    }
+
+    .faw-specs-row {
+        margin-bottom: 14px;
+        gap: 8px;
+    }
+
+    .faw-spec-box {
+        padding: 10px 12px;
+        gap: 8px;
+        border-radius: 12px;
+    }
+
     .faw-spec-icon {
-        margin: 0;
-        flex-shrink: 0;
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
     }
-    .faw-spec-card .faw-spec-label {
-        margin-bottom: 2px;
-        font-size: 1rem;
+
+    .faw-spec-value {
+        font-size: 1.05rem;
     }
-    .faw-spec-card .faw-spec-value {
+
+    .faw-btn-detail {
+        width: 100%;
+        justify-content: center;
+        font-size: 1.1rem;
+        padding: 12px 20px;
+        border-radius: 12px;
+    }
+
+    /* Strelkalar — rasm zonasida */
+    .faw-slider-section > .faw-slider-arrow {
+        top: 130px !important;
+        transform: translateY(-50%) !important;
+        width: 36px;
+        height: 36px;
+    }
+
+    .faw-slider-section > .faw-slider-arrow:hover {
+        transform: translateY(-50%) scale(1.06) !important;
+    }
+
+    .faw-slider-section > .faw-slider-arrow.left-btn {
+        left: 8px;
+    }
+
+    .faw-slider-section > .faw-slider-arrow.right-btn {
+        right: 8px;
+    }
+}
+
+@media (max-width: 480px) {
+    .faw-slider-section {
+        border-radius: 14px;
+    }
+
+    .faw-slider-inner {
+        padding: 14px 12px !important;
+        gap: 10px !important;
+    }
+
+    .faw-slider-section .faw-slider-car {
+        min-height: 180px;
+    }
+
+    .faw-slider-images {
+        height: 180px;
+    }
+
+    .faw-slide img, .faw-slide svg {
+        max-height: 180px;
+    }
+
+    .faw-info-card {
+        padding: 14px 14px 14px;
+        border-radius: 14px;
+    }
+
+    .faw-title {
         font-size: 1.3rem;
     }
+
+    .faw-year {
+        font-size: 1rem;
+        margin-bottom: 8px;
+    }
+
+    .faw-price-value {
+        font-size: 1.2rem;
+    }
+
+    .faw-btn-detail {
+        font-size: 1rem;
+        padding: 11px 18px;
+    }
+
+    .faw-slider-section > .faw-slider-arrow {
+        width: 32px;
+        height: 32px;
+        top: 105px !important;
+    }
 }
 
-.faw-slider-buttons {
-    display: flex;
-    gap: 18px;
-    justify-content: center;
-    margin-top: 8px;
+/* ===== Dark theme ===== */
+body[data-theme="dark"] .faw-info-card {
+    background: rgba(22, 22, 22, 0.80);
+    border-color: rgba(255, 255, 255, 0.12);
 }
 
-.faw-btn {
-    background: #091c2d;
+body[data-theme="dark"] .faw-title {
     color: #fff;
-    border: none;
-    border-radius: 5px;
-    font-size: 2.5rem;
-    padding: 10px 26px;
-    cursor: pointer;
-    font-weight: bold;
-    transition: background 0.19s;
 }
 
-.faw-btn:hover {
-    background: #003e7d;
+body[data-theme="dark"] .faw-year {
+    color: #aaa;
+}
+
+body[data-theme="dark"] .faw-price-label,
+body[data-theme="dark"] .faw-spec-label {
+    color: #aaa;
+}
+
+body[data-theme="dark"] .faw-price-value {
+    color: #fff;
+}
+
+body[data-theme="dark"] .faw-price-section {
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+body[data-theme="dark"] .faw-spec-box {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.08);
+}
+
+body[data-theme="dark"] .faw-spec-icon {
+    background: #2a2a2a;
+    color: #4da3ff;
+}
+
+body[data-theme="dark"] .faw-spec-icon img {
+    filter: none;
+}
+
+body[data-theme="dark"] .faw-spec-value {
+    color: #fff;
+}
+
+body[data-theme="dark"] .faw-slider-arrow {
+    background: rgba(40, 40, 40, 0.5);
+    border-color: rgba(255, 255, 255, 0.15);
+    color: #fff;
 }   
 
 /* Footer title styles */
@@ -2530,63 +2295,7 @@ body {
     color: var(--t-bright);
 }
 
-/* Темная тема для faw-slider-info */
-body[data-theme="dark"] .faw-slider-info {
-    background-color: #161616 !important;
-    color: #FFFFFF !important;
-}
-
-body[data-theme="dark"] .faw-title {
-    color: #FFFFFF !important;
-}
-
-body[data-theme="dark"] .faw-year {
-    color: #ACACAC !important;
-}
-
-body[data-theme="dark"] .faw-price-label,
-body[data-theme="dark"] .faw-power-label,
-body[data-theme="dark"] .faw-mpg-label,
-body[data-theme="dark"] .faw-spec-label {
-    color: #ACACAC !important;
-}
-
-body[data-theme="dark"] .faw-price-value {
-    color: #FFFFFF !important;
-}
-
-body[data-theme="dark"] .faw-power-value,
-body[data-theme="dark"] .faw-mpg-value {
-    color: #ffffff !important;
-}
-
-body[data-theme="dark"] .faw-spec-card {
-    background: #1e1e1e !important;
-    border-color: rgba(255,255,255,0.08) !important;
-}
-
-body[data-theme="dark"] .faw-spec-icon {
-    background: #2a2a2a !important;
-    color: #4da3ff !important;
-}
-
-body[data-theme="dark"] .faw-spec-value {
-    color: #fff !important;
-}
-
-body[data-theme="dark"] .faw-spec-power,
-body[data-theme="dark"] .faw-spec-mpg {
-    color: #4da3ff !important;
-}
-
-body[data-theme="dark"] .faw-btn {
-    background: #0f8dec !important;
-    color: #FFFFFF !important;
-}
-
-body[data-theme="dark"] .faw-btn:hover {
-    background: #0e5388 !important;
-}
+/* Old dark theme overrides removed — new dark theme is in the slider CSS block above */
 
 /* FAW Contact Form Styles */
 .contact-form .t-form__inputsbox {

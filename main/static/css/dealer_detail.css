@@ -64,7 +64,7 @@
     gap: 8px;
     padding: 12px 24px;
     border-radius: 50px;
-    font-size: 0.95rem;
+    font-size: 1.50rem;
     font-weight: 600;
     text-decoration: none;
     transition: all 0.2s;
@@ -129,6 +129,7 @@
 
 .dd-gallery-main {
     width: 100%;
+    max-width: 900px;
     height: 520px;
     border-radius: 16px;
     overflow: hidden;
@@ -136,12 +137,13 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    margin: 0 auto;
 }
 
 .dd-gallery-main-img {
     width: 100%;
     height: 100%;
-    object-fit: contain;
+    object-fit: cover;
     display: block;
 }
 
@@ -320,6 +322,54 @@
     color: #F07800;
     font-weight: 600;
     margin: 0;
+}
+
+/* ── Team Pagination ───────────────────── */
+.dd-team-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    margin-top: 20px;
+    padding-top: 16px;
+    border-top: 1px solid #f0f0f0;
+}
+
+.dd-team-page-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 18px;
+    background: #f5f5f5;
+    color: #1a1a1a;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.dd-team-page-btn:hover:not(:disabled) {
+    background: #F07800;
+    color: #fff;
+}
+
+.dd-team-page-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.dd-team-page-btn i {
+    font-size: 16px;
+}
+
+.dd-team-page-info {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #666;
+    min-width: 50px;
+    text-align: center;
 }
 
 /* ── Team Modal ─────────────────────────── */
@@ -555,13 +605,41 @@ body[data-theme="dark"] .dd-back-btn:hover {
 
 body.dark-theme .dd-social-link,
 body[data-theme="dark"] .dd-social-link {
-    background: #2a2a2a;
-    color: #999;
+    background: #333;
+    color: #e0e0e0;
+}
+
+body.dark-theme .dd-social-link:hover,
+body[data-theme="dark"] .dd-social-link:hover {
+    background: #F07800;
+    color: #fff;
 }
 
 body.dark-theme .dd-gallery-main,
 body[data-theme="dark"] .dd-gallery-main {
     background: #2a2a2a;
+}
+
+body.dark-theme .dd-team-pagination,
+body[data-theme="dark"] .dd-team-pagination {
+    border-top-color: #333;
+}
+
+body.dark-theme .dd-team-page-btn,
+body[data-theme="dark"] .dd-team-page-btn {
+    background: #2a2a2a;
+    color: #f5f5f5;
+}
+
+body.dark-theme .dd-team-page-btn:hover:not(:disabled),
+body[data-theme="dark"] .dd-team-page-btn:hover:not(:disabled) {
+    background: #F07800;
+    color: #fff;
+}
+
+body.dark-theme .dd-team-page-info,
+body[data-theme="dark"] .dd-team-page-info {
+    color: #999;
 }
 
 /* ══ MOBILE ═══════════════════════════════ */

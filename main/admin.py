@@ -1251,7 +1251,6 @@ class DealerAdmin(ContentAdminMixin, TabbedTranslationAdmin):
         }),
         ("Xarita koordinatalari", {
             'fields': ('latitude', 'longitude'),
-            'description': '📍 Google Maps da diler manzilini toping → "joylashuvni koordinatalarini toping" → nusxa oling.',
         }),
         ("Ijtimoiy tarmoqlar", {
             'fields': ('instagram', 'telegram', 'facebook', 'youtube'),
@@ -1261,6 +1260,10 @@ class DealerAdmin(ContentAdminMixin, TabbedTranslationAdmin):
             'fields': ('is_active', 'order'),
         }),
     )
+
+    class Media:
+        css = {'all': ('css/custom_dealer_admin.css',)}
+        js = ('js/admin/dealer_hide_lang_select.js',)
 
 
 # ========== ОТЗЫВЫ КЛИЕНТОВ ==========

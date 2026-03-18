@@ -413,32 +413,31 @@
     <!-- Секция — превью блога (конец) -->
 
     <!-- Секция — слайдер FAW (начало) -->
-    <!-- Скрытый элемент с данными слайдера из Django -->
     <div id="slider-data" style="display: none;">{{ slider_products|safe }}</div>
-    <!-- Секция — слайдер FAW (начало) -->
-    <div class="mxd-section overflow-hidden" style="margin-top: 6.3rem;">
-      <div class="mxd-container">
-        <div class="mxd-block">
-          <div class="faw-bg">
-            <img src="{% static 'images/slider-foto_img/bg-slider.jpg' %}" alt="FAW Slider Background"
-              class="faw-bg-image">
-          </div>
-          <div class="faw-slider-container">
-            <div class="faw-slider-main">
-              <button class="faw-slider-arrow left-btn" aria-label="back">&#8592;</button>
-              <div class="faw-slider-images" id="slider-track">
-                <div class="faw-slide left" id="slide-left"></div>
-                <div class="faw-slide center" id="slide-center"></div>
-                <div class="faw-slide right" id="slide-right"></div>
-              </div>
-              <button class="faw-slider-arrow right-btn" aria-label="forward">&#8594;</button>
-            </div>
-            <div class="faw-slider-info" id="slider-info"></div>
+    <section class="faw-slider-section" style="margin-top: 6.3rem;">
+      <!-- Orqa fon rasmi -->
+      <div class="faw-bg">
+        <img src="{% static 'images/backgroundaut.png' %}" alt="Background" class="faw-bg-image">
+      </div>
+      <!-- Chap/O'ng strelkalar -->
+      <button class="faw-slider-arrow left-btn" aria-label="back">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+      </button>
+      <button class="faw-slider-arrow right-btn" aria-label="forward">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+      </button>
+      <!-- Kontent: info karta + mashina -->
+      <div class="faw-slider-inner">
+        <div class="faw-slider-info" id="slider-info"></div>
+        <div class="faw-slider-car">
+          <div class="faw-slider-images" id="slider-track">
+            <div class="faw-slide left" id="slide-left"></div>
+            <div class="faw-slide center" id="slide-center"></div>
+            <div class="faw-slide right" id="slide-right"></div>
           </div>
         </div>
       </div>
-    </div>
-    <!-- Блок — изображение слайдера (конец) -->
+    </section>
     <!-- Секция — слайдер FAW (конец) -->
 
     <!-- Mijozlar fikrlari (START) -->

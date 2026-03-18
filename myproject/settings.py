@@ -237,29 +237,13 @@ DATABASES = {
 }
 
 # ============ CACHE ============
-# Production uchun Redis o'rnatib, .env ga REDIS_URL qo'shing:
-#   pip install django-redis
-#   REDIS_URL=redis://127.0.0.1:6379/1
-
-REDIS_URL = config('REDIS_URL', default='')
-
-if REDIS_URL:
-    CACHES = {
-        'default': {
-            'BACKEND': 'django.core.cache.backends.redis.RedisCache',
-            'LOCATION': REDIS_URL,
-            'KEY_PREFIX': 'autoliga',
-            'TIMEOUT': 300,
-        }
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'autoliga-cache',
+        'TIMEOUT': 300,
     }
-else:
-    CACHES = {
-        'default': {
-            'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
-            'LOCATION': 'autoliga-cache',
-            'TIMEOUT': 300,
-        }
-    }
+}
 
 # Bot API token authentication
 BOT_API_TOKEN = config('BOT_API_TOKEN', default='')

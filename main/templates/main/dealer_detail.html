@@ -152,7 +152,7 @@
                         <i class="ph ph-users-three"></i>
                         {% if LANGUAGE_CODE == 'uz' %}Bizning jamoa{% elif LANGUAGE_CODE == 'ru' %}Наша команда{% else %}Our Team{% endif %}
                     </h3>
-                    <div class="dd-team-grid">
+                    <div class="dd-team-grid" id="teamGrid">
                         {% for m in managers %}
                         <div class="dd-team-card" data-name="{{ m.full_name }}" data-position="{{ m.position }}" data-phone="{{ m.phone }}" data-photo="{{ m.photo.url }}">
                             <img src="{{ m.photo.url }}" alt="{{ m.full_name }}" class="dd-team-photo">
@@ -162,6 +162,17 @@
                             </div>
                         </div>
                         {% endfor %}
+                    </div>
+                    <div class="dd-team-pagination" id="teamPagination">
+                        <button class="dd-team-page-btn" id="teamPrev">
+                            <i class="ph ph-caret-left"></i>
+                            {% if LANGUAGE_CODE == 'uz' %}Ortga{% elif LANGUAGE_CODE == 'ru' %}Назад{% else %}Prev{% endif %}
+                        </button>
+                        <span class="dd-team-page-info" id="teamPageInfo"></span>
+                        <button class="dd-team-page-btn" id="teamNext">
+                            {% if LANGUAGE_CODE == 'uz' %}Keyingi{% elif LANGUAGE_CODE == 'ru' %}Далее{% else %}Next{% endif %}
+                            <i class="ph ph-caret-right"></i>
+                        </button>
                     </div>
                 </div>
                 {% endif %}
@@ -257,6 +268,44 @@
                 modal.style.display = 'none';
                 document.body.style.overflow = '';
             }
+        }
+
+        // ── Team Pagination ────────────────────
+        const teamGrid = document.getElementById('teamGrid');
+        if (teamGrid) {
+            const allCards = Array.from(teamGrid.querySelectorAll('.dd-team-card'));
+            const perPage = 4;
+            const totalPages = Math.ceil(allCards.length / perPage);
+            let currentPage = 1;
+            const pagination = document.getElementById('teamPagination');
+            const prevBtn = document.getElementById('teamPrev');
+            const nextBtn = document.getElementById('teamNext');
+            const pageInfo = document.getElementById('teamPageInfo');
+
+            function showPage(page) {
+                currentPage = page;
+                allCards.forEach((card, i) => {
+                    const start = (page - 1) * perPage;
+                    const end = start + perPage;
+                    card.style.display = (i >= start && i < end) ? '' : 'none';
+                });
+                pageInfo.textContent = currentPage + ' / ' + totalPages;
+                prevBtn.disabled = currentPage <= 1;
+                nextBtn.disabled = currentPage >= totalPages;
+            }
+
+            if (totalPages <= 1) {
+                pagination.style.display = 'none';
+            }
+
+            prevBtn.addEventListener('click', function() {
+                if (currentPage > 1) showPage(currentPage - 1);
+            });
+            nextBtn.addEventListener('click', function() {
+                if (currentPage < totalPages) showPage(currentPage + 1);
+            });
+
+            showPage(1);
         }
 
     })();

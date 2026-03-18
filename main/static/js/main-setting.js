@@ -318,33 +318,34 @@ function goTo(direction) {
 function renderInfo(idx) {
   const slide = slides[getIndex(idx)];
   document.getElementById('slider-info').innerHTML = `
-    <div class="faw-year">${slide.year}</div>
-    <div class="faw-title">${slide.title}</div>
-    <div class="faw-specs-grid">
-      <div class="faw-spec-card">
-        <div class="faw-spec-icon">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
-        </div>
-        <span class="faw-spec-label">NARXI</span>
-        <div class="faw-spec-value faw-spec-price">${slide.price}</div>
+    <div class="faw-info-card">
+      <div class="faw-title">${slide.title}</div>
+      <div class="faw-year">${slide.year}</div>
+      <div class="faw-price-section">
+        <span class="faw-price-label">NARXI</span>
+        <div class="faw-price-value">${slide.price}</div>
       </div>
-      <div class="faw-spec-card">
-        <div class="faw-spec-icon">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+      <div class="faw-specs-row">
+        <div class="faw-spec-box">
+          <div class="faw-spec-icon">
+            <img src="/static/images/icons/car-engine.svg" alt="engine" width="24" height="24">
+          </div>
+          <div>
+            <span class="faw-spec-label">KUCH</span>
+            <div class="faw-spec-value">${slide.power}</div>
+          </div>
         </div>
-        <span class="faw-spec-label">KUCH</span>
-        <div class="faw-spec-value faw-spec-power">${slide.power}</div>
-      </div>
-      <div class="faw-spec-card">
-        <div class="faw-spec-icon">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><path d="M12 18v-6"></path><path d="M9 15l3 3 3-3"></path></svg>
+        <div class="faw-spec-box">
+          <div class="faw-spec-icon">
+            <img src="/static/images/icons/gas-pump-alt.svg" alt="fuel" width="24" height="24">
+          </div>
+          <div>
+            <span class="faw-spec-label">RASHOD</span>
+            <div class="faw-spec-value">${slide.mpg}</div>
+          </div>
         </div>
-        <span class="faw-spec-label">RASHOD</span>
-        <div class="faw-spec-value faw-spec-mpg">${slide.mpg}</div>
       </div>
-    </div>
-    <div class="faw-slider-buttons">
-      ${slide.cta.map(btn => `<a href="${btn.link}" class="faw-btn">${btn.label}</a>`).join('')}
+      <a href="${slide.cta[0].link}" class="faw-btn-detail">Batafsil <span>›</span></a>
     </div>
   `;
 }

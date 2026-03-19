@@ -518,12 +518,16 @@ $(function() {
         flip(false);
       }
     }, "fade-in-up")
-    .from(videoEl, {
-      opacity: 0,
-      yPercent: 20,
-      duration: 0.2,
-    }, "fade-in-up");
-    tl.from(fadeInEl, { opacity: 0, duration: 0.3, });
+    if (videoEl.length) {
+      tl.from(videoEl, {
+        opacity: 0,
+        yPercent: 20,
+        duration: 0.2,
+      }, "fade-in-up");
+    }
+    if (fadeInEl.length) {
+      tl.from(fadeInEl, { opacity: 0, duration: 0.3, });
+    }
 
     function openMenu(open) {
       if (!tl.isActive()) {
@@ -1255,7 +1259,7 @@ if (innerDemoSlider) {  // ✅ Теперь правильная проверк�
         spaceBetween: 30,
       },
     },
-    loop: true,
+    loop: innerDemoSlider.querySelectorAll('.swiper-slide').length > 3,
     parallax: true,
     autoplay: { disableOnInteraction: false, enabled: true },
     grabCursor: true,
@@ -1561,16 +1565,18 @@ $(".btn-to-top").each(function() {
 // ------------------------------------------------------------------------------ //
 // Parallax Universal (apply parallax effect to any element with a data-speed attribute) Start
 // ------------------------------------------------------------------------------ //
-gsap.to("[data-speed]", {
-  y: (i, el) => (1 - parseFloat(el.getAttribute("data-speed"))) * ScrollTrigger.maxScroll(window) ,
-  ease: "none",
-  scrollTrigger: {
-    start: 0,
-    end: "max",
-    invalidateOnRefresh: true,
-    scrub: 0
-  }
-});
+if (document.querySelector("[data-speed]")) {
+  gsap.to("[data-speed]", {
+    y: (i, el) => (1 - parseFloat(el.getAttribute("data-speed"))) * ScrollTrigger.maxScroll(window) ,
+    ease: "none",
+    scrollTrigger: {
+      start: 0,
+      end: "max",
+      invalidateOnRefresh: true,
+      scrub: 0
+    }
+  });
+}
 // --------------------------------------------- //
 // Parallax Universal End
 // --------------------------------------------- //

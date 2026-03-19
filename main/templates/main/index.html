@@ -417,7 +417,10 @@
     <section class="faw-slider-section" style="margin-top: 6.3rem;">
       <!-- Orqa fon rasmi -->
       <div class="faw-bg">
-        <img src="{% static 'images/backgroundaut.png' %}" alt="Background" class="faw-bg-image">
+        <picture>
+          <source media="(max-width: 500px)" srcset="{% static 'images/mobilebackground.png' %}">
+          <img src="{% static 'images/backgroundaut.png' %}" alt="Background" class="faw-bg-image">
+        </picture>
       </div>
       <!-- Chap/O'ng strelkalar -->
       <button class="faw-slider-arrow left-btn" aria-label="back">
@@ -426,9 +429,8 @@
       <button class="faw-slider-arrow right-btn" aria-label="forward">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
       </button>
-      <!-- Kontent: info karta + mashina -->
+      <!-- Kontent: mashina + info karta -->
       <div class="faw-slider-inner">
-        <div class="faw-slider-info" id="slider-info"></div>
         <div class="faw-slider-car">
           <div class="faw-slider-images" id="slider-track">
             <div class="faw-slide left" id="slide-left"></div>
@@ -436,6 +438,7 @@
             <div class="faw-slide right" id="slide-right"></div>
           </div>
         </div>
+        <div class="faw-slider-info" id="slider-info"></div>
       </div>
     </section>
     <!-- Секция — слайдер FAW (конец) -->

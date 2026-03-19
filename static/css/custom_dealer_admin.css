@@ -64,3 +64,23 @@
     transform: scale(1.1);
 }
 
+/* Xarita koordinatalari, Ijtimoiy tarmoqlar, Sozlamalar tablarida
+   til selectini yashirish — bu bo'limlarda tarjima maydonlari yo'q */
+
+/* Jazzmin tab-pane IDlari: fieldsets-0, fieldsets-1, ... */
+#fieldsets-2 select.modeltranslation-switch,
+#fieldsets-3 select.modeltranslation-switch,
+#fieldsets-4 select.modeltranslation-switch,
+#fieldsets-2 > fieldset > .description + select,
+#fieldsets-3 > fieldset > .description + select,
+#fieldsets-4 > fieldset > select,
+/* CSS :has() fallback — latitude/instagram/is_active bor pane dagi select */
+.tab-pane:has(#id_latitude) select.modeltranslation-switch,
+.tab-pane:has(#id_instagram) select.modeltranslation-switch,
+.tab-pane:has(#id_is_active) select.modeltranslation-switch,
+/* Keng qamrovli: fieldset ichida latitude yonidagi select */
+fieldset:has(#id_latitude) select:not([name]),
+fieldset:has(#id_instagram) select:not([name]),
+fieldset:has(#id_is_active) select:not([name]) {
+    display: none !important;
+}

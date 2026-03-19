@@ -37,3 +37,5 @@ urlpatterns = [
     path('bot/dealers/', BotDealersView.as_view(), name='bot-dealers'),
     path('bot/test-drive/', BotTestDriveView.as_view(), name='bot-test-drive'),
 ]
+
+

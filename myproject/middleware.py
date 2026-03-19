@@ -147,7 +147,7 @@ class SecurityHeadersMiddleware:
                 "img-src 'self' data: https: blob:; "
                 "connect-src 'self' https://www.google-analytics.com "
                 "https://mc.yandex.ru https://www.google.com; "
-                "frame-src https://www.google.com https://www.youtube.com; "
+                "frame-src https://www.google.com https://www.youtube.com https://yandex.uz; "
                 "object-src 'none'; "
                 "base-uri 'self'; "
                 "form-action 'self';"

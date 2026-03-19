@@ -1,0 +1,23 @@
+{
+  "name": "autoliga_uz",
+  "version": "1.0.0",
+  "description": "Backend проект на **Django + Django REST Framework** для сайтов: - 🇺🇿 **Autoliga.uz* (Узбекистан)",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/IsmailK1ng/autoliga_uz.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/IsmailK1ng/autoliga_uz/issues"
+  },
+  "homepage": "https://github.com/IsmailK1ng/autoliga_uz#readme",
+  "devDependencies": {
+    "purgecss": "^8.0.0"
+  }
+}

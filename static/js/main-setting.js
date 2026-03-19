@@ -318,24 +318,34 @@ function goTo(direction) {
 function renderInfo(idx) {
   const slide = slides[getIndex(idx)];
   document.getElementById('slider-info').innerHTML = `
-    <div class="faw-year">${slide.year}</div>
-    <div class="faw-title">${slide.title}</div>
-    <div class="faw-info-row">
-      <div class="faw-info-col">
+    <div class="faw-info-card">
+      <div class="faw-title">${slide.title}</div>
+      <div class="faw-year">${slide.year}</div>
+      <div class="faw-price-section">
         <span class="faw-price-label">NARXI</span>
         <div class="faw-price-value">${slide.price}</div>
       </div>
-      <div class="faw-info-col">
-        <span class="faw-power-label">KUCH</span>
-        <div class="faw-power-value">${slide.power}</div>
+      <div class="faw-specs-row">
+        <div class="faw-spec-box">
+          <div class="faw-spec-icon">
+            <img src="/static/images/icons/car-engine.svg" alt="engine" width="24" height="24">
+          </div>
+          <div>
+            <span class="faw-spec-label">KUCH</span>
+            <div class="faw-spec-value">${slide.power}</div>
+          </div>
+        </div>
+        <div class="faw-spec-box">
+          <div class="faw-spec-icon">
+            <img src="/static/images/icons/gas-pump-alt.svg" alt="fuel" width="24" height="24">
+          </div>
+          <div>
+            <span class="faw-spec-label">RASHOD</span>
+            <div class="faw-spec-value">${slide.mpg}</div>
+          </div>
+        </div>
       </div>
-      <div class="faw-info-col">
-        <span class="faw-mpg-label">RASHOD</span>
-        <div class="faw-mpg-value">${slide.mpg}</div>
-      </div>
-    </div>
-    <div class="faw-slider-buttons">
-      ${slide.cta.map(btn => `<a href="${btn.link}" class="faw-btn">${btn.label}</a>`).join('')}
+      <a href="${slide.cta[0].link}" class="faw-btn-detail">Batafsil <span>›</span></a>
     </div>
   `;
 }
@@ -689,7 +699,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
     phoneInput.addEventListener('paste', function (e) {
       e.preventDefault();
-      const pastedText = (e.clipboardData || window.clipboardData).getData('text');
+      const cbd = e.clipboardData || window.clipboardData;
+      if (!cbd) return;
+      const pastedText = cbd.getData('text');
       const numbers = pastedText.replace(/\D/g, '');
 
       let userNumbers = numbers;

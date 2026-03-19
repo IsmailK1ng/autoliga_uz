@@ -173,7 +173,9 @@ JAZZMIN_UI_TWEAKS = {
 MIDDLEWARE = [
     'myproject.middleware.RequestSizeLimitMiddleware',   # 1. Katta requestlarni erta bloklash
     'myproject.middleware.RateLimitMiddleware',           # 2. Rate limit + IP auto-block
+    'django.middleware.gzip.GZipMiddleware',              # 3. Gzip siqish (70% kichikroq response)
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',         # 4. Static fayllarni samarali berish + cache
     'myproject.middleware.SecurityHeadersMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'corsheaders.middleware.CorsMiddleware',
@@ -268,6 +270,16 @@ STATIC_ROOT = BASE_DIR / 'static' if DEBUG else '/home/autolig1/public_html/stat
 STATICFILES_DIRS = [
     BASE_DIR / 'main' / 'static',
 ]
+
+# WhiteNoise: static fayllarni siqib + cache bilan beradi
+if not DEBUG:
+    STORAGES = {
+        "staticfiles": {
+            "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+        },
+    }
+    # Static fayllar uchun cache: 1 yil (fayl nomi hash bilan o'zgaradi)
+    WHITENOISE_MAX_AGE = 31536000  # 1 year
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media' if DEBUG else '/home/autolig1/public_html/media'

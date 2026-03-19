@@ -419,7 +419,7 @@
       <div class="faw-bg">
         <picture>
           <source media="(max-width: 500px)" srcset="{% static 'images/mobilebackground.png' %}">
-          <img src="{% static 'images/backgroundaut.png' %}" alt="Background" class="faw-bg-image">
+          <img src="{% static 'images/backgroundaut.jpeg' %}" alt="Background" class="faw-bg-image">
         </picture>
       </div>
       <!-- Chap/O'ng strelkalar -->
@@ -546,7 +546,7 @@
 
 
     <!-- reCAPTCHA v3 -->
-    <script src="https://www.google.com/recaptcha/api.js?render={{ RECAPTCHA_SITE_KEY }}"></script>
+    <script src="https://www.google.com/recaptcha/api.js?render={{ RECAPTCHA_SITE_KEY }}" async defer></script>
 
     <script>
     document.addEventListener('DOMContentLoaded', function() {
@@ -1196,10 +1196,10 @@
   <!-- Кнопка «вверх» (конец) -->
 
   <!-- Подключение скриптов (начало) -->
-  <script src="{% static 'js/libs.min.js' %}"></script>
-  <script src="{% static 'js/app.js' %}"></script>
-  <script src="{% static 'js/error-logger.js' %}"></script>
-  <script src="{% static 'js/main-setting.js' %}"></script>
+  <script src="{% static 'js/libs.min.js' %}" defer></script>
+  <script src="{% static 'js/app.js' %}" defer></script>
+  <script src="{% static 'js/error-logger.js' %}" defer></script>
+  <script src="{% static 'js/main-setting.js' %}" defer></script>
 
   <!-- Мобильный фикс: надёжно отключаем инлайн-стили параллакса для маленьких экранов -->
   <script>

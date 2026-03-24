@@ -4,42 +4,170 @@ from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
 from aiogram.fsm.storage.memory import MemoryStorage
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, ReplyKeyboardRemove
+from asgiref.sync import sync_to_async  # ← QO'SHILDI
 import asyncio
-import aiohttp
 import html as html_module
 import re
 import os
-from config import BOT_TOKEN, SITE_URL, MEDIA_ROOT, BOT_API_TOKEN
+import sys
+import django
+from datetime import datetime, date, timedelta
+from django.utils import timezone
+
+# Django setup
+PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, PROJECT_ROOT)
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'myproject.settings')
+django.setup()
+
+from config import BOT_TOKEN, MEDIA_ROOT
+from main.models import TelegramUser, ProductCategory, Product, Dealer, TestDriveRequest, ProductFeature
+from django.db import transaction
+from django.core.exceptions import ObjectDoesNotExist
 
 bot = Bot(token=BOT_TOKEN)
 dp = Dispatcher(storage=MemoryStorage())
 
-# ================= API CLIENT =================
+# ================= DATABASE FUNCTIONS =================
 
-API_BASE = SITE_URL.rstrip("/") + "/api"
-API_HEADERS = {"Authorization": f"Bearer {BOT_API_TOKEN}"} if BOT_API_TOKEN else {}
-
-
-async def api_get(path: str, params: dict = None) -> dict | list | None:
+@sync_to_async
+def get_user_by_telegram_id(telegram_id: int) -> TelegramUser | None:
     try:
-        async with aiohttp.ClientSession(headers=API_HEADERS) as session:
-            async with session.get(f"{API_BASE}{path}", params=params, timeout=aiohttp.ClientTimeout(total=10)) as resp:
-                if resp.status == 200:
-                    return await resp.json()
-                if resp.status == 404:
-                    return None
-                return None
-    except Exception:
+        return TelegramUser.objects.get(telegram_id=telegram_id)
+    except ObjectDoesNotExist:
         return None
 
 
-async def api_post(path: str, data: dict) -> dict | None:
+@sync_to_async
+def update_or_create_user(telegram_id: int, **kwargs) -> TelegramUser:
+    user, created = TelegramUser.objects.get_or_create(
+        telegram_id=telegram_id,
+        defaults=kwargs
+    )
+    if not created:
+        for key, value in kwargs.items():
+            if value is not None:
+                setattr(user, key, value)
+        user.save()
+    return user
+
+
+@sync_to_async
+def get_brands(lang: str = 'uz') -> list[dict]:
+    brands = ProductCategory.objects.filter(is_active=True).order_by('order', 'name')
+    result = []
+    for brand in brands:
+        name = getattr(brand, f'name_{lang}', None) or brand.name
+        result.append({'id': brand.id, 'name': name})
+    return result
+
+
+@sync_to_async
+def get_cars_by_brand(brand_id: int, lang: str = 'uz') -> list[dict]:
+    cars = Product.objects.filter(
+        category_id=brand_id,
+        is_active=True
+    ).order_by('order', 'title')
+    result = []
+    for car in cars:
+        title = getattr(car, f'title_{lang}', None) or car.title
+        result.append({'id': car.id, 'title': title})
+    return result
+
+
+@sync_to_async
+def get_car_detail(car_id: int, lang: str = 'uz') -> dict | None:
     try:
-        async with aiohttp.ClientSession(headers=API_HEADERS) as session:
-            async with session.post(f"{API_BASE}{path}", json=data, timeout=aiohttp.ClientTimeout(total=10)) as resp:
-                return await resp.json()
-    except Exception:
+        car = Product.objects.select_related('category').prefetch_related('features').get(
+            id=car_id,
+            is_active=True
+        )
+    except ObjectDoesNotExist:
         return None
+
+    title = getattr(car, f'title_{lang}', None) or car.title
+    price = getattr(car, f'slider_price_{lang}', None) or car.slider_price
+    power = getattr(car, f'slider_power_{lang}', None) or car.slider_power
+    fuel = getattr(car, f'slider_fuel_consumption_{lang}', None) or car.slider_fuel_consumption
+
+    features = car.features.all().order_by('order')[:6]
+    feat_list = [getattr(f, f'name_{lang}', None) or f.name for f in features]
+
+    return {
+        'title': title,
+        'main_image': car.main_image.url if car.main_image else None,
+        'card_image': car.card_image.url if car.card_image else None,
+        'price': price,
+        'year': car.slider_year,
+        'power': power,
+        'fuel': fuel,
+        'features': feat_list,
+    }
+
+
+@sync_to_async
+def get_dealers(lang: str = 'uz') -> list[dict]:
+    dealers = Dealer.objects.filter(is_active=True).order_by('order', 'name')
+    result = []
+    for dealer in dealers:
+        name = getattr(dealer, f'name_{lang}', None) or dealer.name
+        address = getattr(dealer, f'address_{lang}', None) or dealer.address
+        hours = getattr(dealer, f'working_hours_{lang}', None) or dealer.working_hours
+        result.append({
+            'id': dealer.id,
+            'name': name,
+            'region': dealer.region,
+            'address': address,
+            'phone': dealer.phone,
+            'hours': hours,
+        })
+    return result
+
+
+@sync_to_async
+def get_test_drive_data(lang: str = 'uz') -> dict:
+    dealers = Dealer.objects.filter(is_active=True).order_by('order', 'name')
+    products = Product.objects.filter(is_active=True).order_by('order', 'title')
+
+    dealers_data = []
+    for dealer in dealers:
+        name = getattr(dealer, f'name_{lang}', None) or dealer.name
+        dealers_data.append({'id': dealer.id, 'name': name})
+
+    products_data = []
+    for product in products:
+        title = getattr(product, f'title_{lang}', None) or product.title
+        products_data.append({'id': product.id, 'title': title})
+
+    return {
+        'dealers': dealers_data,
+        'products': products_data,
+        'time_slots': ['10:00', '10:30', '11:00', '11:30', '12:00', '12:30',
+                       '13:00', '13:30', '14:00', '14:30', '15:00', '15:30',
+                       '16:00', '16:30', '17:00'],
+    }
+
+
+@sync_to_async
+def create_test_drive_request(data: dict) -> tuple[TestDriveRequest | None, str | None]:
+    try:
+        with transaction.atomic():
+            phone = data.get('phone', '')
+            if phone:
+                today = timezone.now().date()
+                today_count = TestDriveRequest.objects.filter(
+                    phone=phone,
+                    created_at__date=today
+                ).count()
+                if today_count >= 2:
+                    return None, 'daily_limit'
+
+            request_obj = TestDriveRequest.objects.create(**data)
+            return request_obj, None
+    except Exception as e:
+        import logging
+        logging.getLogger(__name__).error(f"TestDrive create error: {e} | data={data}")
+        return None, str(e)
 
 
 # ================= HELPERS =================
@@ -56,10 +184,8 @@ def sanitize_name(text):
 
 
 def get_image_path(relative_url: str) -> str | None:
-    """Media faylni local pathga aylantirish (rasm yuborish uchun)"""
     if not relative_url:
         return None
-    # API URL dan /media/ ni olib tashlaymiz
     path = relative_url
     if path.startswith("/media/"):
         path = path[7:]
@@ -210,18 +336,16 @@ MESSAGES = {
             "• Ko'pi bilan 30 ta harf\n"
             "• Raqam, emoji, belgilar yo'q"
         ),
-        # Tasdiqlash
         "confirm_name": "Ismingiz: <b>{}</b>\n\nTo'g'ri kiritdingizmi?",
         "confirm_age": "Yoshingiz: <b>{}</b>\n\nTo'g'ri kiritdingizmi?",
         "confirm_region": "Viloyatingiz: <b>{}</b>\n\nTo'g'ri tanladingizmi?",
         "confirm_district": "Tumaningiz: <b>{}</b>\n\nTo'g'ri tanladingizmi?",
         "yes_btn": "✅ Ha",
         "no_btn": "❌ Yo'q, qayta kiritaman",
-        # Test-drayv
         "test_drive_btn": "🚗 Test-drayvga yozilish",
         "td_choose_dealer": "🏢 Diler markazni tanlang:",
         "td_choose_product": "🚗 Avtomobil modelini tanlang:",
-        "td_choose_date": "📅 Sanani kiriting (format: DD.MM.YYYY)\nMasalan: 20.03.2026",
+        "td_choose_date": "📅 Sanani tanlang:",
         "td_choose_time": "🕐 Vaqtni tanlang:",
         "td_enter_name": "👤 Ismingizni kiriting:",
         "td_enter_phone": "📞 Telefon raqamingizni kiriting:\nMasalan: +998901234567",
@@ -237,7 +361,7 @@ MESSAGES = {
         ),
         "td_success": "✅ Test-drayvga muvaffaqiyatli yozildingiz!\nTez orada siz bilan bog'lanamiz.",
         "td_error": "❌ Xatolik yuz berdi. Qayta urinib ko'ring.",
-        "td_invalid_date": "❌ Sana noto'g'ri formatda. DD.MM.YYYY formatida kiriting.",
+        "td_invalid_date": "❌ Iltimos ro'yxatdan sana tanlang.",
         "td_invalid_phone": "❌ Telefon noto'g'ri. +998XXXXXXXXX formatida kiriting.",
         "td_daily_limit": "⚠️ Kuniga 2 tadan ortiq test-drayv ariza yuborib bo'lmaydi.\nErtaga qayta urinib ko'ring.",
     },
@@ -270,18 +394,16 @@ MESSAGES = {
             "• Максимум 30 букв\n"
             "• Цифры, эмодзи, символы запрещены"
         ),
-        # Подтверждение
         "confirm_name": "Ваше имя: <b>{}</b>\n\nВсё верно?",
         "confirm_age": "Ваш возраст: <b>{}</b>\n\nВсё верно?",
         "confirm_region": "Ваша область: <b>{}</b>\n\nВсё верно?",
         "confirm_district": "Ваш район: <b>{}</b>\n\nВсё верно?",
         "yes_btn": "✅ Да",
         "no_btn": "❌ Нет, ввести заново",
-        # Тест-драйв
         "test_drive_btn": "🚗 Записаться на тест-драйв",
         "td_choose_dealer": "🏢 Выберите дилерский центр:",
         "td_choose_product": "🚗 Выберите модель автомобиля:",
-        "td_choose_date": "📅 Введите дату (формат: ДД.ММ.ГГГГ)\nНапример: 20.03.2026",
+        "td_choose_date": "📅 Выберите дату:",
         "td_choose_time": "🕐 Выберите время:",
         "td_enter_name": "👤 Введите ваше имя:",
         "td_enter_phone": "📞 Введите номер телефона:\nНапример: +998901234567",
@@ -297,7 +419,7 @@ MESSAGES = {
         ),
         "td_success": "✅ Вы успешно записаны на тест-драйв!\nМы скоро свяжемся с вами.",
         "td_error": "❌ Произошла ошибка. Попробуйте ещё раз.",
-        "td_invalid_date": "❌ Неверный формат даты. Введите в формате ДД.ММ.ГГГГ.",
+        "td_invalid_date": "❌ Пожалуйста, выберите дату из списка.",
         "td_invalid_phone": "❌ Неверный номер. Введите в формате +998XXXXXXXXX.",
         "td_daily_limit": "⚠️ Дневной лимит: не более 2 заявок в день.\nПопробуйте завтра.",
     }
@@ -306,7 +428,6 @@ MESSAGES = {
 CHANGE_LANG_BTNS = {MESSAGES["uz"]["change_lang_btn"], MESSAGES["ru"]["change_lang_btn"]}
 TEST_DRIVE_BTNS = {MESSAGES["uz"]["test_drive_btn"], MESSAGES["ru"]["test_drive_btn"]}
 
-# Foydalanuvchi tili xotirada
 user_lang: dict = {}
 
 
@@ -357,6 +478,23 @@ def build_car_caption(car: dict) -> str:
     return "\n".join(lines)
 
 
+def get_date_keyboard(back_btn: str, days: int = 14) -> ReplyKeyboardMarkup:
+    """Bugundan boshlab N kunlik sana tugmalari (3 ustunli)"""
+    today = datetime.now().date()
+    rows = []
+    row = []
+    for i in range(days):
+        d = today + timedelta(days=i)
+        row.append(KeyboardButton(text=d.strftime("%d.%m.%Y")))
+        if len(row) == 3:
+            rows.append(row)
+            row = []
+    if row:
+        rows.append(row)
+    rows.append([KeyboardButton(text=back_btn)])
+    return ReplyKeyboardMarkup(keyboard=rows, resize_keyboard=True)
+
+
 # ================= MEDIA BLOCKER =================
 
 @dp.message(~F.text & ~F.contact)
@@ -371,11 +509,10 @@ async def block_unsupported_media(message: types.Message):
 async def start(message: types.Message, state: FSMContext):
     uid = message.from_user.id
 
-    # API orqali foydalanuvchini tekshiramiz
-    user_data = await api_get("/bot/user/", {"telegram_id": uid})
+    user_data = await get_user_by_telegram_id(uid)  # ← await qo'shildi
 
-    if user_data and user_data.get("phone") and user_data.get("first_name"):
-        lang = user_data.get("language") or "uz"
+    if user_data and user_data.phone and user_data.first_name:
+        lang = user_data.language or "uz"
         user_lang[uid] = lang
         await state.clear()
         await message.answer(MESSAGES[lang]["welcome_back"], reply_markup=get_main_menu_keyboard(lang))
@@ -403,16 +540,14 @@ async def choose_language(message: types.Message, state: FSMContext):
     lang = "uz" if message.text.startswith("🇺🇿") else "ru"
     user_lang[uid] = lang
 
-    # API orqali saqlash
-    result = await api_post("/bot/user/", {
-        "telegram_id": uid,
-        "language": lang,
-        "username": message.from_user.username,
-    })
+    await update_or_create_user(  # ← await qo'shildi
+        uid,
+        language=lang,
+        username=message.from_user.username
+    )
 
-    has_profile = False
-    if result:
-        has_profile = bool(result.get("phone") and result.get("first_name"))
+    user = await get_user_by_telegram_id(uid)  # ← await qo'shildi
+    has_profile = bool(user and user.phone and user.first_name)
 
     if has_profile:
         await state.clear()
@@ -433,10 +568,7 @@ async def save_phone(message: types.Message, state: FSMContext):
         await message.answer("❌")
         return
 
-    await api_post("/bot/user/", {
-        "telegram_id": uid,
-        "phone": message.contact.phone_number,
-    })
+    await update_or_create_user(uid, phone=message.contact.phone_number)  # ← await qo'shildi
 
     await state.clear()
     await message.answer(
@@ -450,7 +582,7 @@ async def save_phone(message: types.Message, state: FSMContext):
 @dp.message(F.text.in_({"🚗 Mashinalar", "🚗 Автомобили"}))
 async def show_brands(message: types.Message, state: FSMContext):
     lang = user_lang.get(message.from_user.id, "uz")
-    brands = await api_get("/bot/brands/", {"lang": lang})
+    brands = await get_brands(lang)  # ← await qo'shildi
 
     if not brands:
         await message.answer(MESSAGES[lang]["no_cars"])
@@ -470,7 +602,7 @@ async def show_brands(message: types.Message, state: FSMContext):
 @dp.message(F.text.in_({"🏢 Dilerlik markazlari", "🏢 Дилерские центры"}))
 async def show_dealers(message: types.Message):
     lang = user_lang.get(message.from_user.id, "uz")
-    dealers = await api_get("/bot/dealers/", {"lang": lang})
+    dealers = await get_dealers(lang)  # ← await qo'shildi
 
     if not dealers:
         await message.answer(MESSAGES[lang]["dealers_title"])
@@ -501,12 +633,7 @@ async def show_dealers(message: types.Message):
 async def start_test_drive(message: types.Message, state: FSMContext):
     lang = user_lang.get(message.from_user.id, "uz")
 
-    # API dan diler va productlarni olamiz
-    td_data = await api_get("/bot/test-drive/", {"lang": lang})
-    if not td_data:
-        await message.answer(MESSAGES[lang]["td_error"])
-        return
-
+    td_data = await get_test_drive_data(lang)  # ← await qo'shildi
     dealers = td_data.get("dealers", [])
     if not dealers:
         await message.answer(MESSAGES[lang]["td_error"])
@@ -544,7 +671,6 @@ async def handle_all(message: types.Message, state: FSMContext):
 
     # ===== BACK BUTTON =====
     if text == back_btn:
-        # Ro'yxatdan o'tish davomida orqaga
         if current_state == RegStates.first_name:
             await state.clear()
             await message.answer(MESSAGES[lang]["choose_lang"], reply_markup=LANG_KEYBOARD)
@@ -573,13 +699,11 @@ async def handle_all(message: types.Message, state: FSMContext):
             )
             await state.set_state(RegStates.district)
             await message.answer(MESSAGES[lang]["choose_district"], reply_markup=kb)
-
-        # Navigatsiya
         elif current_state == NavStates.choose_brand:
             await state.clear()
             await message.answer(MESSAGES[lang]["main_menu"], reply_markup=get_main_menu_keyboard(lang))
         elif current_state == NavStates.choose_car:
-            brands = await api_get("/bot/brands/", {"lang": lang})
+            brands = await get_brands(lang)  # ← await qo'shildi
             if brands:
                 await state.set_state(NavStates.choose_brand)
                 await state.update_data(brands={b["name"]: b["id"] for b in brands})
@@ -590,12 +714,9 @@ async def handle_all(message: types.Message, state: FSMContext):
             else:
                 await state.clear()
                 await message.answer(MESSAGES[lang]["main_menu"], reply_markup=get_main_menu_keyboard(lang))
-
-        # Test-drayv
         elif current_state and current_state.startswith("TestDriveStates:"):
             await state.clear()
             await message.answer(MESSAGES[lang]["main_menu"], reply_markup=get_main_menu_keyboard(lang))
-
         else:
             await state.clear()
             await message.answer(MESSAGES[lang]["main_menu"], reply_markup=get_main_menu_keyboard(lang))
@@ -610,7 +731,7 @@ async def handle_all(message: types.Message, state: FSMContext):
             return
 
         brand_id = brands_map[text]
-        cars = await api_get("/bot/cars/", {"brand_id": brand_id, "lang": lang})
+        cars = await get_cars_by_brand(brand_id, lang)  # ← await qo'shildi
 
         if not cars:
             await message.answer(MESSAGES[lang]["no_cars"])
@@ -634,7 +755,7 @@ async def handle_all(message: types.Message, state: FSMContext):
             return
 
         car_id = cars_map[text]
-        car = await api_get("/bot/car-detail/", {"car_id": car_id, "lang": lang})
+        car = await get_car_detail(car_id, lang)  # ← await qo'shildi
 
         if not car:
             await message.answer("❌")
@@ -642,7 +763,6 @@ async def handle_all(message: types.Message, state: FSMContext):
 
         caption = build_car_caption(car)
 
-        # Rasmni yuborish
         image_url = car.get("card_image") or car.get("main_image")
         image_path = get_image_path(image_url) if image_url else None
 
@@ -677,7 +797,7 @@ async def handle_all(message: types.Message, state: FSMContext):
         if text == yes_btn:
             data = await state.get_data()
             name = data.get("reg_name", "")
-            await api_post("/bot/user/", {"telegram_id": uid, "first_name": name})
+            await update_or_create_user(uid, first_name=name)  # ← await qo'shildi
             await state.set_state(RegStates.age)
             await message.answer(MESSAGES[lang]["send_age"], reply_markup=ReplyKeyboardRemove())
         elif text == no_btn:
@@ -705,7 +825,7 @@ async def handle_all(message: types.Message, state: FSMContext):
     if current_state == RegStates.confirm_age:
         if text == yes_btn:
             data = await state.get_data()
-            await api_post("/bot/user/", {"telegram_id": uid, "age": data.get("reg_age")})
+            await update_or_create_user(uid, age=data.get("reg_age"))  # ← await qo'shildi
             await state.set_state(RegStates.region)
             regions = UZ_REGIONS.get(lang, UZ_REGIONS["uz"])
             kb = ReplyKeyboardMarkup(
@@ -783,7 +903,7 @@ async def handle_all(message: types.Message, state: FSMContext):
         if text == yes_btn:
             data = await state.get_data()
             region_full = f"{data.get('reg_region', '')}, {data.get('reg_district', '')}"
-            await api_post("/bot/user/", {"telegram_id": uid, "region": region_full})
+            await update_or_create_user(uid, region=region_full)  # ← await qo'shildi
             await state.set_state(RegStates.phone)
             kb = ReplyKeyboardMarkup(
                 keyboard=[[KeyboardButton(text="📞 Telefon yuborish", request_contact=True)]],
@@ -830,27 +950,23 @@ async def handle_all(message: types.Message, state: FSMContext):
             return
         await state.update_data(td_product_id=products_map[text], td_product_name=text)
         await state.set_state(TestDriveStates.choose_date)
-        await message.answer(MESSAGES[lang]["td_choose_date"], reply_markup=ReplyKeyboardMarkup(
-            keyboard=[[KeyboardButton(text=back_btn)]],
-            resize_keyboard=True
-        ))
+        await message.answer(MESSAGES[lang]["td_choose_date"], reply_markup=get_date_keyboard(back_btn))
         return
 
     # ===== TEST-DRAYV: DATE =====
     if current_state == TestDriveStates.choose_date:
-        from datetime import datetime, date
         try:
             parsed = datetime.strptime(text, "%d.%m.%Y").date()
-            if parsed < date.today():
+            today = datetime.now().date()
+            if parsed < today or parsed > today + timedelta(days=14):
                 await message.answer(MESSAGES[lang]["td_invalid_date"])
                 return
         except ValueError:
             await message.answer(MESSAGES[lang]["td_invalid_date"])
             return
-        await state.update_data(td_date=parsed.isoformat(), td_date_display=text)
+        await state.update_data(td_date=parsed, td_date_display=text)
         data = await state.get_data()
         time_slots = data.get("td_time_slots", [])
-        # 3 ta ustunli qilib joylashtiramiz
         rows = []
         row = []
         for ts in time_slots:
@@ -875,10 +991,9 @@ async def handle_all(message: types.Message, state: FSMContext):
             return
         await state.update_data(td_time=text)
 
-        # Ro'yxatdan o'tgan ism va telefonni API dan olamiz
-        user_data = await api_get("/bot/user/", {"telegram_id": uid})
-        td_name = (user_data or {}).get("first_name", "")
-        td_phone = (user_data or {}).get("phone", "")
+        user_data = await get_user_by_telegram_id(uid)  # ← await qo'shildi
+        td_name = (user_data.first_name if user_data else None) or ""
+        td_phone = (user_data.phone if user_data else None) or ""
         await state.update_data(td_name=td_name, td_phone=td_phone)
 
         data = await state.get_data()
@@ -898,18 +1013,19 @@ async def handle_all(message: types.Message, state: FSMContext):
     if current_state == TestDriveStates.confirm:
         if text == yes_btn:
             data = await state.get_data()
-            result = await api_post("/bot/test-drive/", {
+            request_data = {
                 "name": data.get("td_name"),
                 "phone": data.get("td_phone"),
-                "dealer": data.get("td_dealer_id"),
-                "product": data.get("td_product_id"),
+                "dealer_id": data.get("td_dealer_id"),    # ← ForeignKey uchun _id
+                "product_id": data.get("td_product_id"),  # ← ForeignKey uchun _id
                 "preferred_date": data.get("td_date"),
                 "preferred_time": data.get("td_time"),
                 "agree_terms": True,
-            })
-            if result and result.get("success"):
+            }
+            test_drive_obj, error = await create_test_drive_request(request_data)  # ← await qo'shildi
+            if test_drive_obj and not error:
                 await message.answer(MESSAGES[lang]["td_success"])
-            elif result and result.get("error") == "daily_limit":
+            elif error == "daily_limit":
                 await message.answer(MESSAGES[lang]["td_daily_limit"])
             else:
                 await message.answer(MESSAGES[lang]["td_error"])

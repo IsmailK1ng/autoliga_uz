@@ -1,615 +1,580 @@
-# main/serializers.py
-
-from rest_framework import serializers
-import logging
-
-logger = logging.getLogger('django')
-from main.serializers_base import LanguageSerializerMixin
-
-from .models import (
-    News, NewsBlock, ContactForm, JobApplication,
-    Product, FeatureIcon, ProductCardSpec, ProductParameter, ProductFeature, ProductGallery, ProductCategory,
-    Vacancy, VacancyResponsibility, VacancyRequirement, VacancyCondition, VacancyIdealCandidate,
-    Review, TestDriveRequest
-)
-
-
-# ========== НОВОСТИ ==========
-
-class NewsBlockSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = NewsBlock
-        fields = '__all__'
-
-
-class NewsSerializer(serializers.ModelSerializer):
-    blocks = NewsBlockSerializer(many=True, read_only=True)
-
-    class Meta:
-        model = News
-        fields = '__all__'
-
-
-# ========== ЗАЯВКИ ==========
-
-class ContactFormSerializer(serializers.ModelSerializer):
-    manager_name = serializers.CharField(source='manager.username', read_only=True)
-    status_display = serializers.CharField(source='get_status_display', read_only=True)
-    priority_display = serializers.CharField(source='get_priority_display', read_only=True)
-    region_display = serializers.CharField(source='get_region_display', read_only=True)
-    
-    class Meta:
-        model = ContactForm
-        fields = [
-            'id', 'name', 'phone', 'region', 'region_display', 
-            'product', 'referer', 'utm_data', 'visitor_uid', 
-            'message', 'status', 'status_display', 
-            'priority', 'priority_display',
-            'manager', 'manager_name', 'admin_comment', 'created_at'
-        ]
-        read_only_fields = ['id', 'created_at', 'status_display', 'priority_display', 'region_display']
-    
-    def validate_visitor_uid(self, value):
-        """Валидация visitor_uid от amoCRM Pixel"""
-        if value:
-            if not (value.replace('-', '').replace('_', '').isalnum() and len(value) <= 100):
-                raise serializers.ValidationError("Невалидный visitor_uid")
-        return value
-    
-    def create(self, validated_data):
-        import json
-        from urllib.parse import urlparse, parse_qs
-        
-        validated_data.setdefault('status', 'new')
-        validated_data.setdefault('priority', 'medium')
-        
-        request = self.context.get('request')
-        
-        if request:
-            if not validated_data.get('referer'):
-                referer = request.META.get('HTTP_REFERER')
-                if referer:
-                    validated_data['referer'] = referer
-            
-            utm_from_body = validated_data.get('utm_data')
-            
-            if utm_from_body:
-                if isinstance(utm_from_body, str):
-                    pass
-                elif isinstance(utm_from_body, dict):
-                    validated_data['utm_data'] = json.dumps(utm_from_body, ensure_ascii=False)
-            else:
-                referer = validated_data.get('referer') or request.META.get('HTTP_REFERER')
-                
-                if referer:
-                    parsed = urlparse(referer)
-                    query_params = parse_qs(parsed.query)
-                    
-                    utm_params = {}
-                    for key in ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content']:
-                        if key in query_params:
-                            utm_params[key] = query_params[key][0]
-                    
-                    if utm_params:
-                        validated_data['utm_data'] = json.dumps(utm_params, ensure_ascii=False)
-        
-        contact_form = super().create(validated_data)
-        return contact_form
-
-
-class JobApplicationSerializer(serializers.ModelSerializer):
-    """Заявки на вакансии с валидацией резюме"""
-    vacancy_title = serializers.CharField(source='vacancy.title', read_only=True)
-    
-    class Meta:
-        model = JobApplication
-        fields = ['id', 'vacancy', 'vacancy_title', 'region', 'resume', 'created_at']
-        read_only_fields = ['id', 'created_at', 'vacancy_title']
-    
-    def validate_resume(self, value):
-        """Валидация файла резюме"""
-        try:
-            # Проверка размера (10 MB)
-            if value.size > 10 * 1024 * 1024:
-                raise serializers.ValidationError("Fayl hajmi juda katta. Maksimal 10 MB")
-            
-            # Проверка формата
-            allowed_extensions = ['pdf', 'doc', 'docx', 'jpg', 'jpeg', 'png']
-            file_ext = value.name.lower().split('.')[-1]
-            if file_ext not in allowed_extensions:
-                raise serializers.ValidationError("Noto'g'ri fayl formati. PDF, DOC, DOCX, JPG yoki PNG foydalaning")
-            
-            return value
-        
-        except serializers.ValidationError:
-            raise  # Пробрасываем ValidationError
-        except Exception as e:
-            logger.error(f"Критическая ошибка валидации резюме: {str(e)}", exc_info=True)
-            raise serializers.ValidationError("Xatolik yuz berdi")
-
-
-# ========== ПРОДУКТЫ ==========
-
-class FeatureIconSerializer(serializers.ModelSerializer):
-    """Иконки для характеристик"""
-    icon_url = serializers.SerializerMethodField()
-
-    class Meta:
-        model = FeatureIcon
-        fields = ['id', 'name', 'icon_url']
-
-    def get_icon_url(self, obj):
-        request = self.context.get('request')
-        if obj.icon:
-            if request:
-                return request.build_absolute_uri(obj.icon.url)
-            return obj.icon.url
-        return None
-
-
-class ProductCardSpecSerializer(serializers.ModelSerializer):
-    """4 характеристики для карточки продукта"""
-    icon = FeatureIconSerializer(read_only=True)
-    
-    class Meta:
-        model = ProductCardSpec
-        fields = ['id', 'icon', 'value', 'order']
-
-
-class ProductCardSerializer(LanguageSerializerMixin, serializers.ModelSerializer):
-    """Карточки продуктов для списка"""
-    card_specs = ProductCardSpecSerializer(many=True, read_only=True)
-    image_url = serializers.SerializerMethodField()
-    category = serializers.SerializerMethodField()
-    slider_price = serializers.CharField(read_only=True)  # 👈 SHU YERGA QO‘SH
-
-
-    class Meta:
-        model = Product
-        fields = [
-            'id', 'title', 'slug',
-            'category',
-            'image_url', 'card_specs', 'slider_price', 'is_featured', 'order'
-        ]
-    
-    def get_category(self, obj):
-        """Возвращает одну категорию"""
-        if obj.category and obj.category.is_active:
-            language = self.get_current_language()  # ✅ Теперь работает
-            name = getattr(obj.category, f'name_{language}', None) or obj.category.name
-            return {
-                'id': obj.category.id,
-                'slug': obj.category.slug,
-                'name': name
-            }
-        return None
-    
-    def get_image_url(self, obj):
-        """Возвращает URL изображения для карточки"""
-        image = obj.card_image if obj.card_image else obj.main_image
-        if image:
-            request = self.context.get('request')
-            if request:
-                return request.build_absolute_uri(image.url)
-            return image.url
-        return None
-
-class ProductFeatureSerializer(LanguageSerializerMixin, serializers.ModelSerializer):
-    """8 характеристик с иконками"""
-    icon = FeatureIconSerializer(read_only=True)
-    name = serializers.SerializerMethodField()
-    
-    class Meta:
-        model = ProductFeature
-        fields = ['id', 'icon', 'name', 'order']
-    
-    def get_name(self, obj):
-        lang = self.get_current_language()
-        return getattr(obj, f'name_{lang}', None) or obj.name
-
-
-class ProductGallerySerializer(serializers.ModelSerializer):
-    """Галерея продукта"""
-    image_url = serializers.SerializerMethodField()
-    
-    class Meta:
-        model = ProductGallery
-        fields = ['id', 'image_url', 'order']
-    
-    def get_image_url(self, obj):
-        if obj.image:
-            request = self.context.get('request')
-            if request:
-                return request.build_absolute_uri(obj.image.url)
-            return obj.image.url
-        return None
-
-
-class ProductDetailSerializer(LanguageSerializerMixin, serializers.ModelSerializer):
-    """Детальная страница продукта"""
-    card_specs = ProductCardSpecSerializer(many=True, read_only=True)
-    spec_groups = serializers.SerializerMethodField()
-    features = ProductFeatureSerializer(many=True, read_only=True)
-    gallery = ProductGallerySerializer(many=True, read_only=True)
-    main_image_url = serializers.SerializerMethodField()
-    card_image_url = serializers.SerializerMethodField()
-    title = serializers.SerializerMethodField()
-    category = serializers.SerializerMethodField()
-
-    class Meta:
-        model = Product
-        fields = [
-            'id', 'title', 'slug',
-            'category',
-            'main_image_url', 'card_image_url',
-            'card_specs', 'spec_groups', 'features', 'gallery',
-            'is_active', 'is_featured', 'order'
-        ]
-
-    def get_category(self, obj):
-        if obj.category and obj.category.is_active:
-            language = self.get_current_language()
-            name = getattr(obj.category, f'name_{language}', None) or obj.category.name
-            description = getattr(obj.category, f'description_{language}', None) or obj.category.description or ''
-            return {
-                'id': obj.category.id,
-                'slug': obj.category.slug,
-                'name': name,
-                'description': description
-            }
-        return None
-
-    def get_title(self, obj):
-        lang = self.get_current_language()
-        return getattr(obj, f'title_{lang}', None) or obj.title
-
-    def get_spec_groups(self, obj):
-        language = self.get_current_language()
-
-        # ✅ ДИНАМИК: ParameterCategory ForeignKey dan nom olish
-        parameters = obj.parameters.select_related('category').all().order_by(
-            'category__order', 'order'
-        )
-
-        grouped = {}
-        order_map = {}
-
-        for param in parameters:
-            cat_obj = param.category
-
-            if cat_obj is None:
-                cat_key = 0
-                cat_name = '—'
-                cat_order = 9999
-            else:
-                cat_key = cat_obj.id
-                # 3 tilda nom olish
-                cat_name = getattr(cat_obj, f'name_{language}', None) or cat_obj.name or '—'
-                cat_order = cat_obj.order
-
-            if cat_key not in grouped:
-                grouped[cat_key] = {
-                    'category_name': cat_name,
-                    'parameters': []
-                }
-                order_map[cat_key] = cat_order
-
-            text_value = getattr(param, f'text_{language}', None) or param.text or ''
-            grouped[cat_key]['parameters'].append({
-                'id': param.id,
-                'text': text_value,
-                'order': param.order
-            })
-
-        # Kategoriya order bo'yicha saralash
-        result = [
-            grouped[k]
-            for k in sorted(grouped.keys(), key=lambda k: order_map.get(k, 9999))
-        ]
-
-        return result
-
-    def get_main_image_url(self, obj):
-        if obj.main_image:
-            request = self.context.get('request')
-            if request:
-                return request.build_absolute_uri(obj.main_image.url)
-            return obj.main_image.url
-        return None
-
-    def get_card_image_url(self, obj):
-        if obj.card_image:
-            request = self.context.get('request')
-            if request:
-                return request.build_absolute_uri(obj.card_image.url)
-            return obj.card_image.url
-        return None
-
-class ProductCategorySerializer(LanguageSerializerMixin, serializers.ModelSerializer):
-    """Сериализатор для категорий продуктов"""
-    name = serializers.SerializerMethodField()
-    description = serializers.SerializerMethodField()
-    hero_image_url = serializers.SerializerMethodField()
-    
-    class Meta:
-        model = ProductCategory
-        fields = ['id', 'slug', 'name', 'description', 'hero_image_url', 'order']  # ✅ Убрали icon_url
-    
-    def get_name(self, obj):
-        """Название на текущем языке"""
-        lang = self.get_current_language()
-        return getattr(obj, f'name_{lang}', None) or obj.name
-    
-    def get_description(self, obj):
-        """Описание на текущем языке"""
-        lang = self.get_current_language()
-        return getattr(obj, f'description_{lang}', None) or obj.description or ''
-    
-    def get_hero_image_url(self, obj):
-        """URL фонового изображения"""
-        if obj.hero_image:
-            request = self.context.get('request')
-            if request:
-                return request.build_absolute_uri(obj.hero_image.url)
-            return obj.hero_image.url
-        return None
-    
-# ========== СЕРИАЛИЗАТОР ДЛЯ ВАКАНСИЙ ==========
-
-class VacancySerializer(LanguageSerializerMixin, serializers.ModelSerializer):
-    """Вакансии с поддержкой переводов"""
-    title = serializers.SerializerMethodField()
-    short_description = serializers.SerializerMethodField()
-    contact_info = serializers.SerializerMethodField()
-    responsibilities = serializers.SerializerMethodField()
-    requirements = serializers.SerializerMethodField()
-    conditions = serializers.SerializerMethodField()
-    ideal_candidates = serializers.SerializerMethodField()
-    
-    class Meta:
-        model = Vacancy
-        fields = [
-            'id', 'title', 'short_description', 'contact_info',
-            'responsibilities', 'requirements', 'conditions', 'ideal_candidates',
-            'is_active', 'created_at'
-        ]
-    
-    def get_title(self, obj):
-        lang = self.get_current_language()  
-        return getattr(obj, f'title_{lang}', None) or obj.title
-    
-    def get_short_description(self, obj):
-        lang = self.get_current_language()  
-        return getattr(obj, f'short_description_{lang}', None) or obj.short_description or ''
-    
-    def get_contact_info(self, obj):
-        lang = self.get_current_language()  
-        return getattr(obj, f'contact_info_{lang}', None) or obj.contact_info or ''
-    
-    def get_responsibilities(self, obj):
-        lang = self.get_current_language()  
-        responsibilities = obj.responsibilities.all().order_by('order')
-        return [
-            {
-                'id': item.id, 
-                'title': getattr(item, f'title_{lang}', None) or item.title or '', 
-                'text': getattr(item, f'text_{lang}', None) or item.text or ''
-            } 
-            for item in responsibilities
-        ]
-    
-    def get_requirements(self, obj):
-        lang = self.get_current_language()  
-        requirements = obj.requirements.all().order_by('order')
-        return [
-            {
-                'id': item.id, 
-                'text': getattr(item, f'text_{lang}', None) or item.text or ''
-            } 
-            for item in requirements
-        ]
-    
-    def get_conditions(self, obj):
-        lang = self.get_current_language()  
-        conditions = obj.conditions.all().order_by('order')
-        return [
-            {
-                'id': item.id, 
-                'text': getattr(item, f'text_{lang}', None) or item.text or ''
-            } 
-            for item in conditions
-        ]
-    
-    def get_ideal_candidates(self, obj):
-        lang = self.get_current_language()
-        candidates = obj.ideal_candidates.all().order_by('order')
-        return [
-            {
-                'id': item.id,
-                'text': getattr(item, f'text_{lang}', None) or item.text or ''
-            }
-            for item in candidates
-        ]
-
-
-# ========== ОТЗЫВЫ КЛИЕНТОВ ==========
-
-class ReviewListSerializer(serializers.ModelSerializer):
-    """Сериализатор для отображения одобренных отзывов"""
-    avatar_url = serializers.SerializerMethodField()
-
-    class Meta:
-        model = Review
-        fields = ['id', 'name', 'rating', 'text', 'avatar_url', 'is_verified', 'created_at']
-
-    def get_avatar_url(self, obj):
-        if obj.avatar:
-            request = self.context.get('request')
-            if request:
-                return request.build_absolute_uri(obj.avatar.url)
-            return obj.avatar.url
-        return None
-
-
-class ReviewCreateSerializer(serializers.ModelSerializer):
-    """Сериализатор для создания отзыва с reCAPTCHA"""
-    recaptcha_token = serializers.CharField(write_only=True, required=True)
-
-    class Meta:
-        model = Review
-        fields = ['name', 'rating', 'text', 'avatar', 'recaptcha_token']
-
-    def validate_rating(self, value):
-        if value < 1 or value > 5:
-            raise serializers.ValidationError("Оценка должна быть от 1 до 5")
-        return value
-
-    def validate_avatar(self, value):
-        if value is None:
-            return value
-        # Размер: максимум 100 KB
-        if value.size > 100 * 1024:
-            raise serializers.ValidationError("Максимальный размер фото — 100 KB")
-        # Разрешённые расширения
-        allowed_ext = ['jpg', 'jpeg', 'png', 'webp']
-        ext = value.name.rsplit('.', 1)[-1].lower() if '.' in value.name else ''
-        if ext not in allowed_ext:
-            raise serializers.ValidationError("Допустимые форматы: JPG, PNG, WEBP")
-        # Проверка реального содержимого (magic bytes)
-        header = value.read(16)
-        value.seek(0)
-
-        is_jpeg = header[:3] == b'\xff\xd8\xff'
-        is_png = header[:4] == b'\x89PNG'
-        is_webp = header[:4] == b'RIFF' and header[8:12] == b'WEBP'
-
-        if not (is_jpeg or is_png or is_webp):
-            raise serializers.ValidationError("Файл повреждён или не является изображением")
-
-        # Генерация безопасного имени
-        import uuid
-        safe_name = f"{uuid.uuid4().hex}.{ext}"
-        value.name = safe_name
-        return value
-
-    def validate_recaptcha_token(self, value):
-        import requests
-        from django.conf import settings
-        secret_key = getattr(settings, 'RECAPTCHA_SECRET_KEY', '')
-        if not secret_key:
-            logger.warning("RECAPTCHA_SECRET_KEY не настроен, пропуск проверки")
-            return value
-        try:
-            resp = requests.post(
-                'https://www.google.com/recaptcha/api/siteverify',
-                data={'secret': secret_key, 'response': value},
-                timeout=5
-            )
-            result = resp.json()
-            if not result.get('success'):
-                raise serializers.ValidationError("Проверка reCAPTCHA не пройдена")
-            # Для reCAPTCHA v3 — проверяем score
-            score = result.get('score', 1.0)
-            if score < 0.3:
-                raise serializers.ValidationError("Подозрительная активность")
-        except requests.RequestException:
-            logger.error("Ошибка подключения к reCAPTCHA API", exc_info=True)
-            # В случае ошибки сети — пропускаем (не блокируем пользователя)
-        return value
-
-    def create(self, validated_data):
-        validated_data.pop('recaptcha_token', None)
-        request = self.context.get('request')
-        if request:
-            # Сохраняем IP
-            x_forwarded = request.META.get('HTTP_X_FORWARDED_FOR')
-            if x_forwarded:
-                validated_data['ip_address'] = x_forwarded.split(',')[0].strip()
-            else:
-                validated_data['ip_address'] = request.META.get('REMOTE_ADDR')
-        validated_data['status'] = 'pending'
-        return super().create(validated_data)
-
-
-# ========== ТЕСТ-ДРАЙВ ==========
-
-class TestDriveSerializer(serializers.ModelSerializer):
-    """Сериализатор для заявок на тест-драйв"""
-
-    class Meta:
-        model = TestDriveRequest
-        fields = [
-            'name', 'phone', 'dealer', 'product',
-            'preferred_date', 'preferred_time', 'agree_terms',
-            'referer', 'utm_data', 'visitor_uid',
-        ]
-
-    def validate_agree_terms(self, value):
-        if not value:
-            raise serializers.ValidationError("Необходимо согласие на обработку данных")
-        return value
-
-    def validate_preferred_date(self, value):
-        from datetime import date
-        if value < date.today():
-            raise serializers.ValidationError("Нельзя выбрать прошедшую дату")
-        return value
-
-    def create(self, validated_data):
-        import json
-        request = self.context.get('request')
-        if request:
-            x_forwarded = request.META.get('HTTP_X_FORWARDED_FOR')
-            if x_forwarded:
-                validated_data['ip_address'] = x_forwarded.split(',')[0].strip()
-            else:
-                validated_data['ip_address'] = request.META.get('REMOTE_ADDR')
-
-            if not validated_data.get('referer'):
-                referer = request.META.get('HTTP_REFERER')
-                if referer:
-                    validated_data['referer'] = referer
-
-            utm_from_body = validated_data.get('utm_data')
-            if utm_from_body and isinstance(utm_from_body, dict):
-                validated_data['utm_data'] = json.dumps(utm_from_body, ensure_ascii=False)
-
-        validated_data['status'] = 'new'
-        return super().create(validated_data)
-
-
-# ========== BOT API SERIALIZERS ==========
-
-from .models import TelegramUser, Dealer
-
-class BotTelegramUserSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = TelegramUser
-        fields = ['id', 'telegram_id', 'username', 'first_name', 'age', 'phone', 'region', 'language', 'created_at']
-        read_only_fields = ['id', 'created_at']
-
-class BotDealerSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Dealer
-        fields = ['id', 'name', 'address', 'phone', 'region']
-
-class BotBrandSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = ProductCategory
-        fields = ['id', 'name']
-
-class BotCarSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Product
-        fields = ['id', 'title', 'main_image', 'card_image',
-                  'slider_price', 'slider_year', 'slider_power', 'slider_fuel_consumption']
-
-class BotTestDriveSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = TestDriveRequest
-        fields = ['name', 'phone', 'dealer', 'product', 'preferred_date', 'preferred_time', 'agree_terms']
-
-    def create(self, validated_data):
-        validated_data['status'] = 'new'
-        validated_data['referer'] = 'telegram_bot'
-        return super().create(validated_data)
+# main/serializers.py
+
+from rest_framework import serializers
+import logging
+
+logger = logging.getLogger('django')
+from main.serializers_base import LanguageSerializerMixin
+
+from .models import (
+    News, NewsBlock, ContactForm, JobApplication,
+    Product, FeatureIcon, ProductCardSpec, ProductParameter, ProductFeature, ProductGallery, ProductCategory,
+    Vacancy, VacancyResponsibility, VacancyRequirement, VacancyCondition, VacancyIdealCandidate,
+    Review, TestDriveRequest
+)
+
+
+# ========== РќРћР’РћРЎРўР ==========
+
+class NewsBlockSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = NewsBlock
+        fields = '__all__'
+
+
+class NewsSerializer(serializers.ModelSerializer):
+    blocks = NewsBlockSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = News
+        fields = '__all__'
+
+
+# ========== Р—РђРЇР’РљР ==========
+
+class ContactFormSerializer(serializers.ModelSerializer):
+    manager_name = serializers.CharField(source='manager.username', read_only=True)
+    status_display = serializers.CharField(source='get_status_display', read_only=True)
+    priority_display = serializers.CharField(source='get_priority_display', read_only=True)
+    region_display = serializers.CharField(source='get_region_display', read_only=True)
+    
+    class Meta:
+        model = ContactForm
+        fields = [
+            'id', 'name', 'phone', 'region', 'region_display', 
+            'product', 'referer', 'utm_data', 'visitor_uid', 
+            'message', 'status', 'status_display', 
+            'priority', 'priority_display',
+            'manager', 'manager_name', 'admin_comment', 'created_at'
+        ]
+        read_only_fields = ['id', 'created_at', 'status_display', 'priority_display', 'region_display']
+    
+    def validate_visitor_uid(self, value):
+        """Р’Р°Р»РёРґР°С†РёСЏ visitor_uid РѕС‚ amoCRM Pixel"""
+        if value:
+            if not (value.replace('-', '').replace('_', '').isalnum() and len(value) <= 100):
+                raise serializers.ValidationError("РќРµРІР°Р»РёРґРЅС‹Р№ visitor_uid")
+        return value
+    
+    def create(self, validated_data):
+        import json
+        from urllib.parse import urlparse, parse_qs
+        
+        validated_data.setdefault('status', 'new')
+        validated_data.setdefault('priority', 'medium')
+        
+        request = self.context.get('request')
+        
+        if request:
+            if not validated_data.get('referer'):
+                referer = request.META.get('HTTP_REFERER')
+                if referer:
+                    validated_data['referer'] = referer
+            
+            utm_from_body = validated_data.get('utm_data')
+            
+            if utm_from_body:
+                if isinstance(utm_from_body, str):
+                    pass
+                elif isinstance(utm_from_body, dict):
+                    validated_data['utm_data'] = json.dumps(utm_from_body, ensure_ascii=False)
+            else:
+                referer = validated_data.get('referer') or request.META.get('HTTP_REFERER')
+                
+                if referer:
+                    parsed = urlparse(referer)
+                    query_params = parse_qs(parsed.query)
+                    
+                    utm_params = {}
+                    for key in ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content']:
+                        if key in query_params:
+                            utm_params[key] = query_params[key][0]
+                    
+                    if utm_params:
+                        validated_data['utm_data'] = json.dumps(utm_params, ensure_ascii=False)
+        
+        contact_form = super().create(validated_data)
+        return contact_form
+
+
+class JobApplicationSerializer(serializers.ModelSerializer):
+    """Р—Р°СЏРІРєРё РЅР° РІР°РєР°РЅСЃРёРё СЃ РІР°Р»РёРґР°С†РёРµР№ СЂРµР·СЋРјРµ"""
+    vacancy_title = serializers.CharField(source='vacancy.title', read_only=True)
+    
+    class Meta:
+        model = JobApplication
+        fields = ['id', 'vacancy', 'vacancy_title', 'region', 'resume', 'created_at']
+        read_only_fields = ['id', 'created_at', 'vacancy_title']
+    
+    def validate_resume(self, value):
+        """Р’Р°Р»РёРґР°С†РёСЏ С„Р°Р№Р»Р° СЂРµР·СЋРјРµ"""
+        try:
+            # РџСЂРѕРІРµСЂРєР° СЂР°Р·РјРµСЂР° (10 MB)
+            if value.size > 10 * 1024 * 1024:
+                raise serializers.ValidationError("Fayl hajmi juda katta. Maksimal 10 MB")
+            
+            # РџСЂРѕРІРµСЂРєР° С„РѕСЂРјР°С‚Р°
+            allowed_extensions = ['pdf', 'doc', 'docx', 'jpg', 'jpeg', 'png']
+            file_ext = value.name.lower().split('.')[-1]
+            if file_ext not in allowed_extensions:
+                raise serializers.ValidationError("Noto'g'ri fayl formati. PDF, DOC, DOCX, JPG yoki PNG foydalaning")
+            
+            return value
+        
+        except serializers.ValidationError:
+            raise  # РџСЂРѕР±СЂР°СЃС‹РІР°РµРј ValidationError
+        except Exception as e:
+            logger.error(f"РљСЂРёС‚РёС‡РµСЃРєР°СЏ РѕС€РёР±РєР° РІР°Р»РёРґР°С†РёРё СЂРµР·СЋРјРµ: {str(e)}", exc_info=True)
+            raise serializers.ValidationError("Xatolik yuz berdi")
+
+
+# ========== РџР РћР”РЈРљРўР« ==========
+
+class FeatureIconSerializer(serializers.ModelSerializer):
+    """РРєРѕРЅРєРё РґР»СЏ С…Р°СЂР°РєС‚РµСЂРёСЃС‚РёРє"""
+    icon_url = serializers.SerializerMethodField()
+
+    class Meta:
+        model = FeatureIcon
+        fields = ['id', 'name', 'icon_url']
+
+    def get_icon_url(self, obj):
+        request = self.context.get('request')
+        if obj.icon:
+            if request:
+                return request.build_absolute_uri(obj.icon.url)
+            return obj.icon.url
+        return None
+
+
+class ProductCardSpecSerializer(serializers.ModelSerializer):
+    """4 С…Р°СЂР°РєС‚РµСЂРёСЃС‚РёРєРё РґР»СЏ РєР°СЂС‚РѕС‡РєРё РїСЂРѕРґСѓРєС‚Р°"""
+    icon = FeatureIconSerializer(read_only=True)
+    
+    class Meta:
+        model = ProductCardSpec
+        fields = ['id', 'icon', 'value', 'order']
+
+
+class ProductCardSerializer(LanguageSerializerMixin, serializers.ModelSerializer):
+    """РљР°СЂС‚РѕС‡РєРё РїСЂРѕРґСѓРєС‚РѕРІ РґР»СЏ СЃРїРёСЃРєР°"""
+    card_specs = ProductCardSpecSerializer(many=True, read_only=True)
+    image_url = serializers.SerializerMethodField()
+    category = serializers.SerializerMethodField()
+    slider_price = serializers.CharField(read_only=True)  # рџ‘€ SHU YERGA QOвЂSH
+
+
+    class Meta:
+        model = Product
+        fields = [
+            'id', 'title', 'slug',
+            'category',
+            'image_url', 'card_specs', 'slider_price', 'is_featured', 'order'
+        ]
+    
+    def get_category(self, obj):
+        """Р’РѕР·РІСЂР°С‰Р°РµС‚ РѕРґРЅСѓ РєР°С‚РµРіРѕСЂРёСЋ"""
+        if obj.category and obj.category.is_active:
+            language = self.get_current_language()  # вњ… РўРµРїРµСЂСЊ СЂР°Р±РѕС‚Р°РµС‚
+            name = getattr(obj.category, f'name_{language}', None) or obj.category.name
+            return {
+                'id': obj.category.id,
+                'slug': obj.category.slug,
+                'name': name
+            }
+        return None
+    
+    def get_image_url(self, obj):
+        """Р’РѕР·РІСЂР°С‰Р°РµС‚ URL РёР·РѕР±СЂР°Р¶РµРЅРёСЏ РґР»СЏ РєР°СЂС‚РѕС‡РєРё"""
+        image = obj.card_image if obj.card_image else obj.main_image
+        if image:
+            request = self.context.get('request')
+            if request:
+                return request.build_absolute_uri(image.url)
+            return image.url
+        return None
+
+class ProductFeatureSerializer(LanguageSerializerMixin, serializers.ModelSerializer):
+    """8 С…Р°СЂР°РєС‚РµСЂРёСЃС‚РёРє СЃ РёРєРѕРЅРєР°РјРё"""
+    icon = FeatureIconSerializer(read_only=True)
+    name = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = ProductFeature
+        fields = ['id', 'icon', 'name', 'order']
+    
+    def get_name(self, obj):
+        lang = self.get_current_language()
+        return getattr(obj, f'name_{lang}', None) or obj.name
+
+
+class ProductGallerySerializer(serializers.ModelSerializer):
+    """Р“Р°Р»РµСЂРµСЏ РїСЂРѕРґСѓРєС‚Р°"""
+    image_url = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = ProductGallery
+        fields = ['id', 'image_url', 'order']
+    
+    def get_image_url(self, obj):
+        if obj.image:
+            request = self.context.get('request')
+            if request:
+                return request.build_absolute_uri(obj.image.url)
+            return obj.image.url
+        return None
+
+
+class ProductDetailSerializer(LanguageSerializerMixin, serializers.ModelSerializer):
+    """Р”РµС‚Р°Р»СЊРЅР°СЏ СЃС‚СЂР°РЅРёС†Р° РїСЂРѕРґСѓРєС‚Р°"""
+    card_specs = ProductCardSpecSerializer(many=True, read_only=True)
+    spec_groups = serializers.SerializerMethodField()
+    features = ProductFeatureSerializer(many=True, read_only=True)
+    gallery = ProductGallerySerializer(many=True, read_only=True)
+    main_image_url = serializers.SerializerMethodField()
+    card_image_url = serializers.SerializerMethodField()
+    title = serializers.SerializerMethodField()
+    category = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Product
+        fields = [
+            'id', 'title', 'slug',
+            'category',
+            'main_image_url', 'card_image_url',
+            'card_specs', 'spec_groups', 'features', 'gallery',
+            'is_active', 'is_featured', 'order'
+        ]
+
+    def get_category(self, obj):
+        if obj.category and obj.category.is_active:
+            language = self.get_current_language()
+            name = getattr(obj.category, f'name_{language}', None) or obj.category.name
+            description = getattr(obj.category, f'description_{language}', None) or obj.category.description or ''
+            return {
+                'id': obj.category.id,
+                'slug': obj.category.slug,
+                'name': name,
+                'description': description
+            }
+        return None
+
+    def get_title(self, obj):
+        lang = self.get_current_language()
+        return getattr(obj, f'title_{lang}', None) or obj.title
+
+    def get_spec_groups(self, obj):
+        language = self.get_current_language()
+
+        # вњ… Р”РРќРђРњРРљ: ParameterCategory ForeignKey dan nom olish
+        parameters = obj.parameters.select_related('category').all().order_by(
+            'category__order', 'order'
+        )
+
+        grouped = {}
+        order_map = {}
+
+        for param in parameters:
+            cat_obj = param.category
+
+            if cat_obj is None:
+                cat_key = 0
+                cat_name = 'вЂ”'
+                cat_order = 9999
+            else:
+                cat_key = cat_obj.id
+                # 3 tilda nom olish
+                cat_name = getattr(cat_obj, f'name_{language}', None) or cat_obj.name or 'вЂ”'
+                cat_order = cat_obj.order
+
+            if cat_key not in grouped:
+                grouped[cat_key] = {
+                    'category_name': cat_name,
+                    'parameters': []
+                }
+                order_map[cat_key] = cat_order
+
+            text_value = getattr(param, f'text_{language}', None) or param.text or ''
+            grouped[cat_key]['parameters'].append({
+                'id': param.id,
+                'text': text_value,
+                'order': param.order
+            })
+
+        # Kategoriya order bo'yicha saralash
+        result = [
+            grouped[k]
+            for k in sorted(grouped.keys(), key=lambda k: order_map.get(k, 9999))
+        ]
+
+        return result
+
+    def get_main_image_url(self, obj):
+        if obj.main_image:
+            request = self.context.get('request')
+            if request:
+                return request.build_absolute_uri(obj.main_image.url)
+            return obj.main_image.url
+        return None
+
+    def get_card_image_url(self, obj):
+        if obj.card_image:
+            request = self.context.get('request')
+            if request:
+                return request.build_absolute_uri(obj.card_image.url)
+            return obj.card_image.url
+        return None
+
+class ProductCategorySerializer(LanguageSerializerMixin, serializers.ModelSerializer):
+    """РЎРµСЂРёР°Р»РёР·Р°С‚РѕСЂ РґР»СЏ РєР°С‚РµРіРѕСЂРёР№ РїСЂРѕРґСѓРєС‚РѕРІ"""
+    name = serializers.SerializerMethodField()
+    description = serializers.SerializerMethodField()
+    hero_image_url = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = ProductCategory
+        fields = ['id', 'slug', 'name', 'description', 'hero_image_url', 'order']  # вњ… РЈР±СЂР°Р»Рё icon_url
+    
+    def get_name(self, obj):
+        """РќР°Р·РІР°РЅРёРµ РЅР° С‚РµРєСѓС‰РµРј СЏР·С‹РєРµ"""
+        lang = self.get_current_language()
+        return getattr(obj, f'name_{lang}', None) or obj.name
+    
+    def get_description(self, obj):
+        """РћРїРёСЃР°РЅРёРµ РЅР° С‚РµРєСѓС‰РµРј СЏР·С‹РєРµ"""
+        lang = self.get_current_language()
+        return getattr(obj, f'description_{lang}', None) or obj.description or ''
+    
+    def get_hero_image_url(self, obj):
+        """URL С„РѕРЅРѕРІРѕРіРѕ РёР·РѕР±СЂР°Р¶РµРЅРёСЏ"""
+        if obj.hero_image:
+            request = self.context.get('request')
+            if request:
+                return request.build_absolute_uri(obj.hero_image.url)
+            return obj.hero_image.url
+        return None
+    
+# ========== РЎР•Р РРђР›РР—РђРўРћР  Р”Р›РЇ Р’РђРљРђРќРЎРР™ ==========
+
+class VacancySerializer(LanguageSerializerMixin, serializers.ModelSerializer):
+    """Р’Р°РєР°РЅСЃРёРё СЃ РїРѕРґРґРµСЂР¶РєРѕР№ РїРµСЂРµРІРѕРґРѕРІ"""
+    title = serializers.SerializerMethodField()
+    short_description = serializers.SerializerMethodField()
+    contact_info = serializers.SerializerMethodField()
+    responsibilities = serializers.SerializerMethodField()
+    requirements = serializers.SerializerMethodField()
+    conditions = serializers.SerializerMethodField()
+    ideal_candidates = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = Vacancy
+        fields = [
+            'id', 'title', 'short_description', 'contact_info',
+            'responsibilities', 'requirements', 'conditions', 'ideal_candidates',
+            'is_active', 'created_at'
+        ]
+    
+    def get_title(self, obj):
+        lang = self.get_current_language()  
+        return getattr(obj, f'title_{lang}', None) or obj.title
+    
+    def get_short_description(self, obj):
+        lang = self.get_current_language()  
+        return getattr(obj, f'short_description_{lang}', None) or obj.short_description or ''
+    
+    def get_contact_info(self, obj):
+        lang = self.get_current_language()  
+        return getattr(obj, f'contact_info_{lang}', None) or obj.contact_info or ''
+    
+    def get_responsibilities(self, obj):
+        lang = self.get_current_language()  
+        responsibilities = obj.responsibilities.all().order_by('order')
+        return [
+            {
+                'id': item.id, 
+                'title': getattr(item, f'title_{lang}', None) or item.title or '', 
+                'text': getattr(item, f'text_{lang}', None) or item.text or ''
+            } 
+            for item in responsibilities
+        ]
+    
+    def get_requirements(self, obj):
+        lang = self.get_current_language()  
+        requirements = obj.requirements.all().order_by('order')
+        return [
+            {
+                'id': item.id, 
+                'text': getattr(item, f'text_{lang}', None) or item.text or ''
+            } 
+            for item in requirements
+        ]
+    
+    def get_conditions(self, obj):
+        lang = self.get_current_language()  
+        conditions = obj.conditions.all().order_by('order')
+        return [
+            {
+                'id': item.id, 
+                'text': getattr(item, f'text_{lang}', None) or item.text or ''
+            } 
+            for item in conditions
+        ]
+    
+    def get_ideal_candidates(self, obj):
+        lang = self.get_current_language()
+        candidates = obj.ideal_candidates.all().order_by('order')
+        return [
+            {
+                'id': item.id,
+                'text': getattr(item, f'text_{lang}', None) or item.text or ''
+            }
+            for item in candidates
+        ]
+
+
+# ========== РћРўР—Р«Р’Р« РљР›РР•РќРўРћР’ ==========
+
+class ReviewListSerializer(serializers.ModelSerializer):
+    """РЎРµСЂРёР°Р»РёР·Р°С‚РѕСЂ РґР»СЏ РѕС‚РѕР±СЂР°Р¶РµРЅРёСЏ РѕРґРѕР±СЂРµРЅРЅС‹С… РѕС‚Р·С‹РІРѕРІ"""
+    avatar_url = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Review
+        fields = ['id', 'name', 'rating', 'text', 'avatar_url', 'is_verified', 'created_at']
+
+    def get_avatar_url(self, obj):
+        if obj.avatar:
+            request = self.context.get('request')
+            if request:
+                return request.build_absolute_uri(obj.avatar.url)
+            return obj.avatar.url
+        return None
+
+
+class ReviewCreateSerializer(serializers.ModelSerializer):
+    """РЎРµСЂРёР°Р»РёР·Р°С‚РѕСЂ РґР»СЏ СЃРѕР·РґР°РЅРёСЏ РѕС‚Р·С‹РІР° СЃ reCAPTCHA"""
+    recaptcha_token = serializers.CharField(write_only=True, required=True)
+
+    class Meta:
+        model = Review
+        fields = ['name', 'rating', 'text', 'avatar', 'recaptcha_token']
+
+    def validate_rating(self, value):
+        if value < 1 or value > 5:
+            raise serializers.ValidationError("РћС†РµРЅРєР° РґРѕР»Р¶РЅР° Р±С‹С‚СЊ РѕС‚ 1 РґРѕ 5")
+        return value
+
+    def validate_avatar(self, value):
+        if value is None:
+            return value
+        # Р Р°Р·РјРµСЂ: РјР°РєСЃРёРјСѓРј 100 KB
+        if value.size > 100 * 1024:
+            raise serializers.ValidationError("РњР°РєСЃРёРјР°Р»СЊРЅС‹Р№ СЂР°Р·РјРµСЂ С„РѕС‚Рѕ вЂ” 100 KB")
+        # Р Р°Р·СЂРµС€С‘РЅРЅС‹Рµ СЂР°СЃС€РёСЂРµРЅРёСЏ
+        allowed_ext = ['jpg', 'jpeg', 'png', 'webp']
+        ext = value.name.rsplit('.', 1)[-1].lower() if '.' in value.name else ''
+        if ext not in allowed_ext:
+            raise serializers.ValidationError("Р”РѕРїСѓСЃС‚РёРјС‹Рµ С„РѕСЂРјР°С‚С‹: JPG, PNG, WEBP")
+        # РџСЂРѕРІРµСЂРєР° СЂРµР°Р»СЊРЅРѕРіРѕ СЃРѕРґРµСЂР¶РёРјРѕРіРѕ (magic bytes)
+        header = value.read(16)
+        value.seek(0)
+
+        is_jpeg = header[:3] == b'\xff\xd8\xff'
+        is_png = header[:4] == b'\x89PNG'
+        is_webp = header[:4] == b'RIFF' and header[8:12] == b'WEBP'
+
+        if not (is_jpeg or is_png or is_webp):
+            raise serializers.ValidationError("Р¤Р°Р№Р» РїРѕРІСЂРµР¶РґС‘РЅ РёР»Рё РЅРµ СЏРІР»СЏРµС‚СЃСЏ РёР·РѕР±СЂР°Р¶РµРЅРёРµРј")
+
+        # Р“РµРЅРµСЂР°С†РёСЏ Р±РµР·РѕРїР°СЃРЅРѕРіРѕ РёРјРµРЅРё
+        import uuid
+        safe_name = f"{uuid.uuid4().hex}.{ext}"
+        value.name = safe_name
+        return value
+
+    def validate_recaptcha_token(self, value):
+        import requests
+        from django.conf import settings
+        secret_key = getattr(settings, 'RECAPTCHA_SECRET_KEY', '')
+        if not secret_key:
+            logger.warning("RECAPTCHA_SECRET_KEY РЅРµ РЅР°СЃС‚СЂРѕРµРЅ, РїСЂРѕРїСѓСЃРє РїСЂРѕРІРµСЂРєРё")
+            return value
+        try:
+            resp = requests.post(
+                'https://www.google.com/recaptcha/api/siteverify',
+                data={'secret': secret_key, 'response': value},
+                timeout=5
+            )
+            result = resp.json()
+            if not result.get('success'):
+                raise serializers.ValidationError("РџСЂРѕРІРµСЂРєР° reCAPTCHA РЅРµ РїСЂРѕР№РґРµРЅР°")
+            # Р”Р»СЏ reCAPTCHA v3 вЂ” РїСЂРѕРІРµСЂСЏРµРј score
+            score = result.get('score', 1.0)
+            if score < 0.3:
+                raise serializers.ValidationError("РџРѕРґРѕР·СЂРёС‚РµР»СЊРЅР°СЏ Р°РєС‚РёРІРЅРѕСЃС‚СЊ")
+        except requests.RequestException:
+            logger.error("РћС€РёР±РєР° РїРѕРґРєР»СЋС‡РµРЅРёСЏ Рє reCAPTCHA API", exc_info=True)
+            # Р’ СЃР»СѓС‡Р°Рµ РѕС€РёР±РєРё СЃРµС‚Рё вЂ” РїСЂРѕРїСѓСЃРєР°РµРј (РЅРµ Р±Р»РѕРєРёСЂСѓРµРј РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ)
+        return value
+
+    def create(self, validated_data):
+        validated_data.pop('recaptcha_token', None)
+        request = self.context.get('request')
+        if request:
+            # РЎРѕС…СЂР°РЅСЏРµРј IP
+            x_forwarded = request.META.get('HTTP_X_FORWARDED_FOR')
+            if x_forwarded:
+                validated_data['ip_address'] = x_forwarded.split(',')[0].strip()
+            else:
+                validated_data['ip_address'] = request.META.get('REMOTE_ADDR')
+        validated_data['status'] = 'pending'
+        return super().create(validated_data)
+
+
+# ========== РўР•РЎРў-Р”Р РђР™Р’ ==========
+
+class TestDriveSerializer(serializers.ModelSerializer):
+    """РЎРµСЂРёР°Р»РёР·Р°С‚РѕСЂ РґР»СЏ Р·Р°СЏРІРѕРє РЅР° С‚РµСЃС‚-РґСЂР°Р№РІ"""
+
+    class Meta:
+        model = TestDriveRequest
+        fields = [
+            'name', 'phone', 'dealer', 'product',
+            'preferred_date', 'preferred_time', 'agree_terms',
+            'referer', 'utm_data', 'visitor_uid',
+        ]
+
+    def validate_agree_terms(self, value):
+        if not value:
+            raise serializers.ValidationError("РќРµРѕР±С…РѕРґРёРјРѕ СЃРѕРіР»Р°СЃРёРµ РЅР° РѕР±СЂР°Р±РѕС‚РєСѓ РґР°РЅРЅС‹С…")
+        return value
+
+    def validate_preferred_date(self, value):
+        from datetime import date
+        if value < date.today():
+            raise serializers.ValidationError("РќРµР»СЊР·СЏ РІС‹Р±СЂР°С‚СЊ РїСЂРѕС€РµРґС€СѓСЋ РґР°С‚Сѓ")
+        return value
+
+    def create(self, validated_data):
+        import json
+        request = self.context.get('request')
+        if request:
+            x_forwarded = request.META.get('HTTP_X_FORWARDED_FOR')
+            if x_forwarded:
+                validated_data['ip_address'] = x_forwarded.split(',')[0].strip()
+            else:
+                validated_data['ip_address'] = request.META.get('REMOTE_ADDR')
+
+            if not validated_data.get('referer'):
+                referer = request.META.get('HTTP_REFERER')
+                if referer:
+                    validated_data['referer'] = referer
+
+            utm_from_body = validated_data.get('utm_data')
+            if utm_from_body and isinstance(utm_from_body, dict):
+                validated_data['utm_data'] = json.dumps(utm_from_body, ensure_ascii=False)
+
+        validated_data['status'] = 'new'
+        return super().create(validated_data)
+
+

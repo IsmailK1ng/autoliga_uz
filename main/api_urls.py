@@ -8,12 +8,6 @@ from .views import (
     ProductCategoryViewSet,
     ReviewViewSet,
     TestDriveViewSet,
-    BotUserView,
-    BotBrandsView,
-    BotCarsView,
-    BotCarDetailView,
-    BotDealersView,
-    BotTestDriveView,
 )
 
 router = DefaultRouter()
@@ -29,13 +23,6 @@ urlpatterns = [
     path('uz/', include(router.urls)),
     path('ru/', include(router.urls)),
     path('en/', include(router.urls)),
-    # Bot API
-    path('bot/user/', BotUserView.as_view(), name='bot-user'),
-    path('bot/brands/', BotBrandsView.as_view(), name='bot-brands'),
-    path('bot/cars/', BotCarsView.as_view(), name='bot-cars'),
-    path('bot/car-detail/', BotCarDetailView.as_view(), name='bot-car-detail'),
-    path('bot/dealers/', BotDealersView.as_view(), name='bot-dealers'),
-    path('bot/test-drive/', BotTestDriveView.as_view(), name='bot-test-drive'),
 ]
 
 

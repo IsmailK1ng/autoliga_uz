@@ -9,7 +9,7 @@ Backend проект на **Django + Django REST Framework** для сайтов
 
 
 
-
+Server Error (500)
 
 ---
 

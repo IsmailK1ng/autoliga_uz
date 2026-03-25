@@ -247,8 +247,6 @@ CACHES = {
     }
 }
 
-# Bot API token authentication
-BOT_API_TOKEN = config('BOT_API_TOKEN', default='')
 
 # ============ ВАЛИДАЦИЯ ПАРОЛЕЙ ============
 

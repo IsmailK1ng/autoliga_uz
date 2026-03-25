@@ -14,19 +14,34 @@ class MainConfig(AppConfig):
         import main.admin
         import main.signals
 
-        # Only start bot in main process, not in auto-reloader
-        if os.environ.get('RUN_MAIN') != 'true':
+        import sys
+
+        is_runserver = 'runserver' in sys.argv
+        is_noreload = '--noreload' in sys.argv
+        run_main = os.environ.get('RUN_MAIN')
+
+        # Skip bot startup in auto-reloader parent process only.
+        # With auto-reload: Django sets RUN_MAIN='true' in the worker child process.
+        # With --noreload: RUN_MAIN is never set, but we still want to start the bot.
+        if is_runserver and not is_noreload and run_main != 'true':
+            return
+
+        # Also skip for management commands (migrate, shell, etc.)
+        if not is_runserver:
             return
 
         def start_bot():
             """Start the Telegram bot in a separate thread with proper error handling"""
             try:
                 import asyncio
-                import sys
 
                 # Add bot directory to Python path
                 bot_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'Autoliga_Botfile')
-                sys.path.insert(0, bot_dir)
+                if bot_dir not in sys.path:
+                    sys.path.insert(0, bot_dir)
+
+                # Prevent bot.py from calling django.setup() again (already set up)
+                os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'myproject.settings')
 
                 # Import bot's main function
                 from bot import main as bot_main
@@ -40,8 +55,6 @@ class MainConfig(AppConfig):
 
             except Exception as e:
                 logger.error(f"Telegram bot crashed: {e}", exc_info=True)
-                # In production, you might want to restart the bot here
-                # For now, we'll let the thread die and log the error
 
         # Start bot in a daemon thread so it doesn't prevent Django from shutting down
         bot_thread = threading.Thread(target=start_bot, daemon=True, name="TelegramBot")

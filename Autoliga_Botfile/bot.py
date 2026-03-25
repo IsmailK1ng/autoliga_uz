@@ -3,10 +3,12 @@ from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
 from aiogram.fsm.storage.memory import MemoryStorage
-from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, ReplyKeyboardRemove
-from asgiref.sync import sync_to_async  # ← QO'SHILDI
+from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, ReplyKeyboardRemove, FSInputFile
+from aiogram.exceptions import TelegramAPIError
+from asgiref.sync import sync_to_async
 import asyncio
 import html as html_module
+import logging
 import re
 import os
 import sys
@@ -24,6 +26,21 @@ from config import BOT_TOKEN, MEDIA_ROOT
 from main.models import TelegramUser, ProductCategory, Product, Dealer, TestDriveRequest, ProductFeature
 from django.db import transaction
 from django.core.exceptions import ObjectDoesNotExist
+
+# ================= LOGGING =================
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+    handlers=[
+        logging.StreamHandler(),
+        logging.FileHandler(
+            os.path.join(os.path.dirname(os.path.abspath(__file__)), "bot.log"),
+            encoding="utf-8"
+        ),
+    ]
+)
+logger = logging.getLogger(__name__)
 
 bot = Bot(token=BOT_TOKEN)
 dp = Dispatcher(storage=MemoryStorage())

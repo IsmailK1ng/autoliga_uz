@@ -6,20 +6,9 @@ Backend проект на **Django + Django REST Framework** для сайтов
 
 Проект включает админ-панель, REST API, Swagger-документацию и мультиязычную поддержку.
 
-# ============ CACHE ============
-# Production uchun Redis o'rnatib, .env ga REDIS_URL qo'shing:
-#   pip install django-redis
-#   REDIS_URL=redis://127.0.0.1:6379/1
-
-Telegram bot .env sayt .env ichiga daniylar qoyildi
-# Telegram bot settings
- BOT_TOKEN=860********************************************
-ADMIN_ID=57********
-DATABASE_URL=postgresql://postgres:password@localhost:5432/database_name 
 
 
 
- pip install django-ratelimit django-simple-captcha Pillow
 
 
 ---

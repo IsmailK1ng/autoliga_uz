@@ -110,7 +110,7 @@ body[data-theme="dark"] .review-verified {
 .ht3d-wrapper {
   position: relative;
   width: 100%;
-  height: 520px;
+  height: 560px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -123,21 +123,22 @@ body[data-theme="dark"] .review-verified {
   position: relative;
   width: 100%;
   max-width: 1000px;
-  height: 450px;
+  height: 480px;
   perspective: 1200px;
   margin: 0 auto;
   padding: 0 60px;
 }
 
+/* Kartochka: 3:4 portret nisbat — odamning rasmi uchun ideal */
 .ht3d-card {
   position: absolute;
-  width: 280px;
-  height: 380px;
+  width: 240px;
+  height: 320px;
   top: 50%;
   left: 50%;
-  margin-left: -140px;
-  margin-top: -190px;
-  border-radius: 20px;
+  margin-left: -120px;
+  margin-top: -160px;
+  border-radius: 18px;
   overflow: hidden;
   cursor: pointer;
   transition: transform 0.7s cubic-bezier(.25,.46,.45,.94),
@@ -151,22 +152,36 @@ body[data-theme="dark"] .review-verified {
   backface-visibility: hidden;
 }
 
-.ht3d-card img,
-.ht3d-card-placeholder {
+/* Rasm qutisi — kartochkani to'liq egallaydi */
+.ht3d-card-img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  overflow: hidden;
+  background: #e8eaed;
+}
+
+/* Portret rasm: to'liq egallaydi, yuz yuqorida ko'rinadi */
+.ht3d-card img {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  object-position: center 15%;
   display: block;
   pointer-events: none;
 }
 
+/* Rasm yo'q bo'lganda */
 .ht3d-card-placeholder {
+  width: 100%;
+  height: 100%;
   background: #e8e8e8;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 64px;
   color: #bbb;
+  pointer-events: none;
 }
 
 /* Prev-2 */
@@ -298,39 +313,53 @@ body[data-theme="dark"] .review-verified {
 }
 
 @media (max-width: 1024px) {
-  .ht3d-wrapper { height: 480px; }
-  .ht3d-stage { max-width: 800px; height: 400px; padding: 0 50px; }
-  .ht3d-card { width: 240px; height: 340px; }
-  .ht3d-card.pos-pm2 { transform: translateX(-420px) scale(0.6) rotateY(32deg) translateZ(-150px); }
-  .ht3d-card.pos-pm1 { transform: translateX(-240px) scale(0.75) rotateY(18deg) translateZ(-80px); }
-  .ht3d-card.pos-p1  { transform: translateX(240px) scale(0.75) rotateY(-18deg) translateZ(-80px); }
-  .ht3d-card.pos-p2  { transform: translateX(420px) scale(0.6) rotateY(-32deg) translateZ(-150px); }
+  .ht3d-wrapper { height: 500px; }
+  .ht3d-stage { max-width: 800px; height: 420px; padding: 0 50px; }
+  /* 3:4 portret nisbat */
+  .ht3d-card { width: 210px; height: 280px; margin-left: -105px; margin-top: -140px; }
+  .ht3d-card.pos-pm2 { transform: translateX(-400px) scale(0.6) rotateY(32deg) translateZ(-150px); }
+  .ht3d-card.pos-pm1 { transform: translateX(-230px) scale(0.75) rotateY(18deg) translateZ(-80px); }
+  .ht3d-card.pos-p1  { transform: translateX(230px) scale(0.75) rotateY(-18deg) translateZ(-80px); }
+  .ht3d-card.pos-p2  { transform: translateX(400px) scale(0.6) rotateY(-32deg) translateZ(-150px); }
 }
 
 @media (max-width: 768px) {
-  .ht3d-wrapper { height: 420px; }
-  .ht3d-stage { width: 100%; max-width: 100%; height: 350px; padding: 0 20px; }
-  .ht3d-card { width: 210px; height: 300px; margin-left: -105px; margin-top: -150px; }
-  .ht3d-card.pos-pm2 { transform: translateX(-280px) scale(0.55) rotateY(30deg) translateZ(-120px); opacity: 0.1; }
-  .ht3d-card.pos-pm1 { transform: translateX(-160px) scale(0.7) rotateY(16deg) translateZ(-70px); opacity: 0.4; }
+  .ht3d-wrapper { height: 440px; }
+  .ht3d-stage { width: 100%; max-width: 100%; height: 370px; padding: 0 20px; }
+  /* 3:4 portret nisbat */
+  .ht3d-card { width: 195px; height: 260px; margin-left: -97px; margin-top: -130px; }
+  .ht3d-card.pos-pm2 { transform: translateX(-270px) scale(0.55) rotateY(30deg) translateZ(-120px); opacity: 0.1; }
+  .ht3d-card.pos-pm1 { transform: translateX(-155px) scale(0.7) rotateY(16deg) translateZ(-70px); opacity: 0.4; }
   .ht3d-card.pos-p0 { transform: translateX(0px) scale(1) rotateY(0deg) translateZ(0px); opacity: 1; }
-  .ht3d-card.pos-p1  { transform: translateX(160px) scale(0.7) rotateY(-16deg) translateZ(-70px); opacity: 0.4; }
-  .ht3d-card.pos-p2  { transform: translateX(280px) scale(0.55) rotateY(-30deg) translateZ(-120px); opacity: 0.1; }
+  .ht3d-card.pos-p1  { transform: translateX(155px) scale(0.7) rotateY(-16deg) translateZ(-70px); opacity: 0.4; }
+  .ht3d-card.pos-p2  { transform: translateX(270px) scale(0.55) rotateY(-30deg) translateZ(-120px); opacity: 0.1; }
   .ht3d-btn { width: 44px; height: 44px; font-size: 24px; }
 }
 
 @media (max-width: 480px) {
-  .ht3d-wrapper { height: 360px; }
-  .ht3d-stage { width: 100%; max-width: 100%; height: 300px; padding: 0 15px; }
-  .ht3d-card { width: 160px; height: 240px; margin-left: -80px; margin-top: -120px; }
+  .ht3d-wrapper { height: 380px; }
+  .ht3d-stage { width: 100%; max-width: 100%; height: 320px; padding: 0 10px; }
+  /* 3:4 portret nisbat — mobil uchun */
+  .ht3d-card { width: 180px; height: 240px; margin-left: -90px; margin-top: -120px; }
   .ht3d-card.pos-pm2 { display: none; }
-  .ht3d-card.pos-pm1 { transform: translateX(-130px) scale(0.65) rotateY(20deg) translateZ(-60px); }
-  .ht3d-card.pos-p0 { transform: translateX(0px) scale(1) rotateY(0deg) translateZ(0px); }
-  .ht3d-card.pos-p1  { transform: translateX(130px) scale(0.65) rotateY(-20deg) translateZ(-60px); }
+  .ht3d-card.pos-pm1 { transform: translateX(-140px) scale(0.62) rotateY(20deg) translateZ(-60px); opacity: 0.35; }
+  .ht3d-card.pos-p0 { transform: translateX(0px) scale(1) rotateY(0deg) translateZ(0px); opacity: 1; }
+  .ht3d-card.pos-p1  { transform: translateX(140px) scale(0.62) rotateY(-20deg) translateZ(-60px); opacity: 0.35; }
   .ht3d-card.pos-p2  { display: none; }
   .ht3d-btn { width: 40px; height: 40px; font-size: 22px; }
-  .ht3d-prev { left: 8px; }
-  .ht3d-next { right: 8px; }
+  .ht3d-prev { left: 4px; }
+  .ht3d-next { right: 4px; }
   .ht3d-name { font-size: 2.0rem; }
   .ht3d-position { font-size: 1.75rem; }
+}
+
+/* ── Slider background blur — mobile only ─────────────────────── */
+@media (max-width: 500px) {
+  .faw-bg {
+    overflow: hidden;
+  }
+  .faw-bg-image {
+    filter: blur(6px);
+    transform: scale(1.04); /* blur edges xiralamasligi uchun */
+  }
 }

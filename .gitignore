@@ -59,8 +59,8 @@ venv/
 node_modules/
 tmp/
 .env
-Dockerfile
 docker-compose.yml
 .dockerignore
 __pycache__/
 *.pyc
+Dockerfile

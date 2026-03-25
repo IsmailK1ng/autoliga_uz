@@ -35,6 +35,6 @@ def format_phone(phone: str) -> str | None:
     if not phone:
         return None
     phone = phone.strip().replace(" ", "").replace("-", "")
-    if re.fullmatch(r'\+998\d{9}', phone):
+    if re.fullmatch(r"\+998\d{9}", phone):
         return phone
     return None

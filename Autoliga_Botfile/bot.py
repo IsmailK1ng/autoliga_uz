@@ -1,31 +1,46 @@
-from aiogram import Bot, Dispatcher, types, F
+import asyncio
+import html as html_module
+import logging
+import os
+import re
+import sys
+import django
+from collections import OrderedDict
+from datetime import datetime, timedelta
+from dotenv import load_dotenv
+
+# ── 1. Load .env BEFORE Django setup (settings.py reads env vars) ───────────
+PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+load_dotenv(os.path.join(PROJECT_ROOT, ".env"))
+
+# ── 2. Django setup BEFORE any model imports ────────────────────────────────
+if PROJECT_ROOT not in sys.path:
+    sys.path.insert(0, PROJECT_ROOT)
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "myproject.settings")
+# Guard against double-setup (when imported from apps.py inside running Django)
+from django.apps import apps as _django_apps
+if not _django_apps.ready:
+    django.setup()
+
+# ── 3. Django imports (safe only after setup) ────────────────────────────────
+from django.core.cache import cache
+from django.core.exceptions import ObjectDoesNotExist
+from django.db import transaction
+from django.utils import timezone
+from main.models import (Dealer, Product, ProductCategory, TelegramUser,
+                         TestDriveRequest)
+
+# ── 4. Third-party imports ───────────────────────────────────────────────────
+from aiogram import Bot, Dispatcher, F, types
 from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
 from aiogram.fsm.storage.memory import MemoryStorage
-from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, ReplyKeyboardRemove, FSInputFile
-from aiogram.exceptions import TelegramAPIError
+from aiogram.types import (FSInputFile, KeyboardButton, ReplyKeyboardMarkup,
+                           ReplyKeyboardRemove)
 from asgiref.sync import sync_to_async
-import asyncio
-import html as html_module
-import logging
-import re
-import os
-import sys
-import django
-from datetime import datetime, date, timedelta
-from django.utils import timezone
-
-# Django setup
-PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.insert(0, PROJECT_ROOT)
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'myproject.settings')
-django.setup()
-
 from config import BOT_TOKEN, MEDIA_ROOT
-from main.models import TelegramUser, ProductCategory, Product, Dealer, TestDriveRequest, ProductFeature
-from django.db import transaction
-from django.core.exceptions import ObjectDoesNotExist
+
 
 # ================= LOGGING =================
 
@@ -36,9 +51,9 @@ logging.basicConfig(
         logging.StreamHandler(),
         logging.FileHandler(
             os.path.join(os.path.dirname(os.path.abspath(__file__)), "bot.log"),
-            encoding="utf-8"
+            encoding="utf-8",
         ),
-    ]
+    ],
 )
 logger = logging.getLogger(__name__)
 
@@ -46,6 +61,7 @@ bot = Bot(token=BOT_TOKEN)
 dp = Dispatcher(storage=MemoryStorage())
 
 # ================= DATABASE FUNCTIONS =================
+
 
 @sync_to_async
 def get_user_by_telegram_id(telegram_id: int) -> TelegramUser | None:
@@ -58,136 +74,170 @@ def get_user_by_telegram_id(telegram_id: int) -> TelegramUser | None:
 @sync_to_async
 def update_or_create_user(telegram_id: int, **kwargs) -> TelegramUser:
     user, created = TelegramUser.objects.get_or_create(
-        telegram_id=telegram_id,
-        defaults=kwargs
+        telegram_id=telegram_id, defaults=kwargs
     )
     if not created:
+        changed_fields = []
         for key, value in kwargs.items():
             if value is not None:
                 setattr(user, key, value)
-        user.save()
+                changed_fields.append(key)
+        if changed_fields:
+            user.save(update_fields=changed_fields)
     return user
 
 
 @sync_to_async
-def get_brands(lang: str = 'uz') -> list[dict]:
-    brands = ProductCategory.objects.filter(is_active=True).order_by('order', 'name')
-    result = []
-    for brand in brands:
-        name = getattr(brand, f'name_{lang}', None) or brand.name
-        result.append({'id': brand.id, 'name': name})
+def get_brands(lang: str = "uz") -> list[dict]:
+    cache_key = f"bot:brands:{lang}"
+    cached = cache.get(cache_key)
+    if cached is not None:
+        return cached
+    brands = ProductCategory.objects.filter(is_active=True).order_by("order", "name")
+    result = [
+        {"id": b.id, "name": getattr(b, f"name_{lang}", None) or b.name}
+        for b in brands
+    ]
+    cache.set(cache_key, result, timeout=300)
     return result
 
 
 @sync_to_async
-def get_cars_by_brand(brand_id: int, lang: str = 'uz') -> list[dict]:
-    cars = Product.objects.filter(
-        category_id=brand_id,
-        is_active=True
-    ).order_by('order', 'title')
-    result = []
-    for car in cars:
-        title = getattr(car, f'title_{lang}', None) or car.title
-        result.append({'id': car.id, 'title': title})
+def get_cars_by_brand(brand_id: int, lang: str = "uz") -> list[dict]:
+    cache_key = f"bot:cars:{brand_id}:{lang}"
+    cached = cache.get(cache_key)
+    if cached is not None:
+        return cached
+    cars = Product.objects.filter(category_id=brand_id, is_active=True).order_by(
+        "order", "title"
+    )
+    result = [
+        {"id": c.id, "title": getattr(c, f"title_{lang}", None) or c.title}
+        for c in cars
+    ]
+    cache.set(cache_key, result, timeout=300)
     return result
 
 
 @sync_to_async
-def get_car_detail(car_id: int, lang: str = 'uz') -> dict | None:
+def get_car_detail(car_id: int, lang: str = "uz") -> dict | None:
     try:
-        car = Product.objects.select_related('category').prefetch_related('features').get(
-            id=car_id,
-            is_active=True
+        car = (
+            Product.objects.select_related("category")
+            .prefetch_related("features")
+            .get(id=car_id, is_active=True)
         )
     except ObjectDoesNotExist:
         return None
 
-    title = getattr(car, f'title_{lang}', None) or car.title
-    price = getattr(car, f'slider_price_{lang}', None) or car.slider_price
-    power = getattr(car, f'slider_power_{lang}', None) or car.slider_power
-    fuel = getattr(car, f'slider_fuel_consumption_{lang}', None) or car.slider_fuel_consumption
+    title = getattr(car, f"title_{lang}", None) or car.title
+    price = getattr(car, f"slider_price_{lang}", None) or car.slider_price
+    power = getattr(car, f"slider_power_{lang}", None) or car.slider_power
+    fuel = (
+        getattr(car, f"slider_fuel_consumption_{lang}", None)
+        or car.slider_fuel_consumption
+    )
 
-    features = car.features.all().order_by('order')[:6]
-    feat_list = [getattr(f, f'name_{lang}', None) or f.name for f in features]
+    features = car.features.all().order_by("order")[:6]
+    feat_list = [getattr(f, f"name_{lang}", None) or f.name for f in features]
 
     return {
-        'title': title,
-        'main_image': car.main_image.url if car.main_image else None,
-        'card_image': car.card_image.url if car.card_image else None,
-        'price': price,
-        'year': car.slider_year,
-        'power': power,
-        'fuel': fuel,
-        'features': feat_list,
+        "title": title,
+        "main_image": car.main_image.url if car.main_image else None,
+        "card_image": car.card_image.url if car.card_image else None,
+        "price": price,
+        "year": car.slider_year,
+        "power": power,
+        "fuel": fuel,
+        "features": feat_list,
     }
 
 
 @sync_to_async
-def get_dealers(lang: str = 'uz') -> list[dict]:
-    dealers = Dealer.objects.filter(is_active=True).order_by('order', 'name')
-    result = []
-    for dealer in dealers:
-        name = getattr(dealer, f'name_{lang}', None) or dealer.name
-        address = getattr(dealer, f'address_{lang}', None) or dealer.address
-        hours = getattr(dealer, f'working_hours_{lang}', None) or dealer.working_hours
-        result.append({
-            'id': dealer.id,
-            'name': name,
-            'region': dealer.region,
-            'address': address,
-            'phone': dealer.phone,
-            'hours': hours,
-        })
+def get_dealers(lang: str = "uz") -> list[dict]:
+    cache_key = f"bot:dealers:{lang}"
+    cached = cache.get(cache_key)
+    if cached is not None:
+        return cached
+    dealers = Dealer.objects.filter(is_active=True).order_by("order", "name")
+    result = [
+        {
+            "id": d.id,
+            "name": getattr(d, f"name_{lang}", None) or d.name,
+            "region": d.region,
+            "address": getattr(d, f"address_{lang}", None) or d.address,
+            "phone": d.phone,
+            "hours": getattr(d, f"working_hours_{lang}", None) or d.working_hours,
+        }
+        for d in dealers
+    ]
+    cache.set(cache_key, result, timeout=300)
     return result
 
 
 @sync_to_async
-def get_test_drive_data(lang: str = 'uz') -> dict:
-    dealers = Dealer.objects.filter(is_active=True).order_by('order', 'name')
-    products = Product.objects.filter(is_active=True).order_by('order', 'title')
-
-    dealers_data = []
-    for dealer in dealers:
-        name = getattr(dealer, f'name_{lang}', None) or dealer.name
-        dealers_data.append({'id': dealer.id, 'name': name})
-
-    products_data = []
-    for product in products:
-        title = getattr(product, f'title_{lang}', None) or product.title
-        products_data.append({'id': product.id, 'title': title})
-
-    return {
-        'dealers': dealers_data,
-        'products': products_data,
-        'time_slots': ['10:00', '10:30', '11:00', '11:30', '12:00', '12:30',
-                       '13:00', '13:30', '14:00', '14:30', '15:00', '15:30',
-                       '16:00', '16:30', '17:00'],
+def get_test_drive_data(lang: str = "uz") -> dict:
+    cache_key = f"bot:td_data:{lang}"
+    cached = cache.get(cache_key)
+    if cached is not None:
+        return cached
+    dealers = Dealer.objects.filter(is_active=True).order_by("order", "name")
+    products = Product.objects.filter(is_active=True).order_by("order", "title")
+    dealers_data = [
+        {"id": d.id, "name": getattr(d, f"name_{lang}", None) or d.name}
+        for d in dealers
+    ]
+    products_data = [
+        {"id": p.id, "title": getattr(p, f"title_{lang}", None) or p.title}
+        for p in products
+    ]
+    result = {
+        "dealers": dealers_data,
+        "products": products_data,
+        "time_slots": [
+            "10:00",
+            "10:30",
+            "11:00",
+            "11:30",
+            "12:00",
+            "12:30",
+            "13:00",
+            "13:30",
+            "14:00",
+            "14:30",
+            "15:00",
+            "15:30",
+            "16:00",
+            "16:30",
+            "17:00",
+        ],
     }
+    cache.set(cache_key, result, timeout=300)
+    return result
 
 
 @sync_to_async
 def create_test_drive_request(data: dict) -> tuple[TestDriveRequest | None, str | None]:
     try:
         with transaction.atomic():
-            phone = data.get('phone', '')
+            phone = data.get("phone", "")
             if phone:
                 today = timezone.now().date()
                 today_count = TestDriveRequest.objects.filter(
-                    phone=phone,
-                    created_at__date=today
+                    phone=phone, created_at__date=today
                 ).count()
                 if today_count >= 2:
-                    return None, 'daily_limit'
+                    return None, "daily_limit"
 
             request_obj = TestDriveRequest.objects.create(**data)
             return request_obj, None
     except Exception as e:
-        import logging
-        logging.getLogger(__name__).error(f"TestDrive create error: {e} | data={data}")
+        logger.error("TestDrive create error: %s | data=%s", e, data, exc_info=True)
         return None, str(e)
 
 
 # ================= HELPERS =================
+
 
 def sanitize_name(text):
     if not isinstance(text, str):
@@ -256,40 +306,250 @@ DEALER_REGION_LABELS = {
 
 UZ_REGIONS = {
     "uz": {
-        "Toshkent shahri": ["Yunusobod", "Chilonzor", "Olmazor", "Yashnobod", "Mirzo Ulug'bek", "Sergeli", "Bektemir"],
-        "Toshkent viloyati": ["Zangiota", "Chinoz", "Parkent", "Bo'ka", "Ohangaron", "Oqqo'rg'on", "Bekobod"],
-        "Samarqand": ["Urgut", "Kattaqo'rg'on", "Bulung'ur", "Narpay", "Toyloq", "Qo'shrabot", "Ishtixon"],
-        "Andijon": ["Asaka", "Shahrixon", "Xo'jaobod", "Qo'rg'ontepa", "Baliqchi", "Ulug'nor", "Oltinko'l", "Andijon"],
-        "Farg'ona": ["Qo'qon", "Marg'ilon", "Farg'ona", "Oltiariq", "Beshariq", "Quva", "Rishton"],
-        "Namangan": ["Chust", "Kosonsoy", "Namangan", "Pop", "To'raqo'rg'on", "Uychi", "Mingbuloq"],
-        "Buxoro": ["G'ijduvon", "Kogon", "Buxoro", "Vobkent", "Peshku", "Romitan", "Shofirkon"],
-        "Xorazm": ["Urganch", "Xiva", "Shovot", "Gurlan", "Yangiariq", "Bog'ot", "Xonqa"],
-        "Qashqadaryo": ["Qarshi", "Shahrisabz", "G'uzor", "Chiroqchi", "Koson", "Kitob", "Dehqonobod"],
-        "Surxondaryo": ["Termiz", "Denov", "Boysun", "Muzrabot", "Sariosiyo", "Qumqo'rg'on", "Sherobod"],
-        "Jizzax": ["Zomin", "G'allaorol", "Zarbdor", "Do'stlik", "Yangiobod", "Arnasoy", "Baxmal"],
-        "Sirdaryo": ["Guliston", "Yangiyer", "Sirdaryo", "Oqoltin", "Shirin", "Boyovut"],
-        "Navoiy": ["Zarafshon", "Karmana", "Navoiy", "Qiziltepa", "Tomdi", "Xatirchi", "Konimex"],
-        "Qoraqalpog'iston": ["Nukus", "Xo'jayli", "Kegeyli", "Chimboy", "Taxtako'pir", "Beruniy", "Qo'ng'irot"],
+        "Toshkent shahri": [
+            "Yunusobod",
+            "Chilonzor",
+            "Olmazor",
+            "Yashnobod",
+            "Mirzo Ulug'bek",
+            "Sergeli",
+            "Bektemir",
+        ],
+        "Toshkent viloyati": [
+            "Zangiota",
+            "Chinoz",
+            "Parkent",
+            "Bo'ka",
+            "Ohangaron",
+            "Oqqo'rg'on",
+            "Bekobod",
+        ],
+        "Samarqand": [
+            "Urgut",
+            "Kattaqo'rg'on",
+            "Bulung'ur",
+            "Narpay",
+            "Toyloq",
+            "Qo'shrabot",
+            "Ishtixon",
+        ],
+        "Andijon": [
+            "Asaka",
+            "Shahrixon",
+            "Xo'jaobod",
+            "Qo'rg'ontepa",
+            "Baliqchi",
+            "Ulug'nor",
+            "Oltinko'l",
+            "Andijon",
+        ],
+        "Farg'ona": [
+            "Qo'qon",
+            "Marg'ilon",
+            "Farg'ona",
+            "Oltiariq",
+            "Beshariq",
+            "Quva",
+            "Rishton",
+        ],
+        "Namangan": [
+            "Chust",
+            "Kosonsoy",
+            "Namangan",
+            "Pop",
+            "To'raqo'rg'on",
+            "Uychi",
+            "Mingbuloq",
+        ],
+        "Buxoro": [
+            "G'ijduvon",
+            "Kogon",
+            "Buxoro",
+            "Vobkent",
+            "Peshku",
+            "Romitan",
+            "Shofirkon",
+        ],
+        "Xorazm": [
+            "Urganch",
+            "Xiva",
+            "Shovot",
+            "Gurlan",
+            "Yangiariq",
+            "Bog'ot",
+            "Xonqa",
+        ],
+        "Qashqadaryo": [
+            "Qarshi",
+            "Shahrisabz",
+            "G'uzor",
+            "Chiroqchi",
+            "Koson",
+            "Kitob",
+            "Dehqonobod",
+        ],
+        "Surxondaryo": [
+            "Termiz",
+            "Denov",
+            "Boysun",
+            "Muzrabot",
+            "Sariosiyo",
+            "Qumqo'rg'on",
+            "Sherobod",
+        ],
+        "Jizzax": [
+            "Zomin",
+            "G'allaorol",
+            "Zarbdor",
+            "Do'stlik",
+            "Yangiobod",
+            "Arnasoy",
+            "Baxmal",
+        ],
+        "Sirdaryo": [
+            "Guliston",
+            "Yangiyer",
+            "Sirdaryo",
+            "Oqoltin",
+            "Shirin",
+            "Boyovut",
+        ],
+        "Navoiy": [
+            "Zarafshon",
+            "Karmana",
+            "Navoiy",
+            "Qiziltepa",
+            "Tomdi",
+            "Xatirchi",
+            "Konimex",
+        ],
+        "Qoraqalpog'iston": [
+            "Nukus",
+            "Xo'jayli",
+            "Kegeyli",
+            "Chimboy",
+            "Taxtako'pir",
+            "Beruniy",
+            "Qo'ng'irot",
+        ],
     },
     "ru": {
-        "Ташкент (город)": ["Юнусабад", "Чиланзар", "Олмазар", "Яшнабад", "Мирзо-Улугбек", "Сергели", "Бектемир"],
-        "Ташкентская область": ["Зангиата", "Чиноз", "Паркент", "Бука", "Ахангаран", "Аккурган", "Бекабад"],
-        "Самарканд": ["Ургут", "Каттакурган", "Булунгур", "Нарпай", "Тайлак", "Кошрабад", "Иштихон"],
-        "Андижан": ["Асака", "Шахрихан", "Ходжаабад", "Курганtepa", "Балыкчи", "Улугнор", "Алтынкуль", "Андижан"],
-        "Фергана": ["Коканд", "Маргилан", "Фергана", "Олтиарик", "Бешарик", "Кува", "Риштан"],
-        "Наманган": ["Чуст", "Косонсой", "Наманган", "Поп", "Туракурган", "Уйчи", "Мингбулак"],
-        "Бухара": ["Гиждуван", "Коган", "Бухара", "Вабкент", "Пешку", "Ромитан", "Шафиркан"],
+        "Ташкент (город)": [
+            "Юнусабад",
+            "Чиланзар",
+            "Олмазар",
+            "Яшнабад",
+            "Мирзо-Улугбек",
+            "Сергели",
+            "Бектемир",
+        ],
+        "Ташкентская область": [
+            "Зангиата",
+            "Чиноз",
+            "Паркент",
+            "Бука",
+            "Ахангаран",
+            "Аккурган",
+            "Бекабад",
+        ],
+        "Самарканд": [
+            "Ургут",
+            "Каттакурган",
+            "Булунгур",
+            "Нарпай",
+            "Тайлак",
+            "Кошрабад",
+            "Иштихон",
+        ],
+        "Андижан": [
+            "Асака",
+            "Шахрихан",
+            "Ходжаабад",
+            "Курганtepa",
+            "Балыкчи",
+            "Улугнор",
+            "Алтынкуль",
+            "Андижан",
+        ],
+        "Фергана": [
+            "Коканд",
+            "Маргилан",
+            "Фергана",
+            "Олтиарик",
+            "Бешарик",
+            "Кува",
+            "Риштан",
+        ],
+        "Наманган": [
+            "Чуст",
+            "Косонсой",
+            "Наманган",
+            "Поп",
+            "Туракурган",
+            "Уйчи",
+            "Мингбулак",
+        ],
+        "Бухара": [
+            "Гиждуван",
+            "Коган",
+            "Бухара",
+            "Вабкент",
+            "Пешку",
+            "Ромитан",
+            "Шафиркан",
+        ],
         "Хорезм": ["Ургенч", "Хива", "Шават", "Гурлан", "Янгиарик", "Богот", "Ханка"],
-        "Кашкадарья": ["Карши", "Шахрисабз", "Гузар", "Чирокчи", "Касан", "Китаб", "Дехканабад"],
-        "Сурхандарья": ["Термез", "Денов", "Байсун", "Музрабад", "Сариосиё", "Кумкурган", "Шерабад"],
-        "Джизак": ["Зомин", "Галляарал", "Зарбдар", "Дустлик", "Янгиобод", "Арнасай", "Бахмал"],
+        "Кашкадарья": [
+            "Карши",
+            "Шахрисабз",
+            "Гузар",
+            "Чирокчи",
+            "Касан",
+            "Китаб",
+            "Дехканабад",
+        ],
+        "Сурхандарья": [
+            "Термез",
+            "Денов",
+            "Байсун",
+            "Музрабад",
+            "Сариосиё",
+            "Кумкурган",
+            "Шерабад",
+        ],
+        "Джизак": [
+            "Зомин",
+            "Галляарал",
+            "Зарбдар",
+            "Дустлик",
+            "Янгиобод",
+            "Арнасай",
+            "Бахмал",
+        ],
         "Сырдарья": ["Гулистан", "Янгиер", "Сырдарья", "Акалтын", "Ширин", "Баяут"],
-        "Навои": ["Зарафшан", "Кармана", "Навои", "Кызылтепа", "Томди", "Хатирчи", "Конимех"],
-        "Каракалпакстан": ["Нукус", "Ходжейли", "Кегейли", "Чимбай", "Тахиаташ", "Беруний", "Кунград"],
-    }
+        "Навои": [
+            "Зарафшан",
+            "Кармана",
+            "Навои",
+            "Кызылтепа",
+            "Томди",
+            "Хатирчи",
+            "Конимех",
+        ],
+        "Каракалпакстан": [
+            "Нукус",
+            "Ходжейли",
+            "Кегейли",
+            "Чимбай",
+            "Тахиаташ",
+            "Беруний",
+            "Кунград",
+        ],
+    },
 }
 
 # ================= FSM STATES =================
+
 
 class RegStates(StatesGroup):
     first_name = State()
@@ -320,8 +580,9 @@ class TestDriveStates(StatesGroup):
 
 LANG_KEYBOARD = ReplyKeyboardMarkup(
     keyboard=[[KeyboardButton(text="🇺🇿 O'zbekcha"), KeyboardButton(text="🇷🇺 Русский")]],
-    resize_keyboard=True
+    resize_keyboard=True,
 )
+
 
 MESSAGES = {
     "uz": {
@@ -439,22 +700,41 @@ MESSAGES = {
         "td_invalid_date": "❌ Пожалуйста, выберите дату из списка.",
         "td_invalid_phone": "❌ Неверный номер. Введите в формате +998XXXXXXXXX.",
         "td_daily_limit": "⚠️ Дневной лимит: не более 2 заявок в день.\nПопробуйте завтра.",
-    }
+    },
 }
 
-CHANGE_LANG_BTNS = {MESSAGES["uz"]["change_lang_btn"], MESSAGES["ru"]["change_lang_btn"]}
+CHANGE_LANG_BTNS = {
+    MESSAGES["uz"]["change_lang_btn"],
+    MESSAGES["ru"]["change_lang_btn"],
+}
 TEST_DRIVE_BTNS = {MESSAGES["uz"]["test_drive_btn"], MESSAGES["ru"]["test_drive_btn"]}
 
-user_lang: dict = {}
+class _LRUDict(OrderedDict):
+    """Bounded dict — evicts oldest entry when maxsize exceeded."""
+    def __init__(self, maxsize: int = 5000):
+        self._maxsize = maxsize
+        super().__init__()
+
+    def __setitem__(self, key, value):
+        super().__setitem__(key, value)
+        self.move_to_end(key)
+        if len(self) > self._maxsize:
+            self.popitem(last=False)
+
+
+user_lang: _LRUDict = _LRUDict(maxsize=5000)
 
 
 def get_confirm_keyboard(lang: str) -> ReplyKeyboardMarkup:
     return ReplyKeyboardMarkup(
         keyboard=[
-            [KeyboardButton(text=MESSAGES[lang]["yes_btn"]), KeyboardButton(text=MESSAGES[lang]["no_btn"])],
+            [
+                KeyboardButton(text=MESSAGES[lang]["yes_btn"]),
+                KeyboardButton(text=MESSAGES[lang]["no_btn"]),
+            ],
             [KeyboardButton(text=MESSAGES[lang]["back_btn"])],
         ],
-        resize_keyboard=True
+        resize_keyboard=True,
     )
 
 
@@ -462,19 +742,25 @@ def get_main_menu_keyboard(lang: str) -> ReplyKeyboardMarkup:
     if lang == "ru":
         return ReplyKeyboardMarkup(
             keyboard=[
-                [KeyboardButton(text="🚗 Автомобили"), KeyboardButton(text="🏢 Дилерские центры")],
+                [
+                    KeyboardButton(text="🚗 Автомобили"),
+                    KeyboardButton(text="🏢 Дилерские центры"),
+                ],
                 [KeyboardButton(text=MESSAGES["ru"]["test_drive_btn"])],
                 [KeyboardButton(text=MESSAGES["ru"]["change_lang_btn"])],
             ],
-            resize_keyboard=True
+            resize_keyboard=True,
         )
     return ReplyKeyboardMarkup(
         keyboard=[
-            [KeyboardButton(text="🚗 Mashinalar"), KeyboardButton(text="🏢 Dilerlik markazlari")],
+            [
+                KeyboardButton(text="🚗 Mashinalar"),
+                KeyboardButton(text="🏢 Dilerlik markazlari"),
+            ],
             [KeyboardButton(text=MESSAGES["uz"]["test_drive_btn"])],
             [KeyboardButton(text=MESSAGES["uz"]["change_lang_btn"])],
         ],
-        resize_keyboard=True
+        resize_keyboard=True,
     )
 
 
@@ -497,7 +783,7 @@ def build_car_caption(car: dict) -> str:
 
 def get_date_keyboard(back_btn: str, days: int = 14) -> ReplyKeyboardMarkup:
     """Bugundan boshlab N kunlik sana tugmalari (3 ustunli)"""
-    today = datetime.now().date()
+    today = timezone.localtime(timezone.now()).date()
     rows = []
     row = []
     for i in range(days):
@@ -514,6 +800,7 @@ def get_date_keyboard(back_btn: str, days: int = 14) -> ReplyKeyboardMarkup:
 
 # ================= MEDIA BLOCKER =================
 
+
 @dp.message(~F.text & ~F.contact)
 async def block_unsupported_media(message: types.Message):
     lang = user_lang.get(message.from_user.id, "uz")
@@ -521,6 +808,7 @@ async def block_unsupported_media(message: types.Message):
 
 
 # ================= START =================
+
 
 @dp.message(Command("start"))
 async def start(message: types.Message, state: FSMContext):
@@ -532,7 +820,9 @@ async def start(message: types.Message, state: FSMContext):
         lang = user_data.language or "uz"
         user_lang[uid] = lang
         await state.clear()
-        await message.answer(MESSAGES[lang]["welcome_back"], reply_markup=get_main_menu_keyboard(lang))
+        await message.answer(
+            MESSAGES[lang]["welcome_back"], reply_markup=get_main_menu_keyboard(lang)
+        )
     else:
         await state.clear()
         await message.answer(MESSAGES["uz"]["choose_lang"], reply_markup=LANG_KEYBOARD)
@@ -540,16 +830,18 @@ async def start(message: types.Message, state: FSMContext):
 
 # ================= TIL O'ZGARTIRISH =================
 
+
 @dp.message(F.text.in_(CHANGE_LANG_BTNS))
 async def request_lang_change(message: types.Message, state: FSMContext):
     await state.clear()
     await message.answer(
         MESSAGES["uz"]["choose_lang"] + " / " + MESSAGES["ru"]["choose_lang"],
-        reply_markup=LANG_KEYBOARD
+        reply_markup=LANG_KEYBOARD,
     )
 
 
 # ================= LANGUAGE =================
+
 
 @dp.message(F.text.startswith("🇺🇿") | F.text.startswith("🇷🇺"))
 async def choose_language(message: types.Message, state: FSMContext):
@@ -558,9 +850,7 @@ async def choose_language(message: types.Message, state: FSMContext):
     user_lang[uid] = lang
 
     await update_or_create_user(  # ← await qo'shildi
-        uid,
-        language=lang,
-        username=message.from_user.username
+        uid, language=lang, username=message.from_user.username
     )
 
     user = await get_user_by_telegram_id(uid)  # ← await qo'shildi
@@ -568,13 +858,18 @@ async def choose_language(message: types.Message, state: FSMContext):
 
     if has_profile:
         await state.clear()
-        await message.answer(MESSAGES[lang]["lang_changed"], reply_markup=get_main_menu_keyboard(lang))
+        await message.answer(
+            MESSAGES[lang]["lang_changed"], reply_markup=get_main_menu_keyboard(lang)
+        )
     else:
         await state.set_state(RegStates.first_name)
-        await message.answer(MESSAGES[lang]["send_first_name"], reply_markup=ReplyKeyboardRemove())
+        await message.answer(
+            MESSAGES[lang]["send_first_name"], reply_markup=ReplyKeyboardRemove()
+        )
 
 
 # ================= CONTACT =================
+
 
 @dp.message(F.contact)
 async def save_phone(message: types.Message, state: FSMContext):
@@ -585,16 +880,19 @@ async def save_phone(message: types.Message, state: FSMContext):
         await message.answer("❌")
         return
 
-    await update_or_create_user(uid, phone=message.contact.phone_number)  # ← await qo'shildi
+    await update_or_create_user(
+        uid, phone=message.contact.phone_number
+    )  # ← await qo'shildi
 
     await state.clear()
     await message.answer(
         MESSAGES[lang]["saved"] + "\n\n" + MESSAGES[lang]["main_menu"],
-        reply_markup=get_main_menu_keyboard(lang)
+        reply_markup=get_main_menu_keyboard(lang),
     )
 
 
 # ================= MAIN MENU: MASHINALAR =================
+
 
 @dp.message(F.text.in_({"🚗 Mashinalar", "🚗 Автомобили"}))
 async def show_brands(message: types.Message, state: FSMContext):
@@ -616,6 +914,7 @@ async def show_brands(message: types.Message, state: FSMContext):
 
 # ================= MAIN MENU: DILERLAR =================
 
+
 @dp.message(F.text.in_({"🏢 Dilerlik markazlari", "🏢 Дилерские центры"}))
 async def show_dealers(message: types.Message):
     lang = user_lang.get(message.from_user.id, "uz")
@@ -625,18 +924,24 @@ async def show_dealers(message: types.Message):
         await message.answer(MESSAGES[lang]["dealers_title"])
         return
 
-    header = "🏢 <b>Dilerlik markazlari:</b>\n\n" if lang == "uz" else "🏢 <b>Дилерские центры:</b>\n\n"
+    header = (
+        "🏢 <b>Dilerlik markazlari:</b>\n\n"
+        if lang == "uz"
+        else "🏢 <b>Дилерские центры:</b>\n\n"
+    )
     lines = []
     for d in dealers:
         block = f"<b>{html_module.escape(d['name'])}</b>"
-        if d.get('region'):
-            region_label = DEALER_REGION_LABELS.get(lang, {}).get(d['region'], d['region'])
+        if d.get("region"):
+            region_label = DEALER_REGION_LABELS.get(lang, {}).get(
+                d["region"], d["region"]
+            )
             block += f"\n📍 {html_module.escape(region_label)}"
-        if d.get('address'):
+        if d.get("address"):
             block += f"\n🏠 {html_module.escape(d['address'])}"
-        if d.get('phone'):
+        if d.get("phone"):
             block += f"\n📞 {html_module.escape(d['phone'])}"
-        if d.get('hours'):
+        if d.get("hours"):
             block += f"\n🕐 {html_module.escape(d['hours'])}"
         lines.append(block)
 
@@ -645,6 +950,7 @@ async def show_dealers(message: types.Message):
 
 
 # ================= MAIN MENU: TEST-DRAYV =================
+
 
 @dp.message(F.text.in_(TEST_DRIVE_BTNS))
 async def start_test_drive(message: types.Message, state: FSMContext):
@@ -671,6 +977,7 @@ async def start_test_drive(message: types.Message, state: FSMContext):
 
 # ================= CATCH-ALL =================
 
+
 @dp.message()
 async def handle_all(message: types.Message, state: FSMContext):
     uid = message.from_user.id
@@ -690,19 +997,26 @@ async def handle_all(message: types.Message, state: FSMContext):
     if text == back_btn:
         if current_state == RegStates.first_name:
             await state.clear()
-            await message.answer(MESSAGES[lang]["choose_lang"], reply_markup=LANG_KEYBOARD)
+            await message.answer(
+                MESSAGES[lang]["choose_lang"], reply_markup=LANG_KEYBOARD
+            )
         elif current_state in (RegStates.confirm_name, RegStates.age):
             await state.set_state(RegStates.first_name)
-            await message.answer(MESSAGES[lang]["send_first_name"], reply_markup=ReplyKeyboardRemove())
+            await message.answer(
+                MESSAGES[lang]["send_first_name"], reply_markup=ReplyKeyboardRemove()
+            )
         elif current_state in (RegStates.confirm_age, RegStates.region):
             await state.set_state(RegStates.age)
-            await message.answer(MESSAGES[lang]["send_age"], reply_markup=ReplyKeyboardRemove())
+            await message.answer(
+                MESSAGES[lang]["send_age"], reply_markup=ReplyKeyboardRemove()
+            )
         elif current_state in (RegStates.confirm_region, RegStates.district):
             await state.set_state(RegStates.region)
             regions = UZ_REGIONS.get(lang, UZ_REGIONS["uz"])
             kb = ReplyKeyboardMarkup(
-                keyboard=[[KeyboardButton(text=r)] for r in regions.keys()] + [[KeyboardButton(text=back_btn)]],
-                resize_keyboard=True
+                keyboard=[[KeyboardButton(text=r)] for r in regions.keys()]
+                + [[KeyboardButton(text=back_btn)]],
+                resize_keyboard=True,
             )
             await message.answer(MESSAGES[lang]["choose_region"], reply_markup=kb)
         elif current_state in (RegStates.confirm_district, RegStates.phone):
@@ -711,14 +1025,17 @@ async def handle_all(message: types.Message, state: FSMContext):
             regions = UZ_REGIONS.get(lang, UZ_REGIONS["uz"])
             districts = regions.get(region_name, [])
             kb = ReplyKeyboardMarkup(
-                keyboard=[[KeyboardButton(text=d)] for d in districts] + [[KeyboardButton(text=back_btn)]],
-                resize_keyboard=True
+                keyboard=[[KeyboardButton(text=d)] for d in districts]
+                + [[KeyboardButton(text=back_btn)]],
+                resize_keyboard=True,
             )
             await state.set_state(RegStates.district)
             await message.answer(MESSAGES[lang]["choose_district"], reply_markup=kb)
         elif current_state == NavStates.choose_brand:
             await state.clear()
-            await message.answer(MESSAGES[lang]["main_menu"], reply_markup=get_main_menu_keyboard(lang))
+            await message.answer(
+                MESSAGES[lang]["main_menu"], reply_markup=get_main_menu_keyboard(lang)
+            )
         elif current_state == NavStates.choose_car:
             brands = await get_brands(lang)  # ← await qo'shildi
             if brands:
@@ -730,13 +1047,20 @@ async def handle_all(message: types.Message, state: FSMContext):
                 await message.answer(MESSAGES[lang]["choose_brand"], reply_markup=kb)
             else:
                 await state.clear()
-                await message.answer(MESSAGES[lang]["main_menu"], reply_markup=get_main_menu_keyboard(lang))
+                await message.answer(
+                    MESSAGES[lang]["main_menu"],
+                    reply_markup=get_main_menu_keyboard(lang),
+                )
         elif current_state and current_state.startswith("TestDriveStates:"):
             await state.clear()
-            await message.answer(MESSAGES[lang]["main_menu"], reply_markup=get_main_menu_keyboard(lang))
+            await message.answer(
+                MESSAGES[lang]["main_menu"], reply_markup=get_main_menu_keyboard(lang)
+            )
         else:
             await state.clear()
-            await message.answer(MESSAGES[lang]["main_menu"], reply_markup=get_main_menu_keyboard(lang))
+            await message.answer(
+                MESSAGES[lang]["main_menu"], reply_markup=get_main_menu_keyboard(lang)
+            )
         return
 
     # ===== BRAND SELECTION =====
@@ -755,12 +1079,17 @@ async def handle_all(message: types.Message, state: FSMContext):
             return
 
         await state.set_state(NavStates.choose_car)
-        await state.update_data(brands=brands_map, cars={c["title"]: c["id"] for c in cars})
+        await state.update_data(
+            brands=brands_map, cars={c["title"]: c["id"] for c in cars}
+        )
 
         rows = [[KeyboardButton(text=c["title"])] for c in cars]
         rows.append([KeyboardButton(text=back_btn)])
         kb = ReplyKeyboardMarkup(keyboard=rows, resize_keyboard=True)
-        await message.answer(f"{html_module.escape(text)} — {MESSAGES[lang]['choose_model']}", reply_markup=kb)
+        await message.answer(
+            f"{html_module.escape(text)} — {MESSAGES[lang]['choose_model']}",
+            reply_markup=kb,
+        )
         return
 
     # ===== CAR SELECTION =====
@@ -784,11 +1113,8 @@ async def handle_all(message: types.Message, state: FSMContext):
         image_path = get_image_path(image_url) if image_url else None
 
         if image_path:
-            from aiogram.types import FSInputFile
             await message.answer_photo(
-                photo=FSInputFile(image_path),
-                caption=caption,
-                parse_mode="HTML"
+                photo=FSInputFile(image_path), caption=caption, parse_mode="HTML"
             )
         else:
             await message.answer(caption, parse_mode="HTML")
@@ -805,7 +1131,7 @@ async def handle_all(message: types.Message, state: FSMContext):
         await message.answer(
             MESSAGES[lang]["confirm_name"].format(html_module.escape(name)),
             parse_mode="HTML",
-            reply_markup=get_confirm_keyboard(lang)
+            reply_markup=get_confirm_keyboard(lang),
         )
         return
 
@@ -816,10 +1142,14 @@ async def handle_all(message: types.Message, state: FSMContext):
             name = data.get("reg_name", "")
             await update_or_create_user(uid, first_name=name)  # ← await qo'shildi
             await state.set_state(RegStates.age)
-            await message.answer(MESSAGES[lang]["send_age"], reply_markup=ReplyKeyboardRemove())
+            await message.answer(
+                MESSAGES[lang]["send_age"], reply_markup=ReplyKeyboardRemove()
+            )
         elif text == no_btn:
             await state.set_state(RegStates.first_name)
-            await message.answer(MESSAGES[lang]["send_first_name"], reply_markup=ReplyKeyboardRemove())
+            await message.answer(
+                MESSAGES[lang]["send_first_name"], reply_markup=ReplyKeyboardRemove()
+            )
         else:
             await message.answer(MESSAGES[lang]["choose_from_list"])
         return
@@ -832,7 +1162,7 @@ async def handle_all(message: types.Message, state: FSMContext):
             await message.answer(
                 MESSAGES[lang]["confirm_age"].format(text),
                 parse_mode="HTML",
-                reply_markup=get_confirm_keyboard(lang)
+                reply_markup=get_confirm_keyboard(lang),
             )
         else:
             await message.answer(MESSAGES[lang]["wrong_age"])
@@ -842,17 +1172,22 @@ async def handle_all(message: types.Message, state: FSMContext):
     if current_state == RegStates.confirm_age:
         if text == yes_btn:
             data = await state.get_data()
-            await update_or_create_user(uid, age=data.get("reg_age"))  # ← await qo'shildi
+            await update_or_create_user(
+                uid, age=data.get("reg_age")
+            )  # ← await qo'shildi
             await state.set_state(RegStates.region)
             regions = UZ_REGIONS.get(lang, UZ_REGIONS["uz"])
             kb = ReplyKeyboardMarkup(
-                keyboard=[[KeyboardButton(text=r)] for r in regions.keys()] + [[KeyboardButton(text=back_btn)]],
-                resize_keyboard=True
+                keyboard=[[KeyboardButton(text=r)] for r in regions.keys()]
+                + [[KeyboardButton(text=back_btn)]],
+                resize_keyboard=True,
             )
             await message.answer(MESSAGES[lang]["choose_region"], reply_markup=kb)
         elif text == no_btn:
             await state.set_state(RegStates.age)
-            await message.answer(MESSAGES[lang]["send_age"], reply_markup=ReplyKeyboardRemove())
+            await message.answer(
+                MESSAGES[lang]["send_age"], reply_markup=ReplyKeyboardRemove()
+            )
         else:
             await message.answer(MESSAGES[lang]["choose_from_list"])
         return
@@ -866,7 +1201,7 @@ async def handle_all(message: types.Message, state: FSMContext):
             await message.answer(
                 MESSAGES[lang]["confirm_region"].format(html_module.escape(text)),
                 parse_mode="HTML",
-                reply_markup=get_confirm_keyboard(lang)
+                reply_markup=get_confirm_keyboard(lang),
             )
         else:
             await message.answer(MESSAGES[lang]["choose_from_list"])
@@ -880,8 +1215,9 @@ async def handle_all(message: types.Message, state: FSMContext):
             regions = UZ_REGIONS.get(lang, UZ_REGIONS["uz"])
             districts = regions.get(region_name, [])
             kb = ReplyKeyboardMarkup(
-                keyboard=[[KeyboardButton(text=d)] for d in districts] + [[KeyboardButton(text=back_btn)]],
-                resize_keyboard=True
+                keyboard=[[KeyboardButton(text=d)] for d in districts]
+                + [[KeyboardButton(text=back_btn)]],
+                resize_keyboard=True,
             )
             await state.set_state(RegStates.district)
             await message.answer(MESSAGES[lang]["choose_district"], reply_markup=kb)
@@ -889,8 +1225,9 @@ async def handle_all(message: types.Message, state: FSMContext):
             await state.set_state(RegStates.region)
             regions = UZ_REGIONS.get(lang, UZ_REGIONS["uz"])
             kb = ReplyKeyboardMarkup(
-                keyboard=[[KeyboardButton(text=r)] for r in regions.keys()] + [[KeyboardButton(text=back_btn)]],
-                resize_keyboard=True
+                keyboard=[[KeyboardButton(text=r)] for r in regions.keys()]
+                + [[KeyboardButton(text=back_btn)]],
+                resize_keyboard=True,
             )
             await message.answer(MESSAGES[lang]["choose_region"], reply_markup=kb)
         else:
@@ -911,7 +1248,7 @@ async def handle_all(message: types.Message, state: FSMContext):
         await message.answer(
             MESSAGES[lang]["confirm_district"].format(html_module.escape(text)),
             parse_mode="HTML",
-            reply_markup=get_confirm_keyboard(lang)
+            reply_markup=get_confirm_keyboard(lang),
         )
         return
 
@@ -919,12 +1256,16 @@ async def handle_all(message: types.Message, state: FSMContext):
     if current_state == RegStates.confirm_district:
         if text == yes_btn:
             data = await state.get_data()
-            region_full = f"{data.get('reg_region', '')}, {data.get('reg_district', '')}"
+            region_full = (
+                f"{data.get('reg_region', '')}, {data.get('reg_district', '')}"
+            )
             await update_or_create_user(uid, region=region_full)  # ← await qo'shildi
             await state.set_state(RegStates.phone)
             kb = ReplyKeyboardMarkup(
-                keyboard=[[KeyboardButton(text="📞 Telefon yuborish", request_contact=True)]],
-                resize_keyboard=True
+                keyboard=[
+                    [KeyboardButton(text="📞 Telefon yuborish", request_contact=True)]
+                ],
+                resize_keyboard=True,
             )
             await message.answer(MESSAGES[lang]["send_phone"], reply_markup=kb)
         elif text == no_btn:
@@ -933,8 +1274,9 @@ async def handle_all(message: types.Message, state: FSMContext):
             regions = UZ_REGIONS.get(lang, UZ_REGIONS["uz"])
             districts = regions.get(region_name, [])
             kb = ReplyKeyboardMarkup(
-                keyboard=[[KeyboardButton(text=d)] for d in districts] + [[KeyboardButton(text=back_btn)]],
-                resize_keyboard=True
+                keyboard=[[KeyboardButton(text=d)] for d in districts]
+                + [[KeyboardButton(text=back_btn)]],
+                resize_keyboard=True,
             )
             await state.set_state(RegStates.district)
             await message.answer(MESSAGES[lang]["choose_district"], reply_markup=kb)
@@ -967,14 +1309,16 @@ async def handle_all(message: types.Message, state: FSMContext):
             return
         await state.update_data(td_product_id=products_map[text], td_product_name=text)
         await state.set_state(TestDriveStates.choose_date)
-        await message.answer(MESSAGES[lang]["td_choose_date"], reply_markup=get_date_keyboard(back_btn))
+        await message.answer(
+            MESSAGES[lang]["td_choose_date"], reply_markup=get_date_keyboard(back_btn)
+        )
         return
 
     # ===== TEST-DRAYV: DATE =====
     if current_state == TestDriveStates.choose_date:
         try:
             parsed = datetime.strptime(text, "%d.%m.%Y").date()
-            today = datetime.now().date()
+            today = timezone.localtime(timezone.now()).date()
             if parsed < today or parsed > today + timedelta(days=14):
                 await message.answer(MESSAGES[lang]["td_invalid_date"])
                 return
@@ -1023,7 +1367,9 @@ async def handle_all(message: types.Message, state: FSMContext):
             name=html_module.escape(td_name),
             phone=html_module.escape(td_phone),
         )
-        await message.answer(confirm_text, parse_mode="HTML", reply_markup=get_confirm_keyboard(lang))
+        await message.answer(
+            confirm_text, parse_mode="HTML", reply_markup=get_confirm_keyboard(lang)
+        )
         return
 
     # ===== TEST-DRAYV: CONFIRM =====
@@ -1033,13 +1379,15 @@ async def handle_all(message: types.Message, state: FSMContext):
             request_data = {
                 "name": data.get("td_name"),
                 "phone": data.get("td_phone"),
-                "dealer_id": data.get("td_dealer_id"),    # ← ForeignKey uchun _id
+                "dealer_id": data.get("td_dealer_id"),  # ← ForeignKey uchun _id
                 "product_id": data.get("td_product_id"),  # ← ForeignKey uchun _id
                 "preferred_date": data.get("td_date"),
                 "preferred_time": data.get("td_time"),
                 "agree_terms": True,
             }
-            test_drive_obj, error = await create_test_drive_request(request_data)  # ← await qo'shildi
+            test_drive_obj, error = await create_test_drive_request(
+                request_data
+            )  # ← await qo'shildi
             if test_drive_obj and not error:
                 await message.answer(MESSAGES[lang]["td_success"])
             elif error == "daily_limit":
@@ -1047,16 +1395,23 @@ async def handle_all(message: types.Message, state: FSMContext):
             else:
                 await message.answer(MESSAGES[lang]["td_error"])
             await state.clear()
-            await message.answer(MESSAGES[lang]["main_menu"], reply_markup=get_main_menu_keyboard(lang))
+            await message.answer(
+                MESSAGES[lang]["main_menu"],
+                reply_markup=get_main_menu_keyboard(lang)
+            )
         elif text == no_btn:
             await state.clear()
-            await message.answer(MESSAGES[lang]["main_menu"], reply_markup=get_main_menu_keyboard(lang))
+            await message.answer(
+                MESSAGES[lang]["main_menu"], 
+                reply_markup=get_main_menu_keyboard(lang)
+            )
         else:
             await message.answer(MESSAGES[lang]["choose_from_list"])
         return
 
 
 # ================= RUN =================
+
 
 async def main():
     await bot.set_my_description(

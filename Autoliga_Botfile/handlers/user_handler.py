@@ -1,17 +1,17 @@
 import os
 import sys
+
 from aiogram import types
-from aiogram.fsm.context import FSMContext
 from asgiref.sync import sync_to_async
 from django.core.exceptions import ObjectDoesNotExist
-
-PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-if PROJECT_ROOT not in sys.path:
-    sys.path.insert(0, PROJECT_ROOT)
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'myproject.settings')
-
 from main.models import TelegramUser
 
+PROJECT_ROOT = os.path.dirname(
+    os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+)
+if PROJECT_ROOT not in sys.path:
+    sys.path.insert(0, PROJECT_ROOT)
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "myproject.settings")
 
 @sync_to_async
 def get_user(telegram_id: int):
@@ -25,10 +25,13 @@ def get_user(telegram_id: int):
 def update_user_field(telegram_id: int, **kwargs):
     try:
         user = TelegramUser.objects.get(telegram_id=telegram_id)
+        changed_fields = []
         for key, value in kwargs.items():
             if value is not None:
                 setattr(user, key, value)
-        user.save(update_fields=list(kwargs.keys()))
+                changed_fields.append(key)
+        if changed_fields:
+            user.save(update_fields=changed_fields)
         return user
     except ObjectDoesNotExist:
         return None

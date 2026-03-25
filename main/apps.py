@@ -1,62 +1,83 @@
-from django.apps import AppConfig
-import threading
-import os
 import logging
+import os
+import sys
+import threading
+import time
+
+from django.apps import AppConfig
 
 logger = logging.getLogger(__name__)
 
+# Maximum restart attempts before giving up
+_BOT_MAX_RETRIES = int(os.environ.get("BOT_MAX_RETRIES", "5"))
+
 
 class MainConfig(AppConfig):
-    default_auto_field = 'django.db.models.BigAutoField'
-    name = 'main'
+    default_auto_field = "django.db.models.BigAutoField"
+    name = "main"
 
     def ready(self):
-        import main.admin
-        import main.signals
+        import main.admin  # noqa: F401
+        import main.signals  # noqa: F401
 
-        import sys
+        is_runserver = "runserver" in sys.argv
+        is_noreload = "--noreload" in sys.argv
+        run_main = os.environ.get("RUN_MAIN")
 
-        is_runserver = 'runserver' in sys.argv
-        is_noreload = '--noreload' in sys.argv
-        run_main = os.environ.get('RUN_MAIN')
-
-        # Skip bot startup in auto-reloader parent process only.
-        # With auto-reload: Django sets RUN_MAIN='true' in the worker child process.
-        # With --noreload: RUN_MAIN is never set, but we still want to start the bot.
-        if is_runserver and not is_noreload and run_main != 'true':
+        # Skip in auto-reloader parent process (Django sets RUN_MAIN='true' in worker).
+        # With --noreload, RUN_MAIN is never set, so we must still start the bot.
+        if is_runserver and not is_noreload and run_main != "true":
             return
 
-        # Also skip for management commands (migrate, shell, etc.)
+        # Skip for management commands (migrate, shell, collectstatic, etc.)
         if not is_runserver:
             return
 
         def start_bot():
-            """Start the Telegram bot in a separate thread with proper error handling"""
-            try:
-                import asyncio
+            """Start the bot with exponential-backoff restart on crash."""
+            import asyncio
 
-                # Add bot directory to Python path
-                bot_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'Autoliga_Botfile')
-                if bot_dir not in sys.path:
-                    sys.path.insert(0, bot_dir)
+            bot_dir = os.path.join(
+                os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+                "Autoliga_Botfile",
+            )
+            if bot_dir not in sys.path:
+                sys.path.insert(0, bot_dir)
 
-                # Prevent bot.py from calling django.setup() again (already set up)
-                os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'myproject.settings')
+            # bot.py guards against double django.setup(), so this is safe.
+            os.environ.setdefault("DJANGO_SETTINGS_MODULE", "myproject.settings")
 
-                # Import bot's main function
-                from bot import main as bot_main
+            from bot import main as bot_main  # noqa: PLC0415
 
-                # Create new event loop for the bot to avoid conflicts with Django's async code
+            retry_delay = 5
+            for attempt in range(1, _BOT_MAX_RETRIES + 1):
                 loop = asyncio.new_event_loop()
                 asyncio.set_event_loop(loop)
+                try:
+                    logger.info("Telegram bot starting (attempt %d/%d)…", attempt, _BOT_MAX_RETRIES)
+                    loop.run_until_complete(bot_main())
+                    logger.info("Telegram bot exited cleanly.")
+                    break  # clean shutdown — don't restart
+                except Exception as exc:
+                    logger.error(
+                        "Telegram bot crashed (attempt %d/%d): %s",
+                        attempt, _BOT_MAX_RETRIES, exc,
+                        exc_info=True,
+                    )
+                    if attempt < _BOT_MAX_RETRIES:
+                        logger.info("Restarting bot in %ds…", retry_delay)
+                        time.sleep(retry_delay)
+                        retry_delay = min(retry_delay * 2, 60)  # cap at 60 s
+                finally:
+                    try:
+                        loop.close()
+                    except Exception:
+                        pass
+            else:
+                logger.critical(
+                    "Telegram bot failed after %d attempts — giving up.", _BOT_MAX_RETRIES
+                )
 
-                logger.info("Starting Telegram bot...")
-                loop.run_until_complete(bot_main())
-
-            except Exception as e:
-                logger.error(f"Telegram bot crashed: {e}", exc_info=True)
-
-        # Start bot in a daemon thread so it doesn't prevent Django from shutting down
         bot_thread = threading.Thread(target=start_bot, daemon=True, name="TelegramBot")
         bot_thread.start()
-        logger.info("Telegram bot thread started")
+        logger.info("Telegram bot thread started.")

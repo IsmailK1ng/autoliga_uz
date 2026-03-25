@@ -58,6 +58,10 @@ CAPTCHA_NOISE_FUNCTIONS = ('captcha.helpers.noise_arcs', 'captcha.helpers.noise_
 RECAPTCHA_SITE_KEY = config('RECAPTCHA_SITE_KEY', default='')
 RECAPTCHA_SECRET_KEY = config('RECAPTCHA_SECRET_KEY', default='')
 
+# ============ TELEGRAM ============
+TELEGRAM_BOT_TOKEN = config('BOT_TOKEN', default='')
+TELEGRAM_CHAT_ID = config('TELEGRAM_CHAT_ID', default='')
+
 # ============ REST FRAMEWORK ============
 
 REST_FRAMEWORK = {

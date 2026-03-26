@@ -276,12 +276,14 @@ STATICFILES_DIRS = [
 # WhiteNoise: static fayllarni siqib + cache bilan beradi
 if not DEBUG:
     STORAGES = {
+        "default": {
+            "BACKEND": "django.core.files.storage.FileSystemStorage",
+        },
         "staticfiles": {
-            "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+            "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage",
         },
     }
-    # Static fayllar uchun cache: 1 yil (fayl nomi hash bilan o'zgaradi)
-    WHITENOISE_MAX_AGE = 31536000  # 1 year
+    WHITENOISE_MAX_AGE = 31536000  
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media' if DEBUG else '/home/autolig1/public_html/media'

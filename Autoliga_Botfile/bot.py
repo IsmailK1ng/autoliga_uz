@@ -638,6 +638,10 @@ MESSAGES = {
             "Hammasi to'g'rimi?"
         ),
         "td_success": "✅ Test-drayvga muvaffaqiyatli yozildingiz!\nTez orada siz bilan bog'lanamiz.",
+        "td_no_dealers": (
+            "⚠️ Hozircha test-drayv uchun dilerlik markazlari qo'shilmagan.\n"
+            "Iltimos, birozdan so'ng qayta urinib ko'ring."
+        ),
         "td_error": "❌ Xatolik yuz berdi. Qayta urinib ko'ring.",
         "td_invalid_date": "❌ Iltimos ro'yxatdan sana tanlang.",
         "td_invalid_phone": "❌ Telefon noto'g'ri. +998XXXXXXXXX formatida kiriting.",
@@ -696,6 +700,10 @@ MESSAGES = {
             "Всё верно?"
         ),
         "td_success": "✅ Вы успешно записаны на тест-драйв!\nМы скоро свяжемся с вами.",
+        "td_no_dealers": (
+            "⚠️ Дилерские центры для тест-драйва пока не добавлены.\n"
+            "Пожалуйста, попробуйте позже."
+        ),
         "td_error": "❌ Произошла ошибка. Попробуйте ещё раз.",
         "td_invalid_date": "❌ Пожалуйста, выберите дату из списка.",
         "td_invalid_phone": "❌ Неверный номер. Введите в формате +998XXXXXXXXX.",
@@ -959,7 +967,7 @@ async def start_test_drive(message: types.Message, state: FSMContext):
     td_data = await get_test_drive_data(lang)  # ← await qo'shildi
     dealers = td_data.get("dealers", [])
     if not dealers:
-        await message.answer(MESSAGES[lang]["td_error"])
+        await message.answer(MESSAGES[lang].get("td_no_dealers", MESSAGES[lang]["td_error"]))
         return
 
     await state.set_state(TestDriveStates.choose_dealer)

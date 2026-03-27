@@ -136,6 +136,11 @@ class SecurityHeadersMiddleware:
 
         # Admin sahifalariga CSP qo'ymaymiz (CKEditor, Jazzmin o'z JS ishlatadi)
         if not request.path.startswith('/admin/'):
+            # 'unsafe-eval' intentionally absent:
+            # - SVGInjector (libs.min.js) uses new Function() only when evalScripts!="never";
+            #   we set evalScripts:"never" in app.js and about.js, so it is never called.
+            # - countrymap.js (simplemaps) does not use eval.
+            # - GTM is only a noscript fallback here, no JS initialisation.
             response['Content-Security-Policy'] = (
                 "default-src 'self'; "
                 "script-src 'self' 'unsafe-inline' "
@@ -184,7 +189,6 @@ class RateLimitMiddleware:
 
     Konfiguratsiya settings.py da:
       RATE_LIMIT_RULES = {
-          '/api/bot/': {'limit': 60, 'window': 60},
           '/api/': {'limit': 100, 'window': 60},
           '/admin/login/': {'limit': 5, 'window': 300},
       }
@@ -192,7 +196,6 @@ class RateLimitMiddleware:
 
     # Default rules (settings.py da override qilish mumkin)
     DEFAULT_RULES = {
-        '/api/bot/': {'limit': 60, 'window': 60},
         '/api/': {'limit': 100, 'window': 60},
         '/admin/login/': {'limit': 5, 'window': 300},
     }
@@ -256,7 +259,6 @@ class RateLimitMiddleware:
         TTL = window, shuning uchun eskirgan keylar avtomatik o'chadi.
         Returns True if allowed, False if exceeded.
         """
-        # Endpoint hash: /api/bot/ va /api/bot/status bitta rule bo'lsa bitta key
         prefix = None
         for p in self.rules:
             if path.startswith(p):
@@ -375,47 +377,61 @@ class AdminBruteForceMiddleware:
         return response
 
 
-# ============ REQUEST SIZE LIMIT ============
+# ============ ОГРАНИЧЕНИЕ РАЗМЕРА ЗАПРОСА ============
 
 class RequestSizeLimitMiddleware:
-    """Katta request body larni bloklash — DDoS/upload bomb himoya.
+    """Блокировка слишком больших тел запроса — защита от DDoS и upload-bomb атак.
 
-    - API uchun: 2 MB (JSON payloads)
-    - Fayl upload uchun: 15 MB (resume, avatar)
-    - Admin uchun: cheklov yo'q
+    Лимиты:
+    - Загрузка файлов (multipart/form-data): 300 КБ
+    - API и прочие запросы (JSON и др.):     250 КБ
+    - Панель администратора:                 без ограничений
     """
 
-    API_MAX_SIZE = 2 * 1024 * 1024       # 2 MB
-    UPLOAD_MAX_SIZE = 15 * 1024 * 1024    # 15 MB
+    # 300 КБ — достаточно для аватарок и небольших изображений
+    UPLOAD_MAX_SIZE = 300 * 1024
+
+    # 250 КБ — достаточно для любых JSON-payload (даже с большим количеством полей), но не позволяет отправлять гигабайтные данные в API
+    API_MAX_SIZE = 250 * 1024
 
     def __init__(self, get_response):
         self.get_response = get_response
 
     def __call__(self, request):
+        # Администратор не ограничен — может загружать любые данные
         if request.path.startswith('/admin/'):
             return self.get_response(request)
 
         content_length = request.META.get('CONTENT_LENGTH')
-        if content_length:
-            try:
-                size = int(content_length)
-            except (ValueError, TypeError):
-                return self.get_response(request)
+        if not content_length:
+            return self.get_response(request)
 
-            content_type = request.META.get('CONTENT_TYPE', '')
-            if 'multipart/form-data' in content_type:
-                max_size = self.UPLOAD_MAX_SIZE
-            else:
-                max_size = self.API_MAX_SIZE
+        try:
+            size = int(content_length)
+        except (ValueError, TypeError):
+            return self.get_response(request)
 
-            if size > max_size:
-                security_logger.warning(
-                    f"Oversized request blocked: {get_client_ip(request)} -> "
-                    f"{request.path} ({size} bytes, max {max_size})"
-                )
-                return JsonResponse(
-                    {'error': 'Request too large'},
-                    status=413
-                )
+        content_type = request.META.get('CONTENT_TYPE', '')
+        if 'multipart/form-data' in content_type:
+            max_size = self.UPLOAD_MAX_SIZE
+            type_label = 'загрузка файла'
+        else:
+            max_size = self.API_MAX_SIZE
+            type_label = 'API-запрос'
+
+        if size > max_size:
+            size_kb = round(size / 1024, 1)
+            limit_kb = max_size // 1024
+            security_logger.warning(
+                f"Слишком большой запрос заблокирован: {get_client_ip(request)} -> "
+                f"{request.path} ({size} байт, лимит {max_size} байт)"
+            )
+            return JsonResponse(
+                {
+                    'error': f'Размер запроса превышает допустимый лимит для типа «{type_label}».',
+                    'detail': f'Размер вашего запроса: {size_kb} КБ. Максимально допустимо: {limit_kb} КБ.',
+                },
+                status=413
+            )
 
         return self.get_response(request)

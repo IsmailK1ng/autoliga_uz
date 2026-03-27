@@ -4,6 +4,7 @@
 
 {% block breadcrumbs %}
 <link rel="stylesheet" href="{% static 'css/breadcrumbs.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'css/dealers.css' %}">
 {% endblock breadcrumbs %}
 
 {% block title %}
@@ -160,6 +161,13 @@
 
     <script>
     (function() {
+        // Guard: if simplemaps failed to load (network error, CSP, etc.) — abort silently.
+        if (typeof simplemaps_countrymap_mapdata === 'undefined' ||
+            typeof simplemaps_countrymap === 'undefined') {
+            console.warn('Dealers map: simplemaps not loaded, skipping map init.');
+            return;
+        }
+
         const DEALERS = JSON.parse(document.getElementById('dealers-data').textContent);
         const lang = document.documentElement.lang || 'uz';
         const isMobile = () => window.innerWidth <= 768;

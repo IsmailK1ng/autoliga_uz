@@ -202,194 +202,7 @@
 
     <!-- Секция героя (конец) -->
 
-{% if team_managers %}
-<!-- Секция — Наша команда (START) -->
-<div class="mxd-section ht-section">
-  <div class="mxd-container" style="max-width:1200px;margin:0 auto;padding:0 20px;">
-    <h2 class="home-team-title">
-      {% if request.LANGUAGE_CODE == 'uz' %}Bizning jamoa
-      {% elif request.LANGUAGE_CODE == 'ru' %}Наша команда
-      {% else %}Our team{% endif %}
-    </h2>
-    <p class="home-team-subtitle">
-      {% if request.LANGUAGE_CODE == 'uz' %}Har bir filialimizda sizni professional mutaxassislar kutib oladi
-      {% elif request.LANGUAGE_CODE == 'ru' %}В каждом нашем филиале вас встретят профессионалы своего дела
-      {% else %}Professional specialists are waiting for you at each of our branches{% endif %}
-    </p>
-  </div>
 
-  <!-- 3D Carousel -->
-  <div class="ht3d-wrapper">
-    <button class="ht3d-btn ht3d-prev" id="ht3dPrev" aria-label="Prev">&#8249;</button>
-
-    <div class="ht3d-stage" id="ht3dStage">
-      {% for m in team_managers %}
-      <div class="ht3d-card"
-           data-name="{{ m.full_name }}"
-           data-position="{{ m.position }}"
-           data-phone="{{ m.phone }}"
-           data-photo="{% if m.photo %}{{ m.photo.url }}{% endif %}"
-           data-dealer="{{ m.dealer.name }}">
-        <div class="ht3d-card-img">
-          {% if m.photo %}
-          <img src="{{ m.photo.url }}" alt="{{ m.full_name }}" loading="lazy" />
-          {% else %}
-          <div class="ht3d-card-placeholder"><i class="ph ph-user"></i></div>
-          {% endif %}
-        </div>
-      </div>
-      {% endfor %}
-    </div>
-
-    <button class="ht3d-btn ht3d-next" id="ht3dNext" aria-label="Next">&#8250;</button>
-  </div>
-
-  <!-- Active card info -->
-  <div class="ht3d-info" id="ht3dInfo">
-    <h3 class="ht3d-name" id="ht3dName"></h3>
-    <p class="ht3d-position" id="ht3dPosition"></p>
-  </div>
-
-  <!-- Dots -->
-  <div class="ht3d-dots" id="ht3dDots"></div>
-
-  <div style="text-align:center;padding:20px 20px 0;">
-    <a href="{% url 'team' %}" class="home-team-cta-btn">
-      {% if request.LANGUAGE_CODE == 'uz' %}Barcha jamoani ko'rish
-      {% elif request.LANGUAGE_CODE == 'ru' %}Вся команда
-      {% else %}View all team{% endif %}
-    </a>
-  </div>
-</div>
-
-<!-- Team Detail Modal -->
-<div id="homeTeamModal" class="home-team-modal" onclick="if(event.target===this)this.style.display='none'">
-  <div class="home-team-modal-content">
-    <button class="home-team-modal-close" onclick="document.getElementById('homeTeamModal').style.display='none'">&times;</button>
-    <div class="home-team-modal-body">
-      <div class="home-team-modal-photo-wrap" id="htmPhotoWrap">
-        <img id="htmPhoto" src="" alt="" class="home-team-modal-photo" />
-      </div>
-      <div class="home-team-modal-info">
-        <h2 class="home-team-modal-name" id="htmName"></h2>
-        <p class="home-team-modal-position" id="htmPosition"></p>
-        <p class="home-team-modal-dealer" id="htmDealer"><i class="ph ph-buildings"></i> <span></span></p>
-        <a href="" class="home-team-modal-phone-btn" id="htmPhone" style="display:none;">
-          <i class="ph ph-phone"></i>
-          {% if request.LANGUAGE_CODE == 'uz' %}Qo'ng'iroq qilish
-          {% elif request.LANGUAGE_CODE == 'ru' %}Позвонить
-          {% else %}Call{% endif %}
-          <span class="home-team-modal-phone-num" id="htmPhoneNum"></span>
-        </a>
-      </div>
-    </div>
-  </div>
-</div>
-
-
-
-<script>
-(function() {
-  var cards = Array.from(document.querySelectorAll('.ht3d-card'));
-  var total = cards.length;
-  if (!total) return;
-
-  var current = 0;
-
-  // Build dots
-  var dotsEl = document.getElementById('ht3dDots');
-  cards.forEach(function(_, i) {
-    var d = document.createElement('button');
-    d.className = 'ht3d-dot' + (i === 0 ? ' active' : '');
-    d.setAttribute('aria-label', 'Slide ' + (i+1));
-    d.addEventListener('click', function() { goTo(i); });
-    dotsEl.appendChild(d);
-  });
-
-  function getPos(i) {
-    var diff = ((i - current) % total + total) % total;
-    if (diff === 0) return 'pos-p0';
-    if (diff === 1) return 'pos-p1';
-    if (diff === 2) return 'pos-p2';
-    if (diff === total - 1) return 'pos-pm1';
-    if (diff === total - 2) return 'pos-pm2';
-    return 'pos-hidden';
-  }
-
-  function updateInfo() {
-    var card = cards[current];
-    var nameEl = document.getElementById('ht3dName');
-    var posEl = document.getElementById('ht3dPosition');
-    var info = document.getElementById('ht3dInfo');
-    info.style.opacity = '0';
-    setTimeout(function() {
-      nameEl.textContent = card.dataset.name || '';
-      posEl.textContent = card.dataset.position || '';
-      info.style.opacity = '1';
-    }, 200);
-  }
-
-  function render() {
-    var dots = dotsEl.querySelectorAll('.ht3d-dot');
-    cards.forEach(function(card, i) {
-      card.className = 'ht3d-card ' + getPos(i);
-      if (dots[i]) dots[i].classList.toggle('active', i === current);
-    });
-    updateInfo();
-  }
-
-  function goTo(idx) {
-    current = ((idx % total) + total) % total;
-    render();
-  }
-
-  // Click on side cards to navigate
-  cards.forEach(function(card, i) {
-    card.addEventListener('click', function() {
-      var pos = getPos(i);
-      if (pos === 'pos-p0') {
-        // Open modal
-        var name = card.dataset.name, position = card.dataset.position,
-            phone = card.dataset.phone, photo = card.dataset.photo,
-            dealer = card.dataset.dealer;
-        document.getElementById('htmName').textContent = name;
-        document.getElementById('htmPosition').textContent = position;
-        document.getElementById('htmDealer').querySelector('span').textContent = dealer;
-        var photoWrap = document.getElementById('htmPhotoWrap'), photoEl = document.getElementById('htmPhoto');
-        if (photo) { photoEl.src = photo; photoEl.alt = name; photoWrap.style.display = 'block'; }
-        else { photoWrap.style.display = 'none'; }
-        var phoneBtn = document.getElementById('htmPhone');
-        if (phone) { phoneBtn.href = 'tel:' + phone; document.getElementById('htmPhoneNum').textContent = phone; phoneBtn.style.display = 'inline-flex'; }
-        else { phoneBtn.style.display = 'none'; }
-        document.getElementById('homeTeamModal').style.display = 'flex';
-      } else if (pos === 'pos-p1' || pos === 'pos-p2') {
-        goTo(i);
-      } else if (pos === 'pos-pm1' || pos === 'pos-pm2') {
-        goTo(i);
-      }
-    });
-  });
-
-  document.getElementById('ht3dPrev').addEventListener('click', function() { goTo(current - 1); });
-  document.getElementById('ht3dNext').addEventListener('click', function() { goTo(current + 1); });
-
-  // Swipe support
-  var stage = document.getElementById('ht3dStage');
-  var wrapper = document.querySelector('.ht3d-wrapper');
-  var touchStartX = 0;
-  wrapper.addEventListener('touchstart', function(e) { touchStartX = e.touches[0].clientX; }, { passive: true });
-  wrapper.addEventListener('touchend', function(e) {
-    var dx = e.changedTouches[0].clientX - touchStartX;
-    if (dx < -40) goTo(current + 1);
-    else if (dx > 40) goTo(current - 1);
-  }, { passive: true });
-
-  // Init
-  render();
-})();
-</script>
-<!-- Секция — Наша команда (END) -->
-{% endif %}
 
   <!-- Секция — превью блога (начало) -->
     <div class="mxd-section padding-blog">
@@ -1139,6 +952,195 @@
       </div>
     </div>
     <!-- Секция — контактная форма (конец) -->
+
+    {% if team_managers %}
+<!-- Секция — Наша команда (START) -->
+<div class="mxd-section ht-section">
+  <div class="mxd-container" style="max-width:1200px;margin:0 auto;padding:0 20px;">
+    <h2 class="home-team-title">
+      {% if request.LANGUAGE_CODE == 'uz' %}Bizning jamoa
+      {% elif request.LANGUAGE_CODE == 'ru' %}Наша команда
+      {% else %}Our team{% endif %}
+    </h2>
+    <p class="home-team-subtitle">
+      {% if request.LANGUAGE_CODE == 'uz' %}Har bir filialimizda sizni professional mutaxassislar kutib oladi
+      {% elif request.LANGUAGE_CODE == 'ru' %}В каждом нашем филиале вас встретят профессионалы своего дела
+      {% else %}Professional specialists are waiting for you at each of our branches{% endif %}
+    </p>
+  </div>
+
+  <!-- 3D Carousel -->
+  <div class="ht3d-wrapper">
+    <button class="ht3d-btn ht3d-prev" id="ht3dPrev" aria-label="Prev">&#8249;</button>
+
+    <div class="ht3d-stage" id="ht3dStage">
+      {% for m in team_managers %}
+      <div class="ht3d-card"
+           data-name="{{ m.full_name }}"
+           data-position="{{ m.position }}"
+           data-phone="{{ m.phone }}"
+           data-photo="{% if m.photo %}{{ m.photo.url }}{% endif %}"
+           data-dealer="{{ m.dealer.name }}">
+        <div class="ht3d-card-img">
+          {% if m.photo %}
+          <img src="{{ m.photo.url }}" alt="{{ m.full_name }}" loading="lazy" />
+          {% else %}
+          <div class="ht3d-card-placeholder"><i class="ph ph-user"></i></div>
+          {% endif %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+    <button class="ht3d-btn ht3d-next" id="ht3dNext" aria-label="Next">&#8250;</button>
+  </div>
+
+  <!-- Active card info -->
+  <div class="ht3d-info" id="ht3dInfo">
+    <h3 class="ht3d-name" id="ht3dName"></h3>
+    <p class="ht3d-position" id="ht3dPosition"></p>
+  </div>
+
+  <!-- Dots -->
+  <div class="ht3d-dots" id="ht3dDots"></div>
+
+  <div style="text-align:center;padding:20px 20px 0;">
+    <a href="{% url 'team' %}" class="home-team-cta-btn">
+      {% if request.LANGUAGE_CODE == 'uz' %}Barcha jamoani ko'rish
+      {% elif request.LANGUAGE_CODE == 'ru' %}Вся команда
+      {% else %}View all team{% endif %}
+    </a>
+  </div>
+</div>
+
+<!-- Team Detail Modal -->
+<div id="homeTeamModal" class="home-team-modal" onclick="if(event.target===this)this.style.display='none'">
+  <div class="home-team-modal-content">
+    <button class="home-team-modal-close" onclick="document.getElementById('homeTeamModal').style.display='none'">&times;</button>
+    <div class="home-team-modal-body">
+      <div class="home-team-modal-photo-wrap" id="htmPhotoWrap">
+        <img id="htmPhoto" src="" alt="" class="home-team-modal-photo" />
+      </div>
+      <div class="home-team-modal-info">
+        <h2 class="home-team-modal-name" id="htmName"></h2>
+        <p class="home-team-modal-position" id="htmPosition"></p>
+        <p class="home-team-modal-dealer" id="htmDealer"><i class="ph ph-buildings"></i> <span></span></p>
+        <a href="" class="home-team-modal-phone-btn" id="htmPhone" style="display:none;">
+          <i class="ph ph-phone"></i>
+          {% if request.LANGUAGE_CODE == 'uz' %}Qo'ng'iroq qilish
+          {% elif request.LANGUAGE_CODE == 'ru' %}Позвонить
+          {% else %}Call{% endif %}
+          <span class="home-team-modal-phone-num" id="htmPhoneNum"></span>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<script>
+(function() {
+  var cards = Array.from(document.querySelectorAll('.ht3d-card'));
+  var total = cards.length;
+  if (!total) return;
+
+  var current = 0;
+
+  // Build dots
+  var dotsEl = document.getElementById('ht3dDots');
+  cards.forEach(function(_, i) {
+    var d = document.createElement('button');
+    d.className = 'ht3d-dot' + (i === 0 ? ' active' : '');
+    d.setAttribute('aria-label', 'Slide ' + (i+1));
+    d.addEventListener('click', function() { goTo(i); });
+    dotsEl.appendChild(d);
+  });
+
+  function getPos(i) {
+    var diff = ((i - current) % total + total) % total;
+    if (diff === 0) return 'pos-p0';
+    if (diff === 1) return 'pos-p1';
+    if (diff === 2) return 'pos-p2';
+    if (diff === total - 1) return 'pos-pm1';
+    if (diff === total - 2) return 'pos-pm2';
+    return 'pos-hidden';
+  }
+
+  function updateInfo() {
+    var card = cards[current];
+    var nameEl = document.getElementById('ht3dName');
+    var posEl = document.getElementById('ht3dPosition');
+    var info = document.getElementById('ht3dInfo');
+    info.style.opacity = '0';
+    setTimeout(function() {
+      nameEl.textContent = card.dataset.name || '';
+      posEl.textContent = card.dataset.position || '';
+      info.style.opacity = '1';
+    }, 200);
+  }
+
+  function render() {
+    var dots = dotsEl.querySelectorAll('.ht3d-dot');
+    cards.forEach(function(card, i) {
+      card.className = 'ht3d-card ' + getPos(i);
+      if (dots[i]) dots[i].classList.toggle('active', i === current);
+    });
+    updateInfo();
+  }
+
+  function goTo(idx) {
+    current = ((idx % total) + total) % total;
+    render();
+  }
+
+  // Click on side cards to navigate
+  cards.forEach(function(card, i) {
+    card.addEventListener('click', function() {
+      var pos = getPos(i);
+      if (pos === 'pos-p0') {
+        // Open modal
+        var name = card.dataset.name, position = card.dataset.position,
+            phone = card.dataset.phone, photo = card.dataset.photo,
+            dealer = card.dataset.dealer;
+        document.getElementById('htmName').textContent = name;
+        document.getElementById('htmPosition').textContent = position;
+        document.getElementById('htmDealer').querySelector('span').textContent = dealer;
+        var photoWrap = document.getElementById('htmPhotoWrap'), photoEl = document.getElementById('htmPhoto');
+        if (photo) { photoEl.src = photo; photoEl.alt = name; photoWrap.style.display = 'block'; }
+        else { photoWrap.style.display = 'none'; }
+        var phoneBtn = document.getElementById('htmPhone');
+        if (phone) { phoneBtn.href = 'tel:' + phone; document.getElementById('htmPhoneNum').textContent = phone; phoneBtn.style.display = 'inline-flex'; }
+        else { phoneBtn.style.display = 'none'; }
+        document.getElementById('homeTeamModal').style.display = 'flex';
+      } else if (pos === 'pos-p1' || pos === 'pos-p2') {
+        goTo(i);
+      } else if (pos === 'pos-pm1' || pos === 'pos-pm2') {
+        goTo(i);
+      }
+    });
+  });
+
+  document.getElementById('ht3dPrev').addEventListener('click', function() { goTo(current - 1); });
+  document.getElementById('ht3dNext').addEventListener('click', function() { goTo(current + 1); });
+
+  // Swipe support
+  var stage = document.getElementById('ht3dStage');
+  var wrapper = document.querySelector('.ht3d-wrapper');
+  var touchStartX = 0;
+  wrapper.addEventListener('touchstart', function(e) { touchStartX = e.touches[0].clientX; }, { passive: true });
+  wrapper.addEventListener('touchend', function(e) {
+    var dx = e.changedTouches[0].clientX - touchStartX;
+    if (dx < -40) goTo(current + 1);
+    else if (dx > 40) goTo(current - 1);
+  }, { passive: true });
+
+  // Init
+  render();
+})();
+</script>
+<!-- Секция — Наша команда (END) -->
+{% endif %}
 
     <!-- Section - Inner Pages Slider Start -->
     <div class="mxd-section padding-pre-grid">

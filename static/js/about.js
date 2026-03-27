@@ -1467,7 +1467,7 @@ initMarqueeLeft();
 // --------------------------------------------- //
 var mySVGsToInject = document.querySelectorAll('img.inject-me');
 var injectorOptions = {
-  evalScripts: 'once',
+  evalScripts: 'never',
   pngFallback: 'assets/png',
   each: function (svg) {
   }

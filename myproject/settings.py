@@ -197,7 +197,6 @@ MIDDLEWARE = [
 
 # ============ RATE LIMIT RULES ============
 RATE_LIMIT_RULES = {
-    '/api/bot/': {'limit': 60, 'window': 60},       # Bot API: 60/min
     '/api/': {'limit': 100, 'window': 60},           # Public API: 100/min
     '/admin/login/': {'limit': 5, 'window': 300},    # Admin login: 5/5min
 }
@@ -274,6 +273,11 @@ STATICFILES_DIRS = [
 ]
 
 # WhiteNoise: static fayllarni siqib + cache bilan beradi
+# Siqish (Compression): Fayllarni Gzip yoki Brotli formatida siqadi, bu esa sahifaning tezroq yuklanishini ta'minlaydi.
+
+# Caching (Kesh): Fayllarga uzoq muddatli "Cache-Control" sarlavhalarini qo'shadi.
+
+# Mustaqillik: Nginx sozlamalariga tegmasdan ham static fayllarni xavfsiz va tez ko'rsata olasiz.
 if not DEBUG:
     STORAGES = {
         "default": {

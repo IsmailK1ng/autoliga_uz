@@ -1153,8 +1153,3 @@ class TestDriveSerializer(serializers.ModelSerializer):
         validated_data['status'] = 'new'
 
         return super().create(validated_data)
-
-
-
-
-

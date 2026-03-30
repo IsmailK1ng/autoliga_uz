@@ -1,7 +1,7 @@
 from modeltranslation.translator import register, TranslationOptions
 from main.models import *
 
-# ========== НОВОСТИ ==========
+# ========== Р В РЎСљР В РЎвЂєР В РІР‚в„ўР В РЎвЂєР В Р Р‹Р В РЎС›Р В  ==========
 @register(News)
 class NewsTranslationOptions(TranslationOptions):
     fields = ('title', 'desc')
@@ -12,7 +12,7 @@ class NewsBlockTranslationOptions(TranslationOptions):
     fields = ('title', 'text')
 
 
-# ========== ВАКАНСИИ ==========
+# ========== Р В РІР‚в„ўР В РЎвЂ™Р В РЎв„ўР В РЎвЂ™Р В РЎСљР В Р Р‹Р В Р В  ==========
 @register(Vacancy)
 class VacancyTranslationOptions(TranslationOptions):
     fields = ('title', 'short_description', 'contact_info')
@@ -39,12 +39,12 @@ class VacancyIdealCandidateTranslationOptions(TranslationOptions):
 
 
 
-# ========== КАТЕГОРИИ ПРОДУКТОВ ==========
+# ========== Р В РЎв„ўР В РЎвЂ™Р В РЎС›Р В РІР‚СћР В РІР‚СљР В РЎвЂєР В Р’В Р В Р В  Р В РЎСџР В Р’В Р В РЎвЂєР В РІР‚СњР В Р в‚¬Р В РЎв„ўР В РЎС›Р В РЎвЂєР В РІР‚в„ў ==========
 @register(ProductCategory)
 class ProductCategoryTranslationOptions(TranslationOptions):
     fields = ('name', 'description')
 
-# ========== ПРОДУКТЫ ==========
+# ========== Р В РЎСџР В Р’В Р В РЎвЂєР В РІР‚СњР В Р в‚¬Р В РЎв„ўР В РЎС›Р В Р’В« ==========
 @register(Product)
 class ProductTranslationOptions(TranslationOptions):
     fields = (
@@ -81,7 +81,7 @@ class DealerTranslationOptions(TranslationOptions):
 class DealerImageTranslationOptions(TranslationOptions):
     fields = ('caption',)
 
-# ========== КОМАНДА ==========
+# ========== Р В РЎв„ўР В РЎвЂєР В РЎС™Р В РЎвЂ™Р В РЎСљР В РІР‚СњР В РЎвЂ™ ==========
 @register(BranchManager)
 class BranchManagerTranslationOptions(TranslationOptions):
     fields = ('full_name', 'position')

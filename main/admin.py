@@ -25,27 +25,27 @@ import os
 from datetime import datetime, timedelta
 from urllib.parse import unquote
 
-# ========== ЛОКАЛЬНЫЕ ИМПОРТЫ ==========
+# ========== Р В РІР‚С”Р В РЎвЂєР В РЎв„ўР В РЎвЂ™Р В РІР‚С”Р В Р’В¬Р В РЎСљР В Р’В«Р В РІР‚Сћ Р В Р В РЎС™Р В РЎСџР В РЎвЂєР В Р’В Р В РЎС›Р В Р’В« ==========
 from .models import *
 from main.services.amocrm.token_manager import TokenManager
 logger = logging.getLogger('django')
 
-# ========== НАСТРОЙКИ АДМИНКИ ==========
-admin.site.site_header = "Панель управления Autoliga"
+# ========== Р В РЎСљР В РЎвЂ™Р В Р Р‹Р В РЎС›Р В Р’В Р В РЎвЂєР В РІвЂћСћР В РЎв„ўР В  Р В РЎвЂ™Р В РІР‚СњР В РЎС™Р В Р В РЎСљР В РЎв„ўР В  ==========
+admin.site.site_header = "Р В РЎСџР В Р’В°Р В Р вЂ¦Р В Р’ВµР В Р’В»Р РЋР Р‰ Р РЋРЎвЂњР В РЎвЂ”Р РЋР вЂљР В Р’В°Р В Р вЂ Р В Р’В»Р В Р’ВµР В Р вЂ¦Р В РЎвЂР РЋР РЏ Autoliga"
 admin.site.site_title = "Autoliga Admin"
-admin.site.index_title = "Управление сайтами Autoliga"
+admin.site.index_title = "Р В Р в‚¬Р В РЎвЂ”Р РЋР вЂљР В Р’В°Р В Р вЂ Р В Р’В»Р В Р’ВµР В Р вЂ¦Р В РЎвЂР В Р’Вµ Р РЋР С“Р В Р’В°Р В РІвЂћвЂ“Р РЋРІР‚С™Р В Р’В°Р В РЎР В РЎвЂ Autoliga"
 
-# ============ БАЗОВЫЕ МИКСИНЫ ============
+# ============ Р В РІР‚Р В РЎвЂ™Р В РІР‚вЂќР В РЎвЂєР В РІР‚в„ўР В Р’В«Р В РІР‚Сћ Р В РЎС™Р В Р В РЎв„ўР В Р Р‹Р В Р В РЎСљР В Р’В« ============
 
 class ContentAdminMixin:
-    """Миксин для контент-админов"""
+    """Р В РЎС™Р В РЎвЂР В РЎвЂќР РЋР С“Р В РЎвЂР В Р вЂ¦ Р В РўвЂР В Р’В»Р РЋР РЏ Р В РЎвЂќР В РЎвЂўР В Р вЂ¦Р РЋРІР‚С™Р В Р’ВµР В Р вЂ¦Р РЋРІР‚С™-Р В Р’В°Р В РўвЂР В РЎР В РЎвЂР В Р вЂ¦Р В РЎвЂўР В Р вЂ """
     def has_module_permission(self, request):
         if request.user.is_superuser:
             return True
         
 
         if request.user.groups.filter(
-            name__in=['Главные админы', 'Контент-админы', 'Контент UZ']
+            name__in=['Р В РІР‚СљР В Р’В»Р В Р’В°Р В Р вЂ Р В Р вЂ¦Р РЋРІР‚в„–Р В Р’Вµ Р В Р’В°Р В РўвЂР В РЎР В РЎвЂР В Р вЂ¦Р РЋРІР‚в„–', 'Р В РЎв„ўР В РЎвЂўР В Р вЂ¦Р РЋРІР‚С™Р В Р’ВµР В Р вЂ¦Р РЋРІР‚С™-Р В Р’В°Р В РўвЂР В РЎР В РЎвЂР В Р вЂ¦Р РЋРІР‚в„–', 'Р В РЎв„ўР В РЎвЂўР В Р вЂ¦Р РЋРІР‚С™Р В Р’ВµР В Р вЂ¦Р РЋРІР‚С™ UZ']
         ).exists():
             return True
         
@@ -65,7 +65,7 @@ class ContentAdminMixin:
             return True
         
         if request.user.groups.filter(
-            name__in=['Главные админы', 'Контент-админы', 'Контент UZ']
+            name__in=['Р В РІР‚СљР В Р’В»Р В Р’В°Р В Р вЂ Р В Р вЂ¦Р РЋРІР‚в„–Р В Р’Вµ Р В Р’В°Р В РўвЂР В РЎР В РЎвЂР В Р вЂ¦Р РЋРІР‚в„–', 'Р В РЎв„ўР В РЎвЂўР В Р вЂ¦Р РЋРІР‚С™Р В Р’ВµР В Р вЂ¦Р РЋРІР‚С™-Р В Р’В°Р В РўвЂР В РЎР В РЎвЂР В Р вЂ¦Р РЋРІР‚в„–', 'Р В РЎв„ўР В РЎвЂўР В Р вЂ¦Р РЋРІР‚С™Р В Р’ВµР В Р вЂ¦Р РЋРІР‚С™ UZ']
         ).exists():
             return True
         
@@ -77,21 +77,21 @@ class ContentAdminMixin:
         if request.user.is_superuser:
             return True
         
-        if request.user.groups.filter(name='Главные админы').exists():
+        if request.user.groups.filter(name='Р В РІР‚СљР В Р’В»Р В Р’В°Р В Р вЂ Р В Р вЂ¦Р РЋРІР‚в„–Р В Р’Вµ Р В Р’В°Р В РўвЂР В РЎР В РЎвЂР В Р вЂ¦Р РЋРІР‚в„–').exists():
             return True
 
         model_name = self.model._meta.model_name
         return request.user.has_perm(f'main.delete_{model_name}')
 
 class LeadManagerMixin:
-    """Миксин для лид-менеджеров"""
+    """Р В РЎС™Р В РЎвЂР В РЎвЂќР РЋР С“Р В РЎвЂР В Р вЂ¦ Р В РўвЂР В Р’В»Р РЋР РЏ Р В Р’В»Р В РЎвЂР В РўвЂ-Р В РЎР В Р’ВµР В Р вЂ¦Р В Р’ВµР В РўвЂР В Р’В¶Р В Р’ВµР РЋР вЂљР В РЎвЂўР В Р вЂ """
     def has_module_permission(self, request):
         if request.user.is_superuser:
             return True
         
 
         if request.user.groups.filter(
-            name__in=['Главные админы', 'Лид-менеджеры', 'Лиды UZ']
+            name__in=['Р В РІР‚СљР В Р’В»Р В Р’В°Р В Р вЂ Р В Р вЂ¦Р РЋРІР‚в„–Р В Р’Вµ Р В Р’В°Р В РўвЂР В РЎР В РЎвЂР В Р вЂ¦Р РЋРІР‚в„–', 'Р В РІР‚С”Р В РЎвЂР В РўвЂ-Р В РЎР В Р’ВµР В Р вЂ¦Р В Р’ВµР В РўвЂР В Р’В¶Р В Р’ВµР РЋР вЂљР РЋРІР‚в„–', 'Р В РІР‚С”Р В РЎвЂР В РўвЂР РЋРІР‚в„– UZ']
         ).exists():
             return True
         
@@ -110,7 +110,7 @@ class LeadManagerMixin:
         if request.user.is_superuser:
             return True
         
-        if request.user.groups.filter(name='Главные админы').exists():
+        if request.user.groups.filter(name='Р В РІР‚СљР В Р’В»Р В Р’В°Р В Р вЂ Р В Р вЂ¦Р РЋРІР‚в„–Р В Р’Вµ Р В Р’В°Р В РўвЂР В РЎР В РЎвЂР В Р вЂ¦Р РЋРІР‚в„–').exists():
             return True
         
 
@@ -118,12 +118,12 @@ class LeadManagerMixin:
         return request.user.has_perm(f'main.delete_{model_name}')
         
 class AmoCRMAdminMixin:
-    """Миксин для управления amoCRM"""
+    """Р В РЎС™Р В РЎвЂР В РЎвЂќР РЋР С“Р В РЎвЂР В Р вЂ¦ Р В РўвЂР В Р’В»Р РЋР РЏ Р РЋРЎвЂњР В РЎвЂ”Р РЋР вЂљР В Р’В°Р В Р вЂ Р В Р’В»Р В Р’ВµР В Р вЂ¦Р В РЎвЂР РЋР РЏ amoCRM"""
     def has_module_permission(self, request):
         if request.user.is_superuser:
             return True
         
-        if request.user.groups.filter(name='Главные админы').exists():
+        if request.user.groups.filter(name='Р В РІР‚СљР В Р’В»Р В Р’В°Р В Р вЂ Р В Р вЂ¦Р РЋРІР‚в„–Р В Р’Вµ Р В Р’В°Р В РўвЂР В РЎР В РЎвЂР В Р вЂ¦Р РЋРІР‚в„–').exists():
             return True
         
         return False
@@ -141,7 +141,7 @@ class AmoCRMAdminMixin:
         return False
 
 class CustomReversionMixin:
-    """Миксин для кастомного шаблона восстановления"""
+    """Р В РЎС™Р В РЎвЂР В РЎвЂќР РЋР С“Р В РЎвЂР В Р вЂ¦ Р В РўвЂР В Р’В»Р РЋР РЏ Р В РЎвЂќР В Р’В°Р РЋР С“Р РЋРІР‚С™Р В РЎвЂўР В РЎР В Р вЂ¦Р В РЎвЂўР В РЎвЂ“Р В РЎвЂў Р РЋРІвЂљВ¬Р В Р’В°Р В Р’В±Р В Р’В»Р В РЎвЂўР В Р вЂ¦Р В Р’В° Р В Р вЂ Р В РЎвЂўР РЋР С“Р РЋР С“Р РЋРІР‚С™Р В Р’В°Р В Р вЂ¦Р В РЎвЂўР В Р вЂ Р В Р’В»Р В Р’ВµР В Р вЂ¦Р В РЎвЂР РЋР РЏ"""
     def get_urls(self):
         urls = super().get_urls()
         custom_urls = [
@@ -192,7 +192,7 @@ class CustomReversionMixin:
             **self.admin_site.each_context(request),
             'opts': opts,
             'version_list': version_list_with_preview,
-            'title': f'Восстановление: {opts.verbose_name_plural}',
+            'title': f'Р В РІР‚в„ўР В РЎвЂўР РЋР С“Р РЋР С“Р РЋРІР‚С™Р В Р’В°Р В Р вЂ¦Р В РЎвЂўР В Р вЂ Р В Р’В»Р В Р’ВµР В Р вЂ¦Р В РЎвЂР В Р’Вµ: {opts.verbose_name_plural}',
             'has_view_permission': self.has_view_permission(request),
         }
         
@@ -210,17 +210,17 @@ class CustomReversionMixin:
             
             version.revision.revert()
             
-            messages.success(request, f'✅ Объект "{version.object_repr}" успешно восстановлен!')
+            messages.success(request, f'Р Р†РЎС™РІР‚В¦ Р В РЎвЂєР В Р’В±Р РЋР вЂ°Р В Р’ВµР В РЎвЂќР РЋРІР‚С™ "{version.object_repr}" Р РЋРЎвЂњР РЋР С“Р В РЎвЂ”Р В Р’ВµР РЋРІвЂљВ¬Р В Р вЂ¦Р В РЎвЂў Р В Р вЂ Р В РЎвЂўР РЋР С“Р РЋР С“Р РЋРІР‚С™Р В Р’В°Р В Р вЂ¦Р В РЎвЂўР В Р вЂ Р В Р’В»Р В Р’ВµР В Р вЂ¦!')
             return redirect(f'admin:{opts.app_label}_{opts.model_name}_changelist')
             
         except Version.DoesNotExist:
-            messages.error(request, '❌ Версия не найдена или уже восстановлена')
+            messages.error(request, 'Р Р†РЎСљР Р‰ Р В РІР‚в„ўР В Р’ВµР РЋР вЂљР РЋР С“Р В РЎвЂР РЋР РЏ Р В Р вЂ¦Р В Р’Вµ Р В Р вЂ¦Р В Р’В°Р В РІвЂћвЂ“Р В РўвЂР В Р’ВµР В Р вЂ¦Р В Р’В° Р В РЎвЂР В Р’В»Р В РЎвЂ Р РЋРЎвЂњР В Р’В¶Р В Р’Вµ Р В Р вЂ Р В РЎвЂўР РЋР С“Р РЋР С“Р РЋРІР‚С™Р В Р’В°Р В Р вЂ¦Р В РЎвЂўР В Р вЂ Р В Р’В»Р В Р’ВµР В Р вЂ¦Р В Р’В°')
             return redirect(f'admin:{opts.app_label}_{opts.model_name}_recoverlist')
         except Exception as e:
-            messages.error(request, f'❌ Ошибка восстановления: {str(e)}')
+            messages.error(request, f'Р Р†РЎСљР Р‰ Р В РЎвЂєР РЋРІвЂљВ¬Р В РЎвЂР В Р’В±Р В РЎвЂќР В Р’В° Р В Р вЂ Р В РЎвЂўР РЋР С“Р РЋР С“Р РЋРІР‚С™Р В Р’В°Р В Р вЂ¦Р В РЎвЂўР В Р вЂ Р В Р’В»Р В Р’ВµР В Р вЂ¦Р В РЎвЂР РЋР РЏ: {str(e)}')
             return redirect(f'admin:{opts.app_label}_{opts.model_name}_recoverlist')
 
-# ============ НОВОСТИ ============
+# ============ Р В РЎСљР В РЎвЂєР В РІР‚в„ўР В РЎвЂєР В Р Р‹Р В РЎС›Р В  ============
 
 class NewsBlockInline(TranslationStackedInline): 
     model = NewsBlock
@@ -246,16 +246,16 @@ class NewsAdmin(ContentAdminMixin, CustomReversionMixin, VersionAdmin, TabbedTra
     history_latest_first = True
     
     fieldsets = (
-        ('Основная информация', {
+        ('Р В РЎвЂєР РЋР С“Р В Р вЂ¦Р В РЎвЂўР В Р вЂ Р В Р вЂ¦Р В Р’В°Р РЋР РЏ Р В РЎвЂР В Р вЂ¦Р РЋРІР‚С›Р В РЎвЂўР РЋР вЂљР В РЎР В Р’В°Р РЋРІР‚В Р В РЎвЂР РЋР РЏ', {
             'fields': ('title', 'slug', 'created_at', 'is_active', 'order'),
         }),
-        ('Карточка новости', {
+        ('Р В РЎв„ўР В Р’В°Р РЋР вЂљР РЋРІР‚С™Р В РЎвЂўР РЋРІР‚РЋР В РЎвЂќР В Р’В° Р В Р вЂ¦Р В РЎвЂўР В Р вЂ Р В РЎвЂўР РЋР С“Р РЋРІР‚С™Р В РЎвЂ', {
             'fields': ('desc', 'preview_image', 'preview_image_tag'),
         }),
-        ('Автор', {
+        ('Р В РЎвЂ™Р В Р вЂ Р РЋРІР‚С™Р В РЎвЂўР РЋР вЂљ', {
             'fields': ('author', 'author_photo', 'author_photo_tag')
         }),
-        ('Техническая информация', {
+        ('Р В РЎС›Р В Р’ВµР РЋРІР‚В¦Р В Р вЂ¦Р В РЎвЂР РЋРІР‚РЋР В Р’ВµР РЋР С“Р В РЎвЂќР В Р’В°Р РЋР РЏ Р В РЎвЂР В Р вЂ¦Р РЋРІР‚С›Р В РЎвЂўР РЋР вЂљР В РЎР В Р’В°Р РЋРІР‚В Р В РЎвЂР РЋР РЏ', {
             'fields': ('updated_at',),
             'classes': ('collapse',)
         }),
@@ -264,30 +264,30 @@ class NewsAdmin(ContentAdminMixin, CustomReversionMixin, VersionAdmin, TabbedTra
     def preview_image_tag(self, obj):
         if obj.preview_image:
             return format_html('<img src="{}" width="100" style="border-radius:8px;"/>', obj.preview_image.url)
-        return "—"
-    preview_image_tag.short_description = "Превью"
+        return "Р Р†Р вЂљРІР‚Сњ"
+    preview_image_tag.short_description = "Р В РЎСџР РЋР вЂљР В Р’ВµР В Р вЂ Р РЋР Р‰Р РЋР вЂ№"
 
     def author_photo_tag(self, obj):
         if obj.author_photo:
             return format_html('<img src="{}" width="50" style="border-radius:50%;">', obj.author_photo.url)
-        return "—"
-    author_photo_tag.short_description = "Фото автора"
+        return "Р Р†Р вЂљРІР‚Сњ"
+    author_photo_tag.short_description = "Р В Р’В¤Р В РЎвЂўР РЋРІР‚С™Р В РЎвЂў Р В Р’В°Р В Р вЂ Р РЋРІР‚С™Р В РЎвЂўР РЋР вЂљР В Р’В°"
     
     def action_buttons(self, obj):
         return format_html('''
             <div style="display: flex; gap: 8px;">
-                <a href="{}" title="Редактировать">
+                <a href="{}" title="Р В Р’В Р В Р’ВµР В РўвЂР В Р’В°Р В РЎвЂќР РЋРІР‚С™Р В РЎвЂР РЋР вЂљР В РЎвЂўР В Р вЂ Р В Р’В°Р РЋРІР‚С™Р РЋР Р‰">
                     <img src="/static/media/icon-adminpanel/pencil.png" width="24" height="24">
                 </a>
-                <a href="/news/{}/" title="Просмотр" target="_blank">
+                <a href="/news/{}/" title="Р В РЎСџР РЋР вЂљР В РЎвЂўР РЋР С“Р В РЎР В РЎвЂўР РЋРІР‚С™Р РЋР вЂљ" target="_blank">
                     <img src="/static/media/icon-adminpanel/eyes.png" width="24" height="24">
                 </a>
-                <a href="{}" title="Удалить" onclick="return confirm('Удалить?')">
+                <a href="{}" title="Р В Р в‚¬Р В РўвЂР В Р’В°Р В Р’В»Р В РЎвЂР РЋРІР‚С™Р РЋР Р‰" onclick="return confirm('Р В Р в‚¬Р В РўвЂР В Р’В°Р В Р’В»Р В РЎвЂР РЋРІР‚С™Р РЋР Р‰?')">
                     <img src="/static/media/icon-adminpanel/recycle-bin.png" width="24" height="24">
                 </a>
             </div>
         ''', f'/admin/main/news/{obj.id}/change/', obj.slug, f'/admin/main/news/{obj.id}/delete/')
-    action_buttons.short_description = "Действия"
+    action_buttons.short_description = "Р В РІР‚СњР В Р’ВµР В РІвЂћвЂ“Р РЋР С“Р РЋРІР‚С™Р В Р вЂ Р В РЎвЂР РЋР РЏ"
     
     def changelist_view(self, request, extra_context=None):
         extra_context = extra_context or {}
@@ -297,7 +297,7 @@ class NewsAdmin(ContentAdminMixin, CustomReversionMixin, VersionAdmin, TabbedTra
             extra_context['deleted_count'] = deleted_count
         return super().changelist_view(request, extra_context)
     
-# ============ ЗАЯВКИ ============
+# ============ Р В РІР‚вЂќР В РЎвЂ™Р В Р вЂЎР В РІР‚в„ўР В РЎв„ўР В  ============
 
 @admin.register(ContactForm)
 class ContactFormAdmin(LeadManagerMixin, admin.ModelAdmin):
@@ -322,10 +322,10 @@ class ContactFormAdmin(LeadManagerMixin, admin.ModelAdmin):
     actions = ['retry_failed_leads', 'export_to_excel']
 
     fieldsets = (
-        ('Информация о клиенте', {
+        ('Р В Р В Р вЂ¦Р РЋРІР‚С›Р В РЎвЂўР РЋР вЂљР В РЎР В Р’В°Р РЋРІР‚В Р В РЎвЂР РЋР РЏ Р В РЎвЂў Р В РЎвЂќР В Р’В»Р В РЎвЂР В Р’ВµР В Р вЂ¦Р РЋРІР‚С™Р В Р’Вµ', {
             'fields': ('name', 'phone', 'region', 'message', 'created_at')
         }),
-        ('Управление', {
+        ('Р В Р в‚¬Р В РЎвЂ”Р РЋР вЂљР В Р’В°Р В Р вЂ Р В Р’В»Р В Р’ВµР В Р вЂ¦Р В РЎвЂР В Р’Вµ', {
             'fields': ('status', 'priority', 'manager', 'admin_comment')
         }),
         ('amoCRM', {
@@ -338,82 +338,82 @@ class ContactFormAdmin(LeadManagerMixin, admin.ModelAdmin):
         css = {'all': ('css/amocrm_modal.css', 'css/contactform_admin.css')}
         js = ('js/amocrm_modal.js', 'js/contactform_admin.js')
     
-    # ==================== ОТОБРАЖЕНИЕ ====================
+    # ==================== Р В РЎвЂєР В РЎС›Р В РЎвЂєР В РІР‚Р В Р’В Р В РЎвЂ™Р В РІР‚вЂњР В РІР‚СћР В РЎСљР В Р В РІР‚Сћ ====================
     
     def product_display(self, obj):
         if not obj.product:
-            return "—"
+            return "Р Р†Р вЂљРІР‚Сњ"
         return format_html(
             '<span style="color:#1976d2;font-weight:600;">{}</span>',
             obj.product[:30]
         )
-        return format_html('<span style="color:#999;">—</span>')
+        return format_html('<span style="color:#999;">Р Р†Р вЂљРІР‚Сњ</span>')
     
-    product_display.short_description = "Модель"
+    product_display.short_description = "Р В РЎС™Р В РЎвЂўР В РўвЂР В Р’ВµР В Р’В»Р РЋР Р‰"
     product_display.admin_order_field = 'product'
     
     def amocrm_badge(self, obj):
-        """Бейдж статуса amoCRM"""
+        """Р В РІР‚Р В Р’ВµР В РІвЂћвЂ“Р В РўвЂР В Р’В¶ Р РЋР С“Р РЋРІР‚С™Р В Р’В°Р РЋРІР‚С™Р РЋРЎвЂњР РЋР С“Р В Р’В° amoCRM"""
         if obj.amocrm_status == 'sent':
             return format_html(
-                '<span style="background:#10b981;color:white;padding:5px 12px;border-radius:6px;font-weight:600;font-size:12px;">Отправлено</span>'
+                '<span style="background:#10b981;color:white;padding:5px 12px;border-radius:6px;font-weight:600;font-size:12px;">Р В РЎвЂєР РЋРІР‚С™Р В РЎвЂ”Р РЋР вЂљР В Р’В°Р В Р вЂ Р В Р’В»Р В Р’ВµР В Р вЂ¦Р В РЎвЂў</span>'
             )
         elif obj.amocrm_status == 'failed':
-            error_text = (obj.amocrm_error or 'Неизвестная ошибка').replace('"', '&quot;').replace("'", '&#39;')
+            error_text = (obj.amocrm_error or 'Р В РЎСљР В Р’ВµР В РЎвЂР В Р’В·Р В Р вЂ Р В Р’ВµР РЋР С“Р РЋРІР‚С™Р В Р вЂ¦Р В Р’В°Р РЋР РЏ Р В РЎвЂўР РЋРІвЂљВ¬Р В РЎвЂР В Р’В±Р В РЎвЂќР В Р’В°').replace('"', '&quot;').replace("'", '&#39;')
             return format_html(
-                '<span class="amocrm-error-badge" data-error="{}" style="background:#ef4444;color:white;padding:5px 12px;border-radius:6px;font-weight:600;font-size:12px;cursor:pointer;" title="Нажмите для просмотра ошибки">Ошибка</span>',
+                '<span class="amocrm-error-badge" data-error="{}" style="background:#ef4444;color:white;padding:5px 12px;border-radius:6px;font-weight:600;font-size:12px;cursor:pointer;" title="Р В РЎСљР В Р’В°Р В Р’В¶Р В РЎР В РЎвЂР РЋРІР‚С™Р В Р’Вµ Р В РўвЂР В Р’В»Р РЋР РЏ Р В РЎвЂ”Р РЋР вЂљР В РЎвЂўР РЋР С“Р В РЎР В РЎвЂўР РЋРІР‚С™Р РЋР вЂљР В Р’В° Р В РЎвЂўР РЋРІвЂљВ¬Р В РЎвЂР В Р’В±Р В РЎвЂќР В РЎвЂ">Р В РЎвЂєР РЋРІвЂљВ¬Р В РЎвЂР В Р’В±Р В РЎвЂќР В Р’В°</span>',
                 error_text
             )
         return format_html(
-            '<span style="background:#f59e0b;color:white;padding:5px 12px;border-radius:6px;font-weight:600;font-size:12px;">Ожидает</span>'
+            '<span style="background:#f59e0b;color:white;padding:5px 12px;border-radius:6px;font-weight:600;font-size:12px;">Р В РЎвЂєР В Р’В¶Р В РЎвЂР В РўвЂР В Р’В°Р В Р’ВµР РЋРІР‚С™</span>'
         )
 
     amocrm_badge.short_description = "amoCRM"
     amocrm_badge.admin_order_field = 'amocrm_status'
     
     def action_buttons(self, obj):
-        """Кнопки действий"""
+        """Р В РЎв„ўР В Р вЂ¦Р В РЎвЂўР В РЎвЂ”Р В РЎвЂќР В РЎвЂ Р В РўвЂР В Р’ВµР В РІвЂћвЂ“Р РЋР С“Р РЋРІР‚С™Р В Р вЂ Р В РЎвЂР В РІвЂћвЂ“"""
         view_url = f"https://fawtrucks.amocrm.ru/leads/detail/{obj.amocrm_lead_id}" if obj.amocrm_lead_id else f"/admin/main/contactform/{obj.id}/change/"
-        view_title = "Открыть в amoCRM" if obj.amocrm_lead_id else "Просмотр заявки"
+        view_title = "Р В РЎвЂєР РЋРІР‚С™Р В РЎвЂќР РЋР вЂљР РЋРІР‚в„–Р РЋРІР‚С™Р РЋР Р‰ Р В Р вЂ  amoCRM" if obj.amocrm_lead_id else "Р В РЎСџР РЋР вЂљР В РЎвЂўР РЋР С“Р В РЎР В РЎвЂўР РЋРІР‚С™Р РЋР вЂљ Р В Р’В·Р В Р’В°Р РЋР РЏР В Р вЂ Р В РЎвЂќР В РЎвЂ"
         
         return format_html('''
             <div style="display:flex;gap:8px;">
-                <a href="{}" title="Редактировать" style="padding:6px;border-radius:6px;display:inline-block;transition:transform 0.2s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
+                <a href="{}" title="Р В Р’В Р В Р’ВµР В РўвЂР В Р’В°Р В РЎвЂќР РЋРІР‚С™Р В РЎвЂР РЋР вЂљР В РЎвЂўР В Р вЂ Р В Р’В°Р РЋРІР‚С™Р РЋР Р‰" style="padding:6px;border-radius:6px;display:inline-block;transition:transform 0.2s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
                     <img src="/static/media/icon-adminpanel/pencil.png" width="20" height="20">
                 </a>
                 <a href="{}" title="{}" target="_blank" style="padding:6px;border-radius:6px;display:inline-block;transition:transform 0.2s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
                     <img src="/static/media/icon-adminpanel/eyes.png" width="20" height="20">
                 </a>
-                <a href="{}" title="Удалить" onclick="return confirm('Удалить заявку?')" style="padding:6px;border-radius:6px;display:inline-block;transition:transform 0.2s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
+                <a href="{}" title="Р В Р в‚¬Р В РўвЂР В Р’В°Р В Р’В»Р В РЎвЂР РЋРІР‚С™Р РЋР Р‰" onclick="return confirm('Р В Р в‚¬Р В РўвЂР В Р’В°Р В Р’В»Р В РЎвЂР РЋРІР‚С™Р РЋР Р‰ Р В Р’В·Р В Р’В°Р РЋР РЏР В Р вЂ Р В РЎвЂќР РЋРЎвЂњ?')" style="padding:6px;border-radius:6px;display:inline-block;transition:transform 0.2s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
                     <img src="/static/media/icon-adminpanel/recycle-bin.png" width="20" height="20">
                 </a>
             </div>
         ''', f'/admin/main/contactform/{obj.id}/change/', view_url, view_title, f'/admin/main/contactform/{obj.id}/delete/')
     
-    action_buttons.short_description = "Действия"
+    action_buttons.short_description = "Р В РІР‚СњР В Р’ВµР В РІвЂћвЂ“Р РЋР С“Р РЋРІР‚С™Р В Р вЂ Р В РЎвЂР РЋР РЏ"
     
     def amocrm_lead_link(self, obj):
-        """Ссылка на лид в amoCRM"""
+        """Р В Р Р‹Р РЋР С“Р РЋРІР‚в„–Р В Р’В»Р В РЎвЂќР В Р’В° Р В Р вЂ¦Р В Р’В° Р В Р’В»Р В РЎвЂР В РўвЂ Р В Р вЂ  amoCRM"""
         if obj.amocrm_lead_id:
             # url = f"https://fawtrucks.amocrm.ru/leads/detail/{obj.amocrm_lead_id}"
             return format_html(
-                '<a href="{}" target="_blank" style="color:#3b82f6;font-weight:600;">Открыть в amoCRM (ID: {})</a>',
+                '<a href="{}" target="_blank" style="color:#3b82f6;font-weight:600;">Р В РЎвЂєР РЋРІР‚С™Р В РЎвЂќР РЋР вЂљР РЋРІР‚в„–Р РЋРІР‚С™Р РЋР Р‰ Р В Р вЂ  amoCRM (ID: {})</a>',
                 url, obj.amocrm_lead_id
             )
-        return "—"
+        return "Р Р†Р вЂљРІР‚Сњ"
     
-    amocrm_lead_link.short_description = "Ссылка на лид"
+    amocrm_lead_link.short_description = "Р В Р Р‹Р РЋР С“Р РЋРІР‚в„–Р В Р’В»Р В РЎвЂќР В Р’В° Р В Р вЂ¦Р В Р’В° Р В Р’В»Р В РЎвЂР В РўвЂ"
     
-    # ==================== ДЕЙСТВИЯ ====================
+    # ==================== Р В РІР‚СњР В РІР‚СћР В РІвЂћСћР В Р Р‹Р В РЎС›Р В РІР‚в„ўР В Р В Р вЂЎ ====================
     
     def retry_failed_leads(self, request, queryset):
-        """Повторная отправка ошибочных заявок"""
+        """Р В РЎСџР В РЎвЂўР В Р вЂ Р РЋРІР‚С™Р В РЎвЂўР РЋР вЂљР В Р вЂ¦Р В Р’В°Р РЋР РЏ Р В РЎвЂўР РЋРІР‚С™Р В РЎвЂ”Р РЋР вЂљР В Р’В°Р В Р вЂ Р В РЎвЂќР В Р’В° Р В РЎвЂўР РЋРІвЂљВ¬Р В РЎвЂР В Р’В±Р В РЎвЂўР РЋРІР‚РЋР В Р вЂ¦Р РЋРІР‚в„–Р РЋРІР‚В¦ Р В Р’В·Р В Р’В°Р РЋР РЏР В Р вЂ Р В РЎвЂўР В РЎвЂќ"""
         logger = logging.getLogger('django')
         
         failed_leads = queryset.filter(amocrm_status='failed')
         
         if not failed_leads.exists():
-            self.message_user(request, 'Нет ошибочных заявок для повторной отправки', level=messages.WARNING)
+            self.message_user(request, 'Р В РЎСљР В Р’ВµР РЋРІР‚С™ Р В РЎвЂўР РЋРІвЂљВ¬Р В РЎвЂР В Р’В±Р В РЎвЂўР РЋРІР‚РЋР В Р вЂ¦Р РЋРІР‚в„–Р РЋРІР‚В¦ Р В Р’В·Р В Р’В°Р РЋР РЏР В Р вЂ Р В РЎвЂўР В РЎвЂќ Р В РўвЂР В Р’В»Р РЋР РЏ Р В РЎвЂ”Р В РЎвЂўР В Р вЂ Р РЋРІР‚С™Р В РЎвЂўР РЋР вЂљР В Р вЂ¦Р В РЎвЂўР В РІвЂћвЂ“ Р В РЎвЂўР РЋРІР‚С™Р В РЎвЂ”Р РЋР вЂљР В Р’В°Р В Р вЂ Р В РЎвЂќР В РЎвЂ', level=messages.WARNING)
             return
         
         success_count = 0
@@ -437,14 +437,14 @@ class ContactFormAdmin(LeadManagerMixin, admin.ModelAdmin):
                 fail_count += 1
         
         if success_count > 0:
-            self.message_user(request, f'Успешно отправлено: {success_count}', level=messages.SUCCESS)
+            self.message_user(request, f'Р В Р в‚¬Р РЋР С“Р В РЎвЂ”Р В Р’ВµР РЋРІвЂљВ¬Р В Р вЂ¦Р В РЎвЂў Р В РЎвЂўР РЋРІР‚С™Р В РЎвЂ”Р РЋР вЂљР В Р’В°Р В Р вЂ Р В Р’В»Р В Р’ВµР В Р вЂ¦Р В РЎвЂў: {success_count}', level=messages.SUCCESS)
         if fail_count > 0:
-            self.message_user(request, f'Ошибка отправки: {fail_count}', level=messages.ERROR)
+            self.message_user(request, f'Р В РЎвЂєР РЋРІвЂљВ¬Р В РЎвЂР В Р’В±Р В РЎвЂќР В Р’В° Р В РЎвЂўР РЋРІР‚С™Р В РЎвЂ”Р РЋР вЂљР В Р’В°Р В Р вЂ Р В РЎвЂќР В РЎвЂ: {fail_count}', level=messages.ERROR)
     
-    retry_failed_leads.short_description = 'Повторно отправить ошибочные заявки'
+    retry_failed_leads.short_description = 'Р В РЎСџР В РЎвЂўР В Р вЂ Р РЋРІР‚С™Р В РЎвЂўР РЋР вЂљР В Р вЂ¦Р В РЎвЂў Р В РЎвЂўР РЋРІР‚С™Р В РЎвЂ”Р РЋР вЂљР В Р’В°Р В Р вЂ Р В РЎвЂР РЋРІР‚С™Р РЋР Р‰ Р В РЎвЂўР РЋРІвЂљВ¬Р В РЎвЂР В Р’В±Р В РЎвЂўР РЋРІР‚РЋР В Р вЂ¦Р РЋРІР‚в„–Р В Р’Вµ Р В Р’В·Р В Р’В°Р РЋР РЏР В Р вЂ Р В РЎвЂќР В РЎвЂ'
     
     def export_to_excel(self, request, queryset):
-        """Экспорт в Excel"""
+        """Р В Р’В­Р В РЎвЂќР РЋР С“Р В РЎвЂ”Р В РЎвЂўР РЋР вЂљР РЋРІР‚С™ Р В Р вЂ  Excel"""
         logger = logging.getLogger('django')
         
         try:
@@ -453,12 +453,12 @@ class ContactFormAdmin(LeadManagerMixin, admin.ModelAdmin):
             
             wb = openpyxl.Workbook()
             ws = wb.active
-            ws.title = "Заявки AutoLiga"
+            ws.title = "Р В РІР‚вЂќР В Р’В°Р РЋР РЏР В Р вЂ Р В РЎвЂќР В РЎвЂ AutoLiga"
             
             headers = [
-                'Номер', 'ФИО', 'Телефон', 'Модель', 'Регион', 'Сообщение', 
-                'Статус', 'Приоритет', 'Менеджер', 'Дата',
-                'amoCRM Статус', 'amoCRM ID', 'amoCRM Дата', 'amoCRM Ошибка'
+                'Р В РЎСљР В РЎвЂўР В РЎР В Р’ВµР РЋР вЂљ', 'Р В Р’В¤Р В Р В РЎвЂє', 'Р В РЎС›Р В Р’ВµР В Р’В»Р В Р’ВµР РЋРІР‚С›Р В РЎвЂўР В Р вЂ¦', 'Р В РЎС™Р В РЎвЂўР В РўвЂР В Р’ВµР В Р’В»Р РЋР Р‰', 'Р В Р’В Р В Р’ВµР В РЎвЂ“Р В РЎвЂР В РЎвЂўР В Р вЂ¦', 'Р В Р Р‹Р В РЎвЂўР В РЎвЂўР В Р’В±Р РЋРІР‚В°Р В Р’ВµР В Р вЂ¦Р В РЎвЂР В Р’Вµ', 
+                'Р В Р Р‹Р РЋРІР‚С™Р В Р’В°Р РЋРІР‚С™Р РЋРЎвЂњР РЋР С“', 'Р В РЎСџР РЋР вЂљР В РЎвЂР В РЎвЂўР РЋР вЂљР В РЎвЂР РЋРІР‚С™Р В Р’ВµР РЋРІР‚С™', 'Р В РЎС™Р В Р’ВµР В Р вЂ¦Р В Р’ВµР В РўвЂР В Р’В¶Р В Р’ВµР РЋР вЂљ', 'Р В РІР‚СњР В Р’В°Р РЋРІР‚С™Р В Р’В°',
+                'amoCRM Р В Р Р‹Р РЋРІР‚С™Р В Р’В°Р РЋРІР‚С™Р РЋРЎвЂњР РЋР С“', 'amoCRM ID', 'amoCRM Р В РІР‚СњР В Р’В°Р РЋРІР‚С™Р В Р’В°', 'amoCRM Р В РЎвЂєР РЋРІвЂљВ¬Р В РЎвЂР В Р’В±Р В РЎвЂќР В Р’В°'
             ]
             ws.append(headers)
             
@@ -501,16 +501,16 @@ class ContactFormAdmin(LeadManagerMixin, admin.ModelAdmin):
             return response
             
         except Exception as e:
-            logger.error(f"❌ Error exporting to Excel: {str(e)}", exc_info=True)
-            self.message_user(request, f'Ошибка экспорта: {str(e)}', level=messages.ERROR)
+            logger.error(f"Р Р†РЎСљР Р‰ Error exporting to Excel: {str(e)}", exc_info=True)
+            self.message_user(request, f'Р В РЎвЂєР РЋРІвЂљВ¬Р В РЎвЂР В Р’В±Р В РЎвЂќР В Р’В° Р РЋР РЉР В РЎвЂќР РЋР С“Р В РЎвЂ”Р В РЎвЂўР РЋР вЂљР РЋРІР‚С™Р В Р’В°: {str(e)}', level=messages.ERROR)
             return redirect(request.path)
     
-    export_to_excel.short_description = 'Экспорт в Excel'
+    export_to_excel.short_description = 'Р В Р’В­Р В РЎвЂќР РЋР С“Р В РЎвЂ”Р В РЎвЂўР РЋР вЂљР РЋРІР‚С™ Р В Р вЂ  Excel'
     
     # ==================== QUERYSET ====================
     
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
-        """Отключаем управление менеджерами"""
+        """Р В РЎвЂєР РЋРІР‚С™Р В РЎвЂќР В Р’В»Р РЋР вЂ№Р РЋРІР‚РЋР В Р’В°Р В Р’ВµР В РЎ Р РЋРЎвЂњР В РЎвЂ”Р РЋР вЂљР В Р’В°Р В Р вЂ Р В Р’В»Р В Р’ВµР В Р вЂ¦Р В РЎвЂР В Р’Вµ Р В РЎР В Р’ВµР В Р вЂ¦Р В Р’ВµР В РўвЂР В Р’В¶Р В Р’ВµР РЋР вЂљР В Р’В°Р В РЎР В РЎвЂ"""
         formfield = super().formfield_for_foreignkey(db_field, request, **kwargs)
         if db_field.name == "manager":
             formfield.widget.can_add_related = False
@@ -520,10 +520,10 @@ class ContactFormAdmin(LeadManagerMixin, admin.ModelAdmin):
         return formfield
     
     def get_queryset(self, request):
-        """Фильтрация queryset"""
+        """Р В Р’В¤Р В РЎвЂР В Р’В»Р РЋР Р‰Р РЋРІР‚С™Р РЋР вЂљР В Р’В°Р РЋРІР‚В Р В РЎвЂР РЋР РЏ queryset"""
         qs = super().get_queryset(request)
         
-        # Поиск
+        # Р В РЎСџР В РЎвЂўР В РЎвЂР РЋР С“Р В РЎвЂќ
         if search_query := request.GET.get('q', '').strip():
             qs = qs.filter(
                 Q(name__icontains=search_query) | 
@@ -570,12 +570,12 @@ class ContactFormAdmin(LeadManagerMixin, admin.ModelAdmin):
         return qs
 
     def get_changelist(self, request, **kwargs):
-        """Переопределяем ChangeList чтобы игнорировать date_from/date_to"""
+        """Р В РЎСџР В Р’ВµР РЋР вЂљР В Р’ВµР В РЎвЂўР В РЎвЂ”Р РЋР вЂљР В Р’ВµР В РўвЂР В Р’ВµР В Р’В»Р РЋР РЏР В Р’ВµР В РЎ ChangeList Р РЋРІР‚РЋР РЋРІР‚С™Р В РЎвЂўР В Р’В±Р РЋРІР‚в„– Р В РЎвЂР В РЎвЂ“Р В Р вЂ¦Р В РЎвЂўР РЋР вЂљР В РЎвЂР РЋР вЂљР В РЎвЂўР В Р вЂ Р В Р’В°Р РЋРІР‚С™Р РЋР Р‰ date_from/date_to"""
         from django.contrib.admin.views.main import ChangeList
         
         class CustomChangeList(ChangeList):
             def get_filters_params(self, params=None):
-                """Убираем date_from и date_to из lookup параметров"""
+                """Р В Р в‚¬Р В Р’В±Р В РЎвЂР РЋР вЂљР В Р’В°Р В Р’ВµР В РЎ date_from Р В РЎвЂ date_to Р В РЎвЂР В Р’В· lookup Р В РЎвЂ”Р В Р’В°Р РЋР вЂљР В Р’В°Р В РЎР В Р’ВµР РЋРІР‚С™Р РЋР вЂљР В РЎвЂўР В Р вЂ """
                 lookup_params = super().get_filters_params(params)
                 
 
@@ -587,7 +587,7 @@ class ContactFormAdmin(LeadManagerMixin, admin.ModelAdmin):
         return CustomChangeList
     
     def changelist_view(self, request, extra_context=None):
-        """Контекст для фильтров"""
+        """Р В РЎв„ўР В РЎвЂўР В Р вЂ¦Р РЋРІР‚С™Р В Р’ВµР В РЎвЂќР РЋР С“Р РЋРІР‚С™ Р В РўвЂР В Р’В»Р РЋР РЏ Р РЋРІР‚С›Р В РЎвЂР В Р’В»Р РЋР Р‰Р РЋРІР‚С™Р РЋР вЂљР В РЎвЂўР В Р вЂ """
         extra_context = extra_context or {}
         
         from main.models import REGION_CHOICES
@@ -611,7 +611,7 @@ class ContactFormAdmin(LeadManagerMixin, admin.ModelAdmin):
         return custom_urls + urls
 
     def quick_update_view(self, request, object_id):
-        """AJAX автосохранение статуса/приоритета/менеджера"""
+        """AJAX Р В Р’В°Р В Р вЂ Р РЋРІР‚С™Р В РЎвЂўР РЋР С“Р В РЎвЂўР РЋРІР‚В¦Р РЋР вЂљР В Р’В°Р В Р вЂ¦Р В Р’ВµР В Р вЂ¦Р В РЎвЂР В Р’Вµ Р РЋР С“Р РЋРІР‚С™Р В Р’В°Р РЋРІР‚С™Р РЋРЎвЂњР РЋР С“Р В Р’В°/Р В РЎвЂ”Р РЋР вЂљР В РЎвЂР В РЎвЂўР РЋР вЂљР В РЎвЂР РЋРІР‚С™Р В Р’ВµР РЋРІР‚С™Р В Р’В°/Р В РЎР В Р’ВµР В Р вЂ¦Р В Р’ВµР В РўвЂР В Р’В¶Р В Р’ВµР РЋР вЂљР В Р’В°"""
         import json
         from django.http import JsonResponse
         
@@ -638,7 +638,7 @@ class ContactFormAdmin(LeadManagerMixin, admin.ModelAdmin):
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=500)
     
-# ============ ВАКАНСИИ ============
+# ============ Р В РІР‚в„ўР В РЎвЂ™Р В РЎв„ўР В РЎвЂ™Р В РЎСљР В Р Р‹Р В Р В  ============
 
 class VacancyResponsibilityInline(TranslationStackedInline):
     model = VacancyResponsibility
@@ -671,20 +671,20 @@ class VacancyAdmin(ContentAdminMixin, CustomReversionMixin, VersionAdmin, Tabbed
     history_latest_first = True
     
     fieldsets = (
-        ('Основная информация', {'fields': ('title', 'slug', 'short_description', 'is_active', 'order')}),
-        ('Контакты', {'fields': ('contact_info',)}),
-        ('Статистика', {'fields': ('applications_count', 'created_at', 'updated_at'), 'classes': ('collapse',)}),
+        ('Р В РЎвЂєР РЋР С“Р В Р вЂ¦Р В РЎвЂўР В Р вЂ Р В Р вЂ¦Р В Р’В°Р РЋР РЏ Р В РЎвЂР В Р вЂ¦Р РЋРІР‚С›Р В РЎвЂўР РЋР вЂљР В РЎР В Р’В°Р РЋРІР‚В Р В РЎвЂР РЋР РЏ', {'fields': ('title', 'slug', 'short_description', 'is_active', 'order')}),
+        ('Р В РЎв„ўР В РЎвЂўР В Р вЂ¦Р РЋРІР‚С™Р В Р’В°Р В РЎвЂќР РЋРІР‚С™Р РЋРІР‚в„–', {'fields': ('contact_info',)}),
+        ('Р В Р Р‹Р РЋРІР‚С™Р В Р’В°Р РЋРІР‚С™Р В РЎвЂР РЋР С“Р РЋРІР‚С™Р В РЎвЂР В РЎвЂќР В Р’В°', {'fields': ('applications_count', 'created_at', 'updated_at'), 'classes': ('collapse',)}),
     )
     
     def applications_count(self, obj):
         count = obj.get_applications_count()
         if count > 0:
             return format_html(
-                '<a href="/admin/main/jobapplication/?vacancy__id__exact={}" style="color:#007bff;font-weight:bold;"> {} Заявок</a>',
+                '<a href="/admin/main/jobapplication/?vacancy__id__exact={}" style="color:#007bff;font-weight:bold;"> {} Р В РІР‚вЂќР В Р’В°Р РЋР РЏР В Р вЂ Р В РЎвЂўР В РЎвЂќ</a>',
                 obj.id, count
             )
-        return '0 заявок'
-    applications_count.short_description = 'Заявки'
+        return '0 Р В Р’В·Р В Р’В°Р РЋР РЏР В Р вЂ Р В РЎвЂўР В РЎвЂќ'
+    applications_count.short_description = 'Р В РІР‚вЂќР В Р’В°Р РЋР РЏР В Р вЂ Р В РЎвЂќР В РЎвЂ'
 
     def changelist_view(self, request, extra_context=None):
         extra_context = extra_context or {}
@@ -704,22 +704,22 @@ class JobApplicationAdmin(LeadManagerMixin, admin.ModelAdmin):
     autocomplete_fields = ['vacancy']
     
     fieldsets = (
-        ('Информация', {'fields': ('vacancy', 'region', 'created_at')}),
-        ('Резюме', {'fields': ('resume', 'file_size_display', 'resume_preview')}),
-        ('Контакты', {'fields': ('applicant_name', 'applicant_phone', 'applicant_email')}),
-        ('Обработка', {'fields': ('is_processed', 'admin_comment')}),
+        ('Р В Р В Р вЂ¦Р РЋРІР‚С›Р В РЎвЂўР РЋР вЂљР В РЎР В Р’В°Р РЋРІР‚В Р В РЎвЂР РЋР РЏ', {'fields': ('vacancy', 'region', 'created_at')}),
+        ('Р В Р’В Р В Р’ВµР В Р’В·Р РЋР вЂ№Р В РЎР В Р’Вµ', {'fields': ('resume', 'file_size_display', 'resume_preview')}),
+        ('Р В РЎв„ўР В РЎвЂўР В Р вЂ¦Р РЋРІР‚С™Р В Р’В°Р В РЎвЂќР РЋРІР‚С™Р РЋРІР‚в„–', {'fields': ('applicant_name', 'applicant_phone', 'applicant_email')}),
+        ('Р В РЎвЂєР В Р’В±Р РЋР вЂљР В Р’В°Р В Р’В±Р В РЎвЂўР РЋРІР‚С™Р В РЎвЂќР В Р’В°', {'fields': ('is_processed', 'admin_comment')}),
     )
     
     def resume_link(self, obj):
         if obj.resume:
-            return format_html('<a href="{}" target="_blank" style="color:#007bff;font-weight:bold;"> Скачать</a>', obj.resume.url)
-        return "—"
-    resume_link.short_description = 'Резюме'
+            return format_html('<a href="{}" target="_blank" style="color:#007bff;font-weight:bold;"> Р В Р Р‹Р В РЎвЂќР В Р’В°Р РЋРІР‚РЋР В Р’В°Р РЋРІР‚С™Р РЋР Р‰</a>', obj.resume.url)
+        return "Р Р†Р вЂљРІР‚Сњ"
+    resume_link.short_description = 'Р В Р’В Р В Р’ВµР В Р’В·Р РЋР вЂ№Р В РЎР В Р’Вµ'
     
     def file_size_display(self, obj):
         size = obj.get_file_size()
-        return f"{size} MB" if size else "—"
-    file_size_display.short_description = 'Размер'
+        return f"{size} MB" if size else "Р Р†Р вЂљРІР‚Сњ"
+    file_size_display.short_description = 'Р В Р’В Р В Р’В°Р В Р’В·Р В РЎР В Р’ВµР РЋР вЂљ'
     
     def resume_preview(self, obj):
         if obj.resume:
@@ -727,16 +727,16 @@ class JobApplicationAdmin(LeadManagerMixin, admin.ModelAdmin):
             if file_ext in ['jpg', 'jpeg', 'png']:
                 return format_html('<img src="{}" width="300" style="border-radius:8px;">', obj.resume.url)
             return format_html('<p style="color:#888;"> {}</p>', obj.resume.name)
-        return "—"
-    resume_preview.short_description = 'Превью'
+        return "Р Р†Р вЂљРІР‚Сњ"
+    resume_preview.short_description = 'Р В РЎСџР РЋР вЂљР В Р’ВµР В Р вЂ Р РЋР Р‰Р РЋР вЂ№'
     
     def is_processed_badge(self, obj):
         if obj.is_processed:
-            return format_html('<span style="color:green;font-weight:bold;"> Рассмотрено</span>')
-        return format_html('<span style="color:orange;font-weight:bold;"> Новая</span>')
-    is_processed_badge.short_description = 'Статус'
+            return format_html('<span style="color:green;font-weight:bold;"> Р В Р’В Р В Р’В°Р РЋР С“Р РЋР С“Р В РЎР В РЎвЂўР РЋРІР‚С™Р РЋР вЂљР В Р’ВµР В Р вЂ¦Р В РЎвЂў</span>')
+        return format_html('<span style="color:orange;font-weight:bold;"> Р В РЎСљР В РЎвЂўР В Р вЂ Р В Р’В°Р РЋР РЏ</span>')
+    is_processed_badge.short_description = 'Р В Р Р‹Р РЋРІР‚С™Р В Р’В°Р РЋРІР‚С™Р РЋРЎвЂњР РЋР С“'
 
-# ============ ИКОНКИ ============
+# ============ Р В Р В РЎв„ўР В РЎвЂєР В РЎСљР В РЎв„ўР В  ============
 
 @admin.register(FeatureIcon)
 class FeatureIconAdmin(ContentAdminMixin, admin.ModelAdmin):
@@ -747,10 +747,10 @@ class FeatureIconAdmin(ContentAdminMixin, admin.ModelAdmin):
     def icon_preview(self, obj):
         if obj.icon:
             return format_html('<img src="{}" width="30" height="30"/>', obj.icon.url)
-        return "—"
-    icon_preview.short_description = "Превью"
+        return "Р Р†Р вЂљРІР‚Сњ"
+    icon_preview.short_description = "Р В РЎСџР РЋР вЂљР В Р’ВµР В Р вЂ Р РЋР Р‰Р РЋР вЂ№"
 
-# ============ ПРОДУКТЫ ============
+# ============ Р В РЎСџР В Р’В Р В РЎвЂєР В РІР‚СњР В Р в‚¬Р В РЎв„ўР В РЎС›Р В Р’В« ============
 
 @admin.register(ProductCategory)
 class ProductCategoryAdmin(ContentAdminMixin, TabbedTranslationAdmin):
@@ -761,13 +761,13 @@ class ProductCategoryAdmin(ContentAdminMixin, TabbedTranslationAdmin):
     readonly_fields = ['products_count', 'created_at']
     
     fieldsets = (
-        ('Основная информация', {
+        ('Р В РЎвЂєР РЋР С“Р В Р вЂ¦Р В РЎвЂўР В Р вЂ Р В Р вЂ¦Р В Р’В°Р РЋР РЏ Р В РЎвЂР В Р вЂ¦Р РЋРІР‚С›Р В РЎвЂўР РЋР вЂљР В РЎР В Р’В°Р РЋРІР‚В Р В РЎвЂР РЋР РЏ', {
             'fields': ('name', 'slug', 'description', 'is_active', 'order')
         }),
-        ('Изображения', {
+        ('Р В Р В Р’В·Р В РЎвЂўР В Р’В±Р РЋР вЂљР В Р’В°Р В Р’В¶Р В Р’ВµР В Р вЂ¦Р В РЎвЂР РЋР РЏ', {
             'fields': ('icon', 'hero_image')
         }),
-        ('Статистика', {
+        ('Р В Р Р‹Р РЋРІР‚С™Р В Р’В°Р РЋРІР‚С™Р В РЎвЂР РЋР С“Р РЋРІР‚С™Р В РЎвЂР В РЎвЂќР В Р’В°', {
             'fields': ('products_count', 'created_at'),
             'classes': ('collapse',)
         }),
@@ -776,26 +776,26 @@ class ProductCategoryAdmin(ContentAdminMixin, TabbedTranslationAdmin):
     def icon_preview(self, obj):
         if obj.icon:
             return format_html('<img src="{}" width="30" height="30"/>', obj.icon.url)
-        return "—"
-    icon_preview.short_description = "Иконка"
+        return "Р Р†Р вЂљРІР‚Сњ"
+    icon_preview.short_description = "Р В Р В РЎвЂќР В РЎвЂўР В Р вЂ¦Р В РЎвЂќР В Р’В°"
     
     def products_count(self, obj):
         count = obj.get_products_count()
         if count > 0:
             return format_html(
-                '<a href="/admin/main/product/?category__id__exact={}" style="color:#007bff;font-weight:bold;">{} товаров</a>',
+                '<a href="/admin/main/product/?category__id__exact={}" style="color:#007bff;font-weight:bold;">{} Р РЋРІР‚С™Р В РЎвЂўР В Р вЂ Р В Р’В°Р РЋР вЂљР В РЎвЂўР В Р вЂ </a>',
                 obj.id, count
             )
-        return '0 товаров'
-    products_count.short_description = 'Продуктов'
+        return '0 Р РЋРІР‚С™Р В РЎвЂўР В Р вЂ Р В Р’В°Р РЋР вЂљР В РЎвЂўР В Р вЂ '
+    products_count.short_description = 'Р В РЎСџР РЋР вЂљР В РЎвЂўР В РўвЂР РЋРЎвЂњР В РЎвЂќР РЋРІР‚С™Р В РЎвЂўР В Р вЂ '
 
-# ========== ПРОДУКТЫ (ОБНОВЛЕННЫЙ) ==========
+# ========== Р В РЎСџР В Р’В Р В РЎвЂєР В РІР‚СњР В Р в‚¬Р В РЎв„ўР В РЎС›Р В Р’В« (Р В РЎвЂєР В РІР‚Р В РЎСљР В РЎвЂєР В РІР‚в„ўР В РІР‚С”Р В РІР‚СћР В РЎСљР В РЎСљР В Р’В«Р В РІвЂћСћ) ==========
 
-# ========== ПРОДУКТЫ (ОБНОВЛЕННЫЙ) ==========
+# ========== Р В РЎСџР В Р’В Р В РЎвЂєР В РІР‚СњР В Р в‚¬Р В РЎв„ўР В РЎС›Р В Р’В« (Р В РЎвЂєР В РІР‚Р В РЎСљР В РЎвЂєР В РІР‚в„ўР В РІР‚С”Р В РІР‚СћР В РЎСљР В РЎСљР В Р’В«Р В РІвЂћСћ) ==========
 
 class ProductCategoryFilter(admin.SimpleListFilter):
-    """Фильтр по марке автомобиля"""
-    title = 'Марка автомобиля'
+    """Р В Р’В¤Р В РЎвЂР В Р’В»Р РЋР Р‰Р РЋРІР‚С™Р РЋР вЂљ Р В РЎвЂ”Р В РЎвЂў Р В РЎР В Р’В°Р РЋР вЂљР В РЎвЂќР В Р’Вµ Р В Р’В°Р В Р вЂ Р РЋРІР‚С™Р В РЎвЂўР В РЎР В РЎвЂўР В Р’В±Р В РЎвЂР В Р’В»Р РЋР РЏ"""
+    title = 'Р В РЎС™Р В Р’В°Р РЋР вЂљР В РЎвЂќР В Р’В° Р В Р’В°Р В Р вЂ Р РЋРІР‚С™Р В РЎвЂўР В РЎР В РЎвЂўР В Р’В±Р В РЎвЂР В Р’В»Р РЋР РЏ'
     parameter_name = 'category_filter'
     
     def lookups(self, request, model_admin):
@@ -809,8 +809,8 @@ class ProductCategoryFilter(admin.SimpleListFilter):
 
 
 class ParameterCategoryFilter(admin.SimpleListFilter):
-    """Фильтр параметров по категории (для ProductAdmin)"""
-    title = 'Категория параметра'
+    """Р В Р’В¤Р В РЎвЂР В Р’В»Р РЋР Р‰Р РЋРІР‚С™Р РЋР вЂљ Р В РЎвЂ”Р В Р’В°Р РЋР вЂљР В Р’В°Р В РЎР В Р’ВµР РЋРІР‚С™Р РЋР вЂљР В РЎвЂўР В Р вЂ  Р В РЎвЂ”Р В РЎвЂў Р В РЎвЂќР В Р’В°Р РЋРІР‚С™Р В Р’ВµР В РЎвЂ“Р В РЎвЂўР РЋР вЂљР В РЎвЂР В РЎвЂ (Р В РўвЂР В Р’В»Р РЋР РЏ ProductAdmin)"""
+    title = 'Р В РЎв„ўР В Р’В°Р РЋРІР‚С™Р В Р’ВµР В РЎвЂ“Р В РЎвЂўР РЋР вЂљР В РЎвЂР РЋР РЏ Р В РЎвЂ”Р В Р’В°Р РЋР вЂљР В Р’В°Р В РЎР В Р’ВµР РЋРІР‚С™Р РЋР вЂљР В Р’В°'
     parameter_name = 'param_category'
 
     def lookups(self, request, model_admin):
@@ -825,15 +825,15 @@ class ParameterCategoryFilter(admin.SimpleListFilter):
 
 # class ProductParameterInline(admin.TabularInline):
 #     """
-#     Параметры продукта.
-#     ✅ TranslationTabularInline эмас — category энди ForeignKey (tarjima йўқ).
+#     Р В РЎСџР В Р’В°Р РЋР вЂљР В Р’В°Р В РЎР В Р’ВµР РЋРІР‚С™Р РЋР вЂљР РЋРІР‚в„– Р В РЎвЂ”Р РЋР вЂљР В РЎвЂўР В РўвЂР РЋРЎвЂњР В РЎвЂќР РЋРІР‚С™Р В Р’В°.
+#     Р Р†РЎС™РІР‚В¦ TranslationTabularInline Р РЋР РЉР В РЎР В Р’В°Р РЋР С“ Р Р†Р вЂљРІР‚Сњ category Р РЋР РЉР В Р вЂ¦Р В РўвЂР В РЎвЂ ForeignKey (tarjima Р В РІвЂћвЂ“Р РЋРЎвЂєР СћРІР‚С”).
 #     """
 #     model = ProductParameter
 #     extra = 0
 #     fields = ('category', 'text', 'order')
-#     verbose_name = "Параметр"
-#     verbose_name_plural = "📋 Параметры (выберите категорию для фильтрации)"
-#     # category dropdown учун autocomplete (ParameterCategoryAdmin да search_fields бўлиши керак)
+#     verbose_name = "Р В РЎСџР В Р’В°Р РЋР вЂљР В Р’В°Р В РЎР В Р’ВµР РЋРІР‚С™Р РЋР вЂљ"
+#     verbose_name_plural = "РЎР‚РЎСџРІР‚СљРІР‚в„– Р В РЎСџР В Р’В°Р РЋР вЂљР В Р’В°Р В РЎР В Р’ВµР РЋРІР‚С™Р РЋР вЂљР РЋРІР‚в„– (Р В Р вЂ Р РЋРІР‚в„–Р В Р’В±Р В Р’ВµР РЋР вЂљР В РЎвЂР РЋРІР‚С™Р В Р’Вµ Р В РЎвЂќР В Р’В°Р РЋРІР‚С™Р В Р’ВµР В РЎвЂ“Р В РЎвЂўР РЋР вЂљР В РЎвЂР РЋР вЂ№ Р В РўвЂР В Р’В»Р РЋР РЏ Р РЋРІР‚С›Р В РЎвЂР В Р’В»Р РЋР Р‰Р РЋРІР‚С™Р РЋР вЂљР В Р’В°Р РЋРІР‚В Р В РЎвЂР В РЎвЂ)"
+#     # category dropdown Р РЋРЎвЂњР РЋРІР‚РЋР РЋРЎвЂњР В Р вЂ¦ autocomplete (ParameterCategoryAdmin Р В РўвЂР В Р’В° search_fields Р В Р’В±Р РЋРЎвЂєР В Р’В»Р В РЎвЂР РЋРІвЂљВ¬Р В РЎвЂ Р В РЎвЂќР В Р’ВµР РЋР вЂљР В Р’В°Р В РЎвЂќ)
 #     autocomplete_fields = ['category']
 
 
@@ -842,12 +842,12 @@ class ParameterCategoryFilter(admin.SimpleListFilter):
     #     css = {'all': ('css/admin/parameter_filter.css',)}    
 
 class ProductParameterInline(TranslationTabularInline):
-    """Параметры с фильтрацией по категории"""
+    """Р В РЎСџР В Р’В°Р РЋР вЂљР В Р’В°Р В РЎР В Р’ВµР РЋРІР‚С™Р РЋР вЂљР РЋРІР‚в„– Р РЋР С“ Р РЋРІР‚С›Р В РЎвЂР В Р’В»Р РЋР Р‰Р РЋРІР‚С™Р РЋР вЂљР В Р’В°Р РЋРІР‚В Р В РЎвЂР В Р’ВµР В РІвЂћвЂ“ Р В РЎвЂ”Р В РЎвЂў Р В РЎвЂќР В Р’В°Р РЋРІР‚С™Р В Р’ВµР В РЎвЂ“Р В РЎвЂўР РЋР вЂљР В РЎвЂР В РЎвЂ"""
     model = ProductParameter
     extra = 0
     fields = ('category', 'text', 'order')
-    verbose_name = "Параметр"
-    verbose_name_plural = "📋 Параметры (выберите категорию для фильтрации)"
+    verbose_name = "Р В РЎСџР В Р’В°Р РЋР вЂљР В Р’В°Р В РЎР В Р’ВµР РЋРІР‚С™Р РЋР вЂљ"
+    verbose_name_plural = "РЎР‚РЎСџРІР‚СљРІР‚в„– Р В РЎСџР В Р’В°Р РЋР вЂљР В Р’В°Р В РЎР В Р’ВµР РЋРІР‚С™Р РЋР вЂљР РЋРІР‚в„– (Р В Р вЂ Р РЋРІР‚в„–Р В Р’В±Р В Р’ВµР РЋР вЂљР В РЎвЂР РЋРІР‚С™Р В Р’Вµ Р В РЎвЂќР В Р’В°Р РЋРІР‚С™Р В Р’ВµР В РЎвЂ“Р В РЎвЂўР РЋР вЂљР В РЎвЂР РЋР вЂ№ Р В РўвЂР В Р’В»Р РЋР РЏ Р РЋРІР‚С›Р В РЎвЂР В Р’В»Р РЋР Р‰Р РЋРІР‚С™Р РЋР вЂљР В Р’В°Р РЋРІР‚В Р В РЎвЂР В РЎвЂ)"
     
     class Media:
         js = ('js/admin/parameter_filter.js',)
@@ -859,7 +859,7 @@ class ProductParameterInline(TranslationTabularInline):
 @admin.register(ParameterCategory)
 class ParameterCategoryAdmin(TranslationAdmin):
     """
-    Параметр категориялари — тўлиқ CRUD, 3 тилда.
+    Р В РЎСџР В Р’В°Р РЋР вЂљР В Р’В°Р В РЎР В Р’ВµР РЋРІР‚С™Р РЋР вЂљ Р В РЎвЂќР В Р’В°Р РЋРІР‚С™Р В Р’ВµР В РЎвЂ“Р В РЎвЂўР РЋР вЂљР В РЎвЂР РЋР РЏР В Р’В»Р В Р’В°Р РЋР вЂљР В РЎвЂ Р Р†Р вЂљРІР‚Сњ Р РЋРІР‚С™Р РЋРЎвЂєР В Р’В»Р В РЎвЂР СћРІР‚С” CRUD, 3 Р РЋРІР‚С™Р В РЎвЂР В Р’В»Р В РўвЂР В Р’В°.
     """
     list_display = ('name', 'slug', 'order', 'is_active', 'get_parameters_count')
     list_editable = ('order', 'is_active')
@@ -871,32 +871,32 @@ class ParameterCategoryAdmin(TranslationAdmin):
         (None, {
             'fields': ('slug', 'order', 'is_active')
         }),
-        ("🇺🇿 O'zbek", {
+        ("РЎР‚РЎСџРІР‚РЋРЎвЂќРЎР‚РЎСџРІР‚РЋРЎвЂ” O'zbek", {
             'fields': ('name_uz',),
             'classes': ('collapse',),
         }),
-        ("🇷🇺 Русский", {
+        ("РЎР‚РЎСџРІР‚РЋР’В·РЎР‚РЎСџРІР‚РЋРЎвЂќ Р В Р’В Р РЋРЎвЂњР РЋР С“Р РЋР С“Р В РЎвЂќР В РЎвЂР В РІвЂћвЂ“", {
             'fields': ('name_ru',),
             'classes': ('collapse',),
         }),
-        ("🇬🇧 English", {
+        ("РЎР‚РЎСџРІР‚РЋР’В¬РЎР‚РЎСџРІР‚РЋР’В§ English", {
             'fields': ('name_en',),
             'classes': ('collapse',),
         }),
     )
 
-    @admin.display(description="Параметрлар сони")
+    @admin.display(description="Р В РЎСџР В Р’В°Р РЋР вЂљР В Р’В°Р В РЎР В Р’ВµР РЋРІР‚С™Р РЋР вЂљР В Р’В»Р В Р’В°Р РЋР вЂљ Р РЋР С“Р В РЎвЂўР В Р вЂ¦Р В РЎвЂ")
     def get_parameters_count(self, obj):
         count = obj.parameters.count()
-        return f"{count} та"
+        return f"{count} Р РЋРІР‚С™Р В Р’В°"
 
 class ProductFeatureInline(TranslationTabularInline):
     model = ProductFeature
     extra = 0
     max_num = 8
     fields = ('icon', 'name', 'order')
-    verbose_name = "Характеристика"
-    verbose_name_plural = "🔹 Характеристики с иконками"
+    verbose_name = "Р В РўС’Р В Р’В°Р РЋР вЂљР В Р’В°Р В РЎвЂќР РЋРІР‚С™Р В Р’ВµР РЋР вЂљР В РЎвЂР РЋР С“Р РЋРІР‚С™Р В РЎвЂР В РЎвЂќР В Р’В°"
+    verbose_name_plural = "РЎР‚РЎСџРІР‚СњРІвЂћвЂ“ Р В РўС’Р В Р’В°Р РЋР вЂљР В Р’В°Р В РЎвЂќР РЋРІР‚С™Р В Р’ВµР РЋР вЂљР В РЎвЂР РЋР С“Р РЋРІР‚С™Р В РЎвЂР В РЎвЂќР В РЎвЂ Р РЋР С“ Р В РЎвЂР В РЎвЂќР В РЎвЂўР В Р вЂ¦Р В РЎвЂќР В Р’В°Р В РЎР В РЎвЂ"
 
 
 class ProductCardSpecInline(TranslationTabularInline):
@@ -904,16 +904,16 @@ class ProductCardSpecInline(TranslationTabularInline):
     extra = 0
     max_num = 4
     fields = ('icon', 'value', 'order')
-    verbose_name = "Спецификация"
-    verbose_name_plural = "📄 Характеристики карточки"
+    verbose_name = "Р В Р Р‹Р В РЎвЂ”Р В Р’ВµР РЋРІР‚В Р В РЎвЂР РЋРІР‚С›Р В РЎвЂР В РЎвЂќР В Р’В°Р РЋРІР‚В Р В РЎвЂР РЋР РЏ"
+    verbose_name_plural = "РЎР‚РЎСџРІР‚СљРІР‚С› Р В РўС’Р В Р’В°Р РЋР вЂљР В Р’В°Р В РЎвЂќР РЋРІР‚С™Р В Р’ВµР РЋР вЂљР В РЎвЂР РЋР С“Р РЋРІР‚С™Р В РЎвЂР В РЎвЂќР В РЎвЂ Р В РЎвЂќР В Р’В°Р РЋР вЂљР РЋРІР‚С™Р В РЎвЂўР РЋРІР‚РЋР В РЎвЂќР В РЎвЂ"
 
 
 class ProductGalleryInline(admin.TabularInline):
     model = ProductGallery
     extra = 1
     fields = ('image', 'order')
-    verbose_name = "Фото"
-    verbose_name_plural = "🖼️ Галерея"
+    verbose_name = "Р В Р’В¤Р В РЎвЂўР РЋРІР‚С™Р В РЎвЂў"
+    verbose_name_plural = "РЎР‚РЎСџРІР‚вЂњРЎР С—РЎвЂР РЏ Р В РІР‚СљР В Р’В°Р В Р’В»Р В Р’ВµР РЋР вЂљР В Р’ВµР РЋР РЏ"
 
 
 @admin.register(Product)
@@ -930,15 +930,15 @@ class ProductAdmin(ContentAdminMixin, CustomReversionMixin, VersionAdmin, Tabbed
     show_full_result_count = False
     
     fieldsets = (
-        ('Основная информация', {
+        ('Р В РЎвЂєР РЋР С“Р В Р вЂ¦Р В РЎвЂўР В Р вЂ Р В Р вЂ¦Р В Р’В°Р РЋР РЏ Р В РЎвЂР В Р вЂ¦Р РЋРІР‚С›Р В РЎвЂўР РЋР вЂљР В РЎР В Р’В°Р РЋРІР‚В Р В РЎвЂР РЋР РЏ', {
             'fields': (
                 ('title', 'slug'),
-                'category',  # ✅ Теперь обычный select
+                'category',  # Р Р†РЎС™РІР‚В¦ Р В РЎС›Р В Р’ВµР В РЎвЂ”Р В Р’ВµР РЋР вЂљР РЋР Р‰ Р В РЎвЂўР В Р’В±Р РЋРІР‚в„–Р РЋРІР‚РЋР В Р вЂ¦Р РЋРІР‚в„–Р В РІвЂћвЂ“ select
                 ('order', 'is_active', 'is_featured'),
                 ('main_image', 'card_image')
             )
         }),
-        ('⭐ Настройки главного слайдера', {
+        ('Р Р†Р’В­РЎвЂ™ Р В РЎСљР В Р’В°Р РЋР С“Р РЋРІР‚С™Р РЋР вЂљР В РЎвЂўР В РІвЂћвЂ“Р В РЎвЂќР В РЎвЂ Р В РЎвЂ“Р В Р’В»Р В Р’В°Р В Р вЂ Р В Р вЂ¦Р В РЎвЂўР В РЎвЂ“Р В РЎвЂў Р РЋР С“Р В Р’В»Р В Р’В°Р В РІвЂћвЂ“Р В РўвЂР В Р’ВµР РЋР вЂљР В Р’В°', {
             'classes': ('collapse',),
             'fields': (
                 'slider_image',
@@ -958,28 +958,28 @@ class ProductAdmin(ContentAdminMixin, CustomReversionMixin, VersionAdmin, Tabbed
                 '<img src="{}" width="80" height="50" style="object-fit:cover;border-radius:4px;"/>',
                 img.url
             )
-        return "—"
-    thumbnail.short_description = "Фото"
+        return "Р Р†Р вЂљРІР‚Сњ"
+    thumbnail.short_description = "Р В Р’В¤Р В РЎвЂўР РЋРІР‚С™Р В РЎвЂў"
 
     def category_display(self, obj):
-        """✅ НОВОЕ: Отображение одной категории"""
+        """Р Р†РЎС™РІР‚В¦ Р В РЎСљР В РЎвЂєР В РІР‚в„ўР В РЎвЂєР В РІР‚Сћ: Р В РЎвЂєР РЋРІР‚С™Р В РЎвЂўР В Р’В±Р РЋР вЂљР В Р’В°Р В Р’В¶Р В Р’ВµР В Р вЂ¦Р В РЎвЂР В Р’Вµ Р В РЎвЂўР В РўвЂР В Р вЂ¦Р В РЎвЂўР В РІвЂћвЂ“ Р В РЎвЂќР В Р’В°Р РЋРІР‚С™Р В Р’ВµР В РЎвЂ“Р В РЎвЂўР РЋР вЂљР В РЎвЂР В РЎвЂ"""
         if obj.category:
             return format_html(
                 '<span style="background:#1976d2;color:white;padding:4px 8px;border-radius:4px;font-size:11px;font-weight:600;">{}</span>',
                 obj.category.name
             )
-        return format_html('<span style="color:#999;">Без категории</span>')
-    category_display.short_description = "Категория"
+        return format_html('<span style="color:#999;">Р В РІР‚Р В Р’ВµР В Р’В· Р В РЎвЂќР В Р’В°Р РЋРІР‚С™Р В Р’ВµР В РЎвЂ“Р В РЎвЂўР РЋР вЂљР В РЎвЂР В РЎвЂ</span>')
+    category_display.short_description = "Р В РЎв„ўР В Р’В°Р РЋРІР‚С™Р В Р’ВµР В РЎвЂ“Р В РЎвЂўР РЋР вЂљР В РЎвЂР РЋР РЏ"
     
     def add_to_slider(self, request, queryset):
         updated = queryset.update(is_featured=True)
-        self.message_user(request, f'✅ {updated} продуктов добавлено в слайдер')
-    add_to_slider.short_description = '⭐ Добавить в слайдер'
+        self.message_user(request, f'Р Р†РЎС™РІР‚В¦ {updated} Р В РЎвЂ”Р РЋР вЂљР В РЎвЂўР В РўвЂР РЋРЎвЂњР В РЎвЂќР РЋРІР‚С™Р В РЎвЂўР В Р вЂ  Р В РўвЂР В РЎвЂўР В Р’В±Р В Р’В°Р В Р вЂ Р В Р’В»Р В Р’ВµР В Р вЂ¦Р В РЎвЂў Р В Р вЂ  Р РЋР С“Р В Р’В»Р В Р’В°Р В РІвЂћвЂ“Р В РўвЂР В Р’ВµР РЋР вЂљ')
+    add_to_slider.short_description = 'Р Р†Р’В­РЎвЂ™ Р В РІР‚СњР В РЎвЂўР В Р’В±Р В Р’В°Р В Р вЂ Р В РЎвЂР РЋРІР‚С™Р РЋР Р‰ Р В Р вЂ  Р РЋР С“Р В Р’В»Р В Р’В°Р В РІвЂћвЂ“Р В РўвЂР В Р’ВµР РЋР вЂљ'
     
     def remove_from_slider(self, request, queryset):
         updated = queryset.update(is_featured=False)
-        self.message_user(request, f'❌ {updated} продуктов убрано из слайдера')
-    remove_from_slider.short_description = '❌ Убрать из слайдера'
+        self.message_user(request, f'Р Р†РЎСљР Р‰ {updated} Р В РЎвЂ”Р РЋР вЂљР В РЎвЂўР В РўвЂР РЋРЎвЂњР В РЎвЂќР РЋРІР‚С™Р В РЎвЂўР В Р вЂ  Р РЋРЎвЂњР В Р’В±Р РЋР вЂљР В Р’В°Р В Р вЂ¦Р В РЎвЂў Р В РЎвЂР В Р’В· Р РЋР С“Р В Р’В»Р В Р’В°Р В РІвЂћвЂ“Р В РўвЂР В Р’ВµР РЋР вЂљР В Р’В°')
+    remove_from_slider.short_description = 'Р Р†РЎСљР Р‰ Р В Р в‚¬Р В Р’В±Р РЋР вЂљР В Р’В°Р РЋРІР‚С™Р РЋР Р‰ Р В РЎвЂР В Р’В· Р РЋР С“Р В Р’В»Р В Р’В°Р В РІвЂћвЂ“Р В РўвЂР В Р’ВµР РЋР вЂљР В Р’В°'
 
     def changelist_view(self, request, extra_context=None):
         extra_context = extra_context or {}
@@ -1004,7 +1004,7 @@ class ProductAdmin(ContentAdminMixin, CustomReversionMixin, VersionAdmin, Tabbed
         return custom_urls + urls
 
     def parameter_suggestions_api(self, request):
-        """API для получения подсказок параметров по категории"""
+        """API Р В РўвЂР В Р’В»Р РЋР РЏ Р В РЎвЂ”Р В РЎвЂўР В Р’В»Р РЋРЎвЂњР РЋРІР‚РЋР В Р’ВµР В Р вЂ¦Р В РЎвЂР РЋР РЏ Р В РЎвЂ”Р В РЎвЂўР В РўвЂР РЋР С“Р В РЎвЂќР В Р’В°Р В Р’В·Р В РЎвЂўР В РЎвЂќ Р В РЎвЂ”Р В Р’В°Р РЋР вЂљР В Р’В°Р В РЎР В Р’ВµР РЋРІР‚С™Р РЋР вЂљР В РЎвЂўР В Р вЂ  Р В РЎвЂ”Р В РЎвЂў Р В РЎвЂќР В Р’В°Р РЋРІР‚С™Р В Р’ВµР В РЎвЂ“Р В РЎвЂўР РЋР вЂљР В РЎвЂР В РЎвЂ"""
         category = request.GET.get('category', '')
         
         if not category:
@@ -1036,44 +1036,44 @@ class ProductAdmin(ContentAdminMixin, CustomReversionMixin, VersionAdmin, Tabbed
 class AmoCRMTokenAdmin(AmoCRMAdminMixin, admin.ModelAdmin):
     list_display = ['token_status', 'expires_display', 'time_left_display', 'action_buttons']
     
-    # ========== ОТОБРАЖЕНИЕ ==========
+    # ========== Р В РЎвЂєР В РЎС›Р В РЎвЂєР В РІР‚Р В Р’В Р В РЎвЂ™Р В РІР‚вЂњР В РІР‚СћР В РЎСљР В Р В РІР‚Сћ ==========
     def token_status(self, obj):
-        """Статус токена"""
+        """Р В Р Р‹Р РЋРІР‚С™Р В Р’В°Р РЋРІР‚С™Р РЋРЎвЂњР РЋР С“ Р РЋРІР‚С™Р В РЎвЂўР В РЎвЂќР В Р’ВµР В Р вЂ¦Р В Р’В°"""
         
         if not obj.access_token:
             return format_html(
-                '<span style="background:#dc3545;color:white;padding:6px 12px;border-radius:6px;font-weight:600;">Не настроен</span>'
+                '<span style="background:#dc3545;color:white;padding:6px 12px;border-radius:6px;font-weight:600;">Р В РЎСљР В Р’Вµ Р В Р вЂ¦Р В Р’В°Р РЋР С“Р РЋРІР‚С™Р РЋР вЂљР В РЎвЂўР В Р’ВµР В Р вЂ¦</span>'
             )
         
         if obj.is_expired():
             return format_html(
-                '<span style="background:#ffc107;color:#000;padding:6px 12px;border-radius:6px;font-weight:600;">Истекает скоро</span>'
+                '<span style="background:#ffc107;color:#000;padding:6px 12px;border-radius:6px;font-weight:600;">Р В Р РЋР С“Р РЋРІР‚С™Р В Р’ВµР В РЎвЂќР В Р’В°Р В Р’ВµР РЋРІР‚С™ Р РЋР С“Р В РЎвЂќР В РЎвЂўР РЋР вЂљР В РЎвЂў</span>'
             )
         
         return format_html(
-            '<span style="background:#28a745;color:white;padding:6px 12px;border-radius:6px;font-weight:600;">Валиден</span>'
+            '<span style="background:#28a745;color:white;padding:6px 12px;border-radius:6px;font-weight:600;">Р В РІР‚в„ўР В Р’В°Р В Р’В»Р В РЎвЂР В РўвЂР В Р’ВµР В Р вЂ¦</span>'
         )
     
-    token_status.short_description = "Статус"
+    token_status.short_description = "Р В Р Р‹Р РЋРІР‚С™Р В Р’В°Р РЋРІР‚С™Р РЋРЎвЂњР РЋР С“"
     
     def expires_display(self, obj):
-        """Дата истечения"""
+        """Р В РІР‚СњР В Р’В°Р РЋРІР‚С™Р В Р’В° Р В РЎвЂР РЋР С“Р РЋРІР‚С™Р В Р’ВµР РЋРІР‚РЋР В Р’ВµР В Р вЂ¦Р В РЎвЂР РЋР РЏ"""
         if obj.expires_at:
             return obj.expires_at.strftime('%d.%m.%Y %H:%M')
-        return "—"
+        return "Р Р†Р вЂљРІР‚Сњ"
     
-    expires_display.short_description = "Истекает"
+    expires_display.short_description = "Р В Р РЋР С“Р РЋРІР‚С™Р В Р’ВµР В РЎвЂќР В Р’В°Р В Р’ВµР РЋРІР‚С™"
     
     def time_left_display(self, obj):
-        """Оставшееся время"""
+        """Р В РЎвЂєР РЋР С“Р РЋРІР‚С™Р В Р’В°Р В Р вЂ Р РЋРІвЂљВ¬Р В Р’ВµР В Р’ВµР РЋР С“Р РЋР РЏ Р В Р вЂ Р РЋР вЂљР В Р’ВµР В РЎР РЋР РЏ"""
         
         if not obj.expires_at:
-            return "—"
+            return "Р Р†Р вЂљРІР‚Сњ"
         
         time_left = obj.expires_at - timezone.now()
         
         if time_left.total_seconds() < 0:
-            return format_html('<span style="color:#dc3545;font-weight:600;">Истёк</span>')
+            return format_html('<span style="color:#dc3545;font-weight:600;">Р В Р РЋР С“Р РЋРІР‚С™Р РЋРІР‚Р В РЎвЂќ</span>')
         
         days = time_left.days
         hours = int(time_left.seconds / 3600)
@@ -1087,41 +1087,41 @@ class AmoCRMTokenAdmin(AmoCRMAdminMixin, admin.ModelAdmin):
             color = '#28a745'
         
         if days > 0:
-            text = f"{days} дн. {hours} ч."
+            text = f"{days} Р В РўвЂР В Р вЂ¦. {hours} Р РЋРІР‚РЋ."
         elif hours > 0:
-            text = f"{hours} ч. {minutes} мин."
+            text = f"{hours} Р РЋРІР‚РЋ. {minutes} Р В РЎР В РЎвЂР В Р вЂ¦."
         else:
-            text = f"{minutes} мин."
+            text = f"{minutes} Р В РЎР В РЎвЂР В Р вЂ¦."
         
         return format_html('<span style="color:{};font-weight:600;">{}</span>', color, text)
     
-    time_left_display.short_description = "Осталось"
+    time_left_display.short_description = "Р В РЎвЂєР РЋР С“Р РЋРІР‚С™Р В Р’В°Р В Р’В»Р В РЎвЂўР РЋР С“Р РЋР Р‰"
     
     def action_buttons(self, obj):
-        """Кнопки действий"""
+        """Р В РЎв„ўР В Р вЂ¦Р В РЎвЂўР В РЎвЂ”Р В РЎвЂќР В РЎвЂ Р В РўвЂР В Р’ВµР В РІвЂћвЂ“Р РЋР С“Р РЋРІР‚С™Р В Р вЂ Р В РЎвЂР В РІвЂћвЂ“"""
         return format_html('''
             <div style="display:flex;gap:8px;flex-wrap:wrap;">
                 <a href="/admin/main/amocrmtoken/refresh/" 
                    class="button" 
                    style="background:#007bff;color:white;padding:6px 12px;border-radius:4px;text-decoration:none;white-space:nowrap;">
-                    Обновить токен
+                    Р В РЎвЂєР В Р’В±Р В Р вЂ¦Р В РЎвЂўР В Р вЂ Р В РЎвЂР РЋРІР‚С™Р РЋР Р‰ Р РЋРІР‚С™Р В РЎвЂўР В РЎвЂќР В Р’ВµР В Р вЂ¦
                 </a>
                 <a href="/admin/main/amocrmtoken/logs/" 
                    class="button" 
                    style="background:#dc3545;color:white;padding:6px 12px;border-radius:4px;text-decoration:none;white-space:nowrap;">
-                    Логи ошибок
+                    Р В РІР‚С”Р В РЎвЂўР В РЎвЂ“Р В РЎвЂ Р В РЎвЂўР РЋРІвЂљВ¬Р В РЎвЂР В Р’В±Р В РЎвЂўР В РЎвЂќ
                 </a>
                 <a href="/admin/main/amocrmtoken/instructions/" 
                    class="button" 
                    style="background:#6c757d;color:white;padding:6px 12px;border-radius:4px;text-decoration:none;white-space:nowrap;">
-                    Инструкция
+                    Р В Р В Р вЂ¦Р РЋР С“Р РЋРІР‚С™Р РЋР вЂљР РЋРЎвЂњР В РЎвЂќР РЋРІР‚В Р В РЎвЂР РЋР РЏ
                 </a>
             </div>
         ''')
     
-    action_buttons.short_description = "Действия"
+    action_buttons.short_description = "Р В РІР‚СњР В Р’ВµР В РІвЂћвЂ“Р РЋР С“Р РЋРІР‚С™Р В Р вЂ Р В РЎвЂР РЋР РЏ"
     
-    # ========== МАРШРУТЫ ==========
+    # ========== Р В РЎС™Р В РЎвЂ™Р В Р’В Р В Р РѓР В Р’В Р В Р в‚¬Р В РЎС›Р В Р’В« ==========
     def get_urls(self):
         urls = super().get_urls()
         custom_urls = [
@@ -1131,26 +1131,26 @@ class AmoCRMTokenAdmin(AmoCRMAdminMixin, admin.ModelAdmin):
         ]
         return custom_urls + urls
     
-    # ========== ОБРАБОТЧИКИ ==========
+    # ========== Р В РЎвЂєР В РІР‚Р В Р’В Р В РЎвЂ™Р В РІР‚Р В РЎвЂєР В РЎС›Р В Р’В§Р В Р В РЎв„ўР В  ==========
     def refresh_token_view(self, request):
-        """Обновить токен вручную"""
+        """Р В РЎвЂєР В Р’В±Р В Р вЂ¦Р В РЎвЂўР В Р вЂ Р В РЎвЂР РЋРІР‚С™Р РЋР Р‰ Р РЋРІР‚С™Р В РЎвЂўР В РЎвЂќР В Р’ВµР В Р вЂ¦ Р В Р вЂ Р РЋР вЂљР РЋРЎвЂњР РЋРІР‚РЋР В Р вЂ¦Р РЋРЎвЂњР РЋР вЂ№"""
         try:
             token_obj = AmoCRMToken.get_instance()
             
             if not token_obj.refresh_token:
-                messages.error(request, 'Refresh token не найден. Настройте токены заново.')
+                messages.error(request, 'Refresh token Р В Р вЂ¦Р В Р’Вµ Р В Р вЂ¦Р В Р’В°Р В РІвЂћвЂ“Р В РўвЂР В Р’ВµР В Р вЂ¦. Р В РЎСљР В Р’В°Р РЋР С“Р РЋРІР‚С™Р РЋР вЂљР В РЎвЂўР В РІвЂћвЂ“Р РЋРІР‚С™Р В Р’Вµ Р РЋРІР‚С™Р В РЎвЂўР В РЎвЂќР В Р’ВµР В Р вЂ¦Р РЋРІР‚в„– Р В Р’В·Р В Р’В°Р В Р вЂ¦Р В РЎвЂўР В Р вЂ Р В РЎвЂў.')
                 return redirect('/admin/main/amocrmtoken/')
             
             TokenManager.refresh_token(token_obj)
-            messages.success(request, f'Токен успешно обновлён. Истекает: {token_obj.expires_at.strftime("%d.%m.%Y %H:%M")}')
+            messages.success(request, f'Р В РЎС›Р В РЎвЂўР В РЎвЂќР В Р’ВµР В Р вЂ¦ Р РЋРЎвЂњР РЋР С“Р В РЎвЂ”Р В Р’ВµР РЋРІвЂљВ¬Р В Р вЂ¦Р В РЎвЂў Р В РЎвЂўР В Р’В±Р В Р вЂ¦Р В РЎвЂўР В Р вЂ Р В Р’В»Р РЋРІР‚Р В Р вЂ¦. Р В Р РЋР С“Р РЋРІР‚С™Р В Р’ВµР В РЎвЂќР В Р’В°Р В Р’ВµР РЋРІР‚С™: {token_obj.expires_at.strftime("%d.%m.%Y %H:%M")}')
             
         except Exception as e:
-            messages.error(request, f'Ошибка обновления: {str(e)}')
+            messages.error(request, f'Р В РЎвЂєР РЋРІвЂљВ¬Р В РЎвЂР В Р’В±Р В РЎвЂќР В Р’В° Р В РЎвЂўР В Р’В±Р В Р вЂ¦Р В РЎвЂўР В Р вЂ Р В Р’В»Р В Р’ВµР В Р вЂ¦Р В РЎвЂР РЋР РЏ: {str(e)}')
         
         return redirect('/admin/main/amocrmtoken/')
     
     def logs_view(self, request):
-        """Показать логи ошибок amoCRM"""
+        """Р В РЎСџР В РЎвЂўР В РЎвЂќР В Р’В°Р В Р’В·Р В Р’В°Р РЋРІР‚С™Р РЋР Р‰ Р В Р’В»Р В РЎвЂўР В РЎвЂ“Р В РЎвЂ Р В РЎвЂўР РЋРІвЂљВ¬Р В РЎвЂР В Р’В±Р В РЎвЂўР В РЎвЂќ amoCRM"""
 
         
         amocrm_log_path = os.path.join(settings.BASE_DIR, 'logs', 'amocrm.log')
@@ -1165,7 +1165,7 @@ class AmoCRMTokenAdmin(AmoCRMAdminMixin, admin.ModelAdmin):
                     lines = f.readlines()
                     amocrm_logs = [line.strip() for line in lines if line.strip()][-100:]
             except Exception as e:
-                amocrm_logs = [f"Ошибка чтения amocrm.log: {str(e)}"]
+                amocrm_logs = [f"Р В РЎвЂєР РЋРІвЂљВ¬Р В РЎвЂР В Р’В±Р В РЎвЂќР В Р’В° Р РЋРІР‚РЋР РЋРІР‚С™Р В Р’ВµР В Р вЂ¦Р В РЎвЂР РЋР РЏ amocrm.log: {str(e)}"]
         
         if os.path.exists(errors_log_path):
             try:
@@ -1173,18 +1173,18 @@ class AmoCRMTokenAdmin(AmoCRMAdminMixin, admin.ModelAdmin):
                     lines = f.readlines()
                     errors_logs = [line.strip() for line in lines if line.strip()][-50:]
             except Exception as e:
-                errors_logs = [f"Ошибка чтения errors.log: {str(e)}"]
+                errors_logs = [f"Р В РЎвЂєР РЋРІвЂљВ¬Р В РЎвЂР В Р’В±Р В РЎвЂќР В Р’В° Р РЋРІР‚РЋР РЋРІР‚С™Р В Р’ВµР В Р вЂ¦Р В РЎвЂР РЋР РЏ errors.log: {str(e)}"]
         
         context = {
             **self.admin_site.each_context(request),
-            'title': 'Логи ошибок amoCRM',
+            'title': 'Р В РІР‚С”Р В РЎвЂўР В РЎвЂ“Р В РЎвЂ Р В РЎвЂўР РЋРІвЂљВ¬Р В РЎвЂР В Р’В±Р В РЎвЂўР В РЎвЂќ amoCRM',
             'amocrm_logs': amocrm_logs,
             'errors_logs': errors_logs,
         }
         return render(request, 'main/amocrm_logs.html', context)
     
     def instructions_view(self, request):
-        """Показать инструкцию"""
+        """Р В РЎСџР В РЎвЂўР В РЎвЂќР В Р’В°Р В Р’В·Р В Р’В°Р РЋРІР‚С™Р РЋР Р‰ Р В РЎвЂР В Р вЂ¦Р РЋР С“Р РЋРІР‚С™Р РЋР вЂљР РЋРЎвЂњР В РЎвЂќР РЋРІР‚В Р В РЎвЂР РЋР вЂ№"""
         
         token_obj = AmoCRMToken.get_instance()
         time_left_text = None
@@ -1193,7 +1193,7 @@ class AmoCRMTokenAdmin(AmoCRMAdminMixin, admin.ModelAdmin):
             time_left = token_obj.expires_at - timezone.now()
             
             if time_left.total_seconds() < 0:
-                time_left_text = "Токен истёк"
+                time_left_text = "Р В РЎС›Р В РЎвЂўР В РЎвЂќР В Р’ВµР В Р вЂ¦ Р В РЎвЂР РЋР С“Р РЋРІР‚С™Р РЋРІР‚Р В РЎвЂќ"
             else:
                 days = time_left.days
                 hours = int(time_left.seconds / 3600)
@@ -1201,17 +1201,17 @@ class AmoCRMTokenAdmin(AmoCRMAdminMixin, admin.ModelAdmin):
                 
                 parts = []
                 if days > 0:
-                    parts.append(f"{days} дн.")
+                    parts.append(f"{days} Р В РўвЂР В Р вЂ¦.")
                 if hours > 0:
-                    parts.append(f"{hours} ч.")
+                    parts.append(f"{hours} Р РЋРІР‚РЋ.")
                 if minutes > 0:
-                    parts.append(f"{minutes} мин.")
+                    parts.append(f"{minutes} Р В РЎР В РЎвЂР В Р вЂ¦.")
                 
-                time_left_text = " ".join(parts) if parts else "Менее минуты"
+                time_left_text = " ".join(parts) if parts else "Р В РЎС™Р В Р’ВµР В Р вЂ¦Р В Р’ВµР В Р’Вµ Р В РЎР В РЎвЂР В Р вЂ¦Р РЋРЎвЂњР РЋРІР‚С™Р РЋРІР‚в„–"
         
         context = {
             **self.admin_site.each_context(request),
-            'title': 'Инструкция: Обновление токенов amoCRM',
+            'title': 'Р В Р В Р вЂ¦Р РЋР С“Р РЋРІР‚С™Р РЋР вЂљР РЋРЎвЂњР В РЎвЂќР РЋРІР‚В Р В РЎвЂР РЋР РЏ: Р В РЎвЂєР В Р’В±Р В Р вЂ¦Р В РЎвЂўР В Р вЂ Р В Р’В»Р В Р’ВµР В Р вЂ¦Р В РЎвЂР В Р’Вµ Р РЋРІР‚С™Р В РЎвЂўР В РЎвЂќР В Р’ВµР В Р вЂ¦Р В РЎвЂўР В Р вЂ  amoCRM',
             'token': token_obj,
             'time_left_text': time_left_text,
         }
@@ -1266,7 +1266,7 @@ class DealerAdmin(ContentAdminMixin, TabbedTranslationAdmin):
         js = ('js/admin/dealer_hide_lang_select.js',)
 
 
-# ========== ОТЗЫВЫ КЛИЕНТОВ ==========
+# ========== Р В РЎвЂєР В РЎС›Р В РІР‚вЂќР В Р’В«Р В РІР‚в„ўР В Р’В« Р В РЎв„ўР В РІР‚С”Р В Р В РІР‚СћР В РЎСљР В РЎС›Р В РЎвЂєР В РІР‚в„ў ==========
 
 @admin.register(Review)
 class ReviewAdmin(admin.ModelAdmin):
@@ -1280,14 +1280,14 @@ class ReviewAdmin(admin.ModelAdmin):
     list_per_page = 30
 
     fieldsets = (
-        ("Информация об отзыве", {
+        ("Р В Р В Р вЂ¦Р РЋРІР‚С›Р В РЎвЂўР РЋР вЂљР В РЎР В Р’В°Р РЋРІР‚В Р В РЎвЂР РЋР РЏ Р В РЎвЂўР В Р’В± Р В РЎвЂўР РЋРІР‚С™Р В Р’В·Р РЋРІР‚в„–Р В Р вЂ Р В Р’Вµ", {
             'fields': ('name', 'rating', 'text', 'avatar', 'avatar_preview')
         }),
-        ("Модерация", {
+        ("Р В РЎС™Р В РЎвЂўР В РўвЂР В Р’ВµР РЋР вЂљР В Р’В°Р РЋРІР‚В Р В РЎвЂР РЋР РЏ", {
             'fields': ('status', 'is_verified', 'admin_comment'),
-            'description': '⚠️ Только одобренные отзывы отображаются на сайте'
+            'description': 'Р Р†РЎв„ўР’В Р С—РЎвЂР РЏ Р В РЎС›Р В РЎвЂўР В Р’В»Р РЋР Р‰Р В РЎвЂќР В РЎвЂў Р В РЎвЂўР В РўвЂР В РЎвЂўР В Р’В±Р РЋР вЂљР В Р’ВµР В Р вЂ¦Р В Р вЂ¦Р РЋРІР‚в„–Р В Р’Вµ Р В РЎвЂўР РЋРІР‚С™Р В Р’В·Р РЋРІР‚в„–Р В Р вЂ Р РЋРІР‚в„– Р В РЎвЂўР РЋРІР‚С™Р В РЎвЂўР В Р’В±Р РЋР вЂљР В Р’В°Р В Р’В¶Р В Р’В°Р РЋР вЂ№Р РЋРІР‚С™Р РЋР С“Р РЋР РЏ Р В Р вЂ¦Р В Р’В° Р РЋР С“Р В Р’В°Р В РІвЂћвЂ“Р РЋРІР‚С™Р В Р’Вµ'
         }),
-        ("Системная информация", {
+        ("Р В Р Р‹Р В РЎвЂР РЋР С“Р РЋРІР‚С™Р В Р’ВµР В РЎР В Р вЂ¦Р В Р’В°Р РЋР РЏ Р В РЎвЂР В Р вЂ¦Р РЋРІР‚С›Р В РЎвЂўР РЋР вЂљР В РЎР В Р’В°Р РЋРІР‚В Р В РЎвЂР РЋР РЏ", {
             'fields': ('ip_address', 'created_at', 'moderated_at'),
             'classes': ('collapse',),
         }),
@@ -1296,35 +1296,35 @@ class ReviewAdmin(admin.ModelAdmin):
     def rating_stars(self, obj):
         return format_html(
             '<span style="color:#F7941D;font-size:16px;">{}</span>',
-            '★' * obj.rating + '☆' * (5 - obj.rating)
+            'Р Р†РІР‚В¦' * obj.rating + 'Р Р†РІР‚В ' * (5 - obj.rating)
         )
-    rating_stars.short_description = "Оценка"
+    rating_stars.short_description = "Р В РЎвЂєР РЋРІР‚В Р В Р’ВµР В Р вЂ¦Р В РЎвЂќР В Р’В°"
 
     def status_badge(self, obj):
         colors = {'pending': '#FF9800', 'approved': '#4CAF50', 'rejected': '#f44336'}
-        labels = {'pending': 'На модерации', 'approved': 'Одобрен', 'rejected': 'Отклонён'}
+        labels = {'pending': 'Р В РЎСљР В Р’В° Р В РЎР В РЎвЂўР В РўвЂР В Р’ВµР РЋР вЂљР В Р’В°Р РЋРІР‚В Р В РЎвЂР В РЎвЂ', 'approved': 'Р В РЎвЂєР В РўвЂР В РЎвЂўР В Р’В±Р РЋР вЂљР В Р’ВµР В Р вЂ¦', 'rejected': 'Р В РЎвЂєР РЋРІР‚С™Р В РЎвЂќР В Р’В»Р В РЎвЂўР В Р вЂ¦Р РЋРІР‚Р В Р вЂ¦'}
         return format_html(
             '<span style="background:{};color:#fff;padding:3px 10px;border-radius:12px;font-size:12px;">{}</span>',
             colors.get(obj.status, '#999'),
             labels.get(obj.status, obj.status)
         )
-    status_badge.short_description = "Статус"
+    status_badge.short_description = "Р В Р Р‹Р РЋРІР‚С™Р В Р’В°Р РЋРІР‚С™Р РЋРЎвЂњР РЋР С“"
 
     def avatar_preview(self, obj):
         if obj.avatar:
             return format_html('<img src="{}" style="max-width:150px;max-height:150px;border-radius:50%;">', obj.avatar.url)
-        return "Нет фото"
-    avatar_preview.short_description = "Превью аватара"
+        return "Р В РЎСљР В Р’ВµР РЋРІР‚С™ Р РЋРІР‚С›Р В РЎвЂўР РЋРІР‚С™Р В РЎвЂў"
+    avatar_preview.short_description = "Р В РЎСџР РЋР вЂљР В Р’ВµР В Р вЂ Р РЋР Р‰Р РЋР вЂ№ Р В Р’В°Р В Р вЂ Р В Р’В°Р РЋРІР‚С™Р В Р’В°Р РЋР вЂљР В Р’В°"
 
     def approve_reviews(self, request, queryset):
         count = queryset.update(status='approved', is_verified=True, moderated_at=timezone.now())
-        self.message_user(request, f"✅ Одобрено отзывов: {count}", messages.SUCCESS)
-    approve_reviews.short_description = "✅ Одобрить выбранные отзывы"
+        self.message_user(request, f"Р Р†РЎС™РІР‚В¦ Р В РЎвЂєР В РўвЂР В РЎвЂўР В Р’В±Р РЋР вЂљР В Р’ВµР В Р вЂ¦Р В РЎвЂў Р В РЎвЂўР РЋРІР‚С™Р В Р’В·Р РЋРІР‚в„–Р В Р вЂ Р В РЎвЂўР В Р вЂ : {count}", messages.SUCCESS)
+    approve_reviews.short_description = "Р Р†РЎС™РІР‚В¦ Р В РЎвЂєР В РўвЂР В РЎвЂўР В Р’В±Р РЋР вЂљР В РЎвЂР РЋРІР‚С™Р РЋР Р‰ Р В Р вЂ Р РЋРІР‚в„–Р В Р’В±Р РЋР вЂљР В Р’В°Р В Р вЂ¦Р В Р вЂ¦Р РЋРІР‚в„–Р В Р’Вµ Р В РЎвЂўР РЋРІР‚С™Р В Р’В·Р РЋРІР‚в„–Р В Р вЂ Р РЋРІР‚в„–"
 
     def reject_reviews(self, request, queryset):
         count = queryset.update(status='rejected', moderated_at=timezone.now())
-        self.message_user(request, f"❌ Отклонено отзывов: {count}", messages.WARNING)
-    reject_reviews.short_description = "❌ Отклонить выбранные отзывы"
+        self.message_user(request, f"Р Р†РЎСљР Р‰ Р В РЎвЂєР РЋРІР‚С™Р В РЎвЂќР В Р’В»Р В РЎвЂўР В Р вЂ¦Р В Р’ВµР В Р вЂ¦Р В РЎвЂў Р В РЎвЂўР РЋРІР‚С™Р В Р’В·Р РЋРІР‚в„–Р В Р вЂ Р В РЎвЂўР В Р вЂ : {count}", messages.WARNING)
+    reject_reviews.short_description = "Р Р†РЎСљР Р‰ Р В РЎвЂєР РЋРІР‚С™Р В РЎвЂќР В Р’В»Р В РЎвЂўР В Р вЂ¦Р В РЎвЂР РЋРІР‚С™Р РЋР Р‰ Р В Р вЂ Р РЋРІР‚в„–Р В Р’В±Р РЋР вЂљР В Р’В°Р В Р вЂ¦Р В Р вЂ¦Р РЋРІР‚в„–Р В Р’Вµ Р В РЎвЂўР РЋРІР‚С™Р В Р’В·Р РЋРІР‚в„–Р В Р вЂ Р РЋРІР‚в„–"
 
     def save_model(self, request, obj, form, change):
         if change and 'status' in form.changed_data:
@@ -1332,7 +1332,7 @@ class ReviewAdmin(admin.ModelAdmin):
         super().save_model(request, obj, form, change)
 
 
-# ========== ТЕСТ-ДРАЙВ ==========
+# ========== Р В РЎС›Р В РІР‚СћР В Р Р‹Р В РЎС›-Р В РІР‚СњР В Р’В Р В РЎвЂ™Р В РІвЂћСћР В РІР‚в„ў ==========
 
 @admin.register(TestDriveRequest)
 class TestDriveRequestAdmin(admin.ModelAdmin):
@@ -1344,16 +1344,16 @@ class TestDriveRequestAdmin(admin.ModelAdmin):
     ordering = ['-created_at']
 
     fieldsets = (
-        ('Клиент', {
+        ('Р В РЎв„ўР В Р’В»Р В РЎвЂР В Р’ВµР В Р вЂ¦Р РЋРІР‚С™', {
             'fields': ('name', 'phone', 'dealer', 'product')
         }),
-        ('Дата и время', {
+        ('Р В РІР‚СњР В Р’В°Р РЋРІР‚С™Р В Р’В° Р В РЎвЂ Р В Р вЂ Р РЋР вЂљР В Р’ВµР В РЎР РЋР РЏ', {
             'fields': ('preferred_date', 'preferred_time')
         }),
-        ('Статус', {
+        ('Р В Р Р‹Р РЋРІР‚С™Р В Р’В°Р РЋРІР‚С™Р РЋРЎвЂњР РЋР С“', {
             'fields': ('status', 'admin_comment')
         }),
-        ('Техническая информация', {
+        ('Р В РЎС›Р В Р’ВµР РЋРІР‚В¦Р В Р вЂ¦Р В РЎвЂР РЋРІР‚РЋР В Р’ВµР РЋР С“Р В РЎвЂќР В Р’В°Р РЋР РЏ Р В РЎвЂР В Р вЂ¦Р РЋРІР‚С›Р В РЎвЂўР РЋР вЂљР В РЎР В Р’В°Р РЋРІР‚В Р В РЎвЂР РЋР РЏ', {
             'classes': ('collapse',),
             'fields': ('ip_address', 'referer', 'utm_data', 'visitor_uid', 'created_at', 'updated_at')
         }),
@@ -1363,21 +1363,21 @@ class TestDriveRequestAdmin(admin.ModelAdmin):
 
     def mark_confirmed(self, request, queryset):
         count = queryset.update(status='confirmed')
-        self.message_user(request, f"Подтверждено: {count}", messages.SUCCESS)
-    mark_confirmed.short_description = "Подтвердить выбранные"
+        self.message_user(request, f"Р В РЎСџР В РЎвЂўР В РўвЂР РЋРІР‚С™Р В Р вЂ Р В Р’ВµР РЋР вЂљР В Р’В¶Р В РўвЂР В Р’ВµР В Р вЂ¦Р В РЎвЂў: {count}", messages.SUCCESS)
+    mark_confirmed.short_description = "Р В РЎСџР В РЎвЂўР В РўвЂР РЋРІР‚С™Р В Р вЂ Р В Р’ВµР РЋР вЂљР В РўвЂР В РЎвЂР РЋРІР‚С™Р РЋР Р‰ Р В Р вЂ Р РЋРІР‚в„–Р В Р’В±Р РЋР вЂљР В Р’В°Р В Р вЂ¦Р В Р вЂ¦Р РЋРІР‚в„–Р В Р’Вµ"
 
     def mark_completed(self, request, queryset):
         count = queryset.update(status='completed')
-        self.message_user(request, f"Завершено: {count}", messages.SUCCESS)
-    mark_completed.short_description = "Отметить как завершённые"
+        self.message_user(request, f"Р В РІР‚вЂќР В Р’В°Р В Р вЂ Р В Р’ВµР РЋР вЂљР РЋРІвЂљВ¬Р В Р’ВµР В Р вЂ¦Р В РЎвЂў: {count}", messages.SUCCESS)
+    mark_completed.short_description = "Р В РЎвЂєР РЋРІР‚С™Р В РЎР В Р’ВµР РЋРІР‚С™Р В РЎвЂР РЋРІР‚С™Р РЋР Р‰ Р В РЎвЂќР В Р’В°Р В РЎвЂќ Р В Р’В·Р В Р’В°Р В Р вЂ Р В Р’ВµР РЋР вЂљР РЋРІвЂљВ¬Р РЋРІР‚Р В Р вЂ¦Р В Р вЂ¦Р РЋРІР‚в„–Р В Р’Вµ"
 
     def mark_cancelled(self, request, queryset):
         count = queryset.update(status='cancelled')
-        self.message_user(request, f"Отменено: {count}", messages.WARNING)
-    mark_cancelled.short_description = "Отменить выбранные"
+        self.message_user(request, f"Р В РЎвЂєР РЋРІР‚С™Р В РЎР В Р’ВµР В Р вЂ¦Р В Р’ВµР В Р вЂ¦Р В РЎвЂў: {count}", messages.WARNING)
+    mark_cancelled.short_description = "Р В РЎвЂєР РЋРІР‚С™Р В РЎР В Р’ВµР В Р вЂ¦Р В РЎвЂР РЋРІР‚С™Р РЋР Р‰ Р В Р вЂ Р РЋРІР‚в„–Р В Р’В±Р РЋР вЂљР В Р’В°Р В Р вЂ¦Р В Р вЂ¦Р РЋРІР‚в„–Р В Р’Вµ"
 
 
-# ========== КОМАНДА — МЕНЕДЖЕРЫ ==========
+# ========== Р В РЎв„ўР В РЎвЂєР В РЎС™Р В РЎвЂ™Р В РЎСљР В РІР‚СњР В РЎвЂ™ Р Р†Р вЂљРІР‚Сњ Р В РЎС™Р В РІР‚СћР В РЎСљР В РІР‚СћР В РІР‚СњР В РІР‚вЂњР В РІР‚СћР В Р’В Р В Р’В« ==========
 
 @admin.register(BranchManager)
 class BranchManagerAdmin(TabbedTranslationAdmin):
@@ -1391,7 +1391,7 @@ class BranchManagerAdmin(TabbedTranslationAdmin):
         (None, {
             'fields': ('full_name', 'position', 'photo', 'dealer', 'phone')
         }),
-        ('Настройки', {
+        ('Р В РЎСљР В Р’В°Р РЋР С“Р РЋРІР‚С™Р РЋР вЂљР В РЎвЂўР В РІвЂћвЂ“Р В РЎвЂќР В РЎвЂ', {
             'fields': ('is_active', 'order')
         }),
     )

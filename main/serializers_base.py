@@ -5,18 +5,18 @@ from django.utils.translation import get_language
 
 class LanguageSerializerMixin:
     """
-    Базовый mixin для определения языка в serializers.
+    Serializer-larda tilni aniqlash uchun asosiy mixin.
     
-    Использует Django translation system вместо парсинга URL.
-    Работает с ForceRussianMiddleware.
+    URL-ni tahlil qilish o'rniga Django translation tizimidan foydalanadi.
+    ForceRussianMiddleware bilan mos keladi.
     """
     
     def get_current_language(self):
         """
-        Получить текущий язык из Django translation system.
+        Django translation tizimidan joriy tilni qaytaradi.
         
         Returns:
-            str: Код языка ('uz', 'ru', 'en')
+            str: Til kodi ('uz', 'ru', 'en')
         
         Example:
             >>> self.get_current_language()

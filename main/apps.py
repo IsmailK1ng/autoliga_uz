@@ -54,10 +54,10 @@ class MainConfig(AppConfig):
                 loop = asyncio.new_event_loop()
                 asyncio.set_event_loop(loop)
                 try:
-                    logger.info("Telegram bot starting (attempt %d/%d)…", attempt, _BOT_MAX_RETRIES)
+                    logger.info("Telegram bot starting (attempt %d/%d)Р В Р вЂ Р В РІР‚С™Р вЂ™Р’В¦", attempt, _BOT_MAX_RETRIES)
                     loop.run_until_complete(bot_main())
                     logger.info("Telegram bot exited cleanly.")
-                    break  # clean shutdown — don't restart
+                    break  # clean shutdown Р В Р вЂ Р В РІР‚С™Р Р†Р вЂљРЎСљ don't restart
                 except Exception as exc:
                     logger.error(
                         "Telegram bot crashed (attempt %d/%d): %s",
@@ -65,7 +65,7 @@ class MainConfig(AppConfig):
                         exc_info=True,
                     )
                     if attempt < _BOT_MAX_RETRIES:
-                        logger.info("Restarting bot in %ds…", retry_delay)
+                        logger.info("Restarting bot in %dsР В Р вЂ Р В РІР‚С™Р вЂ™Р’В¦", retry_delay)
                         time.sleep(retry_delay)
                         retry_delay = min(retry_delay * 2, 60)  # cap at 60 s
                 finally:
@@ -75,7 +75,7 @@ class MainConfig(AppConfig):
                         pass
             else:
                 logger.critical(
-                    "Telegram bot failed after %d attempts — giving up.", _BOT_MAX_RETRIES
+                    "Telegram bot failed after %d attempts Р В Р вЂ Р В РІР‚С™Р Р†Р вЂљРЎСљ giving up.", _BOT_MAX_RETRIES
                 )
 
         bot_thread = threading.Thread(target=start_bot, daemon=True, name="TelegramBot")

@@ -7,7 +7,7 @@ LANGUAGES = ('uz', 'ru', 'en')
 
 
 def _clear_bot_cache(model_name, instance=None):
-    """Bot API cache ni tozalash — model o'zgarganda avtomatik chaqiriladi."""
+    """Bot API cache ni tozalash Р В Р вЂ Р В РІР‚С™Р Р†Р вЂљРЎСљ model o'zgarganda avtomatik chaqiriladi."""
     if model_name == 'ProductCategory':
         for lang in LANGUAGES:
             cache.delete(f'bot:brands:{lang}')

@@ -12,7 +12,7 @@ class LeadSender:
 
     @classmethod
     def send_lead(cls, contact_form):
-        """Отправка лида в amoCRM"""
+        """Р В РЎвЂєР РЋРІР‚С™Р В РЎвЂ”Р РЋР вЂљР В Р’В°Р В Р вЂ Р В РЎвЂќР В Р’В° Р В Р’В»Р В РЎвЂР В РўвЂР В Р’В° Р В Р вЂ  amoCRM"""
         if contact_form.amocrm_status == 'sent' and contact_form.amocrm_lead_id:
             return
 
@@ -55,38 +55,38 @@ class LeadSender:
                     contact_form.amocrm_error = None
                     contact_form.save()
                 else:
-                    raise ValueError("ID лида не найден в ответе amoCRM")
+                    raise ValueError("ID Р В Р’В»Р В РЎвЂР В РўвЂР В Р’В° Р В Р вЂ¦Р В Р’Вµ Р В Р вЂ¦Р В Р’В°Р В РІвЂћвЂ“Р В РўвЂР В Р’ВµР В Р вЂ¦ Р В Р вЂ  Р В РЎвЂўР РЋРІР‚С™Р В Р вЂ Р В Р’ВµР РЋРІР‚С™Р В Р’Вµ amoCRM")
             else:
                 error_text = cls._parse_error_response(response)
-                logger.error(f"❌ Ошибка amoCRM {response.status_code}: {error_text}")  
+                logger.error(f"Р Р†РЎСљР Р‰ Р В РЎвЂєР РЋРІвЂљВ¬Р В РЎвЂР В Р’В±Р В РЎвЂќР В Р’В° amoCRM {response.status_code}: {error_text}")  
                 contact_form.amocrm_status = 'failed'
                 contact_form.amocrm_error = error_text[:500]
                 contact_form.save()
 
         except requests.exceptions.Timeout:
-            error_text = "Таймаут соединения с amoCRM"
-            logger.error(f"⏱️ {error_text}") 
+            error_text = "Р В РЎС›Р В Р’В°Р В РІвЂћвЂ“Р В РЎР В Р’В°Р РЋРЎвЂњР РЋРІР‚С™ Р РЋР С“Р В РЎвЂўР В Р’ВµР В РўвЂР В РЎвЂР В Р вЂ¦Р В Р’ВµР В Р вЂ¦Р В РЎвЂР РЋР РЏ Р РЋР С“ amoCRM"
+            logger.error(f"Р Р†Р РЏР’В±Р С—РЎвЂР РЏ {error_text}") 
             contact_form.amocrm_status = 'failed'
             contact_form.amocrm_error = error_text
             contact_form.save()
 
         except requests.exceptions.RequestException as e:
-            error_text = f"Ошибка запроса: {str(e)}"
-            logger.error(f"🌐 {error_text}") 
+            error_text = f"Р В РЎвЂєР РЋРІвЂљВ¬Р В РЎвЂР В Р’В±Р В РЎвЂќР В Р’В° Р В Р’В·Р В Р’В°Р В РЎвЂ”Р РЋР вЂљР В РЎвЂўР РЋР С“Р В Р’В°: {str(e)}"
+            logger.error(f"РЎР‚РЎСџР Р‰РЎвЂ™ {error_text}") 
             contact_form.amocrm_status = 'failed'
             contact_form.amocrm_error = error_text[:500]
             contact_form.save()
 
         except Exception as e:
             error_text = f"{type(e).__name__}: {str(e)}"
-            logger.error(f"💥 Критическая ошибка: {error_text}", exc_info=True)  
+            logger.error(f"РЎР‚РЎСџРІР‚в„ўРўС’ Р В РЎв„ўР РЋР вЂљР В РЎвЂР РЋРІР‚С™Р В РЎвЂР РЋРІР‚РЋР В Р’ВµР РЋР С“Р В РЎвЂќР В Р’В°Р РЋР РЏ Р В РЎвЂўР РЋРІвЂљВ¬Р В РЎвЂР В Р’В±Р В РЎвЂќР В Р’В°: {error_text}", exc_info=True)  
             contact_form.amocrm_status = 'failed'
             contact_form.amocrm_error = error_text[:500]
             contact_form.save()
 
     @staticmethod
     def _get_editable_status_for_pipeline(access_token, pipeline_id):
-        """Возвращает первый is_editable=True status_id для pipeline"""
+        """Р В РІР‚в„ўР В РЎвЂўР В Р’В·Р В Р вЂ Р РЋР вЂљР В Р’В°Р РЋРІР‚В°Р В Р’В°Р В Р’ВµР РЋРІР‚С™ Р В РЎвЂ”Р В Р’ВµР РЋР вЂљР В Р вЂ Р РЋРІР‚в„–Р В РІвЂћвЂ“ is_editable=True status_id Р В РўвЂР В Р’В»Р РЋР РЏ pipeline"""
         try:
             url = f'https://{settings.AMOCRM_SUBDOMAIN}.amocrm.ru/api/v4/leads/pipelines/{pipeline_id}/statuses'
             headers = {'Authorization': f'Bearer {access_token}'}
@@ -99,12 +99,12 @@ class LeadSender:
                     return s.get('id')
             return None
         except Exception as e:
-            logger.error(f"Не удалось получить статусы pipeline {pipeline_id}: {e}") 
+            logger.error(f"Р В РЎСљР В Р’Вµ Р РЋРЎвЂњР В РўвЂР В Р’В°Р В Р’В»Р В РЎвЂўР РЋР С“Р РЋР Р‰ Р В РЎвЂ”Р В РЎвЂўР В Р’В»Р РЋРЎвЂњР РЋРІР‚РЋР В РЎвЂР РЋРІР‚С™Р РЋР Р‰ Р РЋР С“Р РЋРІР‚С™Р В Р’В°Р РЋРІР‚С™Р РЋРЎвЂњР РЋР С“Р РЋРІР‚в„– pipeline {pipeline_id}: {e}") 
             return None
 
     @staticmethod
     def _extract_lead_id(result):
-        """Извлечение ID лида из ответа amoCRM"""
+        """Р В Р В Р’В·Р В Р вЂ Р В Р’В»Р В Р’ВµР РЋРІР‚РЋР В Р’ВµР В Р вЂ¦Р В РЎвЂР В Р’Вµ ID Р В Р’В»Р В РЎвЂР В РўвЂР В Р’В° Р В РЎвЂР В Р’В· Р В РЎвЂўР РЋРІР‚С™Р В Р вЂ Р В Р’ВµР РЋРІР‚С™Р В Р’В° amoCRM"""
         try:
             if isinstance(result, list) and len(result) > 0:
                 first_item = result[0]
@@ -116,12 +116,12 @@ class LeadSender:
                         return leads[0]['id']
             return None
         except (KeyError, IndexError, TypeError) as e:
-            logger.error(f"❌ Ошибка парсинга ID лида: {str(e)}") 
+            logger.error(f"Р Р†РЎСљР Р‰ Р В РЎвЂєР РЋРІвЂљВ¬Р В РЎвЂР В Р’В±Р В РЎвЂќР В Р’В° Р В РЎвЂ”Р В Р’В°Р РЋР вЂљР РЋР С“Р В РЎвЂР В Р вЂ¦Р В РЎвЂ“Р В Р’В° ID Р В Р’В»Р В РЎвЂР В РўвЂР В Р’В°: {str(e)}") 
             return None
 
     @staticmethod
     def _parse_error_response(response):
-        """Парсинг текста ошибки из ответа amoCRM"""
+        """Р В РЎСџР В Р’В°Р РЋР вЂљР РЋР С“Р В РЎвЂР В Р вЂ¦Р В РЎвЂ“ Р РЋРІР‚С™Р В Р’ВµР В РЎвЂќР РЋР С“Р РЋРІР‚С™Р В Р’В° Р В РЎвЂўР РЋРІвЂљВ¬Р В РЎвЂР В Р’В±Р В РЎвЂќР В РЎвЂ Р В РЎвЂР В Р’В· Р В РЎвЂўР РЋРІР‚С™Р В Р вЂ Р В Р’ВµР РЋРІР‚С™Р В Р’В° amoCRM"""
         try:
             error_data = response.json()
             if 'validation-errors' in error_data:
@@ -139,7 +139,7 @@ class LeadSender:
 
     @staticmethod
     def _prepare_lead_data(contact_form, pipeline_id, status_id):
-        """Подготовка данных лида для отправки в amoCRM"""
+        """Р В РЎСџР В РЎвЂўР В РўвЂР В РЎвЂ“Р В РЎвЂўР РЋРІР‚С™Р В РЎвЂўР В Р вЂ Р В РЎвЂќР В Р’В° Р В РўвЂР В Р’В°Р В Р вЂ¦Р В Р вЂ¦Р РЋРІР‚в„–Р РЋРІР‚В¦ Р В Р’В»Р В РЎвЂР В РўвЂР В Р’В° Р В РўвЂР В Р’В»Р РЋР РЏ Р В РЎвЂўР РЋРІР‚С™Р В РЎвЂ”Р РЋР вЂљР В Р’В°Р В Р вЂ Р В РЎвЂќР В РЎвЂ Р В Р вЂ  amoCRM"""
         name_parts = contact_form.name.strip().split(' ', 1)
         first_name = name_parts[0]
         last_name = name_parts[1] if len(name_parts) > 1 else ''
@@ -180,10 +180,10 @@ class LeadSender:
 
         lead_custom_fields.append({
             "field_id": settings.AMOCRM_FIELD_FORMID,
-            "values": [{"value": "Заявка с сайта FAW.UZ"}]
+            "values": [{"value": "Р В РІР‚вЂќР В Р’В°Р РЋР РЏР В Р вЂ Р В РЎвЂќР В Р’В° Р РЋР С“ Р РЋР С“Р В Р’В°Р В РІвЂћвЂ“Р РЋРІР‚С™Р В Р’В° FAW.UZ"}]
         })
 
-        lead_name = f"{contact_form.product} — {contact_form.name}" if contact_form.product else f"Заявка с сайта: {contact_form.name}"
+        lead_name = f"{contact_form.product} Р Р†Р вЂљРІР‚Сњ {contact_form.name}" if contact_form.product else f"Р В РІР‚вЂќР В Р’В°Р РЋР РЏР В Р вЂ Р В РЎвЂќР В Р’В° Р РЋР С“ Р РЋР С“Р В Р’В°Р В РІвЂћвЂ“Р РЋРІР‚С™Р В Р’В°: {contact_form.name}"
 
         lead_dict = {
             "name": lead_name,
@@ -192,7 +192,7 @@ class LeadSender:
             "status_id": status_id,
             "custom_fields_values": lead_custom_fields,
             "_embedded": {
-                "tags": [{"name": "Сайт"}, {"name": "FAW.UZ"}],
+                "tags": [{"name": "Р В Р Р‹Р В Р’В°Р В РІвЂћвЂ“Р РЋРІР‚С™"}, {"name": "FAW.UZ"}],
                 "contacts": [{
                     "first_name": first_name,
                     "last_name": last_name,

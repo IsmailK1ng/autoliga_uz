@@ -112,7 +112,7 @@
                     </div>
 
                     <!-- Mobile dealer list (appears below map after region selected) -->
-                    <div class="mob-dealer-list hidden" id="mobDealerList"></div>
+                    <div class="mob-dealer-list" id="mobDealerList"></div>
 
                 </div><!-- /dealers-map-area -->
 
@@ -474,7 +474,7 @@
         const mobDealerList = document.getElementById('mobDealerList');
 
         function renderMobDealerList(region) {
-            const regionDealers = DEALERS.filter(d => d.region === region);
+            const regionDealers = region ? DEALERS.filter(d => d.region === region) : DEALERS;
             mobDealerList.innerHTML = '';
 
             if (!regionDealers.length) {
@@ -484,7 +484,7 @@
 
             const title = document.createElement('div');
             title.className = 'mob-dealer-list-title';
-            title.textContent = (labels[region] || region) + ' — diler markazlar';
+            title.textContent = region ? (labels[region] || region) + ' — diler markazlar' : 'Barcha diler markazlar';
             mobDealerList.appendChild(title);
 
             const cardsWrap = document.createElement('div');
@@ -618,6 +618,9 @@
             card.classList.add('hidden');
             card.style.display = '';
         }
+
+        // Render all dealers on mobile by default
+        if (isMobile()) renderMobDealerList(null);
 
     })();
 

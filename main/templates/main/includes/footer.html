@@ -41,6 +41,21 @@
                                     <span class="btn-caption">{% if LANGUAGE_CODE == 'uz' %}Yangiliklar{% elif LANGUAGE_CODE == 'ru' %}Новости{% else %}News{% endif %}</span>
                                 </a>
                             </li>
+                            <li class="footer-nav__item">
+                                <a href="#" class="footer-nav__link btn-anim">
+                                    <span class="btn-caption">{% if LANGUAGE_CODE == 'uz' %}Dilerlar{% elif LANGUAGE_CODE == 'ru' %}Дилеры{% else %}Dealers{% endif %}</span>
+                                </a>
+                            </li>
+                            <li class="footer-nav__item">
+                                <a href="#" class="footer-nav__link btn-anim">
+                                    <span class="btn-caption">{% if LANGUAGE_CODE == 'uz' %}Jamoa{% elif LANGUAGE_CODE == 'ru' %}Команда{% else %}Team{% endif %}</span>
+                                </a>
+                            </li>
+                            <li class="footer-nav__item">
+                                <a href="#" class="footer-nav__link btn-anim">
+                                    <span class="btn-caption">{% if LANGUAGE_CODE == 'uz' %}Test drayv{% elif LANGUAGE_CODE == 'ru' %}Тест-драйв{% else %}Test drive{% endif %}</span>
+                                </a>
+                            </li>
                         </ul>
                     </div>
                     <div class="footer-blocks__links">
@@ -70,7 +85,7 @@
                         <a href="tel:+998712345678">
                             <span style="font-weight: bold;">
                                 {% if LANGUAGE_CODE == 'uz' %}Telefon:{% elif LANGUAGE_CODE == 'ru' %}Телефон:{% else %}Phone:{% endif %}
-                            </span> +998 00 000 00 00
+                            </span> +998 78 555 73 77
                         </a>
                     </p>
                     <p class="mxd-point-subtitle">
@@ -79,20 +94,26 @@
                             <span style="font-weight: bold;">
                                 {% if LANGUAGE_CODE == 'uz' %}Manzil:{% elif LANGUAGE_CODE == 'ru' %}Адрес:{% else %}Address:{% endif %}
                             </span> 
-                            {% if LANGUAGE_CODE == 'uz' %}Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                            {% elif LANGUAGE_CODE == 'ru' %}Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                            {% else %}Lorem ipsum dolor sit amet consectetur adipisicing elit.{% endif %}
+                            {% if LANGUAGE_CODE == 'uz' %}Toshkent sh., Farog‘at 2-chi avtomashina, 2
+                            {% elif LANGUAGE_CODE == 'ru' %}г. Ташкент, 2-й проезд Фарогат, дом 2
+                            {% else %}Tashkent city, Farog‘at 2nd driveway, building 2{% endif %}
                         </a>
                     </p>
                 </div>
 
+
                 <div class="footer-blocks__card card-maps" style="padding:0;overflow:hidden;height:100%;">
                     <div style="position:relative;overflow:hidden;width:100%;height:100%;">
-                        <a href="https://yandex.uz/maps/org/187051650206/?utm_medium=mapframe&utm_source=maps" target="_blank" rel="noopener noreferrer" style="color:#eee;font-size:12px;position:absolute;top:0px;">Faw Trucks</a>
-                        <a href="https://yandex.uz/maps/10335/tashkent/category/car_dealership/184105322/?utm_medium=mapframe&utm_source=maps" target="_blank" rel="noopener noreferrer" style="color:#eee;font-size:12px;position:absolute;top:14px;">
-                            {% if LANGUAGE_CODE == 'uz' %}Avtosalon Toshkentda{% elif LANGUAGE_CODE == 'ru' %}Автосалон в Ташкенте{% else %}Car dealership in Tashkent{% endif %}
+                
+                        <a href="https://yandex.com/maps/-/CPbIvZpy" target="_blank" rel="noopener noreferrer"
+                            style="color:#eee;font-size:12px;position:absolute;top:0px;">
+                            Lokatsiyani ochish
                         </a>
-                        <iframe src="https://yandex.uz/maps/-/CLHa40JW" width="100%" height="100%" frameborder="0" allowfullscreen="true" style="position:relative;border:0;min-height:220px;" loading="lazy"></iframe>
+                
+                        <iframe src="https://yandex.com/map-widget/v1/-/CPbIvZpy" width="100%" height="100%" frameborder="0"
+                            allowfullscreen="true" style="position:relative;border:0;min-height:220px;" loading="lazy">
+                        </iframe>
+                
                     </div>
                 </div>
             </div>

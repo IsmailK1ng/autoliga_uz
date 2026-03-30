@@ -20,7 +20,7 @@ ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='127.0.0.1,localhost').split(','
 
 
 
-# ============ ПРИЛОЖЕНИЯ ============
+# ============ Р В РЎСџР В Р’В Р В Р В РІР‚С”Р В РЎвЂєР В РІР‚вЂњР В РІР‚СћР В РЎСљР В Р В Р вЂЎ ============
 
 INSTALLED_APPS = [
     'modeltranslation',
@@ -41,11 +41,10 @@ INSTALLED_APPS = [
     'corsheaders',
     'reversion',
     
-    # Приложения проектов
+    # Р В РЎСџР РЋР вЂљР В РЎвЂР В Р’В»Р В РЎвЂўР В Р’В¶Р В Р’ВµР В Р вЂ¦Р В РЎвЂР РЋР РЏ Р В РЎвЂ”Р РЋР вЂљР В РЎвЂўР В Р’ВµР В РЎвЂќР РЋРІР‚С™Р В РЎвЂўР В Р вЂ 
     'main',  
 
     'captcha', 
-    # 'django_ratelimit'  # Redis kerak, hozir ishlatilmaydi
 ]
 
 # CAPTCHA sozlamalari
@@ -85,7 +84,7 @@ REST_FRAMEWORK = {
     ],
 }
 
-# ============ ЯЗЫКОВЫЕ НАСТРОЙКИ ============
+# ============ Р В Р вЂЎР В РІР‚вЂќР В Р’В«Р В РЎв„ўР В РЎвЂєР В РІР‚в„ўР В Р’В«Р В РІР‚Сћ Р В РЎСљР В РЎвЂ™Р В Р Р‹Р В РЎС›Р В Р’В Р В РЎвЂєР В РІвЂћСћР В РЎв„ўР В  ============
 
 LANGUAGE_CODE = 'uz'
 
@@ -95,7 +94,7 @@ USE_TZ = True
 
 LANGUAGES = [
     ('uz', _("O'zbek")),
-    ('ru', _("Русский")),
+    ('ru', _("Р В Р’В Р РЋРЎвЂњР РЋР С“Р РЋР С“Р В РЎвЂќР В РЎвЂР В РІвЂћвЂ“")),
     ('en', _("English")),
 ]
 
@@ -108,13 +107,13 @@ MODELTRANSLATION_FALLBACK_LANGUAGES = {
 USE_THOUSAND_SEPARATOR = True
 NUMBER_GROUPING = 3
 
-# ============ JAZZMIN НАСТРОЙКИ ============
+# ============ JAZZMIN Р В РЎСљР В РЎвЂ™Р В Р Р‹Р В РЎС›Р В Р’В Р В РЎвЂєР В РІвЂћСћР В РЎв„ўР В  ============
 
 JAZZMIN_SETTINGS = {
     "site_header": "Autoliga Admin",
     "site_brand": "Autoliga",
     "site_logo": "images/logo/autoliga-logo.png",
-    "welcome_sign": "Добро пожаловать в админку Autoliga",
+    "welcome_sign": "Р В РІР‚СњР В РЎвЂўР В Р’В±Р РЋР вЂљР В РЎвЂў Р В РЎвЂ”Р В РЎвЂўР В Р’В¶Р В Р’В°Р В Р’В»Р В РЎвЂўР В Р вЂ Р В Р’В°Р РЋРІР‚С™Р РЋР Р‰ Р В Р вЂ  Р В Р’В°Р В РўвЂР В РЎР В РЎвЂР В Р вЂ¦Р В РЎвЂќР РЋРЎвЂњ Autoliga",
     "search_model": ["auth.User"],
     "copyright": "Autoliga",
     "show_sidebar": True,
@@ -125,7 +124,7 @@ JAZZMIN_SETTINGS = {
     "show_language_switcher": False,
     
     "topmenu_links": [
-        {"name": "Сайт UZ", "url": "https://autoliga.uz", "new_window": True},
+        {"name": "Р В Р Р‹Р В Р’В°Р В РІвЂћвЂ“Р РЋРІР‚С™ UZ", "url": "https://autoliga.uz", "new_window": True},
     ],
     
     "icons": {
@@ -153,7 +152,7 @@ JAZZMIN_SETTINGS = {
     
     "custom_links": {
         "main": [{
-            "name": "Автолига.uz",
+            "name": "Р В РЎвЂ™Р В Р вЂ Р РЋРІР‚С™Р В РЎвЂўР В Р’В»Р В РЎвЂР В РЎвЂ“Р В Р’В°.uz",
             "url": "https://autoliga.uz",
             "icon": "fas fa-flag",
             "new_window": True
@@ -251,7 +250,7 @@ CACHES = {
 }
 
 
-# ============ ВАЛИДАЦИЯ ПАРОЛЕЙ ============
+# ============ Р В РІР‚в„ўР В РЎвЂ™Р В РІР‚С”Р В Р В РІР‚СњР В РЎвЂ™Р В Р’В¦Р В Р В Р вЂЎ Р В РЎСџР В РЎвЂ™Р В Р’В Р В РЎвЂєР В РІР‚С”Р В РІР‚СћР В РІвЂћСћ ============
 
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
@@ -260,41 +259,40 @@ AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
 
-# ============ ЛОКАЛИЗАЦИЯ ============
+# ============ Р В РІР‚С”Р В РЎвЂєР В РЎв„ўР В РЎвЂ™Р В РІР‚С”Р В Р В РІР‚вЂќР В РЎвЂ™Р В Р’В¦Р В Р В Р вЂЎ ============
 
 TIME_ZONE = config('TIME_ZONE', default='Asia/Tashkent')
 
-# ============ СТАТИЧЕСКИЕ ФАЙЛЫ ============
+# ============ Р В Р Р‹Р В РЎС›Р В РЎвЂ™Р В РЎС›Р В Р В Р’В§Р В РІР‚СћР В Р Р‹Р В РЎв„ўР В Р В РІР‚Сћ Р В Р’В¤Р В РЎвЂ™Р В РІвЂћСћР В РІР‚С”Р В Р’В« ============
 
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'static' if DEBUG else '/home/autolig1/public_html/static'
 STATICFILES_DIRS = [
     BASE_DIR / 'main' / 'static',
 ]
-
-# WhiteNoise: static fayllarni siqib + cache bilan beradi
-# Siqish (Compression): Fayllarni Gzip yoki Brotli formatida siqadi, bu esa sahifaning tezroq yuklanishini ta'minlaydi.
-
-# Caching (Kesh): Fayllarga uzoq muddatli "Cache-Control" sarlavhalarini qo'shadi.
-
-# Mustaqillik: Nginx sozlamalariga tegmasdan ham static fayllarni xavfsiz va tez ko'rsata olasiz.
+# WhiteNoise yordamida static fayllar gzip/zip siqilgan va browser keshiga moslangan holda beriladi.
 if not DEBUG:
     STORAGES = {
         "default": {
             "BACKEND": "django.core.files.storage.FileSystemStorage",
         },
-        "staticfiles": {
-            "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage",
+        "staticfiles": { 
+            "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
         },
     }
-    WHITENOISE_MAX_AGE = 31536000  
+    WHITENOISE_MAX_AGE = 31536000  # 1 yil kesh, lekin fayl hash orqali yangilanadi
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media' if DEBUG else '/home/autolig1/public_html/media'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# ============ БЕЗОПАСНОСТЬ ============
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media' if DEBUG else '/home/autolig1/public_html/media'
+
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# ============ Р В РІР‚Р В РІР‚СћР В РІР‚вЂќР В РЎвЂєР В РЎСџР В РЎвЂ™Р В Р Р‹Р В РЎСљР В РЎвЂєР В Р Р‹Р В РЎС›Р В Р’В¬ ============
 
 if DEBUG:
     CSRF_TRUSTED_ORIGINS = [
@@ -318,7 +316,7 @@ else:
 CORS_ALLOW_ALL_ORIGINS = DEBUG
 
 
-# ============ ПРОДАКШЕН НАСТРОЙКИ ============
+# ============ Р В РЎСџР В Р’В Р В РЎвЂєР В РІР‚СњР В РЎвЂ™Р В РЎв„ўР В Р РѓР В РІР‚СћР В РЎСљ Р В РЎСљР В РЎвЂ™Р В Р Р‹Р В РЎС›Р В Р’В Р В РЎвЂєР В РІвЂћСћР В РЎв„ўР В  ============
 
 if not DEBUG:
     CORS_ALLOW_ALL_ORIGINS = False
@@ -338,7 +336,7 @@ if not DEBUG:
     SECURE_CONTENT_TYPE_NOSNIFF = True
     X_FRAME_OPTIONS = 'DENY'
 
-    # HSTS — brauzer faqat HTTPS dan foydalanishga majbur qiladi
+    # HSTS Р Р†Р вЂљРІР‚Сњ brauzer faqat HTTPS dan foydalanishga majbur qiladi
     SECURE_HSTS_SECONDS = 31536000  # 1 yil
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
     SECURE_HSTS_PRELOAD = True
@@ -365,7 +363,9 @@ if not DEBUG:
         'accelerometer': [],
     }
 
-# ============ ЯЗЫКОВЫЕ COOKIES ============
+
+
+# ============ Р В Р вЂЎР В РІР‚вЂќР В Р’В«Р В РЎв„ўР В РЎвЂєР В РІР‚в„ўР В Р’В«Р В РІР‚Сћ COOKIES ============
 
 LANGUAGE_COOKIE_NAME = 'django_language'
 LANGUAGE_COOKIE_AGE = 365 * 24 * 60 * 60
@@ -489,7 +489,7 @@ os.makedirs(BASE_DIR / 'logs', exist_ok=True)
 SILENCED_SYSTEM_CHECKS = ['ckeditor.W001']
 
 
-#ЭТИ СТРОКИ для корректной работы за nginx/reverse proxy
+#Р В Р’В­Р В РЎС›Р В  Р В Р Р‹Р В РЎС›Р В Р’В Р В РЎвЂєР В РЎв„ўР В  Р В РўвЂР В Р’В»Р РЋР РЏ Р В РЎвЂќР В РЎвЂўР РЋР вЂљР РЋР вЂљР В Р’ВµР В РЎвЂќР РЋРІР‚С™Р В Р вЂ¦Р В РЎвЂўР В РІвЂћвЂ“ Р РЋР вЂљР В Р’В°Р В Р’В±Р В РЎвЂўР РЋРІР‚С™Р РЋРІР‚в„– Р В Р’В·Р В Р’В° nginx/reverse proxy
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 USE_X_FORWARDED_HOST = True
 USE_X_FORWARDED_PORT = True

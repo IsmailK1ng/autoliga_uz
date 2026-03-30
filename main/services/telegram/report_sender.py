@@ -11,11 +11,11 @@ logger = logging.getLogger('django')
 
 
 class TelegramReportSender:
-    """Отправка отчётов в Telegram"""
+    """Р В РЎвЂєР РЋРІР‚С™Р В РЎвЂ”Р РЋР вЂљР В Р’В°Р В Р вЂ Р В РЎвЂќР В Р’В° Р В РЎвЂўР РЋРІР‚С™Р РЋРІР‚РЋР РЋРІР‚Р РЋРІР‚С™Р В РЎвЂўР В Р вЂ  Р В Р вЂ  Telegram"""
     
     @classmethod
     def send_daily_report(cls):
-        """Ежедневный отчёт в 20:00"""
+        """Р В РІР‚СћР В Р’В¶Р В Р’ВµР В РўвЂР В Р вЂ¦Р В Р’ВµР В Р вЂ Р В Р вЂ¦Р РЋРІР‚в„–Р В РІвЂћвЂ“ Р В РЎвЂўР РЋРІР‚С™Р РЋРІР‚РЋР РЋРІР‚Р РЋРІР‚С™ Р В Р вЂ  20:00"""
         try:
             from main.models import ContactForm
             
@@ -23,28 +23,28 @@ class TelegramReportSender:
             chat_id = settings.TELEGRAM_CHAT_ID
             
             if not bot_token or not chat_id:
-                logger.warning("Telegram настройки не заданы")
+                logger.warning("Telegram Р В Р вЂ¦Р В Р’В°Р РЋР С“Р РЋРІР‚С™Р РЋР вЂљР В РЎвЂўР В РІвЂћвЂ“Р В РЎвЂќР В РЎвЂ Р В Р вЂ¦Р В Р’Вµ Р В Р’В·Р В Р’В°Р В РўвЂР В Р’В°Р В Р вЂ¦Р РЋРІР‚в„–")
                 return
             
-            # Временная зона
+            # Р В РІР‚в„ўР РЋР вЂљР В Р’ВµР В РЎР В Р’ВµР В Р вЂ¦Р В Р вЂ¦Р В Р’В°Р РЋР РЏ Р В Р’В·Р В РЎвЂўР В Р вЂ¦Р В Р’В°
             tz = pytz.timezone(settings.TIME_ZONE)
             now = timezone.now().astimezone(tz)
             today_start = now.replace(hour=0, minute=0, second=0, microsecond=0)
             today_end = now
             
-            # День недели
+            # Р В РІР‚СњР В Р’ВµР В Р вЂ¦Р РЋР Р‰ Р В Р вЂ¦Р В Р’ВµР В РўвЂР В Р’ВµР В Р’В»Р В РЎвЂ
             weekday_names = {
-                0: 'понедельник',
-                1: 'вторник',
-                2: 'среда',
-                3: 'четверг',
-                4: 'пятница',
-                5: 'суббота',
-                6: 'воскресенье'
+                0: 'Р В РЎвЂ”Р В РЎвЂўР В Р вЂ¦Р В Р’ВµР В РўвЂР В Р’ВµР В Р’В»Р РЋР Р‰Р В Р вЂ¦Р В РЎвЂР В РЎвЂќ',
+                1: 'Р В Р вЂ Р РЋРІР‚С™Р В РЎвЂўР РЋР вЂљР В Р вЂ¦Р В РЎвЂР В РЎвЂќ',
+                2: 'Р РЋР С“Р РЋР вЂљР В Р’ВµР В РўвЂР В Р’В°',
+                3: 'Р РЋРІР‚РЋР В Р’ВµР РЋРІР‚С™Р В Р вЂ Р В Р’ВµР РЋР вЂљР В РЎвЂ“',
+                4: 'Р В РЎвЂ”Р РЋР РЏР РЋРІР‚С™Р В Р вЂ¦Р В РЎвЂР РЋРІР‚В Р В Р’В°',
+                5: 'Р РЋР С“Р РЋРЎвЂњР В Р’В±Р В Р’В±Р В РЎвЂўР РЋРІР‚С™Р В Р’В°',
+                6: 'Р В Р вЂ Р В РЎвЂўР РЋР С“Р В РЎвЂќР РЋР вЂљР В Р’ВµР РЋР С“Р В Р’ВµР В Р вЂ¦Р РЋР Р‰Р В Р’Вµ'
             }
             weekday = weekday_names[now.weekday()]
             
-            # Заявки за сегодня
+            # Р В РІР‚вЂќР В Р’В°Р РЋР РЏР В Р вЂ Р В РЎвЂќР В РЎвЂ Р В Р’В·Р В Р’В° Р РЋР С“Р В Р’ВµР В РЎвЂ“Р В РЎвЂўР В РўвЂР В Р вЂ¦Р РЋР РЏ
             today_leads = ContactForm.objects.filter(
                 created_at__gte=today_start,
                 created_at__lte=today_end
@@ -52,7 +52,7 @@ class TelegramReportSender:
             
             total_today = today_leads.count()
             
-            # Прошлый такой же день недели
+            # Р В РЎСџР РЋР вЂљР В РЎвЂўР РЋРІвЂљВ¬Р В Р’В»Р РЋРІР‚в„–Р В РІвЂћвЂ“ Р РЋРІР‚С™Р В Р’В°Р В РЎвЂќР В РЎвЂўР В РІвЂћвЂ“ Р В Р’В¶Р В Р’Вµ Р В РўвЂР В Р’ВµР В Р вЂ¦Р РЋР Р‰ Р В Р вЂ¦Р В Р’ВµР В РўвЂР В Р’ВµР В Р’В»Р В РЎвЂ
             last_same_day = today_start - timedelta(days=7)
             last_same_day_end = last_same_day + timedelta(days=1)
             last_week_count = ContactForm.objects.filter(
@@ -60,12 +60,12 @@ class TelegramReportSender:
                 created_at__lt=last_same_day_end
             ).count()
             
-            # Разница
+            # Р В Р’В Р В Р’В°Р В Р’В·Р В Р вЂ¦Р В РЎвЂР РЋРІР‚В Р В Р’В°
             diff = total_today - last_week_count
             diff_percent = round((diff / last_week_count * 100), 1) if last_week_count > 0 else 0
-            diff_arrow = "↗️" if diff >= 0 else "↘️"
+            diff_arrow = "Р Р†РІР‚В РІР‚вЂќР С—РЎвЂР РЏ" if diff >= 0 else "Р Р†РІР‚В Р С—РЎвЂР РЏ"
             
-            # Средняя за неделю
+            # Р В Р Р‹Р РЋР вЂљР В Р’ВµР В РўвЂР В Р вЂ¦Р РЋР РЏР РЋР РЏ Р В Р’В·Р В Р’В° Р В Р вЂ¦Р В Р’ВµР В РўвЂР В Р’ВµР В Р’В»Р РЋР вЂ№
             week_start = today_start - timedelta(days=7)
             week_avg = round(ContactForm.objects.filter(
                 created_at__gte=week_start,
@@ -74,24 +74,24 @@ class TelegramReportSender:
             
             avg_diff = total_today - week_avg
             avg_diff_percent = round((avg_diff / week_avg * 100), 1) if week_avg > 0 else 0
-            avg_arrow = "↗️" if avg_diff >= 0 else "↘️"
+            avg_arrow = "Р Р†РІР‚В РІР‚вЂќР С—РЎвЂР РЏ" if avg_diff >= 0 else "Р Р†РІР‚В Р С—РЎвЂР РЏ"
             
-            # amoCRM статистика
+            # amoCRM Р РЋР С“Р РЋРІР‚С™Р В Р’В°Р РЋРІР‚С™Р В РЎвЂР РЋР С“Р РЋРІР‚С™Р В РЎвЂР В РЎвЂќР В Р’В°
             amocrm_sent = today_leads.filter(amocrm_status='sent').count()
             amocrm_failed = today_leads.filter(amocrm_status='failed').count()
             amocrm_conversion = round((amocrm_sent / total_today * 100), 0) if total_today > 0 else 0
             
-            # Популярные модели
+            # Р В РЎСџР В РЎвЂўР В РЎвЂ”Р РЋРЎвЂњР В Р’В»Р РЋР РЏР РЋР вЂљР В Р вЂ¦Р РЋРІР‚в„–Р В Р’Вµ Р В РЎР В РЎвЂўР В РўвЂР В Р’ВµР В Р’В»Р В РЎвЂ
             models_stat = today_leads.exclude(product__isnull=True).exclude(product='').values('product').annotate(
                 count=Count('id')
             ).order_by('-count')[:4]
             
-            # Регионы
+            # Р В Р’В Р В Р’ВµР В РЎвЂ“Р В РЎвЂР В РЎвЂўР В Р вЂ¦Р РЋРІР‚в„–
             regions_stat = today_leads.values('region').annotate(
                 count=Count('id')
             ).order_by('-count')[:4]
             
-            # Пиковые часы
+            # Р В РЎСџР В РЎвЂР В РЎвЂќР В РЎвЂўР В Р вЂ Р РЋРІР‚в„–Р В Р’Вµ Р РЋРІР‚РЋР В Р’В°Р РЋР С“Р РЋРІР‚в„–
             hours_stat = {}
             for lead in today_leads:
                 hour = lead.created_at.astimezone(tz).hour
@@ -100,92 +100,92 @@ class TelegramReportSender:
             
             top_hours = sorted(hours_stat.items(), key=lambda x: x[1], reverse=True)[:3]
             
-            # UTM источники
+            # UTM Р В РЎвЂР РЋР С“Р РЋРІР‚С™Р В РЎвЂўР РЋРІР‚РЋР В Р вЂ¦Р В РЎвЂР В РЎвЂќР В РЎвЂ
             utm_stat = {}
             for lead in today_leads:
                 if lead.utm_data:
                     try:
                         utm = json.loads(lead.utm_data)
-                        source = utm.get('utm_source', 'Неизвестно')
+                        source = utm.get('utm_source', 'Р В РЎСљР В Р’ВµР В РЎвЂР В Р’В·Р В Р вЂ Р В Р’ВµР РЋР С“Р РЋРІР‚С™Р В Р вЂ¦Р В РЎвЂў')
                         utm_stat[source] = utm_stat.get(source, 0) + 1
                     except:
                         pass
             
-            # Прямые заходы
+            # Р В РЎСџР РЋР вЂљР РЋР РЏР В РЎР РЋРІР‚в„–Р В Р’Вµ Р В Р’В·Р В Р’В°Р РЋРІР‚В¦Р В РЎвЂўР В РўвЂР РЋРІР‚в„–
             direct_count = today_leads.filter(Q(utm_data__isnull=True) | Q(utm_data='')).count()
             if direct_count > 0:
-                utm_stat['Прямые'] = direct_count
+                utm_stat['Р В РЎСџР РЋР вЂљР РЋР РЏР В РЎР РЋРІР‚в„–Р В Р’Вµ'] = direct_count
             
             top_sources = sorted(utm_stat.items(), key=lambda x: x[1], reverse=True)[:4]
             
-            # Формируем сообщение
-            message = f"🌆 ОТЧЁТ ЗА СЕГОДНЯ ({now.strftime('%d.%m.%Y')}, {weekday})\n"
-            message += "\n━━━━━━━━━━━━━━━━━━━━\n"
+            # Р В Р’В¤Р В РЎвЂўР РЋР вЂљР В РЎР В РЎвЂР РЋР вЂљР РЋРЎвЂњР В Р’ВµР В РЎ Р РЋР С“Р В РЎвЂўР В РЎвЂўР В Р’В±Р РЋРІР‚В°Р В Р’ВµР В Р вЂ¦Р В РЎвЂР В Р’Вµ
+            message = f"РЎР‚РЎСџР Р‰РІР‚В  Р В РЎвЂєР В РЎС›Р В Р’В§Р В Р С“Р В РЎС› Р В РІР‚вЂќР В РЎвЂ™ Р В Р Р‹Р В РІР‚СћР В РІР‚СљР В РЎвЂєР В РІР‚СњР В РЎСљР В Р вЂЎ ({now.strftime('%d.%m.%Y')}, {weekday})\n"
+            message += "\nР Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“\n"
             
-            message += f"\n📥 Получено заявок: {total_today}"
-            message += f"\n  {diff_arrow} {'+' if diff >= 0 else ''}{diff} к прошлому {weekday}у ({last_same_day.strftime('%d.%m')})"
-            message += f"\n  {avg_arrow} {'+' if avg_diff >= 0 else ''}{avg_diff_percent:+.0f}% к среднему за неделю"
+            message += f"\nРЎР‚РЎСџРІР‚СљРўС’ Р В РЎСџР В РЎвЂўР В Р’В»Р РЋРЎвЂњР РЋРІР‚РЋР В Р’ВµР В Р вЂ¦Р В РЎвЂў Р В Р’В·Р В Р’В°Р РЋР РЏР В Р вЂ Р В РЎвЂўР В РЎвЂќ: {total_today}"
+            message += f"\n  {diff_arrow} {'+' if diff >= 0 else ''}{diff} Р В РЎвЂќ Р В РЎвЂ”Р РЋР вЂљР В РЎвЂўР РЋРІвЂљВ¬Р В Р’В»Р В РЎвЂўР В РЎР РЋРЎвЂњ {weekday}Р РЋРЎвЂњ ({last_same_day.strftime('%d.%m')})"
+            message += f"\n  {avg_arrow} {'+' if avg_diff >= 0 else ''}{avg_diff_percent:+.0f}% Р В РЎвЂќ Р РЋР С“Р РЋР вЂљР В Р’ВµР В РўвЂР В Р вЂ¦Р В Р’ВµР В РЎР РЋРЎвЂњ Р В Р’В·Р В Р’В° Р В Р вЂ¦Р В Р’ВµР В РўвЂР В Р’ВµР В Р’В»Р РЋР вЂ№"
             
-            message += f"\n\n🎯 Конверсия amoCRM: {amocrm_conversion:.0f}%"
+            message += f"\n\nРЎР‚РЎСџР вЂ№Р вЂЎ Р В РЎв„ўР В РЎвЂўР В Р вЂ¦Р В Р вЂ Р В Р’ВµР РЋР вЂљР РЋР С“Р В РЎвЂР РЋР РЏ amoCRM: {amocrm_conversion:.0f}%"
             if amocrm_failed > 0:
-                message += f" ({amocrm_failed} ошибка)" if amocrm_failed == 1 else f" ({amocrm_failed} ошибки)"
+                message += f" ({amocrm_failed} Р В РЎвЂўР РЋРІвЂљВ¬Р В РЎвЂР В Р’В±Р В РЎвЂќР В Р’В°)" if amocrm_failed == 1 else f" ({amocrm_failed} Р В РЎвЂўР РЋРІвЂљВ¬Р В РЎвЂР В Р’В±Р В РЎвЂќР В РЎвЂ)"
             
-            message += "\n\n━━━━━━━━━━━━━━━━━━━━\n"
+            message += "\n\nР Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“\n"
             
-            # Модели
+            # Р В РЎС™Р В РЎвЂўР В РўвЂР В Р’ВµР В Р’В»Р В РЎвЂ
             if models_stat:
-                message += "\n🚗 Популярные модели сегодня:"
+                message += "\nРЎР‚РЎСџРЎв„ўРІР‚вЂќ Р В РЎСџР В РЎвЂўР В РЎвЂ”Р РЋРЎвЂњР В Р’В»Р РЋР РЏР РЋР вЂљР В Р вЂ¦Р РЋРІР‚в„–Р В Р’Вµ Р В РЎР В РЎвЂўР В РўвЂР В Р’ВµР В Р’В»Р В РЎвЂ Р РЋР С“Р В Р’ВµР В РЎвЂ“Р В РЎвЂўР В РўвЂР В Р вЂ¦Р РЋР РЏ:"
                 for i, item in enumerate(models_stat, 1):
                     percent = round((item['count'] / total_today * 100), 0)
-                    message += f"\n  {i}️⃣ {item['product']} — {item['count']} заявок ({percent:.0f}%)"
+                    message += f"\n  {i}Р С—РЎвЂР РЏР Р†РЎвЂњР в‚¬ {item['product']} Р Р†Р вЂљРІР‚Сњ {item['count']} Р В Р’В·Р В Р’В°Р РЋР РЏР В Р вЂ Р В РЎвЂўР В РЎвЂќ ({percent:.0f}%)"
                 
                 others = total_today - sum(item['count'] for item in models_stat)
                 if others > 0:
                     percent = round((others / total_today * 100), 0)
-                    message += f"\n  {len(models_stat)+1}️⃣ Остальные — {others} заявок ({percent:.0f}%)"
+                    message += f"\n  {len(models_stat)+1}Р С—РЎвЂР РЏР Р†РЎвЂњР в‚¬ Р В РЎвЂєР РЋР С“Р РЋРІР‚С™Р В Р’В°Р В Р’В»Р РЋР Р‰Р В Р вЂ¦Р РЋРІР‚в„–Р В Р’Вµ Р Р†Р вЂљРІР‚Сњ {others} Р В Р’В·Р В Р’В°Р РЋР РЏР В Р вЂ Р В РЎвЂўР В РЎвЂќ ({percent:.0f}%)"
             
-            # Регионы
+            # Р В Р’В Р В Р’ВµР В РЎвЂ“Р В РЎвЂР В РЎвЂўР В Р вЂ¦Р РЋРІР‚в„–
             if regions_stat:
-                message += "\n\n📍 По регионам:"
+                message += "\n\nРЎР‚РЎСџРІР‚СљР РЉ Р В РЎСџР В РЎвЂў Р РЋР вЂљР В Р’ВµР В РЎвЂ“Р В РЎвЂР В РЎвЂўР В Р вЂ¦Р В Р’В°Р В РЎ:"
                 region_emoji = {
-                    'Toshkent shahri': '🏙️',
-                    'Samarqand viloyati': '🕌',
-                    'Buxoro viloyati': '🏛️',
+                    'Toshkent shahri': 'РЎР‚РЎСџР РЏРІвЂћСћР С—РЎвЂР РЏ',
+                    'Samarqand viloyati': 'РЎР‚РЎСџРІР‚СћР Р‰',
+                    'Buxoro viloyati': 'РЎР‚РЎСџР РЏРІР‚С”Р С—РЎвЂР РЏ',
                 }
                 
                 for i, item in enumerate(regions_stat, 1):
-                    emoji = region_emoji.get(item['region'], '🌄')
+                    emoji = region_emoji.get(item['region'], 'РЎР‚РЎСџР Р‰РІР‚С›')
                     percent = round((item['count'] / total_today * 100), 0)
-                    message += f"\n  {emoji} {item['region']} — {item['count']} ({percent:.0f}%)"
+                    message += f"\n  {emoji} {item['region']} Р Р†Р вЂљРІР‚Сњ {item['count']} ({percent:.0f}%)"
                 
                 others = total_today - sum(item['count'] for item in regions_stat)
                 if others > 0:
                     percent = round((others / total_today * 100), 0)
-                    message += f"\n  🌄 Остальные — {others} ({percent:.0f}%)"
+                    message += f"\n  РЎР‚РЎСџР Р‰РІР‚С› Р В РЎвЂєР РЋР С“Р РЋРІР‚С™Р В Р’В°Р В Р’В»Р РЋР Р‰Р В Р вЂ¦Р РЋРІР‚в„–Р В Р’Вµ Р Р†Р вЂљРІР‚Сњ {others} ({percent:.0f}%)"
             
-            # Пиковые часы
+            # Р В РЎСџР В РЎвЂР В РЎвЂќР В РЎвЂўР В Р вЂ Р РЋРІР‚в„–Р В Р’Вµ Р РЋРІР‚РЋР В Р’В°Р РЋР С“Р РЋРІР‚в„–
             if top_hours:
-                message += "\n\n⏰ Пиковые часы:"
+                message += "\n\nР Р†Р РЏР’В° Р В РЎСџР В РЎвЂР В РЎвЂќР В РЎвЂўР В Р вЂ Р РЋРІР‚в„–Р В Р’Вµ Р РЋРІР‚РЋР В Р’В°Р РЋР С“Р РЋРІР‚в„–:"
                 for i, (hour_range, count) in enumerate(top_hours, 1):
-                    emoji = "🔥" if i == 1 else ""
-                    message += f"\n  {hour_range} — {count} заявок {emoji}"
+                    emoji = "РЎР‚РЎСџРІР‚СњРўС’" if i == 1 else ""
+                    message += f"\n  {hour_range} Р Р†Р вЂљРІР‚Сњ {count} Р В Р’В·Р В Р’В°Р РЋР РЏР В Р вЂ Р В РЎвЂўР В РЎвЂќ {emoji}"
             
-            # Источники
+            # Р В Р РЋР С“Р РЋРІР‚С™Р В РЎвЂўР РЋРІР‚РЋР В Р вЂ¦Р В РЎвЂР В РЎвЂќР В РЎвЂ
             if top_sources:
-                message += "\n\n🔗 Источники:"
+                message += "\n\nРЎР‚РЎСџРІР‚СњРІР‚вЂќ Р В Р РЋР С“Р РЋРІР‚С™Р В РЎвЂўР РЋРІР‚РЋР В Р вЂ¦Р В РЎвЂР В РЎвЂќР В РЎвЂ:"
                 source_emoji = {
-                    'google': '📊 Google Ads',
-                    'instagram': '📱 Instagram',
-                    'facebook': '📘 Facebook',
-                    'Прямые': '👥 Прямые'
+                    'google': 'РЎР‚РЎСџРІР‚СљР вЂ° Google Ads',
+                    'instagram': 'РЎР‚РЎСџРІР‚СљР’В± Instagram',
+                    'facebook': 'РЎР‚РЎСџРІР‚Сљ Facebook',
+                    'Р В РЎСџР РЋР вЂљР РЋР РЏР В РЎР РЋРІР‚в„–Р В Р’Вµ': 'РЎР‚РЎСџРІР‚РўС’ Р В РЎСџР РЋР вЂљР РЋР РЏР В РЎР РЋРІР‚в„–Р В Р’Вµ'
                 }
                 
                 for i, (source, count) in enumerate(top_sources, 1):
-                    source_name = source_emoji.get(source, f"🔗 {source.title()}")
+                    source_name = source_emoji.get(source, f"РЎР‚РЎСџРІР‚СњРІР‚вЂќ {source.title()}")
                     percent = round((count / total_today * 100), 0)
-                    message += f"\n  {source_name} — {count} ({percent:.0f}%)"
+                    message += f"\n  {source_name} Р Р†Р вЂљРІР‚Сњ {count} ({percent:.0f}%)"
             
-            # Отправляем
+            # Р В РЎвЂєР РЋРІР‚С™Р В РЎвЂ”Р РЋР вЂљР В Р’В°Р В Р вЂ Р В Р’В»Р РЋР РЏР В Р’ВµР В РЎ
             url = f"https://api.telegram.org/bot{bot_token}/sendMessage"
             payload = {
                 "chat_id": chat_id,
@@ -197,16 +197,16 @@ class TelegramReportSender:
             response = requests.post(url, json=payload, timeout=10)
             
             if response.status_code == 200:
-                logger.info("Ежедневный отчёт Telegram отправлен")
+                logger.info("Р В РІР‚СћР В Р’В¶Р В Р’ВµР В РўвЂР В Р вЂ¦Р В Р’ВµР В Р вЂ Р В Р вЂ¦Р РЋРІР‚в„–Р В РІвЂћвЂ“ Р В РЎвЂўР РЋРІР‚С™Р РЋРІР‚РЋР РЋРІР‚Р РЋРІР‚С™ Telegram Р В РЎвЂўР РЋРІР‚С™Р В РЎвЂ”Р РЋР вЂљР В Р’В°Р В Р вЂ Р В Р’В»Р В Р’ВµР В Р вЂ¦")
             else:
-                logger.error(f"Ошибка отправки отчёта: {response.text[:200]}")
+                logger.error(f"Р В РЎвЂєР РЋРІвЂљВ¬Р В РЎвЂР В Р’В±Р В РЎвЂќР В Р’В° Р В РЎвЂўР РЋРІР‚С™Р В РЎвЂ”Р РЋР вЂљР В Р’В°Р В Р вЂ Р В РЎвЂќР В РЎвЂ Р В РЎвЂўР РЋРІР‚С™Р РЋРІР‚РЋР РЋРІР‚Р РЋРІР‚С™Р В Р’В°: {response.text[:200]}")
         
         except Exception as e:
-            logger.error(f"Ошибка формирования отчёта: {str(e)}", exc_info=True)
+            logger.error(f"Р В РЎвЂєР РЋРІвЂљВ¬Р В РЎвЂР В Р’В±Р В РЎвЂќР В Р’В° Р РЋРІР‚С›Р В РЎвЂўР РЋР вЂљР В РЎР В РЎвЂР РЋР вЂљР В РЎвЂўР В Р вЂ Р В Р’В°Р В Р вЂ¦Р В РЎвЂР РЋР РЏ Р В РЎвЂўР РЋРІР‚С™Р РЋРІР‚РЋР РЋРІР‚Р РЋРІР‚С™Р В Р’В°: {str(e)}", exc_info=True)
     
     @classmethod
     def send_weekly_report(cls):
-        """Еженедельный отчёт в понедельник 10:00"""
+        """Р В РІР‚СћР В Р’В¶Р В Р’ВµР В Р вЂ¦Р В Р’ВµР В РўвЂР В Р’ВµР В Р’В»Р РЋР Р‰Р В Р вЂ¦Р РЋРІР‚в„–Р В РІвЂћвЂ“ Р В РЎвЂўР РЋРІР‚С™Р РЋРІР‚РЋР РЋРІР‚Р РЋРІР‚С™ Р В Р вЂ  Р В РЎвЂ”Р В РЎвЂўР В Р вЂ¦Р В Р’ВµР В РўвЂР В Р’ВµР В Р’В»Р РЋР Р‰Р В Р вЂ¦Р В РЎвЂР В РЎвЂќ 10:00"""
         try:
             from main.models import ContactForm
             
@@ -214,20 +214,20 @@ class TelegramReportSender:
             chat_id = settings.TELEGRAM_CHAT_ID
             
             if not bot_token or not chat_id:
-                logger.warning("Telegram настройки не заданы")
+                logger.warning("Telegram Р В Р вЂ¦Р В Р’В°Р РЋР С“Р РЋРІР‚С™Р РЋР вЂљР В РЎвЂўР В РІвЂћвЂ“Р В РЎвЂќР В РЎвЂ Р В Р вЂ¦Р В Р’Вµ Р В Р’В·Р В Р’В°Р В РўвЂР В Р’В°Р В Р вЂ¦Р РЋРІР‚в„–")
                 return
             
-            # Временная зона
+            # Р В РІР‚в„ўР РЋР вЂљР В Р’ВµР В РЎР В Р’ВµР В Р вЂ¦Р В Р вЂ¦Р В Р’В°Р РЋР РЏ Р В Р’В·Р В РЎвЂўР В Р вЂ¦Р В Р’В°
             tz = pytz.timezone(settings.TIME_ZONE)
             now = timezone.now().astimezone(tz)
             
-            # Прошлая неделя (ПН-ВС)
-            # Сегодня понедельник, значит прошлая неделя = 7 дней назад до вчера
+            # Р В РЎСџР РЋР вЂљР В РЎвЂўР РЋРІвЂљВ¬Р В Р’В»Р В Р’В°Р РЋР РЏ Р В Р вЂ¦Р В Р’ВµР В РўвЂР В Р’ВµР В Р’В»Р РЋР РЏ (Р В РЎСџР В РЎСљ-Р В РІР‚в„ўР В Р Р‹)
+            # Р В Р Р‹Р В Р’ВµР В РЎвЂ“Р В РЎвЂўР В РўвЂР В Р вЂ¦Р РЋР РЏ Р В РЎвЂ”Р В РЎвЂўР В Р вЂ¦Р В Р’ВµР В РўвЂР В Р’ВµР В Р’В»Р РЋР Р‰Р В Р вЂ¦Р В РЎвЂР В РЎвЂќ, Р В Р’В·Р В Р вЂ¦Р В Р’В°Р РЋРІР‚РЋР В РЎвЂР РЋРІР‚С™ Р В РЎвЂ”Р РЋР вЂљР В РЎвЂўР РЋРІвЂљВ¬Р В Р’В»Р В Р’В°Р РЋР РЏ Р В Р вЂ¦Р В Р’ВµР В РўвЂР В Р’ВµР В Р’В»Р РЋР РЏ = 7 Р В РўвЂР В Р вЂ¦Р В Р’ВµР В РІвЂћвЂ“ Р В Р вЂ¦Р В Р’В°Р В Р’В·Р В Р’В°Р В РўвЂ Р В РўвЂР В РЎвЂў Р В Р вЂ Р РЋРІР‚РЋР В Р’ВµР РЋР вЂљР В Р’В°
             last_monday = now - timedelta(days=now.weekday() + 7)
             last_monday = last_monday.replace(hour=0, minute=0, second=0, microsecond=0)
             last_sunday = last_monday + timedelta(days=7)
             
-            # Заявки за прошлую неделю
+            # Р В РІР‚вЂќР В Р’В°Р РЋР РЏР В Р вЂ Р В РЎвЂќР В РЎвЂ Р В Р’В·Р В Р’В° Р В РЎвЂ”Р РЋР вЂљР В РЎвЂўР РЋРІвЂљВ¬Р В Р’В»Р РЋРЎвЂњР РЋР вЂ№ Р В Р вЂ¦Р В Р’ВµР В РўвЂР В Р’ВµР В Р’В»Р РЋР вЂ№
             week_leads = ContactForm.objects.filter(
                 created_at__gte=last_monday,
                 created_at__lt=last_sunday
@@ -235,7 +235,7 @@ class TelegramReportSender:
             
             total_week = week_leads.count()
             
-            # Позапрошлая неделя (для сравнения)
+            # Р В РЎСџР В РЎвЂўР В Р’В·Р В Р’В°Р В РЎвЂ”Р РЋР вЂљР В РЎвЂўР РЋРІвЂљВ¬Р В Р’В»Р В Р’В°Р РЋР РЏ Р В Р вЂ¦Р В Р’ВµР В РўвЂР В Р’ВµР В Р’В»Р РЋР РЏ (Р В РўвЂР В Р’В»Р РЋР РЏ Р РЋР С“Р РЋР вЂљР В Р’В°Р В Р вЂ Р В Р вЂ¦Р В Р’ВµР В Р вЂ¦Р В РЎвЂР РЋР РЏ)
             prev_week_start = last_monday - timedelta(days=7)
             prev_week_end = last_monday
             prev_week_count = ContactForm.objects.filter(
@@ -243,30 +243,30 @@ class TelegramReportSender:
                 created_at__lt=prev_week_end
             ).count()
             
-            # Разница
+            # Р В Р’В Р В Р’В°Р В Р’В·Р В Р вЂ¦Р В РЎвЂР РЋРІР‚В Р В Р’В°
             diff = total_week - prev_week_count
             diff_percent = round((diff / prev_week_count * 100), 1) if prev_week_count > 0 else 0
-            diff_arrow = "↗️" if diff >= 0 else "↘️"
+            diff_arrow = "Р Р†РІР‚В РІР‚вЂќР С—РЎвЂР РЏ" if diff >= 0 else "Р Р†РІР‚В Р С—РЎвЂР РЏ"
             
-            # Средняя скорость обработки (примерно, можно улучшить)
-            avg_speed = 11  # минут (заглушка, можно добавить реальный расчёт)
+            # Р В Р Р‹Р РЋР вЂљР В Р’ВµР В РўвЂР В Р вЂ¦Р РЋР РЏР РЋР РЏ Р РЋР С“Р В РЎвЂќР В РЎвЂўР РЋР вЂљР В РЎвЂўР РЋР С“Р РЋРІР‚С™Р РЋР Р‰ Р В РЎвЂўР В Р’В±Р РЋР вЂљР В Р’В°Р В Р’В±Р В РЎвЂўР РЋРІР‚С™Р В РЎвЂќР В РЎвЂ (Р В РЎвЂ”Р РЋР вЂљР В РЎвЂР В РЎР В Р’ВµР РЋР вЂљР В Р вЂ¦Р В РЎвЂў, Р В РЎР В РЎвЂўР В Р’В¶Р В Р вЂ¦Р В РЎвЂў Р РЋРЎвЂњР В Р’В»Р РЋРЎвЂњР РЋРІР‚РЋР РЋРІвЂљВ¬Р В РЎвЂР РЋРІР‚С™Р РЋР Р‰)
+            avg_speed = 11  # Р В РЎР В РЎвЂР В Р вЂ¦Р РЋРЎвЂњР РЋРІР‚С™ (Р В Р’В·Р В Р’В°Р В РЎвЂ“Р В Р’В»Р РЋРЎвЂњР РЋРІвЂљВ¬Р В РЎвЂќР В Р’В°, Р В РЎР В РЎвЂўР В Р’В¶Р В Р вЂ¦Р В РЎвЂў Р В РўвЂР В РЎвЂўР В Р’В±Р В Р’В°Р В Р вЂ Р В РЎвЂР РЋРІР‚С™Р РЋР Р‰ Р РЋР вЂљР В Р’ВµР В Р’В°Р В Р’В»Р РЋР Р‰Р В Р вЂ¦Р РЋРІР‚в„–Р В РІвЂћвЂ“ Р РЋР вЂљР В Р’В°Р РЋР С“Р РЋРІР‚РЋР РЋРІР‚Р РЋРІР‚С™)
             
-            # amoCRM статистика
+            # amoCRM Р РЋР С“Р РЋРІР‚С™Р В Р’В°Р РЋРІР‚С™Р В РЎвЂР РЋР С“Р РЋРІР‚С™Р В РЎвЂР В РЎвЂќР В Р’В°
             amocrm_sent = week_leads.filter(amocrm_status='sent').count()
             amocrm_failed = week_leads.filter(amocrm_status='failed').count()
             amocrm_conversion = round((amocrm_sent / total_week * 100), 0) if total_week > 0 else 0
             
-            # По дням недели
+            # Р В РЎСџР В РЎвЂў Р В РўвЂР В Р вЂ¦Р РЋР РЏР В РЎ Р В Р вЂ¦Р В Р’ВµР В РўвЂР В Р’ВµР В Р’В»Р В РЎвЂ
             days_stat = {}
-            weekday_names = ['ПН', 'ВТ', 'СР', 'ЧТ', 'ПТ', 'СБ', 'ВС']
+            weekday_names = ['Р В РЎСџР В РЎСљ', 'Р В РІР‚в„ўР В РЎС›', 'Р В Р Р‹Р В Р’В ', 'Р В Р’В§Р В РЎС›', 'Р В РЎСџР В РЎС›', 'Р В Р Р‹Р В РІР‚', 'Р В РІР‚в„ўР В Р Р‹']
             weekday_full_names = {
-                0: 'Понедельник',
-                1: 'Вторник',
-                2: 'Среда',
-                3: 'Четверг',
-                4: 'Пятница',
-                5: 'Суббота',
-                6: 'Воскресенье'
+                0: 'Р В РЎСџР В РЎвЂўР В Р вЂ¦Р В Р’ВµР В РўвЂР В Р’ВµР В Р’В»Р РЋР Р‰Р В Р вЂ¦Р В РЎвЂР В РЎвЂќ',
+                1: 'Р В РІР‚в„ўР РЋРІР‚С™Р В РЎвЂўР РЋР вЂљР В Р вЂ¦Р В РЎвЂР В РЎвЂќ',
+                2: 'Р В Р Р‹Р РЋР вЂљР В Р’ВµР В РўвЂР В Р’В°',
+                3: 'Р В Р’В§Р В Р’ВµР РЋРІР‚С™Р В Р вЂ Р В Р’ВµР РЋР вЂљР В РЎвЂ“',
+                4: 'Р В РЎСџР РЋР РЏР РЋРІР‚С™Р В Р вЂ¦Р В РЎвЂР РЋРІР‚В Р В Р’В°',
+                5: 'Р В Р Р‹Р РЋРЎвЂњР В Р’В±Р В Р’В±Р В РЎвЂўР РЋРІР‚С™Р В Р’В°',
+                6: 'Р В РІР‚в„ўР В РЎвЂўР РЋР С“Р В РЎвЂќР РЋР вЂљР В Р’ВµР РЋР С“Р В Р’ВµР В Р вЂ¦Р РЋР Р‰Р В Р’Вµ'
             }
             
             for i in range(7):
@@ -284,10 +284,10 @@ class TelegramReportSender:
                     'percent': round((count / total_week * 100), 0) if total_week > 0 else 0
                 }
             
-            # Пиковый день
+            # Р В РЎСџР В РЎвЂР В РЎвЂќР В РЎвЂўР В Р вЂ Р РЋРІР‚в„–Р В РІвЂћвЂ“ Р В РўвЂР В Р’ВµР В Р вЂ¦Р РЋР Р‰
             peak_day = max(days_stat.items(), key=lambda x: x[1]['count'])
             
-            # Пиковые часы
+            # Р В РЎСџР В РЎвЂР В РЎвЂќР В РЎвЂўР В Р вЂ Р РЋРІР‚в„–Р В Р’Вµ Р РЋРІР‚РЋР В Р’В°Р РЋР С“Р РЋРІР‚в„–
             hours_stat = {}
             for lead in week_leads:
                 hour = lead.created_at.astimezone(tz).hour
@@ -296,34 +296,34 @@ class TelegramReportSender:
             
             top_hours = sorted(hours_stat.items(), key=lambda x: x[1], reverse=True)[:4]
             
-            # Популярные модели
+            # Р В РЎСџР В РЎвЂўР В РЎвЂ”Р РЋРЎвЂњР В Р’В»Р РЋР РЏР РЋР вЂљР В Р вЂ¦Р РЋРІР‚в„–Р В Р’Вµ Р В РЎР В РЎвЂўР В РўвЂР В Р’ВµР В Р’В»Р В РЎвЂ
             models_stat = week_leads.exclude(product__isnull=True).exclude(product='').values('product').annotate(
                 count=Count('id')
             ).order_by('-count')[:6]
             
-            # Регионы
+            # Р В Р’В Р В Р’ВµР В РЎвЂ“Р В РЎвЂР В РЎвЂўР В Р вЂ¦Р РЋРІР‚в„–
             regions_stat = week_leads.values('region').annotate(
                 count=Count('id')
             ).order_by('-count')
             
-            # UTM источники
+            # UTM Р В РЎвЂР РЋР С“Р РЋРІР‚С™Р В РЎвЂўР РЋРІР‚РЋР В Р вЂ¦Р В РЎвЂР В РЎвЂќР В РЎвЂ
             utm_sources = {}
             for lead in week_leads:
                 if lead.utm_data:
                     try:
                         utm = json.loads(lead.utm_data)
-                        source = utm.get('utm_source', 'Неизвестно')
+                        source = utm.get('utm_source', 'Р В РЎСљР В Р’ВµР В РЎвЂР В Р’В·Р В Р вЂ Р В Р’ВµР РЋР С“Р РЋРІР‚С™Р В Р вЂ¦Р В РЎвЂў')
                         utm_sources[source] = utm_sources.get(source, 0) + 1
                     except:
                         pass
             
             direct_count = week_leads.filter(Q(utm_data__isnull=True) | Q(utm_data='')).count()
             if direct_count > 0:
-                utm_sources['Прямые заходы'] = direct_count
+                utm_sources['Р В РЎСџР РЋР вЂљР РЋР РЏР В РЎР РЋРІР‚в„–Р В Р’Вµ Р В Р’В·Р В Р’В°Р РЋРІР‚В¦Р В РЎвЂўР В РўвЂР РЋРІР‚в„–'] = direct_count
             
             top_sources = sorted(utm_sources.items(), key=lambda x: x[1], reverse=True)
             
-            # UTM кампании
+            # UTM Р В РЎвЂќР В Р’В°Р В РЎР В РЎвЂ”Р В Р’В°Р В Р вЂ¦Р В РЎвЂР В РЎвЂ
             utm_campaigns = {}
             for lead in week_leads:
                 if lead.utm_data:
@@ -339,7 +339,7 @@ class TelegramReportSender:
             
             top_campaigns = sorted(utm_campaigns.items(), key=lambda x: x[1], reverse=True)[:5]
             
-            # Конверсия по каналам
+            # Р В РЎв„ўР В РЎвЂўР В Р вЂ¦Р В Р вЂ Р В Р’ВµР РЋР вЂљР РЋР С“Р В РЎвЂР РЋР РЏ Р В РЎвЂ”Р В РЎвЂў Р В РЎвЂќР В Р’В°Р В Р вЂ¦Р В Р’В°Р В Р’В»Р В Р’В°Р В РЎ
             channel_conversion = {}
             for source, count in top_sources[:3]:
                 channel_leads = []
@@ -351,11 +351,11 @@ class TelegramReportSender:
                                 channel_leads.append(lead)
                         except:
                             pass
-                    elif source == 'Прямые заходы' and (not lead.utm_data or lead.utm_data == ''):
+                    elif source == 'Р В РЎСџР РЋР вЂљР РЋР РЏР В РЎР РЋРІР‚в„–Р В Р’Вµ Р В Р’В·Р В Р’В°Р РЋРІР‚В¦Р В РЎвЂўР В РўвЂР РЋРІР‚в„–' and (not lead.utm_data or lead.utm_data == ''):
                         channel_leads.append(lead)
                 
                 if channel_leads:
-                    # Топ продукты для этого канала
+                    # Р В РЎС›Р В РЎвЂўР В РЎвЂ” Р В РЎвЂ”Р РЋР вЂљР В РЎвЂўР В РўвЂР РЋРЎвЂњР В РЎвЂќР РЋРІР‚С™Р РЋРІР‚в„– Р В РўвЂР В Р’В»Р РЋР РЏ Р РЋР РЉР РЋРІР‚С™Р В РЎвЂўР В РЎвЂ“Р В РЎвЂў Р В РЎвЂќР В Р’В°Р В Р вЂ¦Р В Р’В°Р В Р’В»Р В Р’В°
                     products = {}
                     for lead in channel_leads:
                         if lead.product:
@@ -367,110 +367,110 @@ class TelegramReportSender:
                         'products': top_products
                     }
             
-            # Формируем сообщение
-            message = f"📊 ПОЛНЫЙ ОТЧЁТ ЗА НЕДЕЛЮ ({last_monday.strftime('%d.%m')} - {(last_sunday - timedelta(days=1)).strftime('%d.%m')})\n"
+            # Р В Р’В¤Р В РЎвЂўР РЋР вЂљР В РЎР В РЎвЂР РЋР вЂљР РЋРЎвЂњР В Р’ВµР В РЎ Р РЋР С“Р В РЎвЂўР В РЎвЂўР В Р’В±Р РЋРІР‚В°Р В Р’ВµР В Р вЂ¦Р В РЎвЂР В Р’Вµ
+            message = f"РЎР‚РЎСџРІР‚СљР вЂ° Р В РЎСџР В РЎвЂєР В РІР‚С”Р В РЎСљР В Р’В«Р В РІвЂћСћ Р В РЎвЂєР В РЎС›Р В Р’В§Р В Р С“Р В РЎС› Р В РІР‚вЂќР В РЎвЂ™ Р В РЎСљР В РІР‚СћР В РІР‚СњР В РІР‚СћР В РІР‚С”Р В Р’В® ({last_monday.strftime('%d.%m')} - {(last_sunday - timedelta(days=1)).strftime('%d.%m')})\n"
             
-            message += "\n━━━━━━━━━━━━━━━━━━━━"
-            message += "\n📈 ОБЩАЯ СТАТИСТИКА"
-            message += "\n━━━━━━━━━━━━━━━━━━━━\n"
+            message += "\nР Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“"
+            message += "\nРЎР‚РЎСџРІР‚СљРІвЂљВ¬ Р В РЎвЂєР В РІР‚Р В Р’В©Р В РЎвЂ™Р В Р вЂЎ Р В Р Р‹Р В РЎС›Р В РЎвЂ™Р В РЎС›Р В Р В Р Р‹Р В РЎС›Р В Р В РЎв„ўР В РЎвЂ™"
+            message += "\nР Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“\n"
             
-            message += f"\n📥 Всего заявок: {total_week}"
-            message += f"\n  {diff_arrow} {'+' if diff >= 0 else ''}{diff} к прошлой неделе ({diff_percent:+.1f}%)"
+            message += f"\nРЎР‚РЎСџРІР‚СљРўС’ Р В РІР‚в„ўР РЋР С“Р В Р’ВµР В РЎвЂ“Р В РЎвЂў Р В Р’В·Р В Р’В°Р РЋР РЏР В Р вЂ Р В РЎвЂўР В РЎвЂќ: {total_week}"
+            message += f"\n  {diff_arrow} {'+' if diff >= 0 else ''}{diff} Р В РЎвЂќ Р В РЎвЂ”Р РЋР вЂљР В РЎвЂўР РЋРІвЂљВ¬Р В Р’В»Р В РЎвЂўР В РІвЂћвЂ“ Р В Р вЂ¦Р В Р’ВµР В РўвЂР В Р’ВµР В Р’В»Р В Р’Вµ ({diff_percent:+.1f}%)"
             
-            message += f"\n\n⏱️ Средняя скорость обработки: {avg_speed} минут"
+            message += f"\n\nР Р†Р РЏР’В±Р С—РЎвЂР РЏ Р В Р Р‹Р РЋР вЂљР В Р’ВµР В РўвЂР В Р вЂ¦Р РЋР РЏР РЋР РЏ Р РЋР С“Р В РЎвЂќР В РЎвЂўР РЋР вЂљР В РЎвЂўР РЋР С“Р РЋРІР‚С™Р РЋР Р‰ Р В РЎвЂўР В Р’В±Р РЋР вЂљР В Р’В°Р В Р’В±Р В РЎвЂўР РЋРІР‚С™Р В РЎвЂќР В РЎвЂ: {avg_speed} Р В РЎР В РЎвЂР В Р вЂ¦Р РЋРЎвЂњР РЋРІР‚С™"
             
-            message += f"\n\n🎯 Конверсия amoCRM: {amocrm_conversion:.0f}%"
+            message += f"\n\nРЎР‚РЎСџР вЂ№Р вЂЎ Р В РЎв„ўР В РЎвЂўР В Р вЂ¦Р В Р вЂ Р В Р’ВµР РЋР вЂљР РЋР С“Р В РЎвЂР РЋР РЏ amoCRM: {amocrm_conversion:.0f}%"
             if amocrm_failed > 0:
-                message += f" ({amocrm_failed} ошибок)" if amocrm_failed > 1 else f" ({amocrm_failed} ошибка)"
+                message += f" ({amocrm_failed} Р В РЎвЂўР РЋРІвЂљВ¬Р В РЎвЂР В Р’В±Р В РЎвЂўР В РЎвЂќ)" if amocrm_failed > 1 else f" ({amocrm_failed} Р В РЎвЂўР РЋРІвЂљВ¬Р В РЎвЂР В Р’В±Р В РЎвЂќР В Р’В°)"
             
-            message += "\n\n━━━━━━━━━━━━━━━━━━━━"
-            message += "\n📅 АНАЛИТИКА ПО ДНЯМ"
-            message += "\n━━━━━━━━━━━━━━━━━━━━\n"
+            message += "\n\nР Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“"
+            message += "\nРЎР‚РЎСџРІР‚СљРІР‚В¦ Р В РЎвЂ™Р В РЎСљР В РЎвЂ™Р В РІР‚С”Р В Р В РЎС›Р В Р В РЎв„ўР В РЎвЂ™ Р В РЎСџР В РЎвЂє Р В РІР‚СњР В РЎСљР В Р вЂЎР В РЎС™"
+            message += "\nР Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“\n"
             
             for i in range(7):
                 day = days_stat[i]
-                emoji = "🔥" if i == peak_day[0] else ""
-                message += f"\n{day['short']} {day['date']} — {day['count']} заявок ({day['percent']:.0f}%) {emoji}"
+                emoji = "РЎР‚РЎСџРІР‚СњРўС’" if i == peak_day[0] else ""
+                message += f"\n{day['short']} {day['date']} Р Р†Р вЂљРІР‚Сњ {day['count']} Р В Р’В·Р В Р’В°Р РЋР РЏР В Р вЂ Р В РЎвЂўР В РЎвЂќ ({day['percent']:.0f}%) {emoji}"
             
-            message += f"\n\n💡 Вывод: {peak_day[1]['name']} — самый продуктивный день"
+            message += f"\n\nРЎР‚РЎСџРІР‚в„ўР Р‹ Р В РІР‚в„ўР РЋРІР‚в„–Р В Р вЂ Р В РЎвЂўР В РўвЂ: {peak_day[1]['name']} Р Р†Р вЂљРІР‚Сњ Р РЋР С“Р В Р’В°Р В РЎР РЋРІР‚в„–Р В РІвЂћвЂ“ Р В РЎвЂ”Р РЋР вЂљР В РЎвЂўР В РўвЂР РЋРЎвЂњР В РЎвЂќР РЋРІР‚С™Р В РЎвЂР В Р вЂ Р В Р вЂ¦Р РЋРІР‚в„–Р В РІвЂћвЂ“ Р В РўвЂР В Р’ВµР В Р вЂ¦Р РЋР Р‰"
             
-            message += "\n\n━━━━━━━━━━━━━━━━━━━━"
-            message += "\n⏰ ПИКОВЫЕ ЧАСЫ"
-            message += "\n━━━━━━━━━━━━━━━━━━━━\n"
+            message += "\n\nР Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“"
+            message += "\nР Р†Р РЏР’В° Р В РЎСџР В Р В РЎв„ўР В РЎвЂєР В РІР‚в„ўР В Р’В«Р В РІР‚Сћ Р В Р’В§Р В РЎвЂ™Р В Р Р‹Р В Р’В«"
+            message += "\nР Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“\n"
             
             for i, (hour_range, count) in enumerate(top_hours, 1):
-                emoji = "🔥" if i == 1 else ""
-                message += f"\n{hour_range} — {count} заявок {emoji}"
+                emoji = "РЎР‚РЎСџРІР‚СњРўС’" if i == 1 else ""
+                message += f"\n{hour_range} Р Р†Р вЂљРІР‚Сњ {count} Р В Р’В·Р В Р’В°Р РЋР РЏР В Р вЂ Р В РЎвЂўР В РЎвЂќ {emoji}"
             
             top_hour_range = top_hours[0][0] if top_hours else "14:00-15:00"
-            message += f"\n\n💡 Вывод: Обеденное время ({top_hour_range}) — пик активности"
+            message += f"\n\nРЎР‚РЎСџРІР‚в„ўР Р‹ Р В РІР‚в„ўР РЋРІР‚в„–Р В Р вЂ Р В РЎвЂўР В РўвЂ: Р В РЎвЂєР В Р’В±Р В Р’ВµР В РўвЂР В Р’ВµР В Р вЂ¦Р В Р вЂ¦Р В РЎвЂўР В Р’Вµ Р В Р вЂ Р РЋР вЂљР В Р’ВµР В РЎР РЋР РЏ ({top_hour_range}) Р Р†Р вЂљРІР‚Сњ Р В РЎвЂ”Р В РЎвЂР В РЎвЂќ Р В Р’В°Р В РЎвЂќР РЋРІР‚С™Р В РЎвЂР В Р вЂ Р В Р вЂ¦Р В РЎвЂўР РЋР С“Р РЋРІР‚С™Р В РЎвЂ"
             
-            message += "\n\n━━━━━━━━━━━━━━━━━━━━"
-            message += "\n🚗 ПОПУЛЯРНЫЕ МОДЕЛИ"
-            message += "\n━━━━━━━━━━━━━━━━━━━━\n"
+            message += "\n\nР Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“"
+            message += "\nРЎР‚РЎСџРЎв„ўРІР‚вЂќ Р В РЎСџР В РЎвЂєР В РЎСџР В Р в‚¬Р В РІР‚С”Р В Р вЂЎР В Р’В Р В РЎСљР В Р’В«Р В РІР‚Сћ Р В РЎС™Р В РЎвЂєР В РІР‚СњР В РІР‚СћР В РІР‚С”Р В "
+            message += "\nР Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“\n"
             
             for i, item in enumerate(models_stat, 1):
                 percent = round((item['count'] / total_week * 100), 0)
-                message += f"\n{i}️⃣ {item['product']} — {item['count']} заявок ({percent:.0f}%)"
+                message += f"\n{i}Р С—РЎвЂР РЏР Р†РЎвЂњР в‚¬ {item['product']} Р Р†Р вЂљРІР‚Сњ {item['count']} Р В Р’В·Р В Р’В°Р РЋР РЏР В Р вЂ Р В РЎвЂўР В РЎвЂќ ({percent:.0f}%)"
             
             others = total_week - sum(item['count'] for item in models_stat)
             if others > 0:
                 percent = round((others / total_week * 100), 0)
-                message += f"\n{len(models_stat)+1}️⃣ Остальные — {others} заявок ({percent:.0f}%)"
+                message += f"\n{len(models_stat)+1}Р С—РЎвЂР РЏР Р†РЎвЂњР в‚¬ Р В РЎвЂєР РЋР С“Р РЋРІР‚С™Р В Р’В°Р В Р’В»Р РЋР Р‰Р В Р вЂ¦Р РЋРІР‚в„–Р В Р’Вµ Р Р†Р вЂљРІР‚Сњ {others} Р В Р’В·Р В Р’В°Р РЋР РЏР В Р вЂ Р В РЎвЂўР В РЎвЂќ ({percent:.0f}%)"
             
             if models_stat:
                 top_model = models_stat[0]['product']
-                message += f"\n\n💡 Вывод: {top_model} лидирует с большим отрывом"
+                message += f"\n\nРЎР‚РЎСџРІР‚в„ўР Р‹ Р В РІР‚в„ўР РЋРІР‚в„–Р В Р вЂ Р В РЎвЂўР В РўвЂ: {top_model} Р В Р’В»Р В РЎвЂР В РўвЂР В РЎвЂР РЋР вЂљР РЋРЎвЂњР В Р’ВµР РЋРІР‚С™ Р РЋР С“ Р В Р’В±Р В РЎвЂўР В Р’В»Р РЋР Р‰Р РЋРІвЂљВ¬Р В РЎвЂР В РЎ Р В РЎвЂўР РЋРІР‚С™Р РЋР вЂљР РЋРІР‚в„–Р В Р вЂ Р В РЎвЂўР В РЎ"
             
-            message += "\n\n━━━━━━━━━━━━━━━━━━━━"
-            message += "\n📍 ГЕОГРАФИЯ ЗАЯВОК"
-            message += "\n━━━━━━━━━━━━━━━━━━━━\n"
+            message += "\n\nР Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“"
+            message += "\nРЎР‚РЎСџРІР‚СљР РЉ Р В РІР‚СљР В РІР‚СћР В РЎвЂєР В РІР‚СљР В Р’В Р В РЎвЂ™Р В Р’В¤Р В Р В Р вЂЎ Р В РІР‚вЂќР В РЎвЂ™Р В Р вЂЎР В РІР‚в„ўР В РЎвЂєР В РЎв„ў"
+            message += "\nР Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“\n"
             
             region_emoji = {
-                'Toshkent shahri': '🏙️',
-                'Samarqand viloyati': '🕌',
-                'Buxoro viloyati': '🏛️',
-                'Fargʻona viloyati': '🌄',
-                'Namangan viloyati': '🏔️',
+                'Toshkent shahri': 'РЎР‚РЎСџР РЏРІвЂћСћР С—РЎвЂР РЏ',
+                'Samarqand viloyati': 'РЎР‚РЎСџРІР‚СћР Р‰',
+                'Buxoro viloyati': 'РЎР‚РЎСџР РЏРІР‚С”Р С—РЎвЂР РЏ',
+                'FargР С™Р’В»ona viloyati': 'РЎР‚РЎСџР Р‰РІР‚С›',
+                'Namangan viloyati': 'РЎР‚РЎСџР РЏРІР‚СњР С—РЎвЂР РЏ',
             }
             
             for i, item in enumerate(regions_stat[:6], 1):
-                emoji = region_emoji.get(item['region'], '⭐')
+                emoji = region_emoji.get(item['region'], 'Р Р†Р’В­РЎвЂ™')
                 percent = round((item['count'] / total_week * 100), 0)
                 region_name = item['region'].replace(' viloyati', '').replace(' shahri', '')
-                message += f"\n{emoji} {region_name} — {item['count']} ({percent:.0f}%)"
+                message += f"\n{emoji} {region_name} Р Р†Р вЂљРІР‚Сњ {item['count']} ({percent:.0f}%)"
             
             if regions_stat:
                 top_region = regions_stat[0]['region'].replace(' viloyati', '').replace(' shahri', '')
                 top_region_percent = round((regions_stat[0]['count'] / total_week * 100), 0)
-                message += f"\n\n💡 Вывод: {top_region} даёт {top_region_percent}% всех заявок"
+                message += f"\n\nРЎР‚РЎСџРІР‚в„ўР Р‹ Р В РІР‚в„ўР РЋРІР‚в„–Р В Р вЂ Р В РЎвЂўР В РўвЂ: {top_region} Р В РўвЂР В Р’В°Р РЋРІР‚Р РЋРІР‚С™ {top_region_percent}% Р В Р вЂ Р РЋР С“Р В Р’ВµР РЋРІР‚В¦ Р В Р’В·Р В Р’В°Р РЋР РЏР В Р вЂ Р В РЎвЂўР В РЎвЂќ"
             
-            message += "\n\n━━━━━━━━━━━━━━━━━━━━"
-            message += "\n🔗 ИСТОЧНИКИ ТРАФИКА"
-            message += "\n━━━━━━━━━━━━━━━━━━━━\n"
+            message += "\n\nР Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“"
+            message += "\nРЎР‚РЎСџРІР‚СњРІР‚вЂќ Р В Р В Р Р‹Р В РЎС›Р В РЎвЂєР В Р’В§Р В РЎСљР В Р В РЎв„ўР В  Р В РЎС›Р В Р’В Р В РЎвЂ™Р В Р’В¤Р В Р В РЎв„ўР В РЎвЂ™"
+            message += "\nР Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“\n"
             
             source_emoji = {
-                'google': '📊 Google Ads',
-                'instagram': '📱 Instagram',
-                'facebook': '📘 Facebook',
-                'Прямые заходы': '👥 Прямые заходы'
+                'google': 'РЎР‚РЎСџРІР‚СљР вЂ° Google Ads',
+                'instagram': 'РЎР‚РЎСџРІР‚СљР’В± Instagram',
+                'facebook': 'РЎР‚РЎСџРІР‚Сљ Facebook',
+                'Р В РЎСџР РЋР вЂљР РЋР РЏР В РЎР РЋРІР‚в„–Р В Р’Вµ Р В Р’В·Р В Р’В°Р РЋРІР‚В¦Р В РЎвЂўР В РўвЂР РЋРІР‚в„–': 'РЎР‚РЎСџРІР‚РўС’ Р В РЎСџР РЋР вЂљР РЋР РЏР В РЎР РЋРІР‚в„–Р В Р’Вµ Р В Р’В·Р В Р’В°Р РЋРІР‚В¦Р В РЎвЂўР В РўвЂР РЋРІР‚в„–'
             }
             
             for i, (source, count) in enumerate(top_sources, 1):
-                source_name = source_emoji.get(source, f"🔗 {source.title()}")
+                source_name = source_emoji.get(source, f"РЎР‚РЎСџРІР‚СњРІР‚вЂќ {source.title()}")
                 percent = round((count / total_week * 100), 0)
-                message += f"\n{source_name} — {count} заявок ({percent:.0f}%)"
+                message += f"\n{source_name} Р Р†Р вЂљРІР‚Сњ {count} Р В Р’В·Р В Р’В°Р РЋР РЏР В Р вЂ Р В РЎвЂўР В РЎвЂќ ({percent:.0f}%)"
             
-            message += "\n\n━━━━━━━━━━━━━━━━━━━━"
-            message += "\n💰 ЛУЧШИЕ UTM КАМПАНИИ"
-            message += "\n━━━━━━━━━━━━━━━━━━━━\n"
+            message += "\n\nР Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“"
+            message += "\nРЎР‚РЎСџРІР‚в„ўР’В° Р В РІР‚С”Р В Р в‚¬Р В Р’В§Р В Р РѓР В Р В РІР‚Сћ UTM Р В РЎв„ўР В РЎвЂ™Р В РЎС™Р В РЎСџР В РЎвЂ™Р В РЎСљР В Р В "
+            message += "\nР Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“\n"
             
             for i, (campaign, count) in enumerate(top_campaigns, 1):
-                message += f"\n{i}️⃣ {campaign} — {count} заявок"
+                message += f"\n{i}Р С—РЎвЂР РЏР Р†РЎвЂњР в‚¬ {campaign} Р Р†Р вЂљРІР‚Сњ {count} Р В Р’В·Р В Р’В°Р РЋР РЏР В Р вЂ Р В РЎвЂўР В РЎвЂќ"
             
-            message += "\n\n━━━━━━━━━━━━━━━━━━━━"
-            message += "\n📊 КОНВЕРСИЯ ПО КАНАЛАМ"
-            message += "\n━━━━━━━━━━━━━━━━━━━━\n"
+            message += "\n\nР Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“"
+            message += "\nРЎР‚РЎСџРІР‚СљР вЂ° Р В РЎв„ўР В РЎвЂєР В РЎСљР В РІР‚в„ўР В РІР‚СћР В Р’В Р В Р Р‹Р В Р В Р вЂЎ Р В РЎСџР В РЎвЂє Р В РЎв„ўР В РЎвЂ™Р В РЎСљР В РЎвЂ™Р В РІР‚С”Р В РЎвЂ™Р В РЎС™"
+            message += "\nР Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“\n"
             
             for source, data in list(channel_conversion.items())[:3]:
                 source_name = source_emoji.get(source, source.title())
@@ -478,72 +478,72 @@ class TelegramReportSender:
                 
                 for product, count in data['products']:
                     percent = round((count / data['count'] * 100), 0)
-                    message += f"\n  • {product} → {count} заявок ({percent:.0f}%)"
+                    message += f"\n  Р Р†Р вЂљРЎС› {product} Р Р†РІР‚В РІР‚в„ў {count} Р В Р’В·Р В Р’В°Р РЋР РЏР В Р вЂ Р В РЎвЂўР В РЎвЂќ ({percent:.0f}%)"
             
-            message += "\n\n━━━━━━━━━━━━━━━━━━━━"
-            message += "\n💡 РЕКОМЕНДАЦИИ ДЛЯ МАРКЕТОЛОГОВ"
-            message += "\n━━━━━━━━━━━━━━━━━━━━\n"
+            message += "\n\nР Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“"
+            message += "\nРЎР‚РЎСџРІР‚в„ўР Р‹ Р В Р’В Р В РІР‚СћР В РЎв„ўР В РЎвЂєР В РЎС™Р В РІР‚СћР В РЎСљР В РІР‚СњР В РЎвЂ™Р В Р’В¦Р В Р В  Р В РІР‚СњР В РІР‚С”Р В Р вЂЎ Р В РЎС™Р В РЎвЂ™Р В Р’В Р В РЎв„ўР В РІР‚СћР В РЎС›Р В РЎвЂєР В РІР‚С”Р В РЎвЂєР В РІР‚СљР В РЎвЂєР В РІР‚в„ў"
+            message += "\nР Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“Р Р†РІР‚СњР С“\n"
             
-            message += "\n✅ ЧТО РАБОТАЕТ ХОРОШО:"
+            message += "\nР Р†РЎС™РІР‚В¦ Р В Р’В§Р В РЎС›Р В РЎвЂє Р В Р’В Р В РЎвЂ™Р В РІР‚Р В РЎвЂєР В РЎС›Р В РЎвЂ™Р В РІР‚СћР В РЎС› Р В РўС’Р В РЎвЂєР В Р’В Р В РЎвЂєР В Р РѓР В РЎвЂє:"
             
-            # Рекомендации на основе данных
+            # Р В Р’В Р В Р’ВµР В РЎвЂќР В РЎвЂўР В РЎР В Р’ВµР В Р вЂ¦Р В РўвЂР В Р’В°Р РЋРІР‚В Р В РЎвЂР В РЎвЂ Р В Р вЂ¦Р В Р’В° Р В РЎвЂўР РЋР С“Р В Р вЂ¦Р В РЎвЂўР В Р вЂ Р В Р’Вµ Р В РўвЂР В Р’В°Р В Р вЂ¦Р В Р вЂ¦Р РЋРІР‚в„–Р РЋРІР‚В¦
             if peak_day[1]['count'] > 0:
-                message += f"\n  • {peak_day[1]['name']} — усилить рекламу в этот день"
+                message += f"\n  Р Р†Р вЂљРЎС› {peak_day[1]['name']} Р Р†Р вЂљРІР‚Сњ Р РЋРЎвЂњР РЋР С“Р В РЎвЂР В Р’В»Р В РЎвЂР РЋРІР‚С™Р РЋР Р‰ Р РЋР вЂљР В Р’ВµР В РЎвЂќР В Р’В»Р В Р’В°Р В РЎР РЋРЎвЂњ Р В Р вЂ  Р РЋР РЉР РЋРІР‚С™Р В РЎвЂўР РЋРІР‚С™ Р В РўвЂР В Р’ВµР В Р вЂ¦Р РЋР Р‰"
             
             if top_hours:
-                message += f"\n  • {top_hours[0][0]} — пик активности, увеличить ставки"
+                message += f"\n  Р Р†Р вЂљРЎС› {top_hours[0][0]} Р Р†Р вЂљРІР‚Сњ Р В РЎвЂ”Р В РЎвЂР В РЎвЂќ Р В Р’В°Р В РЎвЂќР РЋРІР‚С™Р В РЎвЂР В Р вЂ Р В Р вЂ¦Р В РЎвЂўР РЋР С“Р РЋРІР‚С™Р В РЎвЂ, Р РЋРЎвЂњР В Р вЂ Р В Р’ВµР В Р’В»Р В РЎвЂР РЋРІР‚РЋР В РЎвЂР РЋРІР‚С™Р РЋР Р‰ Р РЋР С“Р РЋРІР‚С™Р В Р’В°Р В Р вЂ Р В РЎвЂќР В РЎвЂ"
             
             if top_sources:
                 top_source_name = source_emoji.get(top_sources[0][0], top_sources[0][0].title())
                 top_source_percent = round((top_sources[0][1] / total_week * 100), 0)
-                message += f"\n  • {top_source_name} даёт стабильно {top_source_percent}%+ заявок"
+                message += f"\n  Р Р†Р вЂљРЎС› {top_source_name} Р В РўвЂР В Р’В°Р РЋРІР‚Р РЋРІР‚С™ Р РЋР С“Р РЋРІР‚С™Р В Р’В°Р В Р’В±Р В РЎвЂР В Р’В»Р РЋР Р‰Р В Р вЂ¦Р В РЎвЂў {top_source_percent}%+ Р В Р’В·Р В Р’В°Р РЋР РЏР В Р вЂ Р В РЎвЂўР В РЎвЂќ"
             
             if top_campaigns:
-                campaign_name = top_campaigns[0][0].split(' / ')[-1]  # только название кампании
-                message += f"\n  • Кампания \"{campaign_name}\" работает лучше всего"
+                campaign_name = top_campaigns[0][0].split(' / ')[-1]  # Р РЋРІР‚С™Р В РЎвЂўР В Р’В»Р РЋР Р‰Р В РЎвЂќР В РЎвЂў Р В Р вЂ¦Р В Р’В°Р В Р’В·Р В Р вЂ Р В Р’В°Р В Р вЂ¦Р В РЎвЂР В Р’Вµ Р В РЎвЂќР В Р’В°Р В РЎР В РЎвЂ”Р В Р’В°Р В Р вЂ¦Р В РЎвЂР В РЎвЂ
+                message += f"\n  Р Р†Р вЂљРЎС› Р В РЎв„ўР В Р’В°Р В РЎР В РЎвЂ”Р В Р’В°Р В Р вЂ¦Р В РЎвЂР РЋР РЏ \"{campaign_name}\" Р РЋР вЂљР В Р’В°Р В Р’В±Р В РЎвЂўР РЋРІР‚С™Р В Р’В°Р В Р’ВµР РЋРІР‚С™ Р В Р’В»Р РЋРЎвЂњР РЋРІР‚РЋР РЋРІвЂљВ¬Р В Р’Вµ Р В Р вЂ Р РЋР С“Р В Р’ВµР В РЎвЂ“Р В РЎвЂў"
             
             if regions_stat:
                 top_region_name = regions_stat[0]['region'].replace(' viloyati', '').replace(' shahri', '')
-                message += f"\n  • {top_region_name} — основной рынок"
+                message += f"\n  Р Р†Р вЂљРЎС› {top_region_name} Р Р†Р вЂљРІР‚Сњ Р В РЎвЂўР РЋР С“Р В Р вЂ¦Р В РЎвЂўР В Р вЂ Р В Р вЂ¦Р В РЎвЂўР В РІвЂћвЂ“ Р РЋР вЂљР РЋРІР‚в„–Р В Р вЂ¦Р В РЎвЂўР В РЎвЂќ"
             
-            message += "\n\n⚠️ НА ЧТО ОБРАТИТЬ ВНИМАНИЕ:"
+            message += "\n\nР Р†РЎв„ўР’В Р С—РЎвЂР РЏ Р В РЎСљР В РЎвЂ™ Р В Р’В§Р В РЎС›Р В РЎвЂє Р В РЎвЂєР В РІР‚Р В Р’В Р В РЎвЂ™Р В РЎС›Р В Р В РЎС›Р В Р’В¬ Р В РІР‚в„ўР В РЎСљР В Р В РЎС™Р В РЎвЂ™Р В РЎСљР В Р В РІР‚Сћ:"
             
-            # Находим слабые дни
+            # Р В РЎСљР В Р’В°Р РЋРІР‚В¦Р В РЎвЂўР В РўвЂР В РЎвЂР В РЎ Р РЋР С“Р В Р’В»Р В Р’В°Р В Р’В±Р РЋРІР‚в„–Р В Р’Вµ Р В РўвЂР В Р вЂ¦Р В РЎвЂ
             min_day = min(days_stat.items(), key=lambda x: x[1]['count'])
-            if min_day[1]['count'] < total_week / 7 * 0.5:  # меньше 50% от среднего
-                message += f"\n  • {min_day[1]['name']} — мало заявок ({min_day[1]['percent']}%), снизить бюджет"
+            if min_day[1]['count'] < total_week / 7 * 0.5:  # Р В РЎР В Р’ВµР В Р вЂ¦Р РЋР Р‰Р РЋРІвЂљВ¬Р В Р’Вµ 50% Р В РЎвЂўР РЋРІР‚С™ Р РЋР С“Р РЋР вЂљР В Р’ВµР В РўвЂР В Р вЂ¦Р В Р’ВµР В РЎвЂ“Р В РЎвЂў
+                message += f"\n  Р Р†Р вЂљРЎС› {min_day[1]['name']} Р Р†Р вЂљРІР‚Сњ Р В РЎР В Р’В°Р В Р’В»Р В РЎвЂў Р В Р’В·Р В Р’В°Р РЋР РЏР В Р вЂ Р В РЎвЂўР В РЎвЂќ ({min_day[1]['percent']}%), Р РЋР С“Р В Р вЂ¦Р В РЎвЂР В Р’В·Р В РЎвЂР РЋРІР‚С™Р РЋР Р‰ Р В Р’В±Р РЋР вЂ№Р В РўвЂР В Р’В¶Р В Р’ВµР РЋРІР‚С™"
             
-            # Регионы с потенциалом
+            # Р В Р’В Р В Р’ВµР В РЎвЂ“Р В РЎвЂР В РЎвЂўР В Р вЂ¦Р РЋРІР‚в„– Р РЋР С“ Р В РЎвЂ”Р В РЎвЂўР РЋРІР‚С™Р В Р’ВµР В Р вЂ¦Р РЋРІР‚В Р В РЎвЂР В Р’В°Р В Р’В»Р В РЎвЂўР В РЎ
             if len(regions_stat) > 1:
                 second_region = regions_stat[1]['region'].replace(' viloyati', '').replace(' shahri', '')
                 second_percent = round((regions_stat[1]['count'] / total_week * 100), 0)
                 if second_percent < 30:
-                    message += f"\n  • Регионы кроме {top_region_name} — потенциал роста +30%"
+                    message += f"\n  Р Р†Р вЂљРЎС› Р В Р’В Р В Р’ВµР В РЎвЂ“Р В РЎвЂР В РЎвЂўР В Р вЂ¦Р РЋРІР‚в„– Р В РЎвЂќР РЋР вЂљР В РЎвЂўР В РЎР В Р’Вµ {top_region_name} Р Р†Р вЂљРІР‚Сњ Р В РЎвЂ”Р В РЎвЂўР РЋРІР‚С™Р В Р’ВµР В Р вЂ¦Р РЋРІР‚В Р В РЎвЂР В Р’В°Р В Р’В» Р РЋР вЂљР В РЎвЂўР РЋР С“Р РЋРІР‚С™Р В Р’В° +30%"
             
-            # Если Instagram < 20%
+            # Р В РІР‚СћР РЋР С“Р В Р’В»Р В РЎвЂ Instagram < 20%
             instagram_count = utm_sources.get('instagram', 0)
             if instagram_count > 0:
                 instagram_percent = round((instagram_count / total_week * 100), 0)
                 if instagram_percent < 20:
-                    message += f"\n  • Instagram можно усилить (только {instagram_percent}%)"
+                    message += f"\n  Р Р†Р вЂљРЎС› Instagram Р В РЎР В РЎвЂўР В Р’В¶Р В Р вЂ¦Р В РЎвЂў Р РЋРЎвЂњР РЋР С“Р В РЎвЂР В Р’В»Р В РЎвЂР РЋРІР‚С™Р РЋР Р‰ (Р РЋРІР‚С™Р В РЎвЂўР В Р’В»Р РЋР Р‰Р В РЎвЂќР В РЎвЂў {instagram_percent}%)"
             
-            message += "\n\n🎯 ДЕЙСТВИЯ НА СЛЕДУЮЩУЮ НЕДЕЛЮ:"
+            message += "\n\nРЎР‚РЎСџР вЂ№Р вЂЎ Р В РІР‚СњР В РІР‚СћР В РІвЂћСћР В Р Р‹Р В РЎС›Р В РІР‚в„ўР В Р В Р вЂЎ Р В РЎСљР В РЎвЂ™ Р В Р Р‹Р В РІР‚С”Р В РІР‚СћР В РІР‚СњР В Р в‚¬Р В Р’В®Р В Р’В©Р В Р в‚¬Р В Р’В® Р В РЎСљР В РІР‚СћР В РІР‚СњР В РІР‚СћР В РІР‚С”Р В Р’В®:"
             
-            # Топ источник
+            # Р В РЎС›Р В РЎвЂўР В РЎвЂ” Р В РЎвЂР РЋР С“Р РЋРІР‚С™Р В РЎвЂўР РЋРІР‚РЋР В Р вЂ¦Р В РЎвЂР В РЎвЂќ
             if top_sources:
                 top_source_name = source_emoji.get(top_sources[0][0], top_sources[0][0].title())
-                message += f"\n  • Увеличить бюджет {top_source_name} на 20%"
+                message += f"\n  Р Р†Р вЂљРЎС› Р В Р в‚¬Р В Р вЂ Р В Р’ВµР В Р’В»Р В РЎвЂР РЋРІР‚РЋР В РЎвЂР РЋРІР‚С™Р РЋР Р‰ Р В Р’В±Р РЋР вЂ№Р В РўвЂР В Р’В¶Р В Р’ВµР РЋРІР‚С™ {top_source_name} Р В Р вЂ¦Р В Р’В° 20%"
             
-            # Топ модель
+            # Р В РЎС›Р В РЎвЂўР В РЎвЂ” Р В РЎР В РЎвЂўР В РўвЂР В Р’ВµР В Р’В»Р РЋР Р‰
             if models_stat:
-                message += f"\n  • Запустить новую кампанию {models_stat[0]['product']} на {peak_day[1]['name'].lower()}"
+                message += f"\n  Р Р†Р вЂљРЎС› Р В РІР‚вЂќР В Р’В°Р В РЎвЂ”Р РЋРЎвЂњР РЋР С“Р РЋРІР‚С™Р В РЎвЂР РЋРІР‚С™Р РЋР Р‰ Р В Р вЂ¦Р В РЎвЂўР В Р вЂ Р РЋРЎвЂњР РЋР вЂ№ Р В РЎвЂќР В Р’В°Р В РЎР В РЎвЂ”Р В Р’В°Р В Р вЂ¦Р В РЎвЂР РЋР вЂ№ {models_stat[0]['product']} Р В Р вЂ¦Р В Р’В° {peak_day[1]['name'].lower()}"
             
-            # Регионы
+            # Р В Р’В Р В Р’ВµР В РЎвЂ“Р В РЎвЂР В РЎвЂўР В Р вЂ¦Р РЋРІР‚в„–
             if len(regions_stat) > 1:
                 second_region = regions_stat[1]['region'].replace(' viloyati', '').replace(' shahri', '')
-                message += f"\n  • Усилить таргетинг на {second_region}"
+                message += f"\n  Р Р†Р вЂљРЎС› Р В Р в‚¬Р РЋР С“Р В РЎвЂР В Р’В»Р В РЎвЂР РЋРІР‚С™Р РЋР Р‰ Р РЋРІР‚С™Р В Р’В°Р РЋР вЂљР В РЎвЂ“Р В Р’ВµР РЋРІР‚С™Р В РЎвЂР В Р вЂ¦Р В РЎвЂ“ Р В Р вЂ¦Р В Р’В° {second_region}"
             
-            # Отправляем
+            # Р В РЎвЂєР РЋРІР‚С™Р В РЎвЂ”Р РЋР вЂљР В Р’В°Р В Р вЂ Р В Р’В»Р РЋР РЏР В Р’ВµР В РЎ
             url = f"https://api.telegram.org/bot{bot_token}/sendMessage"
             payload = {
                 "chat_id": chat_id,
@@ -555,9 +555,9 @@ class TelegramReportSender:
             response = requests.post(url, json=payload, timeout=10)
             
             if response.status_code == 200:
-                logger.info("Еженедельный отчёт Telegram отправлен")
+                logger.info("Р В РІР‚СћР В Р’В¶Р В Р’ВµР В Р вЂ¦Р В Р’ВµР В РўвЂР В Р’ВµР В Р’В»Р РЋР Р‰Р В Р вЂ¦Р РЋРІР‚в„–Р В РІвЂћвЂ“ Р В РЎвЂўР РЋРІР‚С™Р РЋРІР‚РЋР РЋРІР‚Р РЋРІР‚С™ Telegram Р В РЎвЂўР РЋРІР‚С™Р В РЎвЂ”Р РЋР вЂљР В Р’В°Р В Р вЂ Р В Р’В»Р В Р’ВµР В Р вЂ¦")
             else:
-                logger.error(f"Ошибка отправки недельного отчёта: {response.text[:200]}")
+                logger.error(f"Р В РЎвЂєР РЋРІвЂљВ¬Р В РЎвЂР В Р’В±Р В РЎвЂќР В Р’В° Р В РЎвЂўР РЋРІР‚С™Р В РЎвЂ”Р РЋР вЂљР В Р’В°Р В Р вЂ Р В РЎвЂќР В РЎвЂ Р В Р вЂ¦Р В Р’ВµР В РўвЂР В Р’ВµР В Р’В»Р РЋР Р‰Р В Р вЂ¦Р В РЎвЂўР В РЎвЂ“Р В РЎвЂў Р В РЎвЂўР РЋРІР‚С™Р РЋРІР‚РЋР РЋРІР‚Р РЋРІР‚С™Р В Р’В°: {response.text[:200]}")
         
         except Exception as e:
-            logger.error(f"Ошибка формирования недельного отчёта: {str(e)}", exc_info=True)
+            logger.error(f"Р В РЎвЂєР РЋРІвЂљВ¬Р В РЎвЂР В Р’В±Р В РЎвЂќР В Р’В° Р РЋРІР‚С›Р В РЎвЂўР РЋР вЂљР В РЎР В РЎвЂР РЋР вЂљР В РЎвЂўР В Р вЂ Р В Р’В°Р В Р вЂ¦Р В РЎвЂР РЋР РЏ Р В Р вЂ¦Р В Р’ВµР В РўвЂР В Р’ВµР В Р’В»Р РЋР Р‰Р В Р вЂ¦Р В РЎвЂўР В РЎвЂ“Р В РЎвЂў Р В РЎвЂўР РЋРІР‚С™Р РЋРІР‚РЋР РЋРІР‚Р РЋРІР‚С™Р В Р’В°: {str(e)}", exc_info=True)

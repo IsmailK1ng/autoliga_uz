@@ -9,7 +9,7 @@ main/testmodels.py
 Autoliga_uz/.venv/
 # end sobirov settings #
 task.txt
-
+about_project
 # === Python / Django ===
 *.pyc
 __pycache__/

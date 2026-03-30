@@ -18,7 +18,7 @@ try:
     with connection.cursor() as cursor:
         cursor.execute("SELECT 1")
         result = cursor.fetchone()
-    print("✅ PostgreSQL ulanish muvaffaqiyatli!")
+    print("Р В Р вЂ Р РЋРЎв„ўР Р†Р вЂљР’В¦ PostgreSQL ulanish muvaffaqiyatli!")
 
     from main.models import (Dealer, Product, ProductCategory, TelegramUser,
                              TestDriveRequest)
@@ -30,4 +30,4 @@ try:
     print(f"  TestDriveRequest: {TestDriveRequest.objects.count()} ta")
 
 except Exception as e:
-    print(f"❌ Ulanish xatosi: {e}")
+    print(f"Р В Р вЂ Р РЋРЎС™Р В Р вЂ° Ulanish xatosi: {e}")

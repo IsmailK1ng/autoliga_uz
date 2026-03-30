@@ -86,7 +86,7 @@ class ForceRussianMiddleware:
             return response
 
         except Exception as e:
-            logger.error(f"Р В РЎвЂєР РЋРІвЂљВ¬Р В РЎвЂР В Р’В±Р В РЎвЂќР В Р’В° Р В Р вЂ  ForceRussianMiddleware: {str(e)}", exc_info=True)
+            logger.error(f"Ошибка в ForceRussianMiddleware: {str(e)}", exc_info=True)    
             translation.activate('uz')
             return self.get_response(request)
 
@@ -112,7 +112,7 @@ class RefreshUserPermissionsMiddleware:
             return self.get_response(request)
 
         except Exception as e:
-            logger.error(f"Р В РЎвЂєР РЋРІвЂљВ¬Р В РЎвЂР В Р’В±Р В РЎвЂќР В Р’В° Р В Р вЂ  RefreshUserPermissionsMiddleware: {str(e)}", exc_info=True)
+            logger.error(f"Ошибка в RefreshUserPermissionsMiddleware: {str(e)}", exc_info=True)
             return self.get_response(request)
 
 
@@ -414,22 +414,22 @@ class RequestSizeLimitMiddleware:
         content_type = request.META.get('CONTENT_TYPE', '')
         if 'multipart/form-data' in content_type:
             max_size = self.UPLOAD_MAX_SIZE
-            type_label = 'Р В Р’В·Р В Р’В°Р В РЎвЂ“Р РЋР вЂљР РЋРЎвЂњР В Р’В·Р В РЎвЂќР В Р’В° Р РЋРІР‚С›Р В Р’В°Р В РІвЂћвЂ“Р В Р’В»Р В Р’В°'
+            type_label = 'Загрузка файла'
         else:
             max_size = self.API_MAX_SIZE
-            type_label = 'API-Р В Р’В·Р В Р’В°Р В РЎвЂ”Р РЋР вЂљР В РЎвЂўР РЋР С“'
+            type_label = 'API-запрос'
 
         if size > max_size:
             size_kb = round(size / 1024, 1)
             limit_kb = max_size // 1024
             security_logger.warning(
-                f"Р В Р Р‹Р В Р’В»Р В РЎвЂР РЋРІвЂљВ¬Р В РЎвЂќР В РЎвЂўР В РЎ Р В Р’В±Р В РЎвЂўР В Р’В»Р РЋР Р‰Р РЋРІвЂљВ¬Р В РЎвЂўР В РІвЂћвЂ“ Р В Р’В·Р В Р’В°Р В РЎвЂ”Р РЋР вЂљР В РЎвЂўР РЋР С“ Р В Р’В·Р В Р’В°Р В Р’В±Р В Р’В»Р В РЎвЂўР В РЎвЂќР В РЎвЂР РЋР вЂљР В РЎвЂўР В Р вЂ Р В Р’В°Р В Р вЂ¦: {get_client_ip(request)} -> "
-                f"{request.path} ({size} Р В Р’В±Р В Р’В°Р В РІвЂћвЂ“Р РЋРІР‚С™, Р В Р’В»Р В РЎвЂР В РЎР В РЎвЂР РЋРІР‚С™ {max_size} Р В Р’В±Р В Р’В°Р В РІвЂћвЂ“Р РЋРІР‚С™)"
+                f"Слишком большой запрос заблокирован:{get_client_ip(request)} -> "
+                f"{request.path} ({size} байт, лимит {max_size} байт)"
             )
             return JsonResponse(
                 {
-                    'error': f'Р В Р’В Р В Р’В°Р В Р’В·Р В РЎР В Р’ВµР РЋР вЂљ Р В Р’В·Р В Р’В°Р В РЎвЂ”Р РЋР вЂљР В РЎвЂўР РЋР С“Р В Р’В° Р В РЎвЂ”Р РЋР вЂљР В Р’ВµР В Р вЂ Р РЋРІР‚в„–Р РЋРІвЂљВ¬Р В Р’В°Р В Р’ВµР РЋРІР‚С™ Р В РўвЂР В РЎвЂўР В РЎвЂ”Р РЋРЎвЂњР РЋР С“Р РЋРІР‚С™Р В РЎвЂР В РЎР РЋРІР‚в„–Р В РІвЂћвЂ“ Р В Р’В»Р В РЎвЂР В РЎР В РЎвЂР РЋРІР‚С™ Р В РўвЂР В Р’В»Р РЋР РЏ Р РЋРІР‚С™Р В РЎвЂР В РЎвЂ”Р В Р’В° Р вЂ™Р’В«{type_label}Р вЂ™Р’В».',
-                    'detail': f'Р В Р’В Р В Р’В°Р В Р’В·Р В РЎР В Р’ВµР РЋР вЂљ Р В Р вЂ Р В Р’В°Р РЋРІвЂљВ¬Р В Р’ВµР В РЎвЂ“Р В РЎвЂў Р В Р’В·Р В Р’В°Р В РЎвЂ”Р РЋР вЂљР В РЎвЂўР РЋР С“Р В Р’В°: {size_kb} Р В РЎв„ўР В РІР‚. Р В РЎС™Р В Р’В°Р В РЎвЂќР РЋР С“Р В РЎвЂР В РЎР В Р’В°Р В Р’В»Р РЋР Р‰Р В Р вЂ¦Р В РЎвЂў Р В РўвЂР В РЎвЂўР В РЎвЂ”Р РЋРЎвЂњР РЋР С“Р РЋРІР‚С™Р В РЎвЂР В РЎР В РЎвЂў: {limit_kb} Р В РЎв„ўР В РІР‚.',
+                    'error': f'Размер запроса превышает допустимый лимит для типа «{type_label}».',
+                    'detail': f'Размер вашего запроса: {size_kb} КБ. Максимально допустимо: {limit_kb} КБ.',
                 },
                 status=413
             )

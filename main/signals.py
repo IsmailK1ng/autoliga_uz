@@ -7,7 +7,7 @@ LANGUAGES = ('uz', 'ru', 'en')
 
 
 def _clear_bot_cache(model_name, instance=None):
-    """Bot API cache ni tozalash Р В Р вЂ Р В РІР‚С™Р Р†Р вЂљРЎСљ model o'zgarganda avtomatik chaqiriladi."""
+    """Bot API cache ni tozalash — model o'zgarganda avtomatik chaqiriladi."""
     if model_name == 'ProductCategory':
         for lang in LANGUAGES:
             cache.delete(f'bot:brands:{lang}')
@@ -19,14 +19,10 @@ def _clear_bot_cache(model_name, instance=None):
             if instance and instance.category_id:
                 cache.delete(f'bot:cars:{instance.category_id}:{lang}')
             cache.delete(f'bot:car:{instance.id}:{lang}') if instance else None
-            # Test-drayv uchun products ro'yxati ham cache'da turadi
-            cache.delete(f'bot:td_data:{lang}')
 
     elif model_name == 'Dealer':
         for lang in LANGUAGES:
             cache.delete(f'bot:dealers:{lang}')
-            # Test-drayv uchun dealers ro'yxati ham cache'da turadi
-            cache.delete(f'bot:td_data:{lang}')
 
 
 @receiver(post_save, sender='main.ProductCategory')

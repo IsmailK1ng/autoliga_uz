@@ -1,31 +1,28 @@
-import logging
 import os
-
+import logging
 from dotenv import load_dotenv
-
 logger = logging.getLogger(__name__)
 
-PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+# Loyiha ildiz papkasini aniqlash
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-env_path = os.path.join(PROJECT_ROOT, ".env")
+# .env yuklash
+env_path = os.path.join(BASE_DIR, ".env")
 if os.path.exists(env_path):
     load_dotenv(env_path)
 else:
-    # Docker/production: env vars are injected via docker-compose / OS environment.
-    logger.debug(".env fayli topilmadi (%s) — environment variables dan o'qiladi.", env_path)
+    logger.warning(".env fayli topilmadi, tizim o'zgaruvchilaridan foydalaniladi.")
 
+# Bot sozlamalari
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 if not BOT_TOKEN:
-    raise ValueError("BOT_TOKEN .env faylida topilmadi!")
+    # Bu yerda xatolikni aniqroq ko'rsatamiz
+    raise EnvironmentError("Muhim xato: BOT_TOKEN topilmadi. .env faylini tekshiring!")
 
-# MEDIA_ROOT ni Django settings dan olamiz 
-# local va serverda ham to'g'ri path bo'ladi
+# Django settings bilan ulanish
 try:
-    from django.conf import settings as django_settings
-
-    MEDIA_ROOT = str(django_settings.MEDIA_ROOT)
-except Exception:
-    # Django setup bo'lmagan holat uchun fallback
-    MEDIA_ROOT = os.path.join(PROJECT_ROOT, "media")
-
-# DATABASE_URL, SITE_URL, BOT_API_TOKEN — o'chirildi (bot Django ORM ishlatadi)
+    from django.conf import settings
+    MEDIA_ROOT = settings.MEDIA_ROOT
+except Exception as e:
+    logger.info("Django yuklanmadi, fallback media path ishlatiladi.")
+    MEDIA_ROOT = os.path.join(BASE_DIR, "media")

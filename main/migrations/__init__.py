@@ -15,4 +15,7 @@ class Migration(migrations.Migration):
             name='TestDriveRequest',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=255, verbose_name='Р В Р’В Р вЂ™Р’В¤Р В Р’В 
+                ('name', models.CharField(max_length=255, verbose_name='Ism')),
+            ],
+        ),
+    ]

@@ -167,7 +167,23 @@ DEALER_REGION_LABELS = {
         "toshkent-shahri": "город Ташкент",
         "namangan": "Наманганская область",
         "andijon": "Андижанская область",
-        "fargona": "Ферганская область",
+        "fargona": "Fergana region",
+    },
+    "en": {
+        "qoraqalpogiston": "Republic of Karakalpakstan",
+        "xorazm": "Khorezm region",
+        "buxoro": "Bukhara region",
+        "navoiy": "Navoi region",
+        "samarqand": "Samarkand region",
+        "qashqadaryo": "Kashkadarya region",
+        "surxondaryo": "Surkhandarya region",
+        "jizzax": "Jizzakh region",
+        "sirdaryo": "Syrdarya region",
+        "toshkent-viloyati": "Tashkent region",
+        "toshkent-shahri": "Tashkent city",
+        "namangan": "Namangan region",
+        "andijon": "Andijan region",
+        "fargona": "Fergana region",
     },
 }
 
@@ -448,7 +464,10 @@ class TestDriveStates(StatesGroup):
 # ================= KEYBOARDS =================
 
 LANG_KEYBOARD = ReplyKeyboardMarkup(
-    keyboard=[[KeyboardButton(text="🇺🇿 O'zbekcha"), KeyboardButton(text="🇷🇺 Русский")]],
+    keyboard=[
+        [KeyboardButton(text="🇺🇿 O'zbekcha"), KeyboardButton(text="🇷🇺 Русский")],
+        [KeyboardButton(text="🇺🇸 English")]
+    ],
     resize_keyboard=True,
 )
 
@@ -578,13 +597,76 @@ MESSAGES = {
         "td_invalid_phone": "❌ Неверный номер. Введите в формате +998XXXXXXXXX.",
         "td_daily_limit": "⚠️ Дневной лимит: не более 2 заявок в день.\nПопробуйте завтра.",
     },
+    "en": {
+        "choose_lang": "Choose language 🌐",
+        "send_phone": "Send your phone number 📞",
+        "send_first_name": "Enter your name",
+        "send_age": "Enter your age (example: 25)",
+        "wrong_age": "Invalid age ❌\nEnter only numbers (5-100)",
+        "choose_region": "Choose your region",
+        "choose_district": "Choose your district",
+        "saved": "Your data is saved ✅",
+        "wrong_format": "Invalid format ❌",
+        "choose_from_list": "Please choose from the list",
+        "main_menu": "Main menu 👇",
+        "welcome_back": "Welcome back 👋\nMain menu:",
+        "no_cars": "Cars are not available yet.",
+        "choose_brand": "🚗 Choose brand:",
+        "choose_model": "Choose model:",
+        "back_btn": "🔙 Back",
+        "dealers_title": "🏢 Dealerships:\n\nMore information will be added soon.\n\nVisit our website: autoliga.uz/dealers/",
+        "change_lang_btn": "🌐 Change language",
+        "lang_changed": "Language changed ✅\nMain menu:",
+        "unsupported": "Please send only text ✍️",
+        "invalid_name": (
+            "❌ Name entered incorrectly!\n\n"
+            "✅ Rules:\n"
+            "• Only letters (Latin or Cyrillic)\n"
+            "• Minimum 2 letters\n"
+            "• Maximum 30 letters\n"
+            "• Numbers, emojis, symbols prohibited"
+        ),
+        "confirm_name": "Your name: <b>{}</b>\n\nIs it correct?",
+        "confirm_age": "Your age: <b>{}</b>\n\nIs it correct?",
+        "confirm_region": "Your region: <b>{}</b>\n\nIs it correct?",
+        "confirm_district": "Your district: <b>{}</b>\n\nIs it correct?",
+        "yes_btn": "✅ Yes",
+        "no_btn": "❌ No, enter again",
+        "test_drive_btn": "🚗 Book test drive",
+        "td_choose_dealer": "🏢 Choose dealership:",
+        "td_choose_product": "🚗 Choose car model:",
+        "td_choose_date": "📅 Choose date:",
+        "td_choose_time": "🕐 Choose time:",
+        "td_enter_name": "👤 Enter your name:",
+        "td_enter_phone": "📞 Enter your phone number:\nExample: +998901234567",
+        "td_confirm": (
+            "📋 <b>Test drive details:</b>\n\n"
+            "🏢 Dealer: <b>{dealer}</b>\n"
+            "🚗 Model: <b>{product}</b>\n"
+            "📅 Date: <b>{date}</b>\n"
+            "🕐 Time: <b>{time}</b>\n"
+            "👤 Name: <b>{name}</b>\n"
+            "📞 Phone: <b>{phone}</b>\n\n"
+            "Is everything correct?"
+        ),
+        "td_success": "✅ You have successfully booked a test drive!\nWe will contact you soon.",
+        "td_no_dealers": (
+            "⚠️ Dealerships for test drive are not added yet.\n"
+            "Please try again later."
+        ),
+        "td_error": "❌ An error occurred. Try again.",
+        "td_invalid_date": "❌ Please choose a date from the list.",
+        "td_invalid_phone": "❌ Invalid number. Enter in format +998XXXXXXXXX.",
+        "td_daily_limit": "⚠️ Daily limit: no more than 2 requests per day.\nTry tomorrow.",
+    },
 }
 
 CHANGE_LANG_BTNS = {
     MESSAGES["uz"]["change_lang_btn"],
     MESSAGES["ru"]["change_lang_btn"],
+    MESSAGES["en"]["change_lang_btn"],
 }
-TEST_DRIVE_BTNS = {MESSAGES["uz"]["test_drive_btn"], MESSAGES["ru"]["test_drive_btn"]}
+TEST_DRIVE_BTNS = {MESSAGES["uz"]["test_drive_btn"], MESSAGES["ru"]["test_drive_btn"], MESSAGES["en"]["test_drive_btn"]}
 
 class _LRUDict(OrderedDict):
     """Bounded dict — evicts oldest entry when maxsize exceeded."""
@@ -628,6 +710,18 @@ def get_main_menu_keyboard(lang: str) -> ReplyKeyboardMarkup:
             ],
             resize_keyboard=True,
         )
+    if lang == "en":
+        return ReplyKeyboardMarkup(
+            keyboard=[
+                [
+                    KeyboardButton(text="🚗 Cars"),
+                    KeyboardButton(text="🏢 Dealerships"),
+                ],
+                [KeyboardButton(text=MESSAGES["en"]["test_drive_btn"])],
+                [KeyboardButton(text=MESSAGES["en"]["change_lang_btn"])],
+            ],
+            resize_keyboard=True,
+        )
     return ReplyKeyboardMarkup(
         keyboard=[
             [
@@ -646,16 +740,16 @@ def build_car_caption(car: dict, lang: str = "uz") -> str:
     title = html_module.escape(car['title'])
 
     if lang == "uz":
-        lines = [f"UZ:{title}"]
+        lines = [f"UZ: {title}"]
         if car.get("year"):
             lines.append(f"📅 {html_module.escape(str(car['year']))}")
         if car.get("price"):
-            lines.append(f"💰 {html_module.escape(str(car['price']))} sum")
+            lines.append(f"💰 {html_module.escape(str(car['price']))} summ")
         if car.get("power"):
             lines.append(f"⚡️ {html_module.escape(str(car['power']))} o.k.")
         if car.get("fuel"):
             lines.append(f"⛽️ {html_module.escape(str(car['fuel']))} L/100km")
-    else:  # ru
+    elif lang == "ru":
         lines = [title]
         if car.get("year"):
             lines.append(f"📅 {html_module.escape(str(car['year']))}")
@@ -665,6 +759,16 @@ def build_car_caption(car: dict, lang: str = "uz") -> str:
             lines.append(f"⚡️ {html_module.escape(str(car['power']))} л.с.")
         if car.get("fuel"):
             lines.append(f"⛽️ {html_module.escape(str(car['fuel']))} л/100км")
+    else:  # en
+        lines = [title]
+        if car.get("year"):
+            lines.append(f"📅 {html_module.escape(str(car['year']))}")
+        if car.get("price"):
+            lines.append(f"💰 {html_module.escape(str(car['price']))} UZS")
+        if car.get("power"):
+            lines.append(f"⚡️ {html_module.escape(str(car['power']))} hp")
+        if car.get("fuel"):
+            lines.append(f"⛽️ {html_module.escape(str(car['fuel']))} L/100km")
 
     return "\n".join(lines)
 
@@ -723,7 +827,7 @@ async def start(message: types.Message, state: FSMContext):
 async def request_lang_change(message: types.Message, state: FSMContext):
     await state.clear()
     await message.answer(
-        MESSAGES["uz"]["choose_lang"] + " / " + MESSAGES["ru"]["choose_lang"],
+        MESSAGES["uz"]["choose_lang"] + " / " + MESSAGES["ru"]["choose_lang"] + " / " + MESSAGES["en"]["choose_lang"],
         reply_markup=LANG_KEYBOARD,
     )
 
@@ -731,10 +835,15 @@ async def request_lang_change(message: types.Message, state: FSMContext):
 # ================= LANGUAGE =================
 
 
-@dp.message(F.text.startswith("🇺🇿") | F.text.startswith("🇷🇺"))
+@dp.message(F.text.startswith("🇺🇿") | F.text.startswith("🇷🇺") | F.text.startswith("🇺🇸"))
 async def choose_language(message: types.Message, state: FSMContext):
     uid = message.from_user.id
-    lang = "uz" if message.text.startswith("🇺🇿") else "ru"
+    if message.text.startswith("🇺🇿"):
+        lang = "uz"
+    elif message.text.startswith("🇷🇺"):
+        lang = "ru"
+    else:
+        lang = "en"
     user_lang[uid] = lang
 
     await update_or_create_user(  # ← await qo'shildi
@@ -782,7 +891,7 @@ async def save_phone(message: types.Message, state: FSMContext):
 # ================= MAIN MENU: MASHINALAR =================
 
 
-@dp.message(F.text.in_({"🚗 Mashinalar", "🚗 Автомобили"}))
+@dp.message(F.text.in_({"🚗 Mashinalar", "🚗 Автомобили", "🚗 Cars"}))
 async def show_brands(message: types.Message, state: FSMContext):
     lang = user_lang.get(message.from_user.id, "uz")
     brands = await get_brands(lang)  # ← await qo'shildi
@@ -803,7 +912,7 @@ async def show_brands(message: types.Message, state: FSMContext):
 # ================= MAIN MENU: DILERLAR =================
 
 
-@dp.message(F.text.in_({"🏢 Dilerlik markazlari", "🏢 Дилерские центры"}))
+@dp.message(F.text.in_({"🏢 Dilerlik markazlari", "🏢 Дилерские центры", "🏢 Dealerships"}))
 async def show_dealers(message: types.Message):
     lang = user_lang.get(message.from_user.id, "uz")
     dealers = await get_dealers(lang)  # ← await qo'shildi
@@ -812,11 +921,12 @@ async def show_dealers(message: types.Message):
         await message.answer(MESSAGES[lang]["dealers_title"])
         return
 
-    header = (
-        "🏢 <b>Dilerlik markazlari:</b>\n\n"
-        if lang == "uz"
-        else "🏢 <b>Дилерские центры:</b>\n\n"
-    )
+    if lang == "uz":
+        header = "🏢 <b>Dilerlik markazlari:</b>\n\n"
+    elif lang == "ru":
+        header = "🏢 <b>Дилерские центры:</b>\n\n"
+    else:
+        header = "🏢 <b>Dealerships:</b>\n\n"
     lines = []
     for d in dealers:
         block = f"<b>{html_module.escape(d['name'])}</b>"

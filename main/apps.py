@@ -21,7 +21,7 @@ class MainConfig(AppConfig):
             sys.path.insert(0, bot_dir)
             from bot import main as bot_main
 
-            # Yangi event loop yaratamiz — signal muammosini hal qiladi
+            # Yangi event loop yaratamiz вЂ” signal muammosini hal qiladi
             loop = asyncio.new_event_loop()
             asyncio.set_event_loop(loop)
             loop.run_until_complete(bot_main())

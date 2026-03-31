@@ -4,7 +4,7 @@
 
 """
 Bot Service Layer - ORM-based functions for Telegram bot
-Clean architecture: Service → Models
+Clean architecture: Service в†’ Models
 No serializers, no APIView, no DRF dependencies
 
 USAGE EXAMPLES:

@@ -216,9 +216,9 @@
                 <div class="col-12 col-xl-12 mxd-grid-item no-margin">
                   <div class="mxd-section-title__hrtitle">
                   <h2 class="reveal-type">
-                      {% if request.LANGUAGE_CODE == 'uz' %}
+                      {% if LANGUAGE_CODE == 'uz' %}
                           Bizning mashinalar
-                      {% elif request.LANGUAGE_CODE == 'ru' %}
+                      {% elif LANGUAGE_CODE == 'ru' %}
                           Наши автомобили
                       {% else %}
                           Our Cars
@@ -240,9 +240,9 @@
                   <div class="mxd-section-title__hrcontrols ">
                     <a class="btn btn-anim btn-default btn-outline slide-right-up" href="#faw-main-contact-form">
                         <span class="btn-caption">
-                            {% if request.LANGUAGE_CODE == 'uz' %}
+                            {% if LANGUAGE_CODE == 'uz' %}
                                 Biz bilan bog'laning
-                            {% elif request.LANGUAGE_CODE == 'ru' %}
+                            {% elif LANGUAGE_CODE == 'ru' %}
                                 Свяжитесь с нами
                             {% else %}
                                 Contact Us
@@ -296,7 +296,7 @@
     <!-- Mijozlar fikrlari (START) -->
     <div class="mxd-section">
       <div class="mxd-container" style="max-width:1200px;margin:0 auto;padding:0 20px;">
-        <h2 class="reviews-title">{% if request.LANGUAGE_CODE == 'uz' %}Mijozlarimiz nima deydi{% elif request.LANGUAGE_CODE == 'ru' %}Что говорят наши клиенты{% else %}What our clients say{% endif %}</h2>
+        <h2 class="reviews-title">{% if LANGUAGE_CODE == 'uz' %}Mijozlarimiz nima deydi{% elif LANGUAGE_CODE == 'ru' %}Что говорят наши клиенты{% else %}What our clients say{% endif %}</h2>
       </div>
 
       <!-- Marquee reviews -->
@@ -311,7 +311,7 @@
 
       <div class="mxd-container" style="max-width:1200px;margin:0 auto;padding:0 20px;">
         <div class="reviews-cta">
-          <button class="reviews-cta-btn" id="openReviewFormBtn">{% if request.LANGUAGE_CODE == 'uz' %}Fikr qoldirish{% elif request.LANGUAGE_CODE == 'ru' %}Оставить комментарий{% else %}Leave a review{% endif %}</button>
+          <button class="reviews-cta-btn" id="openReviewFormBtn">{% if LANGUAGE_CODE == 'uz' %}Fikr qoldirish{% elif LANGUAGE_CODE == 'ru' %}Оставить комментарий{% else %}Leave a review{% endif %}</button>
         </div>
       </div>
     </div>
@@ -349,22 +349,22 @@
     <div class="review-modal-overlay" id="reviewFormOverlay">
       <div class="review-modal review-form-modal">
         <button class="review-modal-close" id="reviewFormClose">&times;</button>
-        <h3 class="review-form-title">{% if request.LANGUAGE_CODE == 'uz' %}Fikr qoldirish{% elif request.LANGUAGE_CODE == 'ru' %}Оставить отзыв{% else %}Leave a review{% endif %}</h3>
+        <h3 class="review-form-title">{% if LANGUAGE_CODE == 'uz' %}Fikr qoldirish{% elif LANGUAGE_CODE == 'ru' %}Оставить отзыв{% else %}Leave a review{% endif %}</h3>
 
         <div class="review-success-msg" id="reviewSuccessMsg" style="display:none;">
           <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><circle cx="11" cy="11" r="11" fill="#4CAF50"/><path d="M6 11l3 3 7-7" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          <span>{% if request.LANGUAGE_CODE == 'uz' %}Rahmat! Fikringiz tekshiruvga yuborildi.<br>Moderatsiyadan so'ng saytda paydo bo'ladi{% elif request.LANGUAGE_CODE == 'ru' %}Спасибо! Ваш отзыв отправлен на проверку.<br>После модерации он появится на сайте{% else %}Thank you! Your review has been sent for moderation.<br>It will appear on the site after approval{% endif %}</span>
+          <span>{% if LANGUAGE_CODE == 'uz' %}Rahmat! Fikringiz tekshiruvga yuborildi.<br>Moderatsiyadan so'ng saytda paydo bo'ladi{% elif LANGUAGE_CODE == 'ru' %}Спасибо! Ваш отзыв отправлен на проверку.<br>После модерации он появится на сайте{% else %}Thank you! Your review has been sent for moderation.<br>It will appear on the site after approval{% endif %}</span>
         </div>
 
         <div class="review-error-msg" id="reviewErrorMsg" style="display:none;"></div>
 
         <form id="reviewForm" autocomplete="off" enctype="multipart/form-data">
           <div class="review-form-group">
-            <label class="review-form-label">{% if request.LANGUAGE_CODE == 'uz' %}Ismingiz{% elif request.LANGUAGE_CODE == 'ru' %}Ваше имя{% else %}Your name{% endif %}</label>
-            <input type="text" class="review-form-input" id="reviewName" placeholder="{% if request.LANGUAGE_CODE == 'uz' %}Ismingizni kiriting{% elif request.LANGUAGE_CODE == 'ru' %}Введите имя{% else %}Enter your name{% endif %}" required maxlength="150">
+            <label class="review-form-label">{% if LANGUAGE_CODE == 'uz' %}Ismingiz{% elif LANGUAGE_CODE == 'ru' %}Ваше имя{% else %}Your name{% endif %}</label>
+            <input type="text" class="review-form-input" id="reviewName" placeholder="{% if LANGUAGE_CODE == 'uz' %}Ismingizni kiriting{% elif LANGUAGE_CODE == 'ru' %}Введите имя{% else %}Enter your name{% endif %}" required maxlength="150">
           </div>
           <div class="review-form-group">
-            <label class="review-form-label">{% if request.LANGUAGE_CODE == 'uz' %}Baho{% elif request.LANGUAGE_CODE == 'ru' %}Оценка{% else %}Rating{% endif %}</label>
+            <label class="review-form-label">{% if LANGUAGE_CODE == 'uz' %}Baho{% elif LANGUAGE_CODE == 'ru' %}Оценка{% else %}Rating{% endif %}</label>
             <div class="review-form-stars" id="reviewFormStars">
               <span class="star-pick" data-value="1">&#9733;</span>
               <span class="star-pick" data-value="2">&#9733;</span>
@@ -374,11 +374,11 @@
             </div>
           </div>
           <div class="review-form-group">
-            <label class="review-form-label">{% if request.LANGUAGE_CODE == 'uz' %}Fikringiz{% elif request.LANGUAGE_CODE == 'ru' %}Ваш отзыв{% else %}Your review{% endif %}</label>
-            <textarea class="review-form-textarea" id="reviewText" placeholder="{% if request.LANGUAGE_CODE == 'uz' %}Fikringizni yozing...{% elif request.LANGUAGE_CODE == 'ru' %}Напишите отзыв...{% else %}Write your review...{% endif %}" rows="4" required maxlength="2000"></textarea>
+            <label class="review-form-label">{% if LANGUAGE_CODE == 'uz' %}Fikringiz{% elif LANGUAGE_CODE == 'ru' %}Ваш отзыв{% else %}Your review{% endif %}</label>
+            <textarea class="review-form-textarea" id="reviewText" placeholder="{% if LANGUAGE_CODE == 'uz' %}Fikringizni yozing...{% elif LANGUAGE_CODE == 'ru' %}Напишите отзыв...{% else %}Write your review...{% endif %}" rows="4" required maxlength="2000"></textarea>
           </div>
           <div class="review-form-group">
-            <label class="review-form-label">{% if request.LANGUAGE_CODE == 'uz' %}Avatar uchun rasm (ixtiyoriy){% elif request.LANGUAGE_CODE == 'ru' %}Фото для аватара (необязательно){% else %}Avatar photo (optional){% endif %}</label>
+            <label class="review-form-label">{% if LANGUAGE_CODE == 'uz' %}Avatar uchun rasm (ixtiyoriy){% elif LANGUAGE_CODE == 'ru' %}Фото для аватара (необязательно){% else %}Avatar photo (optional){% endif %}</label>
             <div class="review-upload-area">
               <label class="review-upload-btn" for="reviewPhoto">
                 <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M16 11v4a2 2 0 01-2 2H4a2 2 0 01-2-2v-4M13 6l-4-4-4 4M9 2v10" stroke="#F7941D" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -388,7 +388,7 @@
               <span class="review-upload-filename" id="reviewFileName"></span>
             </div>
           </div>
-          <button type="submit" class="review-submit-btn" id="reviewSubmitBtn">{% if request.LANGUAGE_CODE == 'uz' %}Yuborish{% elif request.LANGUAGE_CODE == 'ru' %}Отправить отзыв{% else %}Submit review{% endif %}</button>
+          <button type="submit" class="review-submit-btn" id="reviewSubmitBtn">{% if LANGUAGE_CODE == 'uz' %}Yuborish{% elif LANGUAGE_CODE == 'ru' %}Отправить отзыв{% else %}Submit review{% endif %}</button>
         </form>
       </div>
     </div>
@@ -782,9 +782,9 @@
                 <div class="contact-info">
                   <div class="contact-info__content">
                    <h2 class="contact-info__title">
-                      {% if request.LANGUAGE_CODE == 'uz' %}
+                      {% if LANGUAGE_CODE == 'uz' %}
                           Biz bilan bog'lanish
-                      {% elif request.LANGUAGE_CODE == 'ru' %}
+                      {% elif LANGUAGE_CODE == 'ru' %}
                           Связаться с нами
                       {% else %}
                           Contact Us
@@ -801,38 +801,62 @@
                       {% endif %}
                     </p>
 
-                    <div class="contact-info__details">
-                      <div class="contact-detail ">
-                        <div class="contact-detail__icon">
-                          <i class="ph-fill ph-phone"></i>
-                        </div>
-                        <div class="contact-detail__content">
-                          <h4 class="contact-detail__title">Telefon</h4>
-                          <a href="tel:+998712345678" class="contact-detail__value">+998 00 000 00 00</a>
-                        </div>
-                      </div>
 
-                      <div class="contact-detail ">
-                        <div class="contact-detail__icon">
-                          <i class="ph-fill ph-envelope"></i>
-                        </div>
-                        <div class="contact-detail__content">
-                          <h4 class="contact-detail__title">Email</h4>
-                          <a href="mailto:info@fawtrucks.uz" class="contact-detail__value">example@autoliga.uz</a>
-                        </div>
-                      </div>
+                  <div class="contact-info__details">
 
-                      <div class="contact-detail ">
-                        <div class="contact-detail__icon">
-                          <i class="ph-fill ph-map-pin"></i>
-                        </div>
-                        <div class="contact-detail__content">
-                          <h4 class="contact-detail__title">Manzil</h4>
-                          <p class="contact-detail__value">Lorem ipsum dolor sit amet consectetur adipisicing.
-                          </p>
-                        </div>
+                    <!-- Telefon -->
+                    <div class="contact-detail">
+                      <div class="contact-detail__icon">
+                        <i class="ph-fill ph-phone"></i>
+                      </div>
+                      <div class="contact-detail__content">
+                        <h4 class="contact-detail__title">
+                          {% if LANGUAGE_CODE == 'uz' %}Telefon{% elif LANGUAGE_CODE == 'ru' %}Телефон{% else %}Phone{% endif %}
+                        </h4>
+                        <a href="tel:+998712345678" class="contact-detail__value">
+                          {% if LANGUAGE_CODE == 'uz' %}+998 78 555 73 77{% elif LANGUAGE_CODE == 'ru' %}+998 78 555 73 77{% else %}+998 78 555 73 77{% endif %}
+                        </a>
                       </div>
                     </div>
+
+                    <!-- Email -->
+                    <div class="contact-detail">
+                      <div class="contact-detail__icon">
+                        <i class="ph-fill ph-envelope"></i>
+                      </div>
+                      <div class="contact-detail__content">
+                        <h4 class="contact-detail__title">
+                          {% if LANGUAGE_CODE == 'uz' %}Email{% elif LANGUAGE_CODE == 'ru' %}Электронная почта{% else %}Email{% endif %}
+                        </h4>
+                        <a href="mailto:info@fawtrucks.uz" class="contact-detail__value">
+                          {% if LANGUAGE_CODE == 'uz' %}example@autoliga.uz{% elif LANGUAGE_CODE == 'ru' %}example@autoliga.uz{% else %}example@autoliga.uz{% endif %}
+                        </a>
+                      </div>
+                    </div>
+
+                    <!-- Manzil -->
+                    <div class="contact-detail">
+                      <div class="contact-detail__icon">
+                        <i class="ph-fill ph-map-pin"></i>
+                      </div>
+                      <div class="contact-detail__content">
+                        <h4 class="contact-detail__title">
+                          {% if LANGUAGE_CODE == 'uz' %}Manzil{% elif LANGUAGE_CODE == 'ru' %}Адрес{% else %}Address{% endif %}
+                        </h4>
+                        <p class="contact-detail__value">
+                          {% if LANGUAGE_CODE == 'uz' %}
+                          Toshkent sh., Farog‘at 2-chi avtomashina, 2
+                          {% elif LANGUAGE_CODE == 'ru' %}
+                          Ташкент, Фарогат, 2-й автосервис, 2
+                          {% else %}
+                          Tashkent, Farogat 2nd Car Service, 2
+                          {% endif %}
+                        </p>
+                      </div>
+                    </div>
+
+                  </div>
+
                   </div>
                 </div>
               </div>
@@ -854,7 +878,7 @@
                         <div class="container-fluid p-0">
                           <div class="row gx-0">
                             <div class="col-12 mxd-grid-item ">
-                                <input type="text" name="name" placeholder="{% if request.LANGUAGE_CODE == 'uz' %}Ismingiz*{% elif request.LANGUAGE_CODE == 'ru' %}Ваше имя*{% else %}Your Name*{% endif %}" required>
+                                <input type="text" name="name" placeholder="{% if LANGUAGE_CODE == 'uz' %}Ismingiz*{% elif LANGUAGE_CODE == 'ru' %}Ваше имя*{% else %}Your Name*{% endif %}" required>
                             </div>
                             <div class="col-12 mxd-grid-item ">
                               <select name="region" required>
@@ -958,13 +982,13 @@
 <div class="mxd-section ht-section">
   <div class="mxd-container" style="max-width:1200px;margin:0 auto;padding:0 20px;">
     <h2 class="home-team-title">
-      {% if request.LANGUAGE_CODE == 'uz' %}Bizning jamoa
-      {% elif request.LANGUAGE_CODE == 'ru' %}Наша команда
+      {% if LANGUAGE_CODE == 'uz' %}Bizning jamoa
+      {% elif LANGUAGE_CODE == 'ru' %}Наша команда
       {% else %}Our team{% endif %}
     </h2>
     <p class="home-team-subtitle">
-      {% if request.LANGUAGE_CODE == 'uz' %}Har bir filialimizda sizni professional mutaxassislar kutib oladi
-      {% elif request.LANGUAGE_CODE == 'ru' %}В каждом нашем филиале вас встретят профессионалы своего дела
+      {% if LANGUAGE_CODE == 'uz' %}Har bir filialimizda sizni professional mutaxassislar kutib oladi
+      {% elif LANGUAGE_CODE == 'ru' %}В каждом нашем филиале вас встретят профессионалы своего дела
       {% else %}Professional specialists are waiting for you at each of our branches{% endif %}
     </p>
   </div>
@@ -1006,8 +1030,8 @@
 
   <div style="text-align:center;padding:20px 20px 0;">
     <a href="{% url 'team' %}" class="home-team-cta-btn">
-      {% if request.LANGUAGE_CODE == 'uz' %}Barcha jamoani ko'rish
-      {% elif request.LANGUAGE_CODE == 'ru' %}Вся команда
+      {% if LANGUAGE_CODE == 'uz' %}Barcha jamoani ko'rish
+      {% elif LANGUAGE_CODE == 'ru' %}Вся команда
       {% else %}View all team{% endif %}
     </a>
   </div>
@@ -1027,8 +1051,8 @@
         <p class="home-team-modal-dealer" id="htmDealer"><i class="ph ph-buildings"></i> <span></span></p>
         <a href="" class="home-team-modal-phone-btn" id="htmPhone" style="display:none;">
           <i class="ph ph-phone"></i>
-          {% if request.LANGUAGE_CODE == 'uz' %}Qo'ng'iroq qilish
-          {% elif request.LANGUAGE_CODE == 'ru' %}Позвонить
+          {% if LANGUAGE_CODE == 'uz' %}Qo'ng'iroq qilish
+          {% elif LANGUAGE_CODE == 'ru' %}Позвонить
           {% else %}Call{% endif %}
           <span class="home-team-modal-phone-num" id="htmPhoneNum"></span>
         </a>

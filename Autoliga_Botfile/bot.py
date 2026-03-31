@@ -38,9 +38,9 @@ from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
 from aiogram.fsm.storage.memory import MemoryStorage
 from aiogram.types import (FSInputFile, KeyboardButton, ReplyKeyboardMarkup,
-                           ReplyKeyboardRemove)
+                           ReplyKeyboardRemove, InlineKeyboardButton, InlineKeyboardMarkup)
 from asgiref.sync import sync_to_async
-from config import BOT_TOKEN, MEDIA_ROOT
+from config import BOT_TOKEN, MEDIA_ROOT, SITE_URL
 
 
 # ================= LOGGING =================
@@ -641,20 +641,31 @@ def get_main_menu_keyboard(lang: str) -> ReplyKeyboardMarkup:
     )
 
 
-def build_car_caption(car: dict) -> str:
-    lines = [f"<b>{html_module.escape(car['title'])}</b>"]
-    if car.get("year"):
-        lines.append(f"📅 {html_module.escape(str(car['year']))}")
-    if car.get("price"):
-        lines.append(f"💰 {html_module.escape(str(car['price']))}")
-    if car.get("power"):
-        lines.append(f"⚡ {html_module.escape(str(car['power']))}")
-    if car.get("fuel"):
-        lines.append(f"⛽ {html_module.escape(str(car['fuel']))}")
-    if car.get("features"):
-        lines.append("")
-        for feat in car["features"]:
-            lines.append(f"• {html_module.escape(feat)}")
+def build_car_caption(car: dict, lang: str = "uz") -> str:
+    """Build car caption based on language"""
+    title = html_module.escape(car['title'])
+
+    if lang == "uz":
+        lines = [f"UZ:{title}"]
+        if car.get("year"):
+            lines.append(f"📅 {html_module.escape(str(car['year']))}")
+        if car.get("price"):
+            lines.append(f"💰 {html_module.escape(str(car['price']))} sum")
+        if car.get("power"):
+            lines.append(f"⚡️ {html_module.escape(str(car['power']))} o.k.")
+        if car.get("fuel"):
+            lines.append(f"⛽️ {html_module.escape(str(car['fuel']))} L/100km")
+    else:  # ru
+        lines = [title]
+        if car.get("year"):
+            lines.append(f"📅 {html_module.escape(str(car['year']))}")
+        if car.get("price"):
+            lines.append(f"💰 {html_module.escape(str(car['price']))} сум")
+        if car.get("power"):
+            lines.append(f"⚡️ {html_module.escape(str(car['power']))} л.с.")
+        if car.get("fuel"):
+            lines.append(f"⛽️ {html_module.escape(str(car['fuel']))} л/100км")
+
     return "\n".join(lines)
 
 
@@ -984,17 +995,23 @@ async def handle_all(message: types.Message, state: FSMContext):
             await message.answer("❌")
             return
 
-        caption = build_car_caption(car)
+        caption = build_car_caption(car, lang)
+
+        # Create inline button for site
+        button_text = "Batafsil ma’lumot" if lang == "uz" else "Подробнее"
+        site_url = f"{SITE_URL}/products/{car['slug']}/"
+        inline_button = InlineKeyboardButton(text=button_text, url=site_url)
+        inline_kb = InlineKeyboardMarkup(inline_keyboard=[[inline_button]])
 
         image_url = car.get("card_image") or car.get("main_image")
         image_path = get_image_path(image_url) if image_url else None
 
         if image_path:
             await message.answer_photo(
-                photo=FSInputFile(image_path), caption=caption, parse_mode="HTML"
+                photo=FSInputFile(image_path), caption=caption, reply_markup=inline_kb
             )
         else:
-            await message.answer(caption, parse_mode="HTML")
+            await message.answer(caption, reply_markup=inline_kb)
         return
 
     # ===== REGISTRATION: FIRST NAME =====

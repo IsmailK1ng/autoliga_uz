@@ -19,6 +19,9 @@ if not BOT_TOKEN:
     # Bu yerda xatolikni aniqroq ko'rsatamiz
     raise EnvironmentError("Muhim xato: BOT_TOKEN topilmadi. .env faylini tekshiring!")
 
+# Sayt URL
+SITE_URL = os.getenv("SITE_URL", "https://autoliga.uz")
+
 # Django settings bilan ulanish
 try:
     from django.conf import settings

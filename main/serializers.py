@@ -1,17 +1,18 @@
 # main/serializers.py
-
 from rest_framework import serializers
-import logging
-
-logger = logging.getLogger('django')
 from main.serializers_base import LanguageSerializerMixin
 
 from .models import (
+    TelegramUser, Dealer, DealerImage, BranchManager,
     News, NewsBlock, ContactForm, JobApplication,
     Product, FeatureIcon, ProductCardSpec, ProductParameter, ProductFeature, ProductGallery, ProductCategory,
     Vacancy, VacancyResponsibility, VacancyRequirement, VacancyCondition, VacancyIdealCandidate,
     Review, TestDriveRequest
 )
+
+import logging
+
+logger = logging.getLogger('django')
 
 
 # ========== НОВОСТИ ==========
@@ -575,41 +576,10 @@ class TestDriveSerializer(serializers.ModelSerializer):
                 validated_data['utm_data'] = json.dumps(utm_from_body, ensure_ascii=False)
 
         validated_data['status'] = 'new'
+        # этот параметр нужен для логики получения тест-драйвов от бота в админке
+        if not validated_data.get('referer'):
+            validated_data['referer'] = 'telegram_bot'
         return super().create(validated_data)
 
 
-# ========== BOT API SERIALIZERS ==========
-
-from .models import TelegramUser, Dealer
-
-class BotTelegramUserSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = TelegramUser
-        fields = ['id', 'telegram_id', 'username', 'first_name', 'age', 'phone', 'region', 'language', 'created_at']
-        read_only_fields = ['id', 'created_at']
-
-class BotDealerSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Dealer
-        fields = ['id', 'name', 'address', 'phone', 'region']
-
-class BotBrandSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = ProductCategory
-        fields = ['id', 'name']
-
-class BotCarSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Product
-        fields = ['id', 'title', 'main_image', 'card_image',
-                  'slider_price', 'slider_year', 'slider_power', 'slider_fuel_consumption']
-
-class BotTestDriveSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = TestDriveRequest
-        fields = ['name', 'phone', 'dealer', 'product', 'preferred_date', 'preferred_time', 'agree_terms']
-
-    def create(self, validated_data):
-        validated_data['status'] = 'new'
-        validated_data['referer'] = 'telegram_bot'
-        return super().create(validated_data)
+# ========== BOT SERIALIZERS ========== (REMOVED - now using BotService)

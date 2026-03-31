@@ -3,8 +3,7 @@ import sys
 
 from aiogram import types
 from asgiref.sync import sync_to_async
-from django.core.exceptions import ObjectDoesNotExist
-from main.models import TelegramUser
+from main.services.bot_service import BotService
 
 PROJECT_ROOT = os.path.dirname(
     os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -15,26 +14,13 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "myproject.settings")
 
 @sync_to_async
 def get_user(telegram_id: int):
-    try:
-        return TelegramUser.objects.get(telegram_id=telegram_id)
-    except ObjectDoesNotExist:
-        return None
+    return BotService.get_telegram_user(telegram_id)
 
 
 @sync_to_async
 def update_user_field(telegram_id: int, **kwargs):
-    try:
-        user = TelegramUser.objects.get(telegram_id=telegram_id)
-        changed_fields = []
-        for key, value in kwargs.items():
-            if value is not None:
-                setattr(user, key, value)
-                changed_fields.append(key)
-        if changed_fields:
-            user.save(update_fields=changed_fields)
-        return user
-    except ObjectDoesNotExist:
-        return None
+    user, created = BotService.create_or_update_telegram_user(telegram_id, **kwargs)
+    return user
 
 
 async def profile_handler(message: types.Message):

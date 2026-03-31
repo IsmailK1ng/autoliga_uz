@@ -6,23 +6,22 @@ from django.utils import translation
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework import viewsets, status
-from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAdminUser
 from django.http import HttpResponseRedirect
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.throttling import AnonRateThrottle
-from .models import (
-    News, ContactForm, JobApplication, Vacancy, Product, ProductCategory, Dealer, DealerImage, Review, TestDriveRequest, BranchManager
+from .models import ( TelegramUser,
+    News, ContactForm, JobApplication, Vacancy, Product, ProductCategory, 
+    Dealer, DealerImage, Review, TestDriveRequest, BranchManager
 )
 from .serializers import (
     NewsSerializer, ContactFormSerializer, JobApplicationSerializer,
     ProductCardSerializer, ProductDetailSerializer, ProductCategorySerializer,
     ReviewListSerializer, ReviewCreateSerializer, TestDriveSerializer,
-    BotTelegramUserSerializer, BotDealerSerializer, BotBrandSerializer,
-    BotCarSerializer, BotTestDriveSerializer,
+    VacancySerializer
 )
-from .models import TelegramUser
+from django.utils import timezone
 import logging
 import json
 from django.db.models import Prefetch
@@ -30,7 +29,7 @@ from django.db.models import Prefetch
 
 logger = logging.getLogger('django')
 
-from django.utils import timezone
+
 
 def current_year(request):
     return {'current_year': timezone.now().year}
@@ -239,7 +238,7 @@ def test_drive(request):
 def jobs(request):
     """Страница с вакансиями"""
     try:
-        from .serializers import VacancySerializer
+        
         
         vacancies = Vacancy.objects.filter(is_active=True).prefetch_related(
             'responsibilities', 
@@ -685,7 +684,6 @@ class TestDriveViewSet(viewsets.GenericViewSet):
         # Kunlik limit: 1 telefon raqamdan 2 ta test-drayv
         phone = request.data.get('phone', '')
         if phone:
-            from django.utils import timezone
             today = timezone.now().date()
             today_count = TestDriveRequest.objects.filter(
                 phone=phone, created_at__date=today
@@ -733,172 +731,7 @@ class IsBotAuthenticated(BasePermission):
         return auth == f'Bearer {token}'
 
 
-class BotUserView(APIView):
-    """GET ?telegram_id=123 — получить пользователя, POST — создать/обновить"""
-    permission_classes = [IsBotAuthenticated]
-
-    def get(self, request):
-        tg_id = request.query_params.get('telegram_id')
-        if not tg_id:
-            return Response({'error': 'telegram_id required'}, status=400)
-        try:
-            user = TelegramUser.objects.get(telegram_id=int(tg_id))
-            return Response(BotTelegramUserSerializer(user).data)
-        except TelegramUser.DoesNotExist:
-            return Response({'exists': False}, status=404)
-
-    def post(self, request):
-        tg_id = request.data.get('telegram_id')
-        if not tg_id:
-            return Response({'error': 'telegram_id required'}, status=400)
-        user, created = TelegramUser.objects.get_or_create(telegram_id=int(tg_id))
-        for field in ('username', 'first_name', 'age', 'phone', 'region', 'language'):
-            val = request.data.get(field)
-            if val is not None:
-                setattr(user, field, val)
-        user.save()
-        return Response(BotTelegramUserSerializer(user).data, status=200 if not created else 201)
-
-
-class BotBrandsView(APIView):
-    """GET ?lang=uz — список брендов"""
-    permission_classes = [IsBotAuthenticated]
-
-    def get(self, request):
-        lang = request.query_params.get('lang', 'uz')
-        cache_key = f'bot:brands:{lang}'
-        data = cache.get(cache_key)
-        if data is None:
-            brands = ProductCategory.objects.filter(is_active=True).order_by('order', 'name')
-            data = [{'id': b.id, 'name': getattr(b, f'name_{lang}', None) or b.name} for b in brands]
-            cache.set(cache_key, data, timeout=600)  # 10 minut
-        return Response(data)
-
-
-class BotCarsView(APIView):
-    """GET ?brand_id=1&lang=uz — список машин бренда"""
-    permission_classes = [IsBotAuthenticated]
-
-    def get(self, request):
-        brand_id = request.query_params.get('brand_id')
-        lang = request.query_params.get('lang', 'uz')
-        if not brand_id:
-            return Response({'error': 'brand_id required'}, status=400)
-        cache_key = f'bot:cars:{brand_id}:{lang}'
-        data = cache.get(cache_key)
-        if data is None:
-            cars = Product.objects.filter(category_id=int(brand_id), is_active=True).order_by('order', 'title')
-            data = [{'id': c.id, 'title': getattr(c, f'title_{lang}', None) or c.title} for c in cars]
-            cache.set(cache_key, data, timeout=600)
-        return Response(data)
-
-
-class BotCarDetailView(APIView):
-    """GET ?car_id=1&lang=uz — детали машины"""
-    permission_classes = [IsBotAuthenticated]
-
-    def get(self, request):
-        car_id = request.query_params.get('car_id')
-        lang = request.query_params.get('lang', 'uz')
-        if not car_id:
-            return Response({'error': 'car_id required'}, status=400)
-        cache_key = f'bot:car:{car_id}:{lang}'
-        data = cache.get(cache_key)
-        if data is None:
-            try:
-                c = Product.objects.get(id=int(car_id))
-            except Product.DoesNotExist:
-                return Response({'error': 'not found'}, status=404)
-
-            title = getattr(c, f'title_{lang}', None) or c.title
-            price = getattr(c, f'slider_price_{lang}', None) or c.slider_price
-            power = getattr(c, f'slider_power_{lang}', None) or c.slider_power
-            fuel = getattr(c, f'slider_fuel_consumption_{lang}', None) or c.slider_fuel_consumption
-
-            features = c.features.all().order_by('order')[:6]
-            feat_list = [getattr(f, f'name_{lang}', None) or f.name for f in features]
-
-            data = {
-                'title': title,
-                'main_image': c.main_image.url if c.main_image else None,
-                'card_image': c.card_image.url if c.card_image else None,
-                'price': price,
-                'year': c.slider_year,
-                'power': power,
-                'fuel': fuel,
-                'features': feat_list,
-            }
-            cache.set(cache_key, data, timeout=600)
-        return Response(data)
-
-
-class BotDealersView(APIView):
-    """GET ?lang=uz — список дилеров"""
-    permission_classes = [IsBotAuthenticated]
-
-    def get(self, request):
-        lang = request.query_params.get('lang', 'uz')
-        cache_key = f'bot:dealers:{lang}'
-        data = cache.get(cache_key)
-        if data is None:
-            dealers = Dealer.objects.filter(is_active=True).order_by('order', 'name')
-            data = []
-            for d in dealers:
-                data.append({
-                    'id': d.id,
-                    'name': getattr(d, f'name_{lang}', None) or d.name,
-                    'region': d.region,
-                    'address': getattr(d, f'address_{lang}', None) or d.address,
-                    'phone': d.phone,
-                    'hours': getattr(d, f'working_hours_{lang}', None) or d.working_hours,
-                })
-            cache.set(cache_key, data, timeout=600)
-        return Response(data)
-
-
-class BotTestDriveView(APIView):
-    """POST — создать заявку на тест-драйв из бота"""
-    permission_classes = [IsBotAuthenticated]
-
-    def get(self, request):
-        """GET — список дилеров и продуктов для формы"""
-        lang = request.query_params.get('lang', 'uz')
-        dealers = Dealer.objects.filter(is_active=True).order_by('order', 'name')
-        products = Product.objects.filter(is_active=True).order_by('order', 'title')
-        return Response({
-            'dealers': [{'id': d.id, 'name': getattr(d, f'name_{lang}', None) or d.name} for d in dealers],
-            'products': [{'id': p.id, 'title': getattr(p, f'title_{lang}', None) or p.title} for p in products],
-            'time_slots': ['10:00', '10:30', '11:00', '11:30', '12:00', '12:30',
-                           '13:00', '13:30', '14:00', '14:30', '15:00', '15:30',
-                           '16:00', '16:30', '17:00'],
-        })
-
-    def post(self, request):
-        # Kunlik limit: 1 telefon raqamdan 2 ta test-drayv
-        phone = request.data.get('phone', '')
-        if phone:
-            from django.utils import timezone
-            today = timezone.now().date()
-            today_count = TestDriveRequest.objects.filter(
-                phone=phone, created_at__date=today
-            ).count()
-            if today_count >= 2:
-                return Response({
-                    'success': False,
-                    'error': 'daily_limit',
-                    'message': 'Kuniga 2 tadan ortiq test-drayv ariza yuborib bo\'lmaydi.'
-                }, status=429)
-
-        serializer = BotTestDriveSerializer(data=request.data)
-        if serializer.is_valid():
-            obj = serializer.save()
-            try:
-                from main.services.telegram import TelegramNotificationSender
-                TelegramNotificationSender.send_test_drive_notification(obj)
-            except Exception as e:
-                logger.error(f"Telegram notification error: {e}", exc_info=True)
-            return Response({'success': True, 'id': obj.id}, status=201)
-        return Response({'success': False, 'errors': serializer.errors}, status=400)
+# ========== BOT VIEWS ========== (REMOVED - now using BotService from main.services.bot_service)
  
 
 

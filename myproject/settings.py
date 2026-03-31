@@ -174,6 +174,7 @@ MIDDLEWARE = [
     'myproject.middleware.RequestSizeLimitMiddleware',   # 1. Katta requestlarni erta bloklash
     'myproject.middleware.RateLimitMiddleware',           # 2. Rate limit + IP auto-block
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'myproject.middleware.SecurityHeadersMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'corsheaders.middleware.CorsMiddleware',
@@ -187,6 +188,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'reversion.middleware.RevisionMiddleware',
+   
 ]
 
 # ============ RATE LIMIT RULES ============
@@ -251,7 +253,10 @@ BOT_API_TOKEN = config('BOT_API_TOKEN', default='')
 # ============ ВАЛИДАЦИЯ ПАРОЛЕЙ ============
 
 AUTH_PASSWORD_VALIDATORS = [
-
+    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
 
 # ============ ЛОКАЛИЗАЦИЯ ============
@@ -261,7 +266,10 @@ TIME_ZONE = config('TIME_ZONE', default='Asia/Tashkent')
 # ============ СТАТИЧЕСКИЕ ФАЙЛЫ ============
 
 STATIC_URL = '/static/'
-STATIC_ROOT = BASE_DIR / 'static' if DEBUG else '/home/autolig1/public_html/static'
+STATIC_ROOT = (
+    BASE_DIR / 'static'
+    if DEBUG else '/home/autolig1/public_html/static'
+)
 STATICFILES_DIRS = [
     BASE_DIR / 'main' / 'static',
 ]
@@ -271,6 +279,21 @@ MEDIA_ROOT = BASE_DIR / 'media' if DEBUG else '/home/autolig1/public_html/media'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+
+
+
+
+if not DEBUG:
+    STORAGES = {
+        "default": {
+            "BACKEND": "django.core.files.storage.FileSystemStorage",
+        },
+        "staticfiles": {
+            "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+        },
+    }
+
+    WHITENOISE_MAX_AGE = 31536000  # 1 yil
 # ============ БЕЗОПАСНОСТЬ ============
 
 if DEBUG:
@@ -278,36 +301,33 @@ if DEBUG:
         'http://127.0.0.1:8000',
         'http://localhost:8000',
     ]
+
     CORS_ALLOWED_ORIGINS = [
         'http://127.0.0.1:8000',
         'http://localhost:8000',
     ]
+
+    CORS_ALLOW_ALL_ORIGINS = True
+
 else:
     CSRF_TRUSTED_ORIGINS = [
         'https://autoliga.uz',
         'https://www.autoliga.uz',
     ]
+
     CORS_ALLOWED_ORIGINS = [
         'https://autoliga.uz',
         'https://www.autoliga.uz',
     ]
 
-CORS_ALLOW_ALL_ORIGINS = DEBUG
-
-
-# ============ ПРОДАКШЕН НАСТРОЙКИ ============
-
-if not DEBUG:
     CORS_ALLOW_ALL_ORIGINS = False
-    CORS_ALLOWED_ORIGINS = [
-        'https://autoliga.uz',
-        'https://www.autoliga.uz',
-    ]
+
     ALLOWED_HOSTS = [
         'autoliga.uz',
         'www.autoliga.uz',
         'api.autoliga.uz',
     ]
+
     SECURE_SSL_REDIRECT = True
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
@@ -315,17 +335,17 @@ if not DEBUG:
     SECURE_CONTENT_TYPE_NOSNIFF = True
     X_FRAME_OPTIONS = 'DENY'
 
-    # HSTS — brauzer faqat HTTPS dan foydalanishga majbur qiladi
-    SECURE_HSTS_SECONDS = 31536000  # 1 yil
+    # HSTS — brauzer faqat HTTPS
+    SECURE_HSTS_SECONDS = 31536000
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
     SECURE_HSTS_PRELOAD = True
 
     # Cookie xavfsizligi
     SESSION_COOKIE_HTTPONLY = True
-    CSRF_COOKIE_HTTPONLY = True
+    CSRF_COOKIE_HTTPONLY = False    
     SESSION_COOKIE_SAMESITE = 'Lax'
     CSRF_COOKIE_SAMESITE = 'Lax'
-    SESSION_COOKIE_AGE = 86400  # 1 kun (default 2 hafta juda ko'p)
+    SESSION_COOKIE_AGE = 86400
 
     # Referrer Policy
     SECURE_REFERRER_POLICY = 'strict-origin-when-cross-origin'
@@ -341,7 +361,6 @@ if not DEBUG:
         'gyroscope': [],
         'accelerometer': [],
     }
-
 # ============ ЯЗЫКОВЫЕ COOKIES ============
 
 LANGUAGE_COOKIE_NAME = 'django_language'

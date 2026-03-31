@@ -4,8 +4,7 @@ import sys
 from aiogram import types
 from aiogram.fsm.context import FSMContext
 from asgiref.sync import sync_to_async
-from django.core.exceptions import ObjectDoesNotExist
-from main.models import TelegramUser
+from main.services.bot_service import BotService
 
 # Django setup (agar alohida ishga tushirilsa)
 PROJECT_ROOT = os.path.dirname(
@@ -24,26 +23,19 @@ def get_or_create_user(
     language: str,
     username: str = None,
 ):
-    user, created = TelegramUser.objects.get_or_create(
-        telegram_id=telegram_id,
-        defaults={
-            "first_name": first_name,
-            "username": username,
-            "language": language or "uz",
-        },
+    user, created = BotService.create_or_update_telegram_user(
+        telegram_id,
+        first_name=first_name,
+        username=username,
+        language=language or "uz",
     )
     return user, created
 
 
 @sync_to_async
 def save_phone(telegram_id: int, phone: str):
-    try:
-        user = TelegramUser.objects.get(telegram_id=telegram_id)
-        user.phone = phone
-        user.save(update_fields=["phone"])
-        return user
-    except ObjectDoesNotExist:
-        return None
+    user, created = BotService.create_or_update_telegram_user(telegram_id, phone=phone)
+    return user
 
 
 async def start_handler(message: types.Message, state: FSMContext):

@@ -29,6 +29,7 @@ from django.db import transaction
 from django.utils import timezone
 from main.models import (Dealer, Product, ProductCategory, TelegramUser,
                          TestDriveRequest)
+from main.services.bot_service import BotService
 
 # ── 4. Third-party imports ───────────────────────────────────────────────────
 from aiogram import Bot, Dispatcher, F, types
@@ -65,175 +66,43 @@ dp = Dispatcher(storage=MemoryStorage())
 
 @sync_to_async
 def get_user_by_telegram_id(telegram_id: int) -> TelegramUser | None:
-    try:
-        return TelegramUser.objects.get(telegram_id=telegram_id)
-    except ObjectDoesNotExist:
-        return None
+    return BotService.get_telegram_user(telegram_id)
 
 
 @sync_to_async
 def update_or_create_user(telegram_id: int, **kwargs) -> TelegramUser:
-    user, created = TelegramUser.objects.get_or_create(
-        telegram_id=telegram_id, defaults=kwargs
-    )
-    if not created:
-        changed_fields = []
-        for key, value in kwargs.items():
-            if value is not None:
-                setattr(user, key, value)
-                changed_fields.append(key)
-        if changed_fields:
-            user.save(update_fields=changed_fields)
+    user, created = BotService.create_or_update_telegram_user(telegram_id, **kwargs)
     return user
 
 
 @sync_to_async
 def get_brands(lang: str = "uz") -> list[dict]:
-    cache_key = f"bot:brands:{lang}"
-    cached = cache.get(cache_key)
-    if cached is not None:
-        return cached
-    brands = ProductCategory.objects.filter(is_active=True).order_by("order", "name")
-    result = [
-        {"id": b.id, "name": getattr(b, f"name_{lang}", None) or b.name}
-        for b in brands
-    ]
-    cache.set(cache_key, result, timeout=300)
-    return result
+    return BotService.get_brands(lang)
 
 
 @sync_to_async
 def get_cars_by_brand(brand_id: int, lang: str = "uz") -> list[dict]:
-    cache_key = f"bot:cars:{brand_id}:{lang}"
-    cached = cache.get(cache_key)
-    if cached is not None:
-        return cached
-    cars = Product.objects.filter(category_id=brand_id, is_active=True).order_by(
-        "order", "title"
-    )
-    result = [
-        {"id": c.id, "title": getattr(c, f"title_{lang}", None) or c.title}
-        for c in cars
-    ]
-    cache.set(cache_key, result, timeout=300)
-    return result
+    return BotService.get_cars_by_brand(brand_id, lang)
 
 
 @sync_to_async
 def get_car_detail(car_id: int, lang: str = "uz") -> dict | None:
-    try:
-        car = (
-            Product.objects.select_related("category")
-            .prefetch_related("features")
-            .get(id=car_id, is_active=True)
-        )
-    except ObjectDoesNotExist:
-        return None
-
-    title = getattr(car, f"title_{lang}", None) or car.title
-    price = getattr(car, f"slider_price_{lang}", None) or car.slider_price
-    power = getattr(car, f"slider_power_{lang}", None) or car.slider_power
-    fuel = (
-        getattr(car, f"slider_fuel_consumption_{lang}", None)
-        or car.slider_fuel_consumption
-    )
-
-    features = car.features.all().order_by("order")[:6]
-    feat_list = [getattr(f, f"name_{lang}", None) or f.name for f in features]
-
-    return {
-        "title": title,
-        "main_image": car.main_image.url if car.main_image else None,
-        "card_image": car.card_image.url if car.card_image else None,
-        "price": price,
-        "year": car.slider_year,
-        "power": power,
-        "fuel": fuel,
-        "features": feat_list,
-    }
+    return BotService.get_car_detail(car_id, lang)
 
 
 @sync_to_async
 def get_dealers(lang: str = "uz") -> list[dict]:
-    cache_key = f"bot:dealers:{lang}"
-    cached = cache.get(cache_key)
-    if cached is not None:
-        return cached
-    dealers = Dealer.objects.filter(is_active=True).order_by("order", "name")
-    result = [
-        {
-            "id": d.id,
-            "name": getattr(d, f"name_{lang}", None) or d.name,
-            "region": d.region,
-            "address": getattr(d, f"address_{lang}", None) or d.address,
-            "phone": d.phone,
-            "hours": getattr(d, f"working_hours_{lang}", None) or d.working_hours,
-        }
-        for d in dealers
-    ]
-    cache.set(cache_key, result, timeout=300)
-    return result
+    return BotService.get_dealers(lang)
 
 
 @sync_to_async
 def get_test_drive_data(lang: str = "uz") -> dict:
-    cache_key = f"bot:td_data:{lang}"
-    cached = cache.get(cache_key)
-    if cached is not None:
-        return cached
-    dealers = Dealer.objects.filter(is_active=True).order_by("order", "name")
-    products = Product.objects.filter(is_active=True).order_by("order", "title")
-    dealers_data = [
-        {"id": d.id, "name": getattr(d, f"name_{lang}", None) or d.name}
-        for d in dealers
-    ]
-    products_data = [
-        {"id": p.id, "title": getattr(p, f"title_{lang}", None) or p.title}
-        for p in products
-    ]
-    result = {
-        "dealers": dealers_data,
-        "products": products_data,
-        "time_slots": [
-            "10:00",
-            "10:30",
-            "11:00",
-            "11:30",
-            "12:00",
-            "12:30",
-            "13:00",
-            "13:30",
-            "14:00",
-            "14:30",
-            "15:00",
-            "15:30",
-            "16:00",
-            "16:30",
-            "17:00",
-        ],
-    }
-    cache.set(cache_key, result, timeout=300)
-    return result
+    return BotService.get_test_drive_form_data(lang)
 
 
 @sync_to_async
 def create_test_drive_request(data: dict) -> tuple[TestDriveRequest | None, str | None]:
-    try:
-        with transaction.atomic():
-            phone = data.get("phone", "")
-            if phone:
-                today = timezone.now().date()
-                today_count = TestDriveRequest.objects.filter(
-                    phone=phone, created_at__date=today
-                ).count()
-                if today_count >= 2:
-                    return None, "daily_limit"
-
-            request_obj = TestDriveRequest.objects.create(**data)
-            return request_obj, None
-    except Exception as e:
-        logger.error("TestDrive create error: %s | data=%s", e, data, exc_info=True)
-        return None, str(e)
+    return BotService.create_test_drive_request(data)
 
 
 # ================= HELPERS =================

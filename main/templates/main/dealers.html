@@ -160,349 +160,340 @@
     <script id="dealers-data" type="application/json">{{ dealers_json|safe }}</script>
 
     <script>
-    (function() {
-        // Guard: if simplemaps failed to load (network error, CSP, etc.) — abort silently.
-        if (typeof simplemaps_countrymap_mapdata === 'undefined' ||
-            typeof simplemaps_countrymap === 'undefined') {
-            console.warn('Dealers map: simplemaps not loaded, skipping map init.');
-            return;
-        }
-
-        const DEALERS = JSON.parse(document.getElementById('dealers-data').textContent);
-        const lang = document.documentElement.lang || 'uz';
-        const isMobile = () => window.innerWidth <= 768;
-
-        const REGION_TO_STATE = {
-            'qoraqalpogiston':   'UZQR',
-            'xorazm':            'UZXO',
-            'buxoro':            'UZBU',
-            'navoiy':            'UZNW',
-            'samarqand':         'UZSA',
-            'qashqadaryo':       'UZQA',
-            'surxondaryo':       'UZSU',
-            'jizzax':            'UZJI',
-            'sirdaryo':          'UZSI',
-            'toshkent-viloyati': 'UZTO',
-            'toshkent-shahri':   'UZTK',
-            'namangan':          'UZNG',
-            'andijon':           'UZAN',
-            'fargona':           'UZFA',
-        };
-        const STATE_TO_REGION = Object.fromEntries(
-            Object.entries(REGION_TO_STATE).map(([k, v]) => [v, k])
-        );
-
-        const REGION_LABELS = {
-            uz: {
-                'qoraqalpogiston':   "Qoraqalpog'iston",
-                'xorazm':            'Xorazm',
-                'buxoro':            'Buxoro',
-                'navoiy':            'Navoiy',
-                'samarqand':         'Samarqand',
-                'qashqadaryo':       'Qashqadaryo',
-                'surxondaryo':       'Surxondaryo',
-                'jizzax':            'Jizzax',
-                'sirdaryo':          'Sirdaryo',
-                'toshkent-viloyati': 'Toshkent viloyati',
-                'toshkent-shahri':   'Toshkent shahri',
-                'namangan':          'Namangan',
-                'andijon':           'Andijon',
-                'fargona':           "Farg'ona",
-            },
-            ru: {
-                'qoraqalpogiston':   'Каракалпакстан',
-                'xorazm':            'Хорезм',
-                'buxoro':            'Бухара',
-                'navoiy':            'Навои',
-                'samarqand':         'Самарканд',
-                'qashqadaryo':       'Кашкадарья',
-                'surxondaryo':       'Сурхандарья',
-                'jizzax':            'Джизак',
-                'sirdaryo':          'Сырдарья',
-                'toshkent-viloyati': 'Ташкентская обл.',
-                'toshkent-shahri':   'г. Ташкент',
-                'namangan':          'Наманган',
-                'andijon':           'Андижан',
-                'fargona':           'Фергана',
-            },
-            en: {
-                'qoraqalpogiston':   'Karakalpakstan',
-                'xorazm':            'Khorezm',
-                'buxoro':            'Bukhara',
-                'navoiy':            'Navoi',
-                'samarqand':         'Samarkand',
-                'qashqadaryo':       'Kashkadarya',
-                'surxondaryo':       'Surkhandarya',
-                'jizzax':            'Jizzakh',
-                'sirdaryo':          'Sirdaryo',
-                'toshkent-viloyati': 'Tashkent Region',
-                'toshkent-shahri':   'Tashkent City',
-                'namangan':          'Namangan',
-                'andijon':           'Andijan',
-                'fargona':           'Fergana',
-            }
-        };
-        const labels = REGION_LABELS[lang] || REGION_LABELS.uz;
-        const labelAll = { uz: 'Barchasi', ru: 'Все', en: 'All' }[lang] || 'Barchasi';
-
-        const dealerRegions = [...new Set(DEALERS.map(d => d.region).filter(Boolean))];
-
-        // ── Simplemaps sozlash ─────────────────────────────────────
-        if (!simplemaps_countrymap_mapdata.state_specific) {
-            simplemaps_countrymap_mapdata.state_specific = {};
-        }
-        simplemaps_countrymap_mapdata.main_settings.pop_ups           = 0;
-        simplemaps_countrymap_mapdata.main_settings.zoom              = 'yes';
-        simplemaps_countrymap_mapdata.main_settings.state_color       = '#e0e0e0';
-        simplemaps_countrymap_mapdata.main_settings.state_hover_color = '#f0a040';
-        simplemaps_countrymap_mapdata.main_settings.label_color       = '#666';
-        simplemaps_countrymap_mapdata.main_settings.label_hover_color = '#333';
-        simplemaps_countrymap_mapdata.main_settings.border_color      = '#ffffff';
-        simplemaps_countrymap_mapdata.main_settings.border_size       = 1.5;
-        simplemaps_countrymap_mapdata.main_settings.background_color  = '#f9f9f9';
-        simplemaps_countrymap_mapdata.main_settings.label_size        = 12;
-        simplemaps_countrymap_mapdata.main_settings.location_color    = '#F07800';
-        simplemaps_countrymap_mapdata.main_settings.keyboard_omit    = 'state navigat';
-
-        // Dealer bo'lgan regionlar kulrang
-        dealerRegions.forEach(r => {
-            const code = REGION_TO_STATE[r];
-            if (!code) return;
-            if (!simplemaps_countrymap_mapdata.state_specific[code])
-                simplemaps_countrymap_mapdata.state_specific[code] = {};
-            simplemaps_countrymap_mapdata.state_specific[code].color = '#c8c8c8';
-        });
-
-        // ── Lokatsiyalar ───────────────────────────────────────────
-        function buildLocations(regionFilter) {
-            const locs = {};
-          
-            DEALERS
-                .filter(d => d.lat && d.lng && (!regionFilter || d.region === regionFilter))
-                .forEach(d => {
-                    locs[String(d.id)] = {
-                        name:        d.name || ' ',
-                        lat:         parseFloat(d.lat),
-                        lng:         parseFloat(d.lng),
-                        color:       '#F07800',
-                        size:        22,
-                        type:        'marker',
-                        image:       '{% static "images/map-pin.svg" %}',
-                        description: ' ',
-                        url:         '',
-                    };
-                });
-
-            return locs;
-        }
-        simplemaps_countrymap_mapdata.locations = buildLocations(null);
-
-        // ── DESKTOP: "Barchasi" dropdown ──────────────────────────
-        const allBtn  = document.getElementById('dealerAllBtn');
-        const allList = document.getElementById('dealerAllList');
-
-        dealerRegions.forEach(region => {
-            const item = document.createElement('div');
-            item.className = 'dealer-all-region-item';
-            item.dataset.region = region;
-            item.textContent = labels[region] || region;
-            item.addEventListener('click', () => {
-                closeAllList();
-                selectRegion(region);
-                const code = REGION_TO_STATE[region];
-                if (code) setTimeout(() => simplemaps_countrymap.state_zoom(code), 80);
-            });
-            allList.appendChild(item);
-        });
-
-        allBtn.addEventListener('click', () => {
-            const isOpen = !allList.classList.contains('hidden');
-            if (isOpen) { closeAllList(); } else {
-                allList.classList.remove('hidden');
-                allBtn.classList.add('open');
-            }
-        });
-        function closeAllList() {
-            allList.classList.add('hidden');
-            allBtn.classList.remove('open');
-        }
-        document.addEventListener('click', (e) => {
-            if (!allBtn.contains(e.target) && !allList.contains(e.target)) closeAllList();
-        });
-
-        // ── MOBILE: Region grid ────────────────────────────────────
-        const mobAllBtn   = document.getElementById('mobAllBtn');
-        const mobAllText  = document.getElementById('mobAllBtnText');
-        const mobGrid     = document.getElementById('mobRegionGrid');
-
-        dealerRegions.forEach(region => {
-            const btn = document.createElement('button');
-            btn.className = 'mob-region-btn';
-            btn.dataset.region = region;
-            btn.textContent = labels[region] || region;
-            btn.addEventListener('click', () => {
-                closeMobGrid();
-                mobAllText.textContent = labels[region] || region;
-                selectRegion(region);
-                const code = REGION_TO_STATE[region];
-                if (code) setTimeout(() => simplemaps_countrymap.state_zoom(code), 80);
-            });
-            mobGrid.appendChild(btn);
-        });
-
-        mobAllBtn.addEventListener('click', () => {
-            const isOpen = !mobGrid.classList.contains('hidden');
-            if (isOpen) { closeMobGrid(); } else {
-                mobGrid.classList.remove('hidden');
-                mobAllBtn.classList.add('open');
-            }
-        });
-        function closeMobGrid() {
-            mobGrid.classList.add('hidden');
-            mobAllBtn.classList.remove('open');
-        }
-
-        // ── Region tanlash ─────────────────────────────────────────
-        let activeRegion = null;
-
-        function selectRegion(region) {
-            activeRegion = region;
-
-            // Desktop dropdown highlight
-            document.querySelectorAll('.dealer-all-region-item').forEach(el =>
-                el.classList.toggle('active', el.dataset.region === region)
-            );
-            // Mobile grid highlight
-            document.querySelectorAll('.mob-region-btn').forEach(el =>
-                el.classList.toggle('active', el.dataset.region === region)
-            );
-
-            // Xarita ranglari
-            Object.entries(REGION_TO_STATE).forEach(([r, code]) => {
-                if (!simplemaps_countrymap_mapdata.state_specific[code])
-                    simplemaps_countrymap_mapdata.state_specific[code] = {};
-                if (r === region) {
-                    simplemaps_countrymap_mapdata.state_specific[code];
-                } else if (dealerRegions.includes(r)) {
-                    simplemaps_countrymap_mapdata.state_specific[code].color = '#c8c8c8';
-                } else {
-                    delete simplemaps_countrymap_mapdata.state_specific[code].color;
-                }
-            });
-
-            // Pinlar - faqat shu region
-            simplemaps_countrymap_mapdata.locations = buildLocations(region);
-            simplemaps_countrymap.refresh();
-
-            // Mobile: dealer ro'yxatini ko'rsat
-            if (isMobile()) renderMobDealerList(region);
-        }
-
-        // ── Xaritada viloyat bosilganda ───────────────────────────
-        simplemaps_countrymap.hooks.click_state = function(stateId) {
-            const region = STATE_TO_REGION[stateId];
-            if (region && dealerRegions.includes(region)) {
-                closeAllList();
-                closeMobGrid();
-                if (isMobile()) mobAllText.textContent = labels[region] || region;
-                selectRegion(region);
-                setTimeout(() => simplemaps_countrymap.state_zoom(stateId), 80);
-            }
-        };
-
-        // ── Xaritada pin bosilganda ────────────────────────────────
-        simplemaps_countrymap.hooks.click_location = function(locId) {
-            const id = String(locId);
-            const dealer = DEALERS.find(d => String(d.id) === id);
-            if (!dealer) return;
-            if (isMobile()) {
-                const card = document.getElementById('mob-item-' + id);
-                if (card) {
-                    openMobDealerItem(card, dealer);
-                    card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-                }
-            } else {
-                showDealerCard(dealer);
-            }
-        };
-
-        // ── Fallback: SVG location elementlariga to'g'ridan click ──
-        function attachLocationClicks() {
-            const mapSvg = document.querySelector('#map svg');
-            if (!mapSvg) return;
-            mapSvg.querySelectorAll('[id^="location_"]').forEach(function(el) {
-                el.style.cursor = 'pointer';
-                el.removeEventListener('click', el._dealerClick || function(){});
-                el._dealerClick = function(e) {
-                    e.stopPropagation();
-                    const locId = el.id.replace('location_', '');
-                    const dealer = DEALERS.find(d => String(d.id) === locId);
-                    if (!dealer) return;
-                    if (isMobile()) {
-                        const card = document.getElementById('mob-item-' + locId);
-                        if (card) {
-                            openMobDealerItem(card, dealer);
-                            card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-                        }
-                    } else {
-                        showDealerCard(dealer);
-                    }
-                };
-                el.addEventListener('click', el._dealerClick);
-            });
-        }
-
-        simplemaps_countrymap.hooks.complete         = attachLocationClicks;
-        simplemaps_countrymap.hooks.refresh_complete = attachLocationClicks;
-        // complete allaqachon yongan bo'lishi mumkin — darhol ham chaqiramiz
-        setTimeout(attachLocationClicks, 200);
-
-        // Xarita ustida mouse wheel bilan zoom qilganda sahifa scroll bo'lmasin
-        (function() {
-            const mapEl = document.getElementById('map');
-
-            // capture:true — barcha passive listenerlardan OLDIN ishlaydi
-            // Bu passive listener'lar preventDefault ni bloklay olmasligini ta'minlaydi
-            document.addEventListener('wheel', function(e) {
-                if (mapEl.contains(e.target)) {
-                    e.preventDefault();
-                }
-            }, { passive: false, capture: true });
-        })();
-
-        // ── MOBILE: Dealer ro'yxati ────────────────────────────────
-        const mobDealerList = document.getElementById('mobDealerList');
-
-        function renderMobDealerList(region) {
-            const regionDealers = region ? DEALERS.filter(d => d.region === region) : DEALERS;
-            mobDealerList.innerHTML = '';
-
-            if (!regionDealers.length) {
-                mobDealerList.classList.add('hidden');
+        function initDealersMap() {
+            if (typeof simplemaps_countrymap_mapdata === 'undefined' ||
+                typeof simplemaps_countrymap === 'undefined') {
+                console.warn('Dealers map: simplemaps not loaded, retrying...');
+                setTimeout(initDealersMap, 300);
                 return;
             }
 
-            const title = document.createElement('div');
-            title.className = 'mob-dealer-list-title';
-            title.textContent = region ? (labels[region] || region) + ' — diler markazlar' : 'Barcha diler markazlar';
-            mobDealerList.appendChild(title);
+            const DEALERS = JSON.parse(document.getElementById('dealers-data').textContent);
+            const lang = document.documentElement.lang || 'uz';
+            const isMobile = () => window.innerWidth <= 768;
 
-            const cardsWrap = document.createElement('div');
-            cardsWrap.className = 'mob-dealer-cards';
+            const REGION_TO_STATE = {
+                'qoraqalpogiston': 'UZQR',
+                'xorazm': 'UZXO',
+                'buxoro': 'UZBU',
+                'navoiy': 'UZNW',
+                'samarqand': 'UZSA',
+                'qashqadaryo': 'UZQA',
+                'surxondaryo': 'UZSU',
+                'jizzax': 'UZJI',
+                'sirdaryo': 'UZSI',
+                'toshkent-viloyati': 'UZTO',
+                'toshkent-shahri': 'UZTK',
+                'namangan': 'UZNG',
+                'andijon': 'UZAN',
+                'fargona': 'UZFA',
+            };
+            const STATE_TO_REGION = Object.fromEntries(
+                Object.entries(REGION_TO_STATE).map(([k, v]) => [v, k])
+            );
 
-            regionDealers.forEach(dealer => {
+            const REGION_LABELS = {
+                uz: {
+                    'qoraqalpogiston': "Qoraqalpog'iston",
+                    'xorazm': 'Xorazm',
+                    'buxoro': 'Buxoro',
+                    'navoiy': 'Navoiy',
+                    'samarqand': 'Samarqand',
+                    'qashqadaryo': 'Qashqadaryo',
+                    'surxondaryo': 'Surxondaryo',
+                    'jizzax': 'Jizzax',
+                    'sirdaryo': 'Sirdaryo',
+                    'toshkent-viloyati': 'Toshkent viloyati',
+                    'toshkent-shahri': 'Toshkent shahri',
+                    'namangan': 'Namangan',
+                    'andijon': 'Andijon',
+                    'fargona': "Farg'ona",
+                },
+                ru: {
+                    'qoraqalpogiston': 'Каракалпакстан',
+                    'xorazm': 'Хорезм',
+                    'buxoro': 'Бухара',
+                    'navoiy': 'Навои',
+                    'samarqand': 'Самарканд',
+                    'qashqadaryo': 'Кашкадарья',
+                    'surxondaryo': 'Сурхандарья',
+                    'jizzax': 'Джизак',
+                    'sirdaryo': 'Сырдарья',
+                    'toshkent-viloyati': 'Ташкентская обл.',
+                    'toshkent-shahri': 'г. Ташкент',
+                    'namangan': 'Наманган',
+                    'andijon': 'Андижан',
+                    'fargona': 'Фергана',
+                },
+                en: {
+                    'qoraqalpogiston': 'Karakalpakstan',
+                    'xorazm': 'Khorezm',
+                    'buxoro': 'Bukhara',
+                    'navoiy': 'Navoi',
+                    'samarqand': 'Samarkand',
+                    'qashqadaryo': 'Kashkadarya',
+                    'surxondaryo': 'Surkhandarya',
+                    'jizzax': 'Jizzakh',
+                    'sirdaryo': 'Sirdaryo',
+                    'toshkent-viloyati': 'Tashkent Region',
+                    'toshkent-shahri': 'Tashkent City',
+                    'namangan': 'Namangan',
+                    'andijon': 'Andijan',
+                    'fargona': 'Fergana',
+                }
+            };
+            const labels = REGION_LABELS[lang] || REGION_LABELS.uz;
+            const labelAll = { uz: 'Barchasi', ru: 'Все', en: 'All' }[lang] || 'Barchasi';
+
+            const dealerRegions = [...new Set(DEALERS.map(d => d.region).filter(Boolean))];
+
+            // ── Simplemaps sozlash ─────────────────────────────────────
+            if (!simplemaps_countrymap_mapdata.state_specific) {
+                simplemaps_countrymap_mapdata.state_specific = {};
+            }
+            simplemaps_countrymap_mapdata.main_settings.pop_ups = 0;
+            simplemaps_countrymap_mapdata.main_settings.zoom = 'yes';
+            simplemaps_countrymap_mapdata.main_settings.state_color = '#e0e0e0';
+            simplemaps_countrymap_mapdata.main_settings.state_hover_color = '#f0a040';
+            simplemaps_countrymap_mapdata.main_settings.label_color = '#666';
+            simplemaps_countrymap_mapdata.main_settings.label_hover_color = '#333';
+            simplemaps_countrymap_mapdata.main_settings.border_color = '#ffffff';
+            simplemaps_countrymap_mapdata.main_settings.border_size = 1.5;
+            simplemaps_countrymap_mapdata.main_settings.background_color = '#f9f9f9';
+            simplemaps_countrymap_mapdata.main_settings.label_size = 12;
+            simplemaps_countrymap_mapdata.main_settings.location_color = '#F07800';
+            simplemaps_countrymap_mapdata.main_settings.keyboard_omit = 'state navigat';
+
+            // Dealer bo'lgan regionlar kulrang
+            dealerRegions.forEach(r => {
+                const code = REGION_TO_STATE[r];
+                if (!code) return;
+                if (!simplemaps_countrymap_mapdata.state_specific[code])
+                    simplemaps_countrymap_mapdata.state_specific[code] = {};
+                simplemaps_countrymap_mapdata.state_specific[code].color = '#c8c8c8';
+            });
+
+            // ── Lokatsiyalar ───────────────────────────────────────────
+            function buildLocations(regionFilter) {
+                const locs = {};
+
+                DEALERS
+                    .filter(d => d.lat && d.lng && (!regionFilter || d.region === regionFilter))
+                    .forEach(d => {
+                        locs[String(d.id)] = {
+                            name: d.name || ' ',
+                            lat: parseFloat(d.lat),
+                            lng: parseFloat(d.lng),
+                            color: '#F07800',
+                            size: 22,
+                            type: 'marker',
+                            image: '{% static "images/map-pin.svg" %}',
+                            description: ' ',
+                            url: '',
+                        };
+                    });
+
+                return locs;
+            }
+            simplemaps_countrymap_mapdata.locations = buildLocations(null);
+
+            // ── DESKTOP: "Barchasi" dropdown ──────────────────────────
+            const allBtn = document.getElementById('dealerAllBtn');
+            const allList = document.getElementById('dealerAllList');
+
+            dealerRegions.forEach(region => {
                 const item = document.createElement('div');
-                item.className = 'mob-dealer-item';
-                item.id = 'mob-item-' + dealer.id;
+                item.className = 'dealer-all-region-item';
+                item.dataset.region = region;
+                item.textContent = labels[region] || region;
+                item.addEventListener('click', () => {
+                    closeAllList();
+                    selectRegion(region);
+                    const code = REGION_TO_STATE[region];
+                    if (code) setTimeout(() => simplemaps_countrymap.state_zoom(code), 80);
+                });
+                allList.appendChild(item);
+            });
 
-                const initial = dealer.name ? dealer.name[0].toUpperCase() : 'D';
-                const hasLogo = Boolean(dealer.logo);
-                const logoHtml = hasLogo
-                    ? `<img src="${dealer.logo}" alt="${dealer.name}" onerror="this.parentElement.classList.add('no-logo');this.outerHTML='${initial}'">`
-                    : initial;
-                const logoClass = hasLogo ? 'mob-dealer-item-logo' : 'mob-dealer-item-logo no-logo';
+            allBtn.addEventListener('click', () => {
+                const isOpen = !allList.classList.contains('hidden');
+                if (isOpen) { closeAllList(); } else {
+                    allList.classList.remove('hidden');
+                    allBtn.classList.add('open');
+                }
+            });
+            function closeAllList() {
+                allList.classList.add('hidden');
+                allBtn.classList.remove('open');
+            }
+            document.addEventListener('click', (e) => {
+                if (!allBtn.contains(e.target) && !allList.contains(e.target)) closeAllList();
+            });
 
-                item.innerHTML = `
+            // ── MOBILE: Region grid ────────────────────────────────────
+            const mobAllBtn = document.getElementById('mobAllBtn');
+            const mobAllText = document.getElementById('mobAllBtnText');
+            const mobGrid = document.getElementById('mobRegionGrid');
+
+            dealerRegions.forEach(region => {
+                const btn = document.createElement('button');
+                btn.className = 'mob-region-btn';
+                btn.dataset.region = region;
+                btn.textContent = labels[region] || region;
+                btn.addEventListener('click', () => {
+                    closeMobGrid();
+                    mobAllText.textContent = labels[region] || region;
+                    selectRegion(region);
+                    const code = REGION_TO_STATE[region];
+                    if (code) setTimeout(() => simplemaps_countrymap.state_zoom(code), 80);
+                });
+                mobGrid.appendChild(btn);
+            });
+
+            mobAllBtn.addEventListener('click', () => {
+                const isOpen = !mobGrid.classList.contains('hidden');
+                if (isOpen) { closeMobGrid(); } else {
+                    mobGrid.classList.remove('hidden');
+                    mobAllBtn.classList.add('open');
+                }
+            });
+            function closeMobGrid() {
+                mobGrid.classList.add('hidden');
+                mobAllBtn.classList.remove('open');
+            }
+
+            // ── Region tanlash ─────────────────────────────────────────
+            let activeRegion = null;
+
+            function selectRegion(region) {
+                activeRegion = region;
+
+                document.querySelectorAll('.dealer-all-region-item').forEach(el =>
+                    el.classList.toggle('active', el.dataset.region === region)
+                );
+                document.querySelectorAll('.mob-region-btn').forEach(el =>
+                    el.classList.toggle('active', el.dataset.region === region)
+                );
+
+                Object.entries(REGION_TO_STATE).forEach(([r, code]) => {
+                    if (!simplemaps_countrymap_mapdata.state_specific[code])
+                        simplemaps_countrymap_mapdata.state_specific[code] = {};
+                    if (r === region) {
+                        simplemaps_countrymap_mapdata.state_specific[code];
+                    } else if (dealerRegions.includes(r)) {
+                        simplemaps_countrymap_mapdata.state_specific[code].color = '#c8c8c8';
+                    } else {
+                        delete simplemaps_countrymap_mapdata.state_specific[code].color;
+                    }
+                });
+
+                simplemaps_countrymap_mapdata.locations = buildLocations(region);
+                simplemaps_countrymap.refresh();
+
+                if (isMobile()) renderMobDealerList(region);
+            }
+
+            // ── Xaritada viloyat bosilganda ───────────────────────────
+            simplemaps_countrymap.hooks.click_state = function (stateId) {
+                const region = STATE_TO_REGION[stateId];
+                if (region && dealerRegions.includes(region)) {
+                    closeAllList();
+                    closeMobGrid();
+                    if (isMobile()) mobAllText.textContent = labels[region] || region;
+                    selectRegion(region);
+                    setTimeout(() => simplemaps_countrymap.state_zoom(stateId), 80);
+                }
+            };
+
+            // ── Xaritada pin bosilganda ────────────────────────────────
+            simplemaps_countrymap.hooks.click_location = function (locId) {
+                const id = String(locId);
+                const dealer = DEALERS.find(d => String(d.id) === id);
+                if (!dealer) return;
+                if (isMobile()) {
+                    const card = document.getElementById('mob-item-' + id);
+                    if (card) {
+                        openMobDealerItem(card, dealer);
+                        card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                    }
+                } else {
+                    showDealerCard(dealer);
+                }
+            };
+
+            // ── Fallback: SVG location elementlariga to'g'ridan click ──
+            function attachLocationClicks() {
+                const mapSvg = document.querySelector('#map svg');
+                if (!mapSvg) return;
+                mapSvg.querySelectorAll('[id^="location_"]').forEach(function (el) {
+                    el.style.cursor = 'pointer';
+                    el.removeEventListener('click', el._dealerClick || function () { });
+                    el._dealerClick = function (e) {
+                        e.stopPropagation();
+                        const locId = el.id.replace('location_', '');
+                        const dealer = DEALERS.find(d => String(d.id) === locId);
+                        if (!dealer) return;
+                        if (isMobile()) {
+                            const card = document.getElementById('mob-item-' + locId);
+                            if (card) {
+                                openMobDealerItem(card, dealer);
+                                card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                            }
+                        } else {
+                            showDealerCard(dealer);
+                        }
+                    };
+                    el.addEventListener('click', el._dealerClick);
+                });
+            }
+
+            simplemaps_countrymap.hooks.complete = attachLocationClicks;
+            simplemaps_countrymap.hooks.refresh_complete = attachLocationClicks;
+            setTimeout(attachLocationClicks, 200);
+
+            // ── Mouse wheel zoom ───────────────────────────────────────
+            (function () {
+                const mapEl = document.getElementById('map');
+                document.addEventListener('wheel', function (e) {
+                    if (mapEl.contains(e.target)) {
+                        e.preventDefault();
+                    }
+                }, { passive: false, capture: true });
+            })();
+
+            // ── MOBILE: Dealer ro'yxati ────────────────────────────────
+            const mobDealerList = document.getElementById('mobDealerList');
+
+            function renderMobDealerList(region) {
+                const regionDealers = region ? DEALERS.filter(d => d.region === region) : DEALERS;
+                mobDealerList.innerHTML = '';
+
+                if (!regionDealers.length) {
+                    mobDealerList.classList.add('hidden');
+                    return;
+                }
+
+                const title = document.createElement('div');
+                title.className = 'mob-dealer-list-title';
+                title.textContent = region ? (labels[region] || region) + ' — diler markazlar' : 'Barcha diler markazlar';
+                mobDealerList.appendChild(title);
+
+                const cardsWrap = document.createElement('div');
+                cardsWrap.className = 'mob-dealer-cards';
+
+                regionDealers.forEach(dealer => {
+                    const item = document.createElement('div');
+                    item.className = 'mob-dealer-item';
+                    item.id = 'mob-item-' + dealer.id;
+
+                    const initial = dealer.name ? dealer.name[0].toUpperCase() : 'D';
+                    const hasLogo = Boolean(dealer.logo);
+                    const logoHtml = hasLogo
+                        ? `<img src="${dealer.logo}" alt="${dealer.name}" onerror="this.parentElement.classList.add('no-logo');this.outerHTML='${initial}'">`
+                        : initial;
+                    const logoClass = hasLogo ? 'mob-dealer-item-logo' : 'mob-dealer-item-logo no-logo';
+
+                    item.innerHTML = `
                     <div class="mob-dealer-item-header">
                         <div class="${logoClass}">${logoHtml}</div>
                         <span class="mob-dealer-item-name">${dealer.name || '—'}</span>
@@ -510,133 +501,136 @@
                     </div>
                     <div class="mob-dealer-detail">
                         ${dealer.address ? `<div class="mob-dealer-detail-row"><i class="ph ph-map-pin"></i><span>${dealer.address}</span></div>` : ''}
-                        ${dealer.phone ? `<div class="mob-dealer-detail-row"><i class="ph ph-phone"></i><a href="tel:${dealer.phone.replace(/\s/g,'')}">${dealer.phone}</a></div>` : ''}
+                        ${dealer.phone ? `<div class="mob-dealer-detail-row"><i class="ph ph-phone"></i><a href="tel:${dealer.phone.replace(/\s/g, '')}">${dealer.phone}</a></div>` : ''}
                         ${dealer.working_hours ? `<div class="mob-dealer-detail-row"><i class="ph ph-clock"></i><span>${dealer.working_hours}</span></div>` : ''}
                         ${buildSocialsHtml(dealer)}
                         ${dealer.detail_url ? `<a href="${dealer.detail_url}" class="mob-dealer-detail-link">{% if LANGUAGE_CODE == 'uz' %}Batafsil{% elif LANGUAGE_CODE == 'ru' %}Подробнее{% else %}Details{% endif %} <i class="ph ph-arrow-right"></i></a>` : ''}
                     </div>`;
 
-                item.querySelector('.mob-dealer-item-header').addEventListener('click', () => {
-                    openMobDealerItem(item, dealer);
+                    item.querySelector('.mob-dealer-item-header').addEventListener('click', () => {
+                        openMobDealerItem(item, dealer);
+                    });
+
+                    cardsWrap.appendChild(item);
                 });
 
-                cardsWrap.appendChild(item);
-            });
-
-            mobDealerList.appendChild(cardsWrap);
-            mobDealerList.classList.remove('hidden');
-        }
-
-        function openMobDealerItem(item, dealer) {
-            const isActive = item.classList.contains('active');
-            document.querySelectorAll('.mob-dealer-item.active').forEach(el =>
-                el.classList.remove('active')
-            );
-            if (!isActive) item.classList.add('active');
-        }
-
-        function buildSocialsHtml(dealer) {
-            const socials = [
-                { key: 'instagram', icon: 'ph-instagram-logo' },
-                { key: 'telegram',  icon: 'ph-telegram-logo' },
-                { key: 'facebook',  icon: 'ph-facebook-logo' },
-                { key: 'youtube',   icon: 'ph-youtube-logo' },
-            ];
-            const links = socials
-                .filter(s => dealer[s.key])
-                .map(s => `<a href="${dealer[s.key]}" target="_blank" rel="noopener noreferrer"><i class="ph ${s.icon}"></i></a>`)
-                .join('');
-            return links ? `<div class="mob-dealer-socials">${links}</div>` : '';
-        }
-
-        // ── DESKTOP: Dealer info card ──────────────────────────────
-        document.getElementById('cardClose').addEventListener('click', hideDealerCard);
-
-        function showDealerCard(dealer) {
-            const card   = document.getElementById('dealerCard');
-            const logoEl = document.getElementById('cardLogo');
-            const initial = dealer.name ? dealer.name[0].toUpperCase() : 'D';
-
-            logoEl.innerHTML = dealer.logo
-                ? `<img src="${dealer.logo}" alt="${dealer.name}">`
-                : `<div class="dealer-card-logo-placeholder">${initial}</div>`;
-
-            document.getElementById('cardName').textContent = dealer.name || '—';
-
-            const addr = document.getElementById('cardAddress');
-            if (dealer.address) {
-                addr.querySelector('span').textContent = dealer.address;
-                addr.style.display = 'flex';
-            } else { addr.style.display = 'none'; }
-
-            const ph = document.getElementById('cardPhone');
-            if (dealer.phone) {
-                const a = ph.querySelector('a');
-                a.href = 'tel:' + dealer.phone.replace(/\s/g, '');
-                a.textContent = dealer.phone;
-                ph.style.display = 'flex';
-            } else { ph.style.display = 'none'; }
-
-            const hrs = document.getElementById('cardHours');
-            if (dealer.working_hours) {
-                hrs.querySelector('span').textContent = dealer.working_hours;
-                hrs.style.display = 'flex';
-            } else { hrs.style.display = 'none'; }
-
-            const socials = document.getElementById('cardSocials');
-            socials.innerHTML = '';
-            [
-                { key: 'instagram', icon: 'ph-instagram-logo' },
-                { key: 'telegram',  icon: 'ph-telegram-logo' },
-                { key: 'facebook',  icon: 'ph-facebook-logo' },
-                { key: 'youtube',   icon: 'ph-youtube-logo' },
-            ].forEach(s => {
-                if (dealer[s.key]) {
-                    const a = document.createElement('a');
-                    a.href = dealer[s.key];
-                    a.target = '_blank';
-                    a.rel = 'noopener noreferrer';
-                    a.innerHTML = `<i class="ph ${s.icon}"></i>`;
-                    socials.appendChild(a);
-                }
-            });
-
-            const detailLink = document.getElementById('cardDetailLink');
-            if (dealer.detail_url) {
-                detailLink.href = dealer.detail_url;
-                detailLink.style.display = 'inline-flex';
-            } else {
-                detailLink.style.display = 'none';
+                mobDealerList.appendChild(cardsWrap);
+                mobDealerList.classList.remove('hidden');
             }
 
-            card.classList.remove('hidden');
-            card.style.display = 'block';
+            function openMobDealerItem(item, dealer) {
+                const isActive = item.classList.contains('active');
+                document.querySelectorAll('.mob-dealer-item.active').forEach(el =>
+                    el.classList.remove('active')
+                );
+                if (!isActive) item.classList.add('active');
+            }
+
+            function buildSocialsHtml(dealer) {
+                const socials = [
+                    { key: 'instagram', icon: 'ph-instagram-logo' },
+                    { key: 'telegram', icon: 'ph-telegram-logo' },
+                    { key: 'facebook', icon: 'ph-facebook-logo' },
+                    { key: 'youtube', icon: 'ph-youtube-logo' },
+                ];
+                const links = socials
+                    .filter(s => dealer[s.key])
+                    .map(s => `<a href="${dealer[s.key]}" target="_blank" rel="noopener noreferrer"><i class="ph ${s.icon}"></i></a>`)
+                    .join('');
+                return links ? `<div class="mob-dealer-socials">${links}</div>` : '';
+            }
+
+            // ── DESKTOP: Dealer info card ──────────────────────────────
+            document.getElementById('cardClose').addEventListener('click', hideDealerCard);
+
+            function showDealerCard(dealer) {
+                const card = document.getElementById('dealerCard');
+                const logoEl = document.getElementById('cardLogo');
+                const initial = dealer.name ? dealer.name[0].toUpperCase() : 'D';
+
+                logoEl.innerHTML = dealer.logo
+                    ? `<img src="${dealer.logo}" alt="${dealer.name}">`
+                    : `<div class="dealer-card-logo-placeholder">${initial}</div>`;
+
+                document.getElementById('cardName').textContent = dealer.name || '—';
+
+                const addr = document.getElementById('cardAddress');
+                if (dealer.address) {
+                    addr.querySelector('span').textContent = dealer.address;
+                    addr.style.display = 'flex';
+                } else { addr.style.display = 'none'; }
+
+                const ph = document.getElementById('cardPhone');
+                if (dealer.phone) {
+                    const a = ph.querySelector('a');
+                    a.href = 'tel:' + dealer.phone.replace(/\s/g, '');
+                    a.textContent = dealer.phone;
+                    ph.style.display = 'flex';
+                } else { ph.style.display = 'none'; }
+
+                const hrs = document.getElementById('cardHours');
+                if (dealer.working_hours) {
+                    hrs.querySelector('span').textContent = dealer.working_hours;
+                    hrs.style.display = 'flex';
+                } else { hrs.style.display = 'none'; }
+
+                const socials = document.getElementById('cardSocials');
+                socials.innerHTML = '';
+                [
+                    { key: 'instagram', icon: 'ph-instagram-logo' },
+                    { key: 'telegram', icon: 'ph-telegram-logo' },
+                    { key: 'facebook', icon: 'ph-facebook-logo' },
+                    { key: 'youtube', icon: 'ph-youtube-logo' },
+                ].forEach(s => {
+                    if (dealer[s.key]) {
+                        const a = document.createElement('a');
+                        a.href = dealer[s.key];
+                        a.target = '_blank';
+                        a.rel = 'noopener noreferrer';
+                        a.innerHTML = `<i class="ph ${s.icon}"></i>`;
+                        socials.appendChild(a);
+                    }
+                });
+
+                const detailLink = document.getElementById('cardDetailLink');
+                if (dealer.detail_url) {
+                    detailLink.href = dealer.detail_url;
+                    detailLink.style.display = 'inline-flex';
+                } else {
+                    detailLink.style.display = 'none';
+                }
+
+                card.classList.remove('hidden');
+                card.style.display = 'block';
+            }
+
+            function hideDealerCard() {
+                const card = document.getElementById('dealerCard');
+                card.classList.add('hidden');
+                card.style.display = '';
+            }
+
+            // Mobile da barcha dilerlarni ko'rsat
+            if (isMobile()) renderMobDealerList(null);
         }
 
-        function hideDealerCard() {
-            const card = document.getElementById('dealerCard');
-            card.classList.add('hidden');
-            card.style.display = '';
-        }
-
-        // Render all dealers on mobile by default
-        if (isMobile()) renderMobDealerList(null);
-
-    })();
+        // DOM tayyor bo'lgach ishga tushir
+        document.addEventListener('DOMContentLoaded', initDealersMap);
 
 
-(function() {
-    function hideTrial() {
-        var link = document.querySelector('a[href="https://simplemaps.com"]');
-        if (link && link.parentNode) {
-            link.parentNode.style.cssText += ';display:none!important;visibility:hidden!important;opacity:0!important;pointer-events:none!important;';
-        }
-    }
-    hideTrial();
-    var obs = new MutationObserver(hideTrial);
-    obs.observe(document.body, { childList: true, subtree: true });
-    window.addEventListener('load', hideTrial);
-})();
+        // ── SimpleMaps trial linkini yashirish ────────────────────────
+        (function () {
+            function hideTrial() {
+                var link = document.querySelector('a[href="https://simplemaps.com"]');
+                if (link && link.parentNode) {
+                    link.parentNode.style.cssText += ';display:none!important;visibility:hidden!important;opacity:0!important;pointer-events:none!important;';
+                }
+            }
+            hideTrial();
+            var obs = new MutationObserver(hideTrial);
+            obs.observe(document.body, { childList: true, subtree: true });
+            window.addEventListener('load', hideTrial);
+        })();
     </script>
 
     {% endif %}

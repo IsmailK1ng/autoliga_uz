@@ -733,42 +733,45 @@ def get_main_menu_keyboard(lang: str) -> ReplyKeyboardMarkup:
         ],
         resize_keyboard=True,
     )
-
-
+    
+    
 def build_car_caption(car: dict, lang: str = "uz") -> str:
     """Build car caption based on language"""
-    title = html_module.escape(car['title'])
+    title = car.get('title', '')
 
-    if lang == "uz":
-        lines = [f"UZ: {title}"]
-        if car.get("year"):
-            lines.append(f"📅 {html_module.escape(str(car['year']))}")
-        if car.get("price"):
-            lines.append(f"💰 {html_module.escape(str(car['price']))} summ")
-        if car.get("power"):
-            lines.append(f"⚡️ {html_module.escape(str(car['power']))} o.k.")
-        if car.get("fuel"):
-            lines.append(f"⛽️ {html_module.escape(str(car['fuel']))} L/100km")
-    elif lang == "ru":
-        lines = [title]
-        if car.get("year"):
-            lines.append(f"📅 {html_module.escape(str(car['year']))}")
-        if car.get("price"):
-            lines.append(f"💰 {html_module.escape(str(car['price']))} сум")
-        if car.get("power"):
-            lines.append(f"⚡️ {html_module.escape(str(car['power']))} л.с.")
-        if car.get("fuel"):
-            lines.append(f"⛽️ {html_module.escape(str(car['fuel']))} л/100км")
-    else:  # en
-        lines = [title]
-        if car.get("year"):
-            lines.append(f"📅 {html_module.escape(str(car['year']))}")
-        if car.get("price"):
-            lines.append(f"💰 {html_module.escape(str(car['price']))} UZS")
-        if car.get("power"):
-            lines.append(f"⚡️ {html_module.escape(str(car['power']))} hp")
-        if car.get("fuel"):
-            lines.append(f"⛽️ {html_module.escape(str(car['fuel']))} L/100km")
+    labels = {
+        "uz": {
+            "year":  "🗓 Yil",
+            "price": "💰 Narx",
+            "power": "⚡️ Quvvat",
+            "fuel":  "⛽️ Yoqilg'i",
+        },
+        "ru": {
+            "year":  "🗓 Год",
+            "price": "💰 Цена",
+            "power": "⚡️ Мощность",
+            "fuel":  "⛽️ Топливо",
+        },
+        "en": {
+            "year":  "🗓 Year",
+            "price": "💰 Price",
+            "power": "⚡️ Power",
+            "fuel":  "⛽️ Fuel",
+        },
+    }
+
+    L = labels.get(lang, labels["uz"])
+
+    lines = [f"🚗 {title}", ""]
+
+    if car.get("year"):
+        lines.append(f"{L['year']}:  {car['year']}")
+    if car.get("price"):
+        lines.append(f"{L['price']}:  {car['price']}")
+    if car.get("power"):
+        lines.append(f"{L['power']}:  {car['power']}")
+    if car.get("fuel"):
+        lines.append(f"{L['fuel']}:  {car['fuel']}")
 
     return "\n".join(lines)
 

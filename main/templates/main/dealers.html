@@ -7,6 +7,10 @@
 <link rel="stylesheet" type="text/css" href="{% static 'css/dealers.css' %}">
 {% endblock breadcrumbs %}
 
+{% block extra_meta %}
+    <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline' 'unsafe-eval' https://simplemaps.com https://www.googletagmanager.com https://www.google-analytics.com https://www.google.com https://www.gstatic.com https://mc.yandex.ru https://yastatic.net;">
+{% endblock extra_meta %}
+
 {% block title %}
     {% if LANGUAGE_CODE == 'uz' %}Dilerlar - Autoliga Uzbekistan{% elif LANGUAGE_CODE == 'ru' %}Дилеры - Autoliga Uzbekistan{% else %}Dealers - Autoliga Uzbekistan{% endif %}
 {% endblock title %}

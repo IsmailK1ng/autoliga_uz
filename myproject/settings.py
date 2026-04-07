@@ -173,7 +173,6 @@ MIDDLEWARE = [
     'myproject.middleware.RequestSizeLimitMiddleware',   # 1. Katta requestlarni erta bloklash
     'myproject.middleware.RateLimitMiddleware',           # 2. Rate limit + IP auto-block
     'django.middleware.security.SecurityMiddleware',
-    # 'whitenoise.middleware.WhiteNoiseMiddleware',
     'myproject.middleware.SecurityHeadersMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'corsheaders.middleware.CorsMiddleware',
@@ -280,19 +279,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
 
-#  Cpanel uchun kerak emas
-# if not DEBUG:
-#     STORAGES = {
-#         "default": {
-#             "BACKEND": "django.core.files.storage.FileSystemStorage",
-#         },
-#         "staticfiles": {
-#             "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
-#         },
-#     }
 
-#     WHITENOISE_MAX_AGE = 31536000  # 1 yil
-# ============ БЕЗОПАСНОСТЬ ============
 
 if DEBUG:
     CSRF_TRUSTED_ORIGINS = [

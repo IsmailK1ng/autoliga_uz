@@ -13,6 +13,10 @@
     {% hreflang_tags %}
     {% canonical_url %}
 
+    {% block extra_meta %}{% endblock extra_meta %}
+
+    {% block extra_css %}{% endblock %}
+
     <!-- Мета теги -->
     <meta name="description" content="{% block meta_description %}Autoliga{% endblock %}">
     <meta name="keywords" content="{% block meta_keywords %}Autoliga{% endblock %}">
@@ -86,7 +90,6 @@
 
 
     <!-- Дополнительные стили можно добавить в блоке extra_css -->
-    {% block extra_css %}{% endblock %}
 
     {% block inline_styles %}{% endblock %}
 </head>

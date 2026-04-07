@@ -1433,11 +1433,11 @@ class TelegramUserAdmin(admin.ModelAdmin):
     ordering = ['-created_at']
     list_per_page = 50
 
-    # Sanani chiroyli raqamlarda ko'rsatuvchi funksiya
     def formatted_created_at(self, obj):
         if obj.created_at:
-            # Natija: 30.03.2026 15:17 ko'rinishida bo'ladi
-            return obj.created_at.strftime("%d.%m.%Y %H:%M")
+            # Server vaqtini lokal vaqtga o'tkazamiz (settings.py TIME_ZONE ga mos)
+            local_time = timezone.localtime(obj.created_at)
+            return local_time.strftime("%d.%m.%Y %H:%M")
         return "-"
     
     # Ustun nomini belgilaymiz

@@ -7,9 +7,6 @@
 <link rel="stylesheet" type="text/css" href="{% static 'css/dealers.css' %}">
 {% endblock breadcrumbs %}
 
-{% block extra_meta %}
-    <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline' 'unsafe-eval' https://simplemaps.com https://www.googletagmanager.com https://www.google-analytics.com https://www.google.com https://www.gstatic.com https://mc.yandex.ru https://yastatic.net;">
-{% endblock extra_meta %}
 
 {% block title %}
     {% if LANGUAGE_CODE == 'uz' %}Dilerlar - Autoliga Uzbekistan{% elif LANGUAGE_CODE == 'ru' %}Дилеры - Autoliga Uzbekistan{% else %}Dealers - Autoliga Uzbekistan{% endif %}
@@ -627,7 +624,10 @@
             function hideTrial() {
                 var link = document.querySelector('a[href="https://simplemaps.com"]');
                 if (link && link.parentNode) {
-                    link.parentNode.style.cssText += ';display:none!important;visibility:hidden!important;opacity:0!important;pointer-events:none!important;';
+                    link.parentNode.style.display = 'none';
+                    link.parentNode.style.visibility = 'hidden';
+                    link.parentNode.style.opacity = '0';
+                    link.parentNode.style.pointerEvents = 'none';
                 }
             }
             hideTrial();

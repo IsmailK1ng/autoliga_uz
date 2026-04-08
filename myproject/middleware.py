@@ -134,16 +134,20 @@ class SecurityHeadersMiddleware:
     def __call__(self, request):
         response = self.get_response(request)
 
-        # Admin sahifalariga CSP qo'ymaymiz (CKEditor, Jazzmin o'z JS ishlatadi)
         if not request.path.startswith('/admin/'):
-            # 'unsafe-eval' intentionally absent:
-            # - SVGInjector (libs.min.js) uses new Function() only when evalScripts!="never";
-            #   we set evalScripts:"never" in app.js and about.js, so it is never called.
-            # - countrymap.js (simplemaps) does not use eval.
-            # - GTM is only a noscript fallback here, no JS initialisation.
+            
+            # Dealers sahifasi simplemaps uchun 'unsafe-eval' kerak
+            is_dealers_page = '/dealers' in request.path
+            
+            script_src = (
+                "script-src 'self' 'unsafe-inline' 'unsafe-eval' "
+                if is_dealers_page else
+                "script-src 'self' 'unsafe-inline' "
+            )
+            
             response['Content-Security-Policy'] = (
                 "default-src 'self'; "
-                "script-src 'self' 'unsafe-inline' "
+                + script_src +
                 "https://www.googletagmanager.com https://www.google-analytics.com "
                 "https://www.google.com https://www.gstatic.com "
                 "https://mc.yandex.ru https://yastatic.net; "

@@ -135,19 +135,9 @@ class SecurityHeadersMiddleware:
         response = self.get_response(request)
 
         if not request.path.startswith('/admin/'):
-            
-            # Dealers sahifasi simplemaps uchun 'unsafe-eval' kerak
-            is_dealers_page = '/dealers' in request.path
-            
-            script_src = (
-                "script-src 'self' 'unsafe-inline' 'unsafe-eval' "
-                if is_dealers_page else
-                "script-src 'self' 'unsafe-inline' "
-            )
-            
             response['Content-Security-Policy'] = (
                 "default-src 'self'; "
-                + script_src +
+                "script-src 'self' 'unsafe-inline' 'unsafe-eval' "
                 "https://www.googletagmanager.com https://www.google-analytics.com "
                 "https://www.google.com https://www.gstatic.com "
                 "https://mc.yandex.ru https://yastatic.net; "

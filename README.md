@@ -79,7 +79,9 @@ Windows:
 bash
 Копировать код
 python -m venv venv
-venv\Scripts\activate
+venv\Scripts\activate  
+
+source venv/Scripts/activate
 macOS / Linux:
 
 bash

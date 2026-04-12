@@ -132,8 +132,49 @@ def services(request):
     return render(request, 'main/services.html')
 
 
+# def product_detail(request, product_id):
+#     return render(request, 'main/product_detail.html', {'product_id': product_id})
 def product_detail(request, product_id):
-    return render(request, 'main/product_detail.html', {'product_id': product_id})
+    """
+    product_id — bu aslida slug yoki id?
+    URL dan tekshirib olamiz, ikkalasini qo'llab-quvvatlaymiz
+    """
+    # Slug bilan ishlash (SEO uchun to'g'ri)
+    product = get_object_or_404(
+        Product.objects.select_related('category').prefetch_related(
+            'card_specs__icon',
+            'parameters',
+            'features__icon',
+            'gallery',
+        ),
+        slug=product_id,      # ← slug bilan qidiramiz
+        is_active=True
+    )
+
+    # O'xshash mahsulotlar — internal linking uchun (SEO ga foydali)
+    related_products = Product.objects.filter(
+        category=product.category,
+        is_active=True
+    ).exclude(pk=product.pk).order_by('order')[:4]
+
+    # SEO description — Python da tayyorlaymiz (160 belgi limit)
+    seo_parts = [f"{product.title} Toshkentda"]
+    if product.slider_price:
+        seo_parts.append(f"narx {product.slider_price}")
+    if product.slider_power:
+        seo_parts.append(f"dvigatel {product.slider_power}")
+    if product.slider_fuel_consumption:
+        seo_parts.append(f"yoqilg'i {product.slider_fuel_consumption}")
+    seo_parts.append("Kredit shartlari mavjud. Autoliga rasmiy dileri.")
+    seo_description = '. '.join(seo_parts)[:160]
+
+    return render(request, 'main/product_detail.html', {
+        'product': product,                      # ← SEO uchun asosiy
+        'related_products': related_products,    # ← internal linking
+        'seo_description': seo_description,      # ← tayyor description
+        'product_id': product_id,                # ← eski kod uchun (agar JS ishlatsa)
+    })
+
 
 def lizing(request):
     return render(request, 'main/lizing.html')

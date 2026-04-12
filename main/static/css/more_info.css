@@ -54,6 +54,7 @@
     font-size: 7rem;
     text-shadow: none;
     padding-right: 10px;
+    margin-top: 20px;
 }
 
 .more_info-link {
@@ -107,6 +108,19 @@
 .car-img_block {
     height: auto;
     object-fit: cover;
+}
+
+
+
+#main-car-image {
+    opacity: 0;
+    transition: opacity 0.4s ease;
+}
+
+
+#main-car-image.loaded {
+    opacity: 1;
+    
 }
 
 .car-img_block img {

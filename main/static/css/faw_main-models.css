@@ -22,7 +22,7 @@
 
 .mxd-hero-06__content {
     margin: 4rem 0 0;
-    height: 60vh;
+    height: 70vh;
 }
 
 .mxd-hero-06__top {
@@ -543,7 +543,7 @@ body[data-theme="dark"] .hero-05-title__item {
 /* Tablet Portrait */
 @media (max-width: 768px) {
     .mxd-hero-06__content {
-        height: 50vh;
+        height: 38vh;
     }
 
     .stack-item {
@@ -579,7 +579,7 @@ body[data-theme="dark"] .hero-05-title__item {
 /* Mobile Landscape */
 @media (max-width: 576px) {
     .mxd-hero-06__content {
-        height: 60vh;
+        height: 27vh;
     }
 
     .mxd-hero-06__img img {
@@ -906,8 +906,9 @@ body[data-theme="dark"] .hero-05-title__item {
     }
 }
 
-.truck-price {
-    display: none; /* Narx hozircha ko'rinmaydi */
-}
+/* .truck-price { */
+    /* display: none;  */
+    /* Narx hozircha ko'rinmaydi */
+/* } */
 
 

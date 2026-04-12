@@ -407,7 +407,7 @@ if (categoryLink) {
 }
 
 // Sahifa title
-document.title = `${this.product.title} - FAW Trucks`;
+document.title = `${this.product.title} - Autoliga`;
 }
 
 

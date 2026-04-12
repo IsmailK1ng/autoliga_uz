@@ -2,12 +2,69 @@
 {% load static %}
 {% load seo_tags %}
 
+
+{% block title %}
+    Avtosalon Toshkent — Jetour, Omoda, Exeed narxlari 2025
+{% endblock %}
+
+{% block meta_description %}
+    Autoliga — Toshkentdagi rasmiy avtosalon. Jetour T1, T2, Omoda C5, Exeed RX narxlari va kredit shartlari. Bepul konsultatsiya va test drive.
+{% endblock %}
+
+{% block meta_keywords %}
+    avtosalon toshkent, autoliga samarqand, autoliga olmaliq,  jetour narxi 2026, Soueast c5 narxi, exeed rx uzbekiston, kredit bilan mashina toshkent, yangi mashina narxlari
+{% endblock %}
+
+{% block og_title %}Autoliga — Toshkentdagi Rasmiy Avtosalon{% endblock %}
+{% block og_description %}Jetour, Soueast, Exeed brendlari. Kredit,  test drive. Toshkentda eng yaxshi narxlar.{% endblock %}
+{% block og_image %}{{ request.scheme }}://{{ request.get_host }}{% static 'images/og-home.jpg' %}{% endblock %}
+
+{% block structured_data %}
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "AutoDealer",
+    "name": "Autoliga",
+    "url": "https://autoliga.uz",
+    "logo": "{{ request.scheme }}://{{ request.get_host }}{% static 'images/logo/autoliga-logo.png' %}",
+    "description": "Toshkentdagi rasmiy avtosalon — Jetour, Soueast, Exeed va boshqa brendlar",
+    "address": {
+        "@type": "PostalAddress",
+        "addressLocality": "Toshkent",
+        "addressCountry": "UZ"
+    },
+    "telephone": "+998785557377",
+    "openingHours": "Mo-Su 09:00-20:00",
+
+    "hasOfferCatalog": {
+        "@type": "OfferCatalog",
+        "name": "Avtomobillar katalogi",
+        "itemListElement": [
+            {% for category in productCategory %}
+            {
+                "@type": "Offer",
+                "itemOffered": {
+                    "@type": "Product",
+                    "name": "{{ category.name }}",
+                    "url": "{{ request.scheme }}://{{ request.get_host }}/category/{{ category.slug }}/"
+                }
+            }{% if not forloop.last %},{% endif %}
+            {% endfor %}
+        ]
+    },
+
+    "sameAs": [
+        "https://t.me/autoliga_uz",
+        "https://instagram.com/autoliga.uz"
+    ]
+}
+</script>
+{% endblock %}
+
 {% block content %}
-
   {% include 'main/includes/header.html' %}
-  <!-- Контент страницы (начало) -->
   <main id="mxd-page-content" class="mxd-page-content">
-
+  <!-- qolgan content o'zgarishsiz... -->
 
 <!-- ===== STYLE: Faqat sidebar uchun yangi stillar ===== -->
 

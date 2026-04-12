@@ -5,67 +5,244 @@
 
 <head>
     <meta charset="UTF-8">
-    <script src="{% static 'js/utm-tracker.js' %}"></script>
-    <title>FAW Trucks - Mahsulot</title>
-    {% hreflang_tags %}
+
+    <!-- ═══════════════════════════════════════════
+         TITLE — dinamik, har bir mashina o'z titleiga ega
+         Natija: "Jetour T1 — 434 000 000 sum | Autoliga"
+    ═══════════════════════════════════════════ -->
+    <title>
+        {% if product %}
+            {{ product.title }}
+            {% if product.slider_price %} — {{ product.slider_price }}{% endif %}
+            | Autoliga
+        {% else %}
+            Autoliga — O'zbekistonda Ishonchli Avtosalon
+        {% endif %}
+    </title>
+
+    <!-- ═══════════════════════════════════════════
+         META — asosiy SEO teglari
+    ═══════════════════════════════════════════ -->
+    <meta name="description" content="
+        {% if product %}
+            {{ product.title }} Toshkentda rasmiy narxi
+            {% if product.slider_price %}{{ product.slider_price }}{% endif %}.
+            {% if product.slider_power %}Dvigatel: {{ product.slider_power }}.{% endif %}
+            {% if product.slider_fuel_consumption %}Yoqilg'i: {{ product.slider_fuel_consumption }}.{% endif %}
+            Kredit shartlari mavjud. Autoliga rasmiy dileri.
+        {% else %}
+            Autoliga — Toshkentdagi ishonchli avtosalon. Jetour, soueast xitoy brendlari.
+        {% endif %}
+    ">
+
+    <meta name="keywords" content="
+        {% if product %}
+            {{ product.title }} narxi,
+            {{ product.title }} toshkent,
+            {{ product.title }} kredit,
+            {% if product.category %}{{ product.category.name }} narxi uzbekiston,{% endif %}
+            {{ product.title }} {{ product.slider_year }}
+        {% else %}
+            avtosalon toshkent, yangi mashina narxlari, xitoy mashinalari, jetour, soueast, mg 
+        {% endif %}
+    ">
+
+    <!-- Google indexlash ruxsati -->
+    <meta name="robots" content="index, follow">
+
+    <!-- ═══════════════════════════════════════════
+         OPEN GRAPH — Telegram, WhatsApp, Facebook
+         share qilganda chiroyli ko'rinsin
+    ═══════════════════════════════════════════ -->
+    <meta property="og:type" content="{% if product %}product{% else %}website{% endif %}">
+
+    <meta property="og:title" content="
+        {% if product %}
+            {{ product.title }}{% if product.slider_price %} — {{ product.slider_price }}{% endif %} | Autoliga
+        {% else %}
+            Autoliga — Toshkentdagi Avtosalon
+        {% endif %}">
+
+    <meta property="og:description" content="
+        {% if product %}
+            {{ product.title }} Toshkentda.
+            {% if product.slider_power %}Quvvat: {{ product.slider_power }}.{% endif %}
+            Kredit shartlari mavjud.
+        {% else %}
+            Jetour, Omoda, Exeed brendlari. Kredit shartlari mavjud.
+        {% endif %}
+    ">
+
+    <meta property="og:image" content="
+        {% if product and product.main_image %}
+            {{ request.scheme }}://{{ request.get_host }}{{ product.main_image.url }}
+        {% else %}
+            {{ request.scheme }}://{{ request.get_host }}{% static 'images/og-default.jpg' %}
+        {% endif %}
+    ">
+
+    <meta property="og:url" content="{{ request.build_absolute_uri }}">
+    <meta property="og:site_name" content="autoliga.uz">
+    <meta property="og:locale" content="uz_UZ">
+
+    <!-- ═══════════════════════════════════════════
+         CANONICAL — duplicate content dan himoya
+         (sizning seo_tags da mavjud)
+    ═══════════════════════════════════════════ -->
     {% canonical_url %}
-    <meta name="description" content="Autoliga в Узбекистане">
+    {% hreflang_tags %}
+
+    <!-- ═══════════════════════════════════════════
+         JSON-LD STRUCTURED DATA
+         Google Rich Results uchun — eng muhim qism!
+         Qidiruv natijasida narx va rasm ko'rinadi
+    ═══════════════════════════════════════════ -->
+    {% if product %}
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "Product",
+        "name": "{{ product.title }}",
+        "image": "{{ request.scheme }}://{{ request.get_host }}{{ product.main_image.url }}",
+
+        {% if product.category %}
+        "brand": {
+            "@type": "Brand",
+            "name": "{{ product.category.name }}"
+        },
+        {% endif %}
+
+        "offers": {
+            "@type": "Offer",
+            "priceCurrency": "UZS",
+            "price": "{{ product.slider_price|default:'0' }}",
+            "availability": "https://schema.org/InStock",
+            "url": "{{ request.build_absolute_uri }}",
+            "seller": {
+                "@type": "Organization",
+                "name": "Autoliga",
+                "url": "https://autoliga.uz"
+            }
+        },
+
+        "additionalProperty": [
+            {% if product.slider_power %}
+            {
+                "@type": "PropertyValue",
+                "name": "Dvigatel quvvati",
+                "value": "{{ product.slider_power }}"
+            }{% if product.slider_fuel_consumption or product.slider_year %},{% endif %}
+            {% endif %}
+
+            {% if product.slider_fuel_consumption %}
+            {
+                "@type": "PropertyValue",
+                "name": "Yoqilg'i sarfi",
+                "value": "{{ product.slider_fuel_consumption }}"
+            }{% if product.slider_year %},{% endif %}
+            {% endif %}
+
+            {% if product.slider_year %}
+            {
+                "@type": "PropertyValue",
+                "name": "Yil",
+                "value": "{{ product.slider_year }}"
+            }
+            {% endif %}
+        ],
+
+        "dateModified": "{{ product.updated_at|date:'Y-m-d' }}"
+    }
+    </script>
+
+    <!-- Breadcrumb Schema — navigatsiya uchun -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+            {
+                "@type": "ListItem",
+                "position": 1,
+                "name": "Bosh sahifa",
+                "item": "{{ request.scheme }}://{{ request.get_host }}"
+            }
+            {% if product.category %},
+            {
+                "@type": "ListItem",
+                "position": 2,
+                "name": "{{ product.category.name }}",
+                "item": "{{ request.scheme }}://{{ request.get_host }}/category/{{ product.category.slug }}/"
+            },
+            {
+                "@type": "ListItem",
+                "position": 3,
+                "name": "{{ product.title }}",
+                "item": "{{ request.build_absolute_uri }}"
+            }
+            {% else %},
+            {
+                "@type": "ListItem",
+                "position": 2,
+                "name": "{{ product.title }}",
+                "item": "{{ request.build_absolute_uri }}"
+            }
+            {% endif %}
+        ]
+    }
+    </script>
+    {% endif %}
+
+    <!-- ═══════════════════════════════════════════
+         VIEWPORT + FAVICON
+    ═══════════════════════════════════════════ -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
-    <!-- Универсальный favicon -->
-    <link rel="icon" href="{% static 'images/logo/autoliga-logo.png' %}"/>
-    <!-- Для Apple устройств -->
+    <link rel="icon" href="{% static 'images/logo/autoliga-logo.png' %}">
     <link rel="apple-touch-icon" href="{% static 'images/logo/autoliga-logo.png' %}">
 
-    <!-- Подключение стилей -->
+    <!-- ═══════════════════════════════════════════
+         CSS — o'zgarishsiz qoldiramiz
+    ═══════════════════════════════════════════ -->
     <link rel="stylesheet" type="text/css" href="{% static 'css/loaders/loader.css' %}">
     <link rel="stylesheet" type="text/css" href="{% static 'css/plugins.css' %}">
     <link rel="stylesheet" type="text/css" href="{% static 'css/main_site.css' %}">
     <link rel="stylesheet" type="text/css" href="{% static 'css/faw_main-models.css' %}">
     <link rel="stylesheet" type="text/css" href="{% static 'css/site_main.css' %}">
     <link rel="stylesheet" type="text/css" href="{% static 'css/more_info.css' %}">
+
+    <!-- utm-tracker eng oxirida, defer bilan -->
+    <script src="{% static 'js/utm-tracker.js' %}" defer></script>
+
     <style>
         .page-loader {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
             background: rgba(255, 255, 255, 0.95);
             display: flex;
             justify-content: center;
             align-items: center;
             z-index: 9999;
         }
-
         .page-loader .loader {
             font-size: 24px;
             color: #333;
             font-weight: 600;
         }
-
         .error-page {
             min-height: 60vh;
             display: flex;
             align-items: center;
             justify-content: center;
         }
-
         .error-content {
             text-align: center;
             padding: 40px;
         }
-
-        .error-content h1 {
-            font-size: 48px;
-            margin-bottom: 20px;
-        }
-
-        .error-content p {
-            font-size: 20px;
-            margin-bottom: 30px;
-            color: #666;
-        }
+        .error-content h1 { font-size: 48px; margin-bottom: 20px; }
+        .error-content p { font-size: 20px; margin-bottom: 30px; color: #666; }
     </style>
 </head>
 
@@ -177,8 +354,10 @@
                                     {% else %}
                                         src="{% static 'images/noobject.avif' %}"
                                     {% endif %}
-                                    data-default-src="{% static 'images/noobject.avif' %}">
-                            </div>
+                                    data-default-src="{% static 'images/noobject.avif' %}"
+                                    onload="this.classList.add('loaded')"
+                                    onerror="this.src=this.dataset.defaultSrc; this.classList.add('loaded')">
+                            </div>                        
                             
 
                             <div class="car-img_block-info">
@@ -334,9 +513,9 @@
 
         <form class="faw-modal__form" id="faw-contact-form">
             {% csrf_token %}
-            <input type="hidden" name="project_name" value="FAW Trucks">
-            <input type="hidden" name="admin_email" value="info@fawtrucks.uz">
-            <input type="hidden" name="form_subject" value="FAW Contact Form Message">
+            <input type="hidden" name="project_name" value="autoliga.uz">
+            <input type="hidden" name="admin_email" value="info@autoliga.uz">
+            <input type="hidden" name="form_subject" value="autoliga Contact Form Message">
 
             <input type="hidden" name="product" id="product-field" value="">
 

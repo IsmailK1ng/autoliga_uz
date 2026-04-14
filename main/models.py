@@ -6,6 +6,7 @@ from ckeditor.fields import RichTextField
 from django.utils import timezone
 from datetime import timedelta
 from django.utils.translation import gettext_lazy as _
+from django.urls import reverse
 
 # ========== ОБЩИЕ CHOICES ==========
 
@@ -84,6 +85,8 @@ class News(models.Model):
             self.slug = slug
         
         super().save(*args, **kwargs)
+
+
 
 class NewsBlock(models.Model):
     """Гибкие блоки внутри новости"""
@@ -301,6 +304,9 @@ class Product(models.Model):
             'image': (self.slider_image or self.main_image).url if (self.slider_image or self.main_image) else None,
             'link': f'/products/{self.slug}/',
         }
+    
+    def get_absolute_url(self):
+        return reverse('product_detail', args=[self.slug])
 
 class ParameterCategory(models.Model):
     """

@@ -87,7 +87,7 @@ macOS / Linux:
 bash
 Копировать код
 python3 -m venv venv
-source venv/bin/activate
+source venv/bin/activate 
 3️⃣ Установить зависимости
 bash
 Копировать код

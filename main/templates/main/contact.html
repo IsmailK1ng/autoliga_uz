@@ -2,6 +2,10 @@
 {% load static %}
 {% load static seo_tags %}
 
+<title>
+    {% if LANGUAGE_CODE == 'uz' %}Bog'lanish va Manzil — Autoliga Avtosaloni Toshkent{% else %}Контакты и Адрес — Автосалон Autoliga Ташкент{% endif %}
+</title>
+<meta name="description" content="{% if LANGUAGE_CODE == 'uz' %}Autoliga avtosaloni bilan bog'laning. Manzil: Toshkent shahri. Telefon: +998785557377. Bizning mutaxassislarimiz avtomobil tanlashda sizga yordam beradi.{% else %}Свяжитесь с автосалоном Autoliga. Адрес в Ташкенте. Телефон: +998785557377. Наши специалисты помогут вам с выбором автомобиля.{% endif %}">
 
 {% block breadcrumbs %}
 <link rel="stylesheet" href="{% static 'css/breadcrumbs.css' %}">
@@ -11,6 +15,36 @@
 <link rel="stylesheet" type="text/css" href="{% static 'css/site_contact.css' %}" />
 {% endblock site_contact %}
 
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "AutoDealer",
+  "name": "Autoliga",
+  "address": {
+    "@type": "PostalAddress",
+    "streetAddress": "2-й проезд Фарогат, 2, Ташкент",
+    "addressLocality": "Tashkent",
+    "addressRegion": "Tashkent",
+    "postalCode": "100000",
+    "addressCountry": "UZ"
+  },
+  "geo": {
+    "@type": "GeoCoordinates",
+    "latitude": "41.375042", "longitude": "69.287543"
+  },
+  "telephone": "+998785557377",
+  "openingHoursSpecification": [
+    {
+      "@type": "OpeningHoursSpecification",
+      "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
+      "opens": "09:00",
+      "closes": "19:00"
+    }
+  ],
+  "url": "https://autoliga.uz/contact/",
+  "image": "{% static 'images/logo/autoliga-logo.png' %}"
+}
+</script>
 
 {% block content %}
     <!-- Google Tag Manager (noscript) -->

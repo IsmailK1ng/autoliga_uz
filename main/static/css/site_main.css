@@ -566,7 +566,7 @@ body[data-theme=dark] .mxd-contact {
     box-shadow: 0 8px 32px rgba(0, 0, 0, .1);
     border: 1px solid rgba(255, 255, 255, .2);
     transition: all .3s ease;
-    padding: 10px 20px
+    padding: 10px 20px 10px 15px;
 }
 
 #header.scrolled .mxd-nav__contain {
@@ -584,7 +584,8 @@ body[data-theme=dark] .mxd-contact {
 
 @media (max-width:425px) {
     .mxd-nav__wrap {
-        padding: 20px 2rem
+        /* padding: 20px 2rem */
+        padding: 10px 20px 10px 15px;
     }
 
     .mxd-nav__contain {
@@ -605,7 +606,8 @@ body[data-theme=dark] .mxd-contact {
     }
 
     #header.scrolled {
-        padding: 10px 20px !important;
+        /* padding: 10px 20px !important; */
+        padding: 10px 20px 10px 15px;
     }
 }
 

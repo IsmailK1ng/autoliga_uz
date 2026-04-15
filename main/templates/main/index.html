@@ -340,13 +340,21 @@
 
     <!-- Секция — слайдер FAW (начало) -->
     <div id="slider-data" style="display: none;">{{ slider_products|safe }}</div>
+    <div
+      id="slider-i18n"
+      style="display:none;"
+      data-lang="{{ LANGUAGE_CODE|default:'uz' }}"
+      data-price-label="{% if LANGUAGE_CODE == 'uz' %}NARXI{% elif LANGUAGE_CODE == 'ru' %}ЦЕНА{% else %}PRICE{% endif %}"
+      data-power-label="{% if LANGUAGE_CODE == 'uz' %}KUCH{% elif LANGUAGE_CODE == 'ru' %}МОЩНОСТЬ{% else %}POWER{% endif %}"
+      data-consumption-label="{% if LANGUAGE_CODE == 'uz' %}RASHOD{% elif LANGUAGE_CODE == 'ru' %}РАСХОД{% else %}CONSUMPTION{% endif %}"
+      data-detail-label="{% if LANGUAGE_CODE == 'uz' %}Batafsil{% elif LANGUAGE_CODE == 'ru' %}Подробнее{% else %}Learn more{% endif %}">
+    </div>
     <section class="faw-slider-section" style="margin-top: 6.3rem;">
     
     <h2 class="slider-title">Autoliga — O'zbekistondagi eng ommabop avtomobillar narxlari 2026</h2>
       <!-- Orqa fon rasmi -->
       <div class="faw-bg">
         <picture>
-          <source media="(max-width: 500px)" srcset="{% static 'images/mobilebackground.png' %}">
           <img src="{% static 'images/backgroundaut.jpeg' %}" alt="Background" class="faw-bg-image">
         </picture>
       </div>

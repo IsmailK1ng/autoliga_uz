@@ -1577,165 +1577,190 @@ body[data-theme=light] .language-option:hover {
 
 @media (max-width:768px) {
     .faw-slider-section {
-        border-radius: 18px
+        border-radius: 0;
+        /* background: #f3f3f3; */
+        overflow: hidden
+    }
+
+    .faw-slider-section>.faw-bg {
+        display: none
+    }
+
+    .slider-title {
+        display: none
     }
 
     .faw-slider-inner {
         flex-direction: column !important;
-        padding: 20px 16px !important;
+        padding: 8px 14px 50px !important;
         min-height: auto !important;
-        gap: 12px !important
+        gap: 8px !important
     }
 
     .faw-slider-section .faw-slider-car {
         order: -1;
-        min-height: 220px;
+        min-height: 210px;
         width: 100%
     }
 
     .faw-slider-images {
-        height: 220px
+        height: 210px;
+        touch-action: pan-y
     }
 
     .faw-slide img,
     .faw-slide svg {
-        max-height: 220px
+        max-height: 210px;
+        max-width: min(96%, 360px)
     }
 
     .faw-slider-section .faw-slider-info {
         flex: none !important;
         max-width: 100% !important;
-        width: 100%
+        width: 100%;
+        text-align: center;
+        position: relative;
+        z-index: 5
     }
 
     .faw-info-card {
-        padding: 18px 16px 16px;
-        border-radius: 16px
+        background: transparent;
+        border: 0;
+        box-shadow: none;
+        padding: 0 8px 0;
+        border-radius: 0
     }
 
     .faw-title {
-        font-size: 1.5rem
+        font-size: 1.95rem;
+        font-weight: 600;
+        line-height: 1.1;
+        margin-bottom: 8px;
+        text-transform: uppercase
     }
 
     .faw-year {
-        font-size: 1.1rem;
-        margin-bottom: 10px
+        display: none
     }
 
     .faw-price-section {
-        padding-top: 10px;
-        margin-bottom: 12px
+        border-top: 0;
+        padding-top: 0;
+        margin-bottom: 10px
+    }
+
+    .faw-price-label {
+        font-size: 1rem;
+        letter-spacing: 1px;
+        color: #555;
+        margin-bottom: 3px
     }
 
     .faw-price-value {
-        font-size: 1.35rem
+        font-size: 1.45rem;
+        font-weight: 800
     }
 
     .faw-specs-row {
-        margin-bottom: 14px;
-        gap: 8px
-    }
-
-    .faw-spec-box {
-        padding: 10px 12px;
-        gap: 8px;
-        border-radius: 12px
-    }
-
-    .faw-spec-icon {
-        width: 36px;
-        height: 36px;
-        border-radius: 10px
-    }
-
-    .faw-spec-value {
-        font-size: 1.05rem
+        display: none
     }
 
     .faw-btn-detail {
-        width: 100%;
+        width: auto;
         justify-content: center;
-        font-size: 1.1rem;
-        padding: 12px 20px;
-        border-radius: 12px
+        font-size: .95rem;
+        padding: 10px 24px;
+        border-radius: 999px;
+        background: #111;
+        color: #fff;
+        margin: 0 auto
+    }
+
+    .faw-btn-detail:hover {
+        transform: none;
+        background: #111
+    }
+
+    .faw-btn-detail span {
+        display: none
     }
 
     .faw-slider-section>.faw-slider-arrow {
-        top: 130px !important;
-        transform: translateY(-50%) !important;
-        width: 36px;
-        height: 36px
+        top: auto !important;
+        bottom: 22px !important;
+        transform: none !important;
+        width: 30px;
+        height: 30px;
+        border: 0;
+        border-radius: 0;
+        background: transparent;
+        box-shadow: none;
+        backdrop-filter: none;
+        -webkit-backdrop-filter: none;
+        color: #5d5d5d;
+        z-index: 30;
+        pointer-events: auto
     }
 
     .faw-slider-section>.faw-slider-arrow:hover {
-        transform: translateY(-50%) scale(1.06) !important
+        transform: none !important;
+        background: transparent
     }
 
     .faw-slider-section>.faw-slider-arrow.left-btn {
-        left: 8px
+        left: 14px
     }
 
     .faw-slider-section>.faw-slider-arrow.right-btn {
-        right: 8px
+        right: 14px
     }
 }
 
 @media (max-width:480px) {
-    .faw-slider-section {
-        border-radius: 14px
-    }
-
     .faw-slider-inner {
-        padding: 14px 12px !important;
+        padding: 6px 10px 46px !important;
         gap: 10px !important
     }
 
     .faw-slider-section .faw-slider-car {
-        min-height: 180px
+        min-height: 185px
     }
 
     .faw-slider-images {
-        height: 180px
+        height: 185px
     }
 
     .faw-slide img,
     .faw-slide svg {
-        max-height: 180px
+        max-height: 185px
     }
 
     .faw-info-card {
-        padding: 14px 14px 14px;
-        border-radius: 14px
+        padding: 0 6px
     }
 
     .faw-title {
-        font-size: 1.3rem
-    }
-
-    .faw-year {
-        font-size: 1.3rem;
-        margin-bottom: 8px
+        font-size: 3rem
     }
 
     .faw-price-value {
-        font-size: 1.3rem
+        font-size: 1.5rem
     }
 
     .faw-btn-detail {
-        font-size: 1.3rem;
-        padding: 11px 18px
+        font-size: 1rem;
+        padding: 9px 20px
     }
 
     .faw-slider-section>.faw-slider-arrow {
-        width: 32px;
-        height: 32px;
-        top: 105px !important
+        width: 50px;
+        height: 80px;
+        bottom: 20px !important
     }
 }
 
 body[data-theme=dark] .faw-info-card {
-    background: rgba(22, 22, 22, .8);
-    border-color: rgba(255, 255, 255, .12)
+    border-color: rgba(255, 0, 0, 0.709)
 }
 
 body[data-theme=dark] .faw-title {
@@ -3889,6 +3914,10 @@ body[data-theme=dark] .slide-image {
 /* home our team */
 /* ===== 3D CAROUSEL ===== */
 
+html, body {
+  overflow-x: hidden;
+}
+
 .ht3d-wrapper {
   position: relative;
   width: 100%;
@@ -3897,7 +3926,8 @@ body[data-theme=dark] .slide-image {
   align-items: center;
   justify-content: center;
   margin: 30px 0 0;
-  overflow: visible;
+  
+  overflow: hidden;
   perspective: 1200px;
 }
 
@@ -3909,6 +3939,7 @@ body[data-theme=dark] .slide-image {
   perspective: 1200px;
   margin: 0 auto;
   padding: 0 60px;
+  overflow: hidden;
 }
 
 /* Kartochka: 3:4 portret nisbat — odamning rasmi uchun ideal */
@@ -4124,9 +4155,13 @@ body[data-theme=dark] .slide-image {
   /* 3:4 portret nisbat — mobil uchun */
   .ht3d-card { width: 180px; height: 240px; margin-left: -90px; margin-top: -120px; }
   .ht3d-card.pos-pm2 { display: none; }
-  .ht3d-card.pos-pm1 { transform: translateX(-140px) scale(0.62) rotateY(20deg) translateZ(-60px); opacity: 0.35; }
+  .ht3d-card.pos-pm1 { 
+    transform: translateX(-100px) scale(0.65) rotateY(15deg);
+  }
   .ht3d-card.pos-p0 { transform: translateX(0px) scale(1) rotateY(0deg) translateZ(0px); opacity: 1; }
-  .ht3d-card.pos-p1  { transform: translateX(140px) scale(0.62) rotateY(-20deg) translateZ(-60px); opacity: 0.35; }
+  .ht3d-card.pos-p1  { 
+    transform: translateX(100px) scale(0.65) rotateY(-15deg);
+  }
   .ht3d-card.pos-p2  { display: none; }
   .ht3d-btn { width: 40px; height: 40px; font-size: 22px; }
   .ht3d-prev { left: 4px; }
@@ -4135,13 +4170,9 @@ body[data-theme=dark] .slide-image {
   .ht3d-position { font-size: 1.75rem; }
 }
 
-/* ── Slider background blur — mobile only ─────────────────────── */
+/* ── Slider background hidden on mobile ─────────────────────── */
 @media (max-width: 500px) {
-  .faw-bg {
-    overflow: hidden;
-  }
-  .faw-bg-image {
-    filter: blur(6px);
-    transform: scale(1.04); /* blur edges xiralamasligi uchun */
-  }
+    .faw-slider-section > .faw-bg {
+        display: none !important;
+    }
 }

@@ -11,6 +11,14 @@
     {{ dealer.name }} - Autoliga Uzbekistan
 {% endblock title %}
 
+{% block meta_description %}
+    {% if LANGUAGE_CODE == 'uz' %}{{ dealer.name }} diler markazi: {{ dealer.address|default:'Toshkent, O\'zbekiston' }}. Telefon: {{ dealer.phone|default:'+998 78 555 73 77' }}. Ish vaqti va joylashuv xaritada.{% elif LANGUAGE_CODE == 'ru' %}Дилерский центр {{ dealer.name }}: {{ dealer.address|default:'Ташкент, Узбекистан' }}. Телефон: {{ dealer.phone|default:'+998 78 555 73 77' }}. Время работы и расположение на карте.{% else %}{{ dealer.name }} dealer center: {{ dealer.address|default:'Tashkent, Uzbekistan' }}. Phone: {{ dealer.phone|default:'+998 78 555 73 77' }}. Working hours and map location.{% endif %}
+{% endblock %}
+
+{% block meta_keywords %}
+    {% if LANGUAGE_CODE == 'uz' %}{{ dealer.name }}, autoliga diler, avtosalon manzili, mashina dileri{% elif LANGUAGE_CODE == 'ru' %}{{ dealer.name }}, дилер autoliga, адрес автосалона, дилерский центр{% else %}{{ dealer.name }}, autoliga dealer, car showroom address, dealer center{% endif %}
+{% endblock %}
+
 {% block content %}
     <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-M33GWKMW" height="0" width="0"
             style="display:none;visibility:hidden"></iframe></noscript>

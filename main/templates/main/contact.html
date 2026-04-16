@@ -2,10 +2,17 @@
 {% load static %}
 {% load static seo_tags %}
 
-<title>
-    {% if LANGUAGE_CODE == 'uz' %}Bog'lanish va Manzil — Autoliga Avtosaloni Toshkent{% else %}Контакты и Адрес — Автосалон Autoliga Ташкент{% endif %}
-</title>
-<meta name="description" content="{% if LANGUAGE_CODE == 'uz' %}Autoliga avtosaloni bilan bog'laning. Manzil: Toshkent shahri. Telefon: +998785557377. Bizning mutaxassislarimiz avtomobil tanlashda sizga yordam beradi.{% else %}Свяжитесь с автосалоном Autoliga. Адрес в Ташкенте. Телефон: +998785557377. Наши специалисты помогут вам с выбором автомобиля.{% endif %}">
+{% block title %}
+    {% if LANGUAGE_CODE == 'uz' %}Bog'lanish va manzil - Autoliga avtosaloni Toshkent{% elif LANGUAGE_CODE == 'ru' %}Контакты и адрес - автосалон Autoliga Ташкент{% else %}Contact and address - Autoliga car dealer Tashkent{% endif %}
+{% endblock %}
+
+{% block meta_description %}
+    {% if LANGUAGE_CODE == 'uz' %}Autoliga avtosaloni bilan bog'laning: Toshkentdagi manzil, telefon va ish vaqti. Mutaxassislar model tanlash bo'yicha yordam beradi.{% elif LANGUAGE_CODE == 'ru' %}Свяжитесь с автосалоном Autoliga: адрес в Ташкенте, телефон и график работы. Поможем с выбором автомобиля.{% else %}Contact Autoliga car dealer: Tashkent address, phone number and working hours. Get help choosing the right car.{% endif %}
+{% endblock %}
+
+{% block meta_keywords %}
+    {% if LANGUAGE_CODE == 'uz' %}autoliga kontakt, autoliga manzil, avtosalon toshkent telefon, jetour diler toshkent{% elif LANGUAGE_CODE == 'ru' %}контакты autoliga, адрес автосалона ташкент, дилер jetour ташкент{% else %}autoliga contacts, tashkent car dealer address, jetour dealer tashkent{% endif %}
+{% endblock %}
 
 {% block breadcrumbs %}
 <link rel="stylesheet" href="{% static 'css/breadcrumbs.css' %}">

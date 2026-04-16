@@ -349,15 +349,9 @@
       data-consumption-label="{% if LANGUAGE_CODE == 'uz' %}RASHOD{% elif LANGUAGE_CODE == 'ru' %}РАСХОД{% else %}CONSUMPTION{% endif %}"
       data-detail-label="{% if LANGUAGE_CODE == 'uz' %}Batafsil{% elif LANGUAGE_CODE == 'ru' %}Подробнее{% else %}Learn more{% endif %}">
     </div>
-    <section class="faw-slider-section" style="margin-top: 6.3rem;">
+    <section class="faw-slider-section">
     
     <h2 class="slider-title">Autoliga — O'zbekistondagi eng ommabop avtomobillar narxlari 2026</h2>
-      <!-- Orqa fon rasmi -->
-      <div class="faw-bg">
-        <picture>
-          <img src="{% static 'images/backgroundaut.jpeg' %}" alt="Background" class="faw-bg-image">
-        </picture>
-      </div>
       <!-- Chap/O'ng strelkalar -->
       <button class="faw-slider-arrow left-btn" aria-label="back">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
@@ -382,7 +376,7 @@
     <!-- Mijozlar fikrlari (START) -->
     <div class="mxd-section">
       <div class="mxd-container" style="max-width:1200px;margin:0 auto;padding:0 20px;">
-        <h2 class="reviews-title">{% if LANGUAGE_CODE == 'uz' %}Mijozlarimiz nima deydi{% elif LANGUAGE_CODE == 'ru' %}Что говорят наши клиенты{% else %}What our clients say{% endif %}</h2>
+        <h2 class="reviews-title">{% if LANGUAGE_CODE == 'uz' %}Mijozlarimiz fikri{% elif LANGUAGE_CODE == 'ru' %}Отзывы наших клиентов{% else %}Customer Reviews{% endif %}</h2>
       </div>
 
       <!-- Marquee reviews -->
@@ -413,7 +407,7 @@
             </div>
             <div class="review-user-info">
               <span class="review-user-name" id="detailName"></span>
-              <span class="review-verified"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="8" fill="#4CAF50"/><path d="M5 8l2 2 4-4" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg> Проверено</span>
+              <span class="review-verified"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="8" fill="#4CAF50"/><path d="M5 8l2 2 4-4" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg> {% if LANGUAGE_CODE == 'uz' %}Tekshirilgan{% elif LANGUAGE_CODE == 'ru' %}Проверено{% else %}Verified{% endif %}</span>
             </div>
           </div>
           <div class="review-detail-stars" id="detailStars"></div>

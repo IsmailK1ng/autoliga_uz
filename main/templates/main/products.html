@@ -2,6 +2,18 @@
 {% load static %}
 {% load seo_tags %}
 
+{% block title %}
+    {% if LANGUAGE_CODE == 'uz' %}Yangi avtomobillar katalogi - Jetour, Omoda, Exeed narxlari | Autoliga{% elif LANGUAGE_CODE == 'ru' %}Каталог новых автомобилей - цены Jetour, Omoda, Exeed | Autoliga{% else %}New car catalog - Jetour, Omoda, Exeed prices | Autoliga{% endif %}
+{% endblock %}
+
+{% block meta_description %}
+    {% if LANGUAGE_CODE == 'uz' %}Autoliga katalogi: Jetour T1, T2, Omoda C5, Exeed RX va boshqa modellarning narxlari, texnik xususiyatlari va kredit shartlari.{% elif LANGUAGE_CODE == 'ru' %}Каталог Autoliga: цены, характеристики и кредитные условия для Jetour T1, T2, Omoda C5, Exeed RX и других моделей.{% else %}Autoliga catalog: prices, specs and financing options for Jetour T1, T2, Omoda C5, Exeed RX and more.{% endif %}
+{% endblock %}
+
+{% block meta_keywords %}
+    {% if LANGUAGE_CODE == 'uz' %}jetour t1 narxi, jetour t2 narxi, omoda c5 narxi, exeed rx narxi, avtosalon toshkent{% elif LANGUAGE_CODE == 'ru' %}цена jetour t1, цена jetour t2, omoda c5 узбекистан, exeed rx ташкент, автосалон ташкент{% else %}jetour t1 price, jetour t2 price, omoda c5 price, exeed rx price, car dealer tashkent{% endif %}
+{% endblock %}
+
 
 {% block productcss %}
 <link rel="stylesheet" type="text/css" href="{% static 'css/faw_main-models.css' %}">

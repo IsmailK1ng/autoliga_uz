@@ -23880,7 +23880,7 @@ form textarea:required:valid {
     font-size: 2rem;
     font-weight: 700;
     color: var(--t-bright, #161616);
-    margin-bottom: 32px
+    margin-bottom: 50px
 }
 
 .reviews-slider-wrap {
@@ -24349,7 +24349,7 @@ form textarea:required:valid {
 @media (max-width:768px) {
     .reviews-title {
         font-size: 1.5rem;
-        margin-bottom: 20px
+        margin-bottom: 50px
     }
 
     .reviews-arrow {
@@ -24841,9 +24841,9 @@ body[data-theme=dark] .home-team-cta-btn:hover {
     font-size: 6rem;
     font-weight: 700;
     color: var(--t-bright, #161616);
-    margin-bottom: 32px;
+    margin-bottom: 50px;
     text-align: center;
-    margin-top: 20px
+    margin-top: 50px
 }
 
 .reviews-marquee {
@@ -25292,7 +25292,7 @@ body[data-theme=dark] .home-team-cta-btn:hover {
 @media (max-width:768px) {
     .reviews-title {
         font-size: 3rem;
-        margin-bottom: 20px
+        margin-bottom: 50px
     }
 
     .review-card {

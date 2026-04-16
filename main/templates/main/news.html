@@ -2,6 +2,18 @@
 {% load static %}
 {% load seo_tags %}
 
+{% block title %}
+  {% if LANGUAGE_CODE == 'uz' %}Autoliga yangiliklari - avto bozor va model yangilanishlari{% elif LANGUAGE_CODE == 'ru' %}Новости Autoliga - обновления моделей и авто рынка{% else %}Autoliga News - model updates and car market insights{% endif %}
+{% endblock %}
+
+{% block meta_description %}
+  {% if LANGUAGE_CODE == 'uz' %}Autoliga yangiliklari: Jetour, Omoda, Exeed va Soueast modellari bo'yicha so'nggi yangiliklar, narxlar va taqdimotlar.{% elif LANGUAGE_CODE == 'ru' %}Новости Autoliga: обновления по моделям Jetour, Omoda, Exeed и Soueast, цены и обзоры.{% else %}Autoliga news: latest updates on Jetour, Omoda, Exeed and Soueast models, prices and reviews.{% endif %}
+{% endblock %}
+
+{% block meta_keywords %}
+  {% if LANGUAGE_CODE == 'uz' %}autoliga yangiliklar, jetour yangiliklari, omoda narxi, exeed uzbekistan, yangi mashina yangiliklari{% elif LANGUAGE_CODE == 'ru' %}новости autoliga, jetour узбекистан, цены omoda, exeed ташкент, автоновости{% else %}autoliga news, jetour uzbekistan, omoda price, exeed tashkent, car news{% endif %}
+{% endblock %}
+
 
 {% block breadcrumbs %}
 <link rel="stylesheet" href="{% static 'css/breadcrumbs.css' %}">

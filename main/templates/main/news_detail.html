@@ -2,6 +2,18 @@
 {% load static %}
 {% load seo_tags %}
 
+{% block title %}
+  {{ news.title }} | Autoliga
+{% endblock %}
+
+{% block meta_description %}
+  {{ news.desc|striptags|truncatechars:155 }}
+{% endblock %}
+
+{% block meta_keywords %}
+  {% if LANGUAGE_CODE == 'uz' %}{{ news.title }}, autoliga yangiliklari, avtomobil yangiliklari{% elif LANGUAGE_CODE == 'ru' %}{{ news.title }}, новости autoliga, авто новости{% else %}{{ news.title }}, autoliga news, automotive updates{% endif %}
+{% endblock %}
+
 
 {% block breadcrumbs %}
 <link rel="stylesheet" href="{% static 'css/breadcrumbs.css' %}">

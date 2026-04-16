@@ -12,6 +12,14 @@
     {% if LANGUAGE_CODE == 'uz' %}Dilerlar - Autoliga Uzbekistan{% elif LANGUAGE_CODE == 'ru' %}Дилеры - Autoliga Uzbekistan{% else %}Dealers - Autoliga Uzbekistan{% endif %}
 {% endblock title %}
 
+{% block meta_description %}
+    {% if LANGUAGE_CODE == 'uz' %}Autoliga rasmiy dilerlari: filiallar manzili, telefon raqamlari, ish vaqti va xarita orqali qulay topish imkoniyati.{% elif LANGUAGE_CODE == 'ru' %}Официальные дилеры Autoliga: адреса филиалов, телефоны, график работы и удобный поиск на карте.{% else %}Autoliga official dealers: branch addresses, phone numbers, working hours and map-based location search.{% endif %}
+{% endblock %}
+
+{% block meta_keywords %}
+    {% if LANGUAGE_CODE == 'uz' %}autoliga dilerlar, rasmiy diler toshkent, jetour diler uzbekistan, avtosalon filiallari{% elif LANGUAGE_CODE == 'ru' %}дилеры autoliga, официальный дилер ташкент, дилер jetour узбекистан{% else %}autoliga dealers, official car dealer tashkent, jetour dealer uzbekistan{% endif %}
+{% endblock %}
+
 {% block content %}
     <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-M33GWKMW" height="0" width="0"
             style="display:none;visibility:hidden"></iframe></noscript>

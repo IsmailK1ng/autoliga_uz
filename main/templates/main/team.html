@@ -2,6 +2,18 @@
 {% load static %}
 {% load static seo_tags %}
 
+{% block title %}
+    {% if LANGUAGE_CODE == 'uz' %}Autoliga jamoasi - filiallar bo'yicha menejerlar{% elif LANGUAGE_CODE == 'ru' %}Команда Autoliga - менеджеры по филиалам{% else %}Autoliga Team - branch managers{% endif %}
+{% endblock %}
+
+{% block meta_description %}
+    {% if LANGUAGE_CODE == 'uz' %}Autoliga jamoasi bilan tanishing: Toshkent va boshqa filiallardagi professional menejerlar sizga model tanlashda yordam beradi.{% elif LANGUAGE_CODE == 'ru' %}Познакомьтесь с командой Autoliga: профессиональные менеджеры филиалов помогут выбрать подходящий автомобиль.{% else %}Meet the Autoliga team: professional branch managers help you choose the right car model.{% endif %}
+{% endblock %}
+
+{% block meta_keywords %}
+    {% if LANGUAGE_CODE == 'uz' %}autoliga jamoasi, avtosalon menejerlari, autoliga dilerlar, toshkent avtosalon{% elif LANGUAGE_CODE == 'ru' %}команда autoliga, менеджеры автосалона, дилеры autoliga{% else %}autoliga team, car dealer managers, autoliga branches{% endif %}
+{% endblock %}
+
 {% block breadcrumbs %}
 <link rel="stylesheet" href="{% static 'css/breadcrumbs.css' %}">
 {% endblock breadcrumbs %}

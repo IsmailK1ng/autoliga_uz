@@ -1188,24 +1188,25 @@ body[data-theme=light] .language-option:hover {
 .faw-slider-section {
     position: relative;
     width: 100%;
+    background: linear-gradient(162deg, #f3f4f8 0 62%, #e3e6ef 62% 100%);
     overflow: hidden;
     border-radius: 28px
 }
 
-.faw-slider-section>.faw-bg {
+.faw-slider-section::after {
     position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+    inset: 0;
+    background: repeating-linear-gradient(162deg, rgba(33, 37, 45, .08) 0 1px, transparent 1px 92px);
+    opacity: .55;
     z-index: 0
 }
 
-.faw-bg-image {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    object-position: center
+body[data-theme=dark] .faw-slider-section {
+    background: linear-gradient(162deg, #232732 0 62%, #2b3040 62% 100%)
+}
+
+body[data-theme=dark] .faw-slider-section::after {
+    background: repeating-linear-gradient(162deg, rgba(228, 233, 243, .14) 0 1px, transparent 1px 92px)
 }
 
 .faw-slider-section>.faw-slider-arrow {
@@ -1578,12 +1579,15 @@ body[data-theme=light] .language-option:hover {
 @media (max-width:768px) {
     .faw-slider-section {
         border-radius: 0;
-        /* background: #f3f3f3; */
+        background: transparent !important;
         overflow: hidden
     }
 
-    .faw-slider-section>.faw-bg {
-        display: none
+    .faw-slider-section::before,
+    .faw-slider-section::after {
+        content: none !important;
+        display: none !important;
+        background: none !important;
     }
 
     .slider-title {
@@ -1806,6 +1810,286 @@ body[data-theme=dark] .faw-slider-arrow {
     background: rgba(40, 40, 40, .5);
     border-color: rgba(255, 255, 255, .15);
     color: #fff
+}
+
+@media (min-width:769px) {
+    .faw-slider-section {
+        position: relative;
+        min-height: clamp(680px, 80vh, 860px);
+        margin-top: 1.2rem;
+        border-radius: 0;
+        overflow: hidden;
+        background: #f8f5f5;
+        border-top: 1px solid rgba(20, 27, 43, .12);
+        border-bottom: 1px solid rgba(20, 27, 43, .12)
+    }
+
+    .faw-slider-section::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(164deg, transparent 0 62%, #EEF1FB 62% 100%);
+        z-index: 0;
+        pointer-events: none
+    }
+
+    .slider-title {
+        display: none
+    }
+
+    .faw-slider-inner {
+        position: relative;
+        z-index: 1;
+        display: block;
+        max-width: 1560px;
+        min-height: clamp(620px, 74vh, 790px);
+        padding: clamp(78px, 12vh, 112px) 92px 28px
+    }
+
+    .faw-slider-section .faw-slider-car {
+        min-height: clamp(470px, 58vh, 620px);
+        width: 100%
+    }
+
+    .faw-slider-images {
+        height: clamp(470px, 58vh, 620px)
+    }
+
+    .faw-slide img,
+    .faw-slide svg {
+        max-height: clamp(470px, 58vh, 620px)
+    }
+
+    .faw-slider-section .faw-slider-info {
+        position: absolute;
+        top: clamp(36px, 6.5vh, 64px);
+        left: 92px;
+        right: clamp(22px, 2.8vw, 48px);
+        max-width: none;
+        flex: none;
+        width: auto;
+        pointer-events: none
+    }
+
+    .faw-info-card {
+        background: transparent;
+        backdrop-filter: none;
+        -webkit-backdrop-filter: none;
+        border: 0;
+        box-shadow: none;
+        border-radius: 0;
+        padding: 0;
+        display: grid;
+        grid-template-columns: minmax(320px, 1fr) minmax(320px, 460px);
+        grid-template-areas: "title price" "year price" "specs price" "cta cta";
+        align-items: start;
+        column-gap: 34px
+    }
+
+    .faw-title {
+        grid-area: title;
+        margin: 0;
+        font-size: clamp(2.3rem, 3vw, 3.75rem);
+        font-weight: 700;
+        line-height: 1.08;
+        letter-spacing: .01em;
+        text-transform: none;
+        color: #0f1114
+    }
+
+    .faw-year {
+        grid-area: year;
+        margin: 8px 0 0;
+        font-size: clamp(1.85rem, 2vw, 2.85rem);
+        font-weight: 650;
+        color: #121212
+    }
+
+    .faw-price-section {
+        grid-area: price;
+        align-self: start;
+        justify-self: end;
+        border: 0;
+        margin: 0;
+        padding: 0 clamp(8px, 1vw, 22px) 0 0;
+        width: min(42vw, 460px);
+        max-width: 460px;
+        text-align: right
+    }
+
+    .faw-price-label {
+        margin-bottom: 8px;
+        font-size: clamp(1.4rem, 1.8vw, 2.7rem);
+        color: #121212;
+        letter-spacing: 0;
+        font-weight: 700
+    }
+
+    .faw-price-value {
+        font-size: clamp(2rem, 2.4vw, 3.55rem);
+        line-height: 1.06;
+        color: #0f1114;
+        font-weight: 800;
+        max-width: 100%;
+        overflow-wrap: anywhere;
+        margin-left: auto
+    }
+
+    .faw-specs-row {
+        grid-area: specs;
+        margin: 22px 0 0;
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 16px;
+        max-width: 310px
+    }
+
+    .faw-spec-box {
+        gap: 0;
+        padding: 0;
+        border: 0;
+        background: transparent;
+        border-radius: 0
+    }
+
+    .faw-spec-icon {
+        display: none
+    }
+
+    .faw-spec-label {
+        margin: 0 0 4px;
+        font-size: clamp(1.2rem, 1.25vw, 1.7rem);
+        letter-spacing: 0;
+        color: #171717;
+        font-weight: 650;
+        text-transform: none
+    }
+
+    .faw-spec-value {
+        font-size: clamp(1.95rem, 2vw, 2.85rem);
+        font-weight: 700;
+        color: #0f1114;
+        line-height: 1.1
+    }
+
+    .faw-btn-detail {
+        grid-area: cta;
+        margin-top: 20px;
+        width: fit-content;
+        background: rgba(255, 255, 255, .45);
+        color: #1b1b1b;
+        border: 1.5px solid rgba(27, 27, 27, .6);
+        border-radius: 999px;
+        padding: 11px 34px;
+        font-size: clamp(1rem, 1.05vw, 1.28rem);
+        font-weight: 500;
+        letter-spacing: 0;
+        pointer-events: auto
+    }
+
+    .faw-btn-detail:hover {
+        background: #1b1b1b;
+        color: #fff;
+        border-color: #1b1b1b;
+        transform: none
+    }
+
+    .faw-btn-detail span {
+        display: none
+    }
+
+    .faw-slider-section>.faw-slider-arrow {
+        top: 52%;
+        width: 54px;
+        height: 54px;
+        border: 0;
+        border-radius: 0;
+        background: transparent;
+        box-shadow: none;
+        backdrop-filter: none;
+        -webkit-backdrop-filter: none;
+        color: #1b1b1b
+    }
+
+    .faw-slider-section>.faw-slider-arrow:hover {
+        transform: translateY(-50%) scale(1.03);
+        background: transparent
+    }
+
+    .faw-slider-arrow.left-btn {
+        left: 20px
+    }
+
+    .faw-slider-arrow.right-btn {
+        right: 20px
+    }
+
+    body[data-theme=dark] .faw-slider-section {
+        background: #1d2028;
+        border-top-color: rgba(255, 255, 255, .12);
+        border-bottom-color: rgba(255, 255, 255, .12)
+    }
+
+    body[data-theme=dark] .faw-slider-section::before {
+        background: linear-gradient(164deg, transparent 0 62%, #2a2f3d 62% 100%)
+    }
+
+    body[data-theme=dark] .faw-title,
+    body[data-theme=dark] .faw-year,
+    body[data-theme=dark] .faw-price-label,
+    body[data-theme=dark] .faw-price-value,
+    body[data-theme=dark] .faw-spec-label,
+    body[data-theme=dark] .faw-spec-value {
+        color: #f2f4f8
+    }
+
+    body[data-theme=dark] .faw-slider-section>.faw-slider-arrow {
+        color: #e5e7ee
+    }
+}
+
+@media (min-width:769px) and (max-width:1200px) {
+    .faw-slider-inner {
+        min-height: clamp(560px, 70vh, 690px);
+        padding: clamp(64px, 9vh, 90px) 64px 20px
+    }
+
+    .faw-slider-section .faw-slider-info {
+        top: 42px;
+        left: 64px;
+        right: 24px
+    }
+
+    .faw-slider-images,
+    .faw-slider-section .faw-slider-car {
+        min-height: clamp(390px, 50vh, 470px);
+        height: clamp(390px, 50vh, 470px)
+    }
+
+    .faw-slide img,
+    .faw-slide svg {
+        max-height: clamp(390px, 50vh, 470px)
+    }
+
+    .faw-info-card {
+        grid-template-columns: minmax(250px, 1fr) minmax(250px, 360px);
+        column-gap: 22px
+    }
+
+    .faw-price-section {
+        width: min(43vw, 360px);
+        max-width: 360px;
+        padding-right: 8px
+    }
+
+    .faw-price-value,
+    .faw-spec-value {
+        font-size: clamp(1.45rem, 2vw, 2.1rem)
+    }
+
+    .faw-spec-label {
+        font-size: clamp(1.3rem, 1.7vw, 1.65rem)
+    }
 }
 
 .footer-title {
@@ -4170,9 +4454,4 @@ html, body {
   .ht3d-position { font-size: 1.75rem; }
 }
 
-/* ── Slider background hidden on mobile ─────────────────────── */
-@media (max-width: 500px) {
-    .faw-slider-section > .faw-bg {
-        display: none !important;
-    }
-}
+/* ── Slider background stays CSS-only on mobile too ─────────── */

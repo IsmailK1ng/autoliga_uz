@@ -7220,7 +7220,7 @@ form textarea:required:valid {
 
 @media only screen and (min-width:1200px) {
     .mxd-footer__fullwidth-text.personal {
-        margin-bottom: 2rem
+        margin-bottom: 8rem
     }
 }
 

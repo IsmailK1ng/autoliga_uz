@@ -339,8 +339,8 @@ async loadCategories() {
       const brandName = product.category ? product.category.name : '';
       const productTitle = product.title || product.name || '';
       
-      // ✅ Narx: Agar slider_price bo'lsa shuni oladi, bo'lmasa price
-      const displayPrice = product.slider_price || product.slider_price || '';
+      // Narx: avval slider_price, bo'lmasa oddiy price maydonidan olamiz
+      const displayPrice = product.slider_price || product.price || '';
 
       return `
         <div class="faw-truck-card">
@@ -353,9 +353,11 @@ async loadCategories() {
             <h3 class="truck-title">${productTitle}</h3>
             
         
+            ${displayPrice ? `
             <div class="truck-price">
-                <span>${displayPrice}</span>
+              <span>${displayPrice}</span>
             </div>
+            ` : ''}
             ${specsHTML ? `<div class="truck-specs">${specsHTML}</div>` : ''}
             
             <div class="truck-cta">

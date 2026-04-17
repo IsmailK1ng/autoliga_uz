@@ -4,18 +4,19 @@
 
 
 {% block title %}
-    Avtosalon Toshkent — Jetour, Omoda, Soueast, Exeed narxlari 2026
+    Yunusobod Autoliga — Toshkentdagi Rasmiy Avtosalon, 
+    Jetour, Soueast, Exeed va Omoda va boshqa brendlari. Kredit, test drive. Toshkentda eng yaxshi narxlar.
 {% endblock %}
 
 {% block meta_description %}
-    Autoliga — Toshkentdagi rasmiy avtosalon. Jetour T1, T2, Omoda C5, Exeed RX narxlari va kredit shartlari. Bepul konsultatsiya va test drive.
+    Autoliga — Toshkentdagi rasmiy avtosalon. Jetour T1, T2, JAC, Deepal, Nevo narxlari va kredit shartlari. Bepul konsultatsiya va test drive.
 {% endblock %}
 
 {% block meta_keywords %}
-    avtosalon toshkent, autoliga samarqand, autoliga olmaliq,  jetour narxi 2026, Soueast c5 narxi, exeed rx uzbekiston, kredit bilan mashina toshkent, yangi mashina narxlari
+    autoliga toshkent, autoliga samarqand, autoliga olmaliq,  jetour narxi 2026, Soueast narxi, jac uzbekiston, kredit bilan mashina toshkent, yangi mashina narxlari
 {% endblock %}
 
-{% block og_title %}Autoliga — Toshkentdagi Rasmiy Avtosalon{% endblock %}
+{% block og_title %}Autoliga — Toshkentdagi Rasmiy Avtosalon.{% endblock %}
 {% block og_description %}Jetour, Soueast, Exeed brendlari. Kredit,  test drive. Toshkentda eng yaxshi narxlar.{% endblock %}
 {% block og_image %}{{ request.scheme }}://{{ request.get_host }}{% static 'images/autoliga.jpg' %}{% endblock %}
 
@@ -32,7 +33,7 @@
     "description": "Toshkentdagi rasmiy avtosalon — Jetour, Soueast, Exeed va Omoda brendlarining eng yangi modellari.",
     "address": {
         "@type": "PostalAddress",
-        "streetAddress": "Sizning aniq ko'changiz", 
+        "streetAddress": "Yunusobod tumani, Farog‘at ko‘chasi 2-uy (2-tor ko‘cha)",
         "addressLocality": "Toshkent",
         "addressRegion": "Tashkent City",
         "postalCode": "100000",
@@ -41,7 +42,7 @@
     "geo": {
         "@type": "GeoCoordinates",
         "latitude": 41.375042, 
-        "longitude": 69.287543
+        "longitude": 69.287543    
     },
     "telephone": "+998785557377",
     "priceRange": "$$$",
@@ -55,9 +56,8 @@
     ],
     "sameAs": [
         "https://t.me/avtoligauz",
-        "https://instagram.com/autoliga.uz",
-        "https://facebook.com/autoliga.uz"
-    ]
+        "https://www.instagram.com/jetour_tashkent_yunusobod",
+            ]
 }
 </script>
 {% endblock %}
@@ -171,7 +171,7 @@
              width="120"
              height="80">
 
-        <span class="visually-hidden">{{ category.name }} narxlari</span>
+        <span class="visually-hidden">{{ category.name }} narxi</span>
       </a>
 
     {% endif %}
@@ -208,6 +208,7 @@
 
   <button class="scroll-arrow right-arrow" id="scrollRight" aria-label="O'ngga skroll">&gt;</button>
 </div>
+
 
 
 
@@ -351,7 +352,7 @@
     </div>
     <section class="faw-slider-section">
     
-    <h2 class="slider-title">Autoliga — O'zbekistondagi eng ommabop avtomobillar narxlari 2026</h2>
+    <h2 class="slider-title">Autoliga</h2>
       <!-- Chap/O'ng strelkalar -->
       <button class="faw-slider-arrow left-btn" aria-label="back">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
@@ -372,6 +373,7 @@
       </div>
     </section>
     <!-- Секция — слайдер FAW (конец) -->
+
 
     <!-- Mijozlar fikrlari (START) -->
     <div class="mxd-section">
@@ -1668,6 +1670,110 @@ document.addEventListener("DOMContentLoaded", function () {
         sidebar.scrollTop += e.deltaY;
     }, { passive: true });
 });
+</script>
+
+<script>
+(function () {
+  var mql = window.matchMedia('(max-width: 768px)');
+  var bar = null;
+  var lastScrollY = 0;
+  var ticking = false;
+  var THRESHOLD = 14;
+  var TOP_GUARD = 50;
+
+  function getScrollY() {
+    return window.pageYOffset || document.documentElement.scrollTop || 0;
+  }
+
+  function applyBarState() {
+    ticking = false;
+    if (!bar || !mql.matches) return;
+
+    var currentY = getScrollY();
+    var delta = currentY - lastScrollY;
+
+    if (Math.abs(delta) < THRESHOLD) {
+      return;
+    }
+
+    if (currentY < TOP_GUARD) {
+      bar.classList.remove('hide');
+      setPanelsHidden(false);
+      lastScrollY = currentY;
+      return;
+    }
+
+    if (delta > 0) {
+      bar.classList.add('hide');
+      closePanelsOnMobile();
+    } else {
+      bar.classList.remove('hide');
+      setPanelsHidden(false);
+    }
+
+    lastScrollY = currentY;
+  }
+
+  function setPanelsHidden(shouldHide) {
+    var activePanels = document.querySelectorAll('.model-panel.active');
+    activePanels.forEach(function (panel) {
+      panel.classList.toggle('mobile-hide', shouldHide);
+    });
+  }
+
+  function closePanelsOnMobile() {
+    if (!mql.matches) return;
+    if (typeof closePanel === 'function') {
+      closePanel();
+    } else {
+      document.querySelectorAll('.model-panel').forEach(function (panel) {
+        panel.classList.remove('active');
+      });
+      document.querySelectorAll('.brand-card').forEach(function (card) {
+        card.classList.remove('active');
+      });
+    }
+    document.querySelectorAll('.model-panel.mobile-hide').forEach(function (panel) {
+      panel.classList.remove('mobile-hide');
+    });
+  }
+
+  function onScroll() {
+    if (!bar || !mql.matches) return;
+    if (ticking) return;
+    ticking = true;
+    window.requestAnimationFrame(applyBarState);
+  }
+
+  function onResize() {
+    if (!bar) return;
+    if (!mql.matches) {
+      bar.classList.remove('hide');
+      document.querySelectorAll('.model-panel.mobile-hide').forEach(function (panel) {
+        panel.classList.remove('mobile-hide');
+      });
+      return;
+    }
+    lastScrollY = getScrollY();
+  }
+
+  function init() {
+    bar = document.querySelector('.mobile-brand-bar');
+    if (!bar) return;
+
+    bar.classList.remove('hide');
+    lastScrollY = getScrollY();
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onResize, { passive: true });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
 </script>
 
 

@@ -619,7 +619,7 @@ body[data-theme=dark] .mxd-contact {
     }
 
     #header.scrolled {
-        margin: 0;
+        margin: 12px 24px 0;
         background: rgba(22, 22, 22, 0);
         backdrop-filter: blur(20px);
         -webkit-backdrop-filter: blur(20px);
@@ -1833,6 +1833,7 @@ body[data-theme=dark] .faw-slider-arrow {
         pointer-events: none
     }
 
+
     .slider-title {
         display: none
     }
@@ -2099,7 +2100,7 @@ body[data-theme=dark] .faw-slider-arrow {
     margin: 0;
     letter-spacing: .1em;
     text-transform: uppercase;
-    color: #f66e2e
+    color: #004595
 }
 
 .footer-blocks__card .card-maps {
@@ -2145,7 +2146,7 @@ body[data-theme=dark] .faw-slider-arrow {
     max-width: 100%;
     padding: 1rem 2rem;
     text-align: center;
-    margin-top: 2rem;
+    margin-top: rem;
     margin-bottom: 0;
     z-index: unset
 }
@@ -4332,7 +4333,7 @@ html, body {
 /* Nav buttons */
 .ht3d-btn {
   position: absolute;
-  top: 50%;
+  top: 80%;
   transform: translateY(-50%);
   z-index: 10;
   width: 50px;
@@ -4455,3 +4456,55 @@ html, body {
 }
 
 /* ── Slider background stays CSS-only on mobile too ─────────── */
+
+
+@media (max-width: 768px) {
+  .mobile-brand-bar {
+    transform: translateY(0);
+    opacity: 1;
+    transition: transform 0.28s ease, opacity 0.22s ease;
+    will-change: transform, opacity;
+  }
+
+  .mobile-brand-bar.hide {
+    transform: translateY(100%);
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .model-panel {
+    transition: transform 0.28s ease, opacity 0.22s ease;
+    will-change: transform, opacity;
+  }
+
+  .model-panel.mobile-hide {
+    transform: translateY(100%);
+    opacity: 0;
+    pointer-events: none;
+  }
+}
+
+@media (max-width: 768px) {
+    .reviews-marquee .review-card {
+        height: 250px;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .reviews-marquee .review-text {
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 3;
+        line-clamp: 3;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        line-height: 1.45;
+        max-height: calc(1.45em * 3);
+        word-break: break-word;
+        flex: 1 1 auto;
+    }
+
+    .reviews-marquee .review-more-btn {
+        margin-top: auto;
+    }
+}

@@ -12,9 +12,9 @@
     ═══════════════════════════════════════════ -->
     <title>
         {% if product %}
-            {{ product.title }} narxi Toshkentda — Bo'lib to'lash (Kredit) | Autoliga
+            {{ product.title }} narxi | Autoliga
         {% else %}
-            Autoliga — Toshkentdagi yangi mashinalar avtosaloni va narxlari 2026
+            Autoliga — Toshkentdagi yangi mashinalar avtosaloni va narxlari
         {% endif %}
     </title>
 
@@ -23,25 +23,23 @@
     ═══════════════════════════════════════════ -->
     <meta name="description" content="
         {% if product %}
-            {{ product.title }} Toshkentda  narxi
+            {{ product.title }} narxi
             {% if product.slider_price %}{{ product.slider_price }}{% endif %}.
             {% if product.slider_power %}Dvigatel: {{ product.slider_power }}.{% endif %}
             {% if product.slider_fuel_consumption %}Yoqilg'i: {{ product.slider_fuel_consumption }}.{% endif %}
-            Kredit shartlari mavjud. Autoliga rasmiy dileri.
+            Autoliga rasmiy dileri.
         {% else %}
-            Autoliga — Toshkentdagi ishonchli avtosalon. Jetour, soueast xitoy brendlari.
-        {% endif %}
-    ">
+            Autoliga — Toshkentdagi ishonchli avtosalon. Jetour, soueast va boshqa brendlari.">
 
     <meta name="keywords" content="
         {% if product %}
             {{ product.title }} narxi,
             {{ product.title }} toshkent,
             {{ product.title }} kredit,
-            {% if product.category %}{{ product.category.name }} narxi uzbekiston,{% endif %}
+            {% if product.category %}{{ product.category.name }} narxi{% endif %}
             {{ product.title }} {{ product.slider_year }}
         {% else %}
-            avtosalon toshkent, yangi mashina narxlari, xitoy mashinalari, jetour, soueast, mg 
+            avtosalon toshkent, yangi mashina narxlari, jetour narxlari, soueast narxlari, boshqa brendlar narxlari
         {% endif %}
     ">
 
@@ -58,7 +56,7 @@
         {% if product %}
             {{ product.title }}{% if product.slider_price %} — {{ product.slider_price }}{% endif %} | Autoliga
         {% else %}
-            Autoliga — Toshkentdagi Avtosalon
+            Autoliga — Avtosalon
         {% endif %}">
 
     <meta property="og:description" content="
@@ -67,7 +65,7 @@
             {% if product.slider_power %}Quvvat: {{ product.slider_power }}.{% endif %}
             Kredit shartlari mavjud.
         {% else %}
-            Jetour, Omoda, Exeed brendlari. Kredit shartlari mavjud.
+            Jetour, Soueast va boshqa brendlari. 
         {% endif %}
     ">
 

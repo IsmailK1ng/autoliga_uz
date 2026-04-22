@@ -1671,105 +1671,24 @@ document.addEventListener("DOMContentLoaded", function () {
 
 <script>
 (function () {
-  var mql = window.matchMedia('(max-width: 768px)');
-  var bar = null;
-  var lastScrollY = 0;
-  var ticking = false;
-  var THRESHOLD = 14;
-  var TOP_GUARD = 50;
-
-  function getScrollY() {
-    return window.pageYOffset || document.documentElement.scrollTop || 0;
-  }
-
-  function applyBarState() {
-    ticking = false;
-    if (!bar || !mql.matches) return;
-
-    var currentY = getScrollY();
-    var delta = currentY - lastScrollY;
-
-    if (Math.abs(delta) < THRESHOLD) {
-      return;
-    }
-
-    if (currentY < TOP_GUARD) {
+  function ensureMobilePanelsVisible() {
+    var bar = document.querySelector('.mobile-brand-bar');
+    if (bar) {
       bar.classList.remove('hide');
-      setPanelsHidden(false);
-      lastScrollY = currentY;
-      return;
     }
 
-    if (delta > 0) {
-      bar.classList.add('hide');
-      closePanelsOnMobile();
-    } else {
-      bar.classList.remove('hide');
-      setPanelsHidden(false);
-    }
-
-    lastScrollY = currentY;
-  }
-
-  function setPanelsHidden(shouldHide) {
-    var activePanels = document.querySelectorAll('.model-panel.active');
-    activePanels.forEach(function (panel) {
-      panel.classList.toggle('mobile-hide', shouldHide);
-    });
-  }
-
-  function closePanelsOnMobile() {
-    if (!mql.matches) return;
-    if (typeof closePanel === 'function') {
-      closePanel();
-    } else {
-      document.querySelectorAll('.model-panel').forEach(function (panel) {
-        panel.classList.remove('active');
-      });
-      document.querySelectorAll('.brand-card').forEach(function (card) {
-        card.classList.remove('active');
-      });
-    }
     document.querySelectorAll('.model-panel.mobile-hide').forEach(function (panel) {
       panel.classList.remove('mobile-hide');
     });
   }
 
-  function onScroll() {
-    if (!bar || !mql.matches) return;
-    if (ticking) return;
-    ticking = true;
-    window.requestAnimationFrame(applyBarState);
-  }
-
-  function onResize() {
-    if (!bar) return;
-    if (!mql.matches) {
-      bar.classList.remove('hide');
-      document.querySelectorAll('.model-panel.mobile-hide').forEach(function (panel) {
-        panel.classList.remove('mobile-hide');
-      });
-      return;
-    }
-    lastScrollY = getScrollY();
-  }
-
-  function init() {
-    bar = document.querySelector('.mobile-brand-bar');
-    if (!bar) return;
-
-    bar.classList.remove('hide');
-    lastScrollY = getScrollY();
-
-    window.addEventListener('scroll', onScroll, { passive: true });
-    window.addEventListener('resize', onResize, { passive: true });
-  }
-
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init);
+    document.addEventListener('DOMContentLoaded', ensureMobilePanelsVisible);
   } else {
-    init();
+    ensureMobilePanelsVisible();
   }
+
+  window.addEventListener('resize', ensureMobilePanelsVisible, { passive: true });
 })();
 </script>
 

@@ -4461,25 +4461,25 @@ html, body {
   .mobile-brand-bar {
     transform: translateY(0);
     opacity: 1;
-    transition: transform 0.28s ease, opacity 0.22s ease;
-    will-change: transform, opacity;
+        transition: none;
+        will-change: auto;
   }
 
   .mobile-brand-bar.hide {
-    transform: translateY(100%);
-    opacity: 0;
-    pointer-events: none;
+        transform: translateY(0);
+        opacity: 1;
+        pointer-events: auto;
   }
 
   .model-panel {
-    transition: transform 0.28s ease, opacity 0.22s ease;
-    will-change: transform, opacity;
+        transition: none;
+        will-change: auto;
   }
 
   .model-panel.mobile-hide {
-    transform: translateY(100%);
-    opacity: 0;
-    pointer-events: none;
+        transform: none;
+        opacity: 1;
+        pointer-events: auto;
   }
 }
 

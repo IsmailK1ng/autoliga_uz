@@ -51,6 +51,7 @@ BotService.clear_bot_cache()
 
 from django.core.cache import cache
 from django.core.exceptions import ObjectDoesNotExist
+from django.db import close_old_connections
 from django.db import transaction
 from django.utils import timezone
 from typing import List, Dict, Optional, Tuple, Any
@@ -65,6 +66,7 @@ class BotService:
     @staticmethod
     def get_telegram_user(telegram_id: int) -> Optional[TelegramUser]:
         """Get TelegramUser by telegram_id"""
+        close_old_connections()
         try:
             return TelegramUser.objects.get(telegram_id=telegram_id)
         except ObjectDoesNotExist:
@@ -76,6 +78,7 @@ class BotService:
         Create or update TelegramUser
         Returns: (user, created)
         """
+        close_old_connections()
         user, created = TelegramUser.objects.get_or_create(
             telegram_id=telegram_id, defaults=kwargs
         )
@@ -98,6 +101,7 @@ class BotService:
         Get active brands/categories with caching
         Returns: [{'id': int, 'name': str}, ...]
         """
+        close_old_connections()
         cache_key = f'bot:brands:{lang}'
         cached = cache.get(cache_key)
         if cached is not None:
@@ -122,6 +126,7 @@ class BotService:
         Get active cars by brand with caching
         Returns: [{'id': int, 'title': str}, ...]
         """
+        close_old_connections()
         cache_key = f'bot:cars:{brand_id}:{lang}'
         cached = cache.get(cache_key)
         if cached is not None:
@@ -148,6 +153,7 @@ class BotService:
         Get detailed car info with optimized queries
         Uses select_related and prefetch_related
         """
+        close_old_connections()
         try:
             car = Product.objects.select_related('category').prefetch_related(
                 'features'
@@ -193,6 +199,7 @@ class BotService:
         Get active dealers with caching
         Returns: [{'id': int, 'name': str, 'region': str, 'address': str, 'phone': str, 'hours': str}, ...]
         """
+        close_old_connections()
         cache_key = f'bot:dealers:{lang}'
         cached = cache.get(cache_key)
         if cached is not None:
@@ -220,6 +227,7 @@ class BotService:
         """
         Get data for test drive form (dealers, products, time slots)
         """
+        close_old_connections()
         cache_key = f'bot:td_data:{lang}'
         cached = cache.get(cache_key)
         if cached is not None:
@@ -266,6 +274,7 @@ class BotService:
         Validation:
         - Daily limit: 2 requests per phone number
         """
+        close_old_connections()
         try:
             with transaction.atomic():
                 phone = data.get('phone', '')
@@ -312,6 +321,7 @@ class BotService:
     @staticmethod
     def get_brand_by_id(brand_id: int, lang: str = "uz") -> Optional[Dict[str, Any]]:
         """Get single brand by ID"""
+        close_old_connections()
         try:
             brand = ProductCategory.objects.get(id=brand_id, is_active=True)
             return {
@@ -325,6 +335,7 @@ class BotService:
     @staticmethod
     def get_dealer_by_id(dealer_id: int, lang: str = "uz") -> Optional[Dict[str, Any]]:
         """Get single dealer by ID"""
+        close_old_connections()
         try:
             dealer = Dealer.objects.get(id=dealer_id, is_active=True)
             return {

@@ -15,7 +15,7 @@ if PROJECT_ROOT not in sys.path:
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "myproject.settings")
 
 
-@sync_to_async
+@sync_to_async(thread_sensitive=False)
 def get_or_create_user(
     telegram_id: int,
     first_name: str,
@@ -32,7 +32,7 @@ def get_or_create_user(
     return user, created
 
 
-@sync_to_async
+@sync_to_async(thread_sensitive=False)
 def save_phone(telegram_id: int, phone: str):
     user, created = BotService.create_or_update_telegram_user(telegram_id, phone=phone)
     return user

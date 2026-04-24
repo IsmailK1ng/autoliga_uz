@@ -25,6 +25,7 @@ if not _django_apps.ready:
 # ── 3. Django imports (safe only after setup) ────────────────────────────────
 from django.core.cache import cache
 from django.core.exceptions import ObjectDoesNotExist
+from django.db import close_old_connections
 from django.db import transaction
 from django.utils import timezone
 from main.models import (Dealer, Product, ProductCategory, TelegramUser,
@@ -61,46 +62,57 @@ logger = logging.getLogger(__name__)
 bot = Bot(token=BOT_TOKEN)
 dp = Dispatcher(storage=MemoryStorage())
 
+
+class DjangoDBMiddleware:
+    """Refresh stale Django DB connections before each update."""
+
+    async def __call__(self, handler, event, data):
+        close_old_connections()
+        return await handler(event, data)
+
+
+dp.update.outer_middleware(DjangoDBMiddleware())
+
 # ================= DATABASE FUNCTIONS =================
 
 
-@sync_to_async
+@sync_to_async(thread_sensitive=False)
 def get_user_by_telegram_id(telegram_id: int) -> TelegramUser | None:
     return BotService.get_telegram_user(telegram_id)
 
 
-@sync_to_async
+@sync_to_async(thread_sensitive=False)
 def update_or_create_user(telegram_id: int, **kwargs) -> TelegramUser:
     user, created = BotService.create_or_update_telegram_user(telegram_id, **kwargs)
     return user
 
 
-@sync_to_async
+@sync_to_async(thread_sensitive=False)
 def get_brands(lang: str = "uz") -> list[dict]:
     return BotService.get_brands(lang)
 
 
-@sync_to_async
+@sync_to_async(thread_sensitive=False)
 def get_cars_by_brand(brand_id: int, lang: str = "uz") -> list[dict]:
     return BotService.get_cars_by_brand(brand_id, lang)
 
 
-@sync_to_async
+@sync_to_async(thread_sensitive=False)
 def get_car_detail(car_id: int, lang: str = "uz") -> dict | None:
     return BotService.get_car_detail(car_id, lang)
 
 
-@sync_to_async
+@sync_to_async(thread_sensitive=False)
 def get_dealers(lang: str = "uz") -> list[dict]:
     return BotService.get_dealers(lang)
 
 
-@sync_to_async
+@sync_to_async(thread_sensitive=False)
 def get_test_drive_data(lang: str = "uz") -> dict:
     return BotService.get_test_drive_form_data(lang)
 
 
-@sync_to_async
+@sync_to_async(thread_sensitive=False)
 def create_test_drive_request(data: dict) -> tuple[TestDriveRequest | None, str | None]:
     return BotService.create_test_drive_request(data)
 

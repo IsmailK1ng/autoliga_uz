@@ -44,9 +44,6 @@ INSTALLED_APPS = [
     'main',  
 
     'captcha', 
-    # 'django_ratelimit'  # Redis kerak, hozir ishlatilmaydi
-    'django.contrib.sitemaps',
-    'django.contrib.sites',
 ]
 
 # CAPTCHA sozlamalari

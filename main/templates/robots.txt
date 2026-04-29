@@ -4,5 +4,3 @@ Disallow: /api/
 Disallow: /captcha/
 Disallow: /set-language/
 Allow: /
-
-Sitemap: https://autoliga.uz/sitemap.xml

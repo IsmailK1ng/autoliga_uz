@@ -6,15 +6,11 @@
 <head>
     <meta charset="UTF-8">
 
-    <!-- ═══════════════════════════════════════════
-         TITLE — dinamik, har bir mashina o'z titleiga ega
-         Natija: "Jetour T1 — 434 000 000 sum | Autoliga"
-    ═══════════════════════════════════════════ -->
     <title>
         {% if product %}
             {{ product.title }} narxi | Autoliga
         {% else %}
-            Autoliga — Toshkentdagi yangi mashinalar avtosaloni va narxlari
+            Autoliga — avtosaloni va narxlari
         {% endif %}
     </title>
 
@@ -29,7 +25,7 @@
             {% if product.slider_fuel_consumption %}Yoqilg'i: {{ product.slider_fuel_consumption }}.{% endif %}
             Autoliga rasmiy dileri.
         {% else %}
-            Autoliga — Toshkentdagi ishonchli avtosalon. Jetour, soueast va boshqa brendlari.">
+            Autoliga — ishonchli avtosalon. Jetour, soueast va boshqa brendlari.">
         {% endif %} 
     <meta name="keywords" content="
         {% if product %}

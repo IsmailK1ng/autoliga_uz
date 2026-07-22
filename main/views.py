@@ -279,8 +279,6 @@ def test_drive(request):
 def jobs(request):
     """Страница с вакансиями"""
     try:
-        
-        
         vacancies = Vacancy.objects.filter(is_active=True).prefetch_related(
             'responsibilities', 
             'requirements', 

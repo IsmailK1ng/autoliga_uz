@@ -214,6 +214,10 @@
 
 <!-- Model panel -->
 {% for category in productCategory %}
+
+<!-- Panel overlay - har category uchun alohida -->
+<div class="panel-overlay" id="overlay-{{ category.slug }}" onclick="closePanel()"></div>
+
 <div class="model-panel" id="panel-{{ category.slug }}">
     
     <button class="close-btn" onclick="closePanel()">✕</button>
@@ -481,382 +485,457 @@
     <script src="https://www.google.com/recaptcha/api.js?render={{ RECAPTCHA_SITE_KEY }}" async defer></script>
 
     <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      // ===== CONFIG =====
-      var LANG = '{{ request.LANGUAGE_CODE|default:"uz" }}';
-      var API_BASE = '/api/' + LANG + '/reviews/';
-      var RECAPTCHA_SITE_KEY = '{{ RECAPTCHA_SITE_KEY }}';
-      var reviews = [];
+      document.addEventListener('DOMContentLoaded', function () {
+        // ===== CONFIG =====
+        var LANG = '{{ request.LANGUAGE_CODE|default:"uz" }}';
+        var API_BASE = '/api/' + LANG + '/reviews/';
+        var RECAPTCHA_SITE_KEY = '{{ RECAPTCHA_SITE_KEY }}';
+        var reviews = [];
 
-      // ===== HELPERS =====
-      function getCookie(name) {
-        var v = document.cookie.match('(^|;)\\s*' + name + '\\s*=\\s*([^;]+)');
-        return v ? v.pop() : '';
-      }
-
-      function starsHTML(rating) {
-        var s = '';
-        for (var i = 1; i <= 5; i++) {
-          s += '<span class="star' + (i > rating ? ' empty' : '') + '">&#9733;</span>';
+        // ===== HELPERS =====
+        function getCookie(name) {
+          var v = document.cookie.match('(^|;)\\s*' + name + '\\s*=\\s*([^;]+)');
+          return v ? v.pop() : '';
         }
-        return s;
-      }
 
-      function defaultAvatarSVG(size) {
-        size = size || 40;
-        return '<svg width="' + size + '" height="' + size + '" viewBox="0 0 40 40" fill="none"><circle cx="20" cy="20" r="20" fill="#E0DDDB"/><circle cx="20" cy="15" r="7" fill="#B2AEAD"/><ellipse cx="20" cy="32" rx="12" ry="9" fill="#B2AEAD"/></svg>';
-      }
-
-      function avatarHTML(r, size) {
-        size = size || 40;
-        if (r.avatar_url) {
-          return '<img src="' + r.avatar_url + '" alt="' + escapeHtml(r.name) + '" width="' + size + '" height="' + size + '">';
+        function starsHTML(rating) {
+          var s = '';
+          for (var i = 1; i <= 5; i++) {
+            s += '<span class="star' + (i > rating ? ' empty' : '') + '">&#9733;</span>';
+          }
+          return s;
         }
-        return defaultAvatarSVG(size);
-      }
 
-      function escapeHtml(str) {
-        var div = document.createElement('div');
-        div.textContent = str;
-        return div.innerHTML;
-      }
+        function defaultAvatarSVG(size) {
+          size = size || 40;
+          return '<svg width="' + size + '" height="' + size + '" viewBox="0 0 40 40" fill="none"><circle cx="20" cy="20" r="20" fill="#E0DDDB"/><circle cx="20" cy="15" r="7" fill="#B2AEAD"/><ellipse cx="20" cy="32" rx="12" ry="9" fill="#B2AEAD"/></svg>';
+        }
 
-      function formatDate(dateStr) {
-        var d = new Date(dateStr);
-        var months = {
-          'uz': ['yanvar','fevral','mart','aprel','may','iyun','iyul','avgust','sentabr','oktabr','noyabr','dekabr'],
-          'ru': ['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря'],
-          'en': ['January','February','March','April','May','June','July','August','September','October','November','December']
-        };
-        var ml = months[LANG] || months['uz'];
-        return d.getDate() + ' ' + ml[d.getMonth()] + ' ' + d.getFullYear() + ' г.';
-      }
+        function avatarHTML(r, size) {
+          size = size || 40;
+          if (r.avatar_url) {
+            return '<img src="' + r.avatar_url + '" alt="' + escapeHtml(r.name) + '" width="' + size + '" height="' + size + '">';
+          }
+          return defaultAvatarSVG(size);
+        }
 
-      var verifiedText = {uz: 'Tasdiqlangan', ru: 'Проверено', en: 'Verified'}[LANG] || 'Проверено';
-      var detailBtnText = {uz: 'batafsil', ru: 'подробно', en: 'details'}[LANG] || 'подробно';
+        function escapeHtml(str) {
+          var div = document.createElement('div');
+          div.textContent = str;
+          return div.innerHTML;
+        }
 
-      // ===== DOM =====
-      var grid = document.getElementById('reviewsGrid');
-      var loading = document.getElementById('reviewsLoading');
+        function formatDate(dateStr) {
+          var d = new Date(dateStr);
+          var months = {
+            'uz': ['yanvar', 'fevral', 'mart', 'aprel', 'may', 'iyun', 'iyul', 'avgust', 'sentabr', 'oktabr', 'noyabr', 'dekabr'],
+            'ru': ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'],
+            'en': ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
+          };
+          var ml = months[LANG] || months['uz'];
+          return d.getDate() + ' ' + ml[d.getMonth()] + ' ' + d.getFullYear() + ' г.';
+        }
 
-      // ===== RENDER CARDS (marquee) =====
-      function renderCards() {
-        grid.innerHTML = '';
-        reviews.forEach(function(r, i) {
-          var card = document.createElement('div');
-          card.className = 'review-card';
-          card.innerHTML =
-            '<div class="review-card-header">' +
+        var verifiedText = { uz: 'Tasdiqlangan', ru: 'Проверено', en: 'Verified' }[LANG] || 'Проверено';
+        var detailBtnText = { uz: 'batafsil', ru: 'подробно', en: 'details' }[LANG] || 'подробно';
+
+        // ===== DOM =====
+        var grid = document.getElementById('reviewsGrid');
+        var loading = document.getElementById('reviewsLoading');
+
+        // ===== RENDER CARDS =====
+        function renderCards() {
+          grid.innerHTML = '';
+
+          // Animatsiyani to'xtatamiz
+          grid.style.animation = 'none';
+          grid.style.transform = '';
+
+          // Birinchi set — real kartalar (click ishlaydi)
+          reviews.forEach(function (r, i) {
+            var card = document.createElement('div');
+            card.className = 'review-card';
+            card.innerHTML =
+              '<div class="review-card-header">' +
               '<div class="review-avatar" data-index="' + i + '">' + avatarHTML(r) + '</div>' +
               '<div class="review-user-info">' +
-                '<span class="review-user-name">' + escapeHtml(r.name) + '</span>' +
-                (r.is_verified ? '<span class="review-verified"><svg width="14" height="14" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="8" fill="#4CAF50"/><path d="M5 8l2 2 4-4" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg> ' + verifiedText + '</span>' : '') +
+              '<span class="review-user-name">' + escapeHtml(r.name) + '</span>' +
+              (r.is_verified ? '<span class="review-verified"><svg width="14" height="14" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="8" fill="#4CAF50"/><path d="M5 8l2 2 4-4" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg> ' + verifiedText + '</span>' : '') +
               '</div>' +
-            '</div>' +
-            '<div class="review-stars">' + starsHTML(r.rating) + '</div>' +
-            '<div class="review-date">' + formatDate(r.created_at) + '</div>' +
-            '<div class="review-text">' + escapeHtml(r.text) + '</div>' +
-            '<button class="review-more-btn" data-index="' + i + '">' + detailBtnText + '</button>';
-          grid.appendChild(card);
-        });
-        // Дублируем карточки для бесконечного marquee
-        var cards = grid.innerHTML;
-        grid.innerHTML = cards + cards;
-      }
-
-      // ===== API FETCH =====
-      function fetchReviews(url) {
-        loading.style.display = 'block';
-        fetch(url)
-          .then(function(r) { return r.json(); })
-          .then(function(data) {
-            reviews = data.results || [];
-            renderCards();
-            loading.style.display = 'none';
-          })
-          .catch(function() {
-            loading.style.display = 'none';
+              '</div>' +
+              '<div class="review-stars">' + starsHTML(r.rating) + '</div>' +
+              '<div class="review-date">' + formatDate(r.created_at) + '</div>' +
+              '<div class="review-text">' + escapeHtml(r.text) + '</div>' +
+              '<button class="review-more-btn" data-index="' + i + '">' + detailBtnText + '</button>';
+            grid.appendChild(card);
           });
-      }
 
-      // Загружаем побольше для ленты
-      fetchReviews(API_BASE + '?page_size=12');
+          // Ikkinchi set — clone (faqat ko'rinish uchun, click ishlamaydi)
+          var originals = Array.from(grid.children);
+          originals.forEach(function (card) {
+            var clone = card.cloneNode(true);
+            clone.setAttribute('aria-hidden', 'true');
+            // Clone da data-index olib tashlaymiz
+            clone.querySelectorAll('[data-index]').forEach(function (el) {
+              el.removeAttribute('data-index');
+            });
+            // Clone da button ni disable qilamiz
+            clone.querySelectorAll('button').forEach(function (btn) {
+              btn.setAttribute('tabindex', '-1');
+              btn.style.pointerEvents = 'none';
+            });
+            grid.appendChild(clone);
+          });
 
-      // ===== DRAG/SWIPE для reviews marquee =====
-      (function() {
-        var marquee = document.getElementById('reviewsSlider');
-        var track = document.getElementById('reviewsGrid');
-        if (!marquee || !track) return;
-        var isDown = false, startX = 0, scrollOffset = 0, currentOffset = 0, animRunning = true;
-        marquee.style.cursor = 'grab';
+          // DOM yangilanganidan keyin animatsiyani boshlash
+          requestAnimationFrame(function () {
+            requestAnimationFrame(function () {
+              grid.style.animation = 'reviewsMarquee 40s linear infinite';
+            });
+          });
+        }
 
-        function pauseAnim() {
-          if (animRunning) {
+        // ===== API FETCH =====
+        function fetchReviews(url) {
+          loading.style.display = 'block';
+          fetch(url)
+            .then(function (r) { return r.json(); })
+            .then(function (data) {
+              reviews = data.results || [];
+              renderCards();
+              loading.style.display = 'none';
+            })
+            .catch(function () {
+              loading.style.display = 'none';
+            });
+        }
+
+        fetchReviews(API_BASE + '?page_size=12');
+
+// ===== DRAG/SWIPE =====
+        (function () {
+          var marquee = document.getElementById('reviewsSlider');
+          var track = document.getElementById('reviewsGrid');
+          if (!marquee || !track) return;
+
+          var isDown = false;
+          var startX = 0;
+          var scrollOffset = 0;
+          var currentOffset = 0;
+          var animRunning = true;
+          var resumeTimer = null;
+
+          marquee.style.cursor = 'grab';
+
+          function pauseAnim() {
+            if (!animRunning) return;
             var matrix = new DOMMatrix(getComputedStyle(track).transform);
             currentOffset = matrix.m41;
             track.style.animation = 'none';
             track.style.transform = 'translateX(' + currentOffset + 'px)';
             animRunning = false;
           }
-        }
-        function resumeAnim() {
-          var tw = track.scrollWidth / 2;
-          if (tw <= 0) return;
-          var n = currentOffset % tw;
-          if (n > 0) n -= tw;
-          var pct = Math.abs(n) / tw;
-          track.style.animation = 'none';
-          track.style.transform = '';
-          void track.offsetHeight;
-          track.style.animation = 'reviewsMarquee 40s linear infinite';
-          track.style.animationDelay = '-' + (pct * 40) + 's';
-          animRunning = true;
-        }
 
-        marquee.addEventListener('mousedown', function(e) { isDown = true; startX = e.clientX; pauseAnim(); scrollOffset = currentOffset; marquee.style.cursor = 'grabbing'; });
-        document.addEventListener('mousemove', function(e) {
-          if (!isDown) return;
-          currentOffset = scrollOffset + (e.clientX - startX);
-          var tw = track.scrollWidth / 2;
-          if (tw > 0) { if (currentOffset > 0) currentOffset -= tw; if (currentOffset < -tw) currentOffset += tw; }
-          track.style.transform = 'translateX(' + currentOffset + 'px)';
-        });
-        document.addEventListener('mouseup', function() {
-          if (!isDown) return;
-          isDown = false; marquee.style.cursor = 'grab';
-          setTimeout(function() { if (!isDown) resumeAnim(); }, 2000);
-        });
-        marquee.addEventListener('touchstart', function(e) { isDown = true; startX = e.touches[0].clientX; pauseAnim(); scrollOffset = currentOffset; }, { passive: true });
-        marquee.addEventListener('touchmove', function(e) {
-          if (!isDown) return;
-          currentOffset = scrollOffset + (e.touches[0].clientX - startX);
-          var tw = track.scrollWidth / 2;
-          if (tw > 0) { if (currentOffset > 0) currentOffset -= tw; if (currentOffset < -tw) currentOffset += tw; }
-          track.style.transform = 'translateX(' + currentOffset + 'px)';
-        }, { passive: true });
-        marquee.addEventListener('touchend', function() { isDown = false; setTimeout(function() { if (!isDown) resumeAnim(); }, 2000); });
-      })();
+          function resumeAnim() {
+            var tw = track.scrollWidth / 2; // Clone hisobga olingan umumiy kenglikning yarmi
+            if (tw <= 0) return;
 
-      // ===== DETAIL MODAL =====
-      var detailOverlay = document.getElementById('reviewDetailOverlay');
-      var detailClose = document.getElementById('reviewDetailClose');
+            // Offset qiymatini normalize qilamiz (manfiy doirada ushlab turish uchun)
+            var n = currentOffset % tw;
+            if (n > 0) n -= tw;
 
-      grid.addEventListener('click', function(e) {
-        var btn = e.target.closest('.review-more-btn');
-        if (!btn) return;
-        var idx = parseInt(btn.dataset.index);
-        var r = reviews[idx];
-        if (!r) return;
-        document.getElementById('detailName').textContent = r.name;
-        document.getElementById('detailStars').innerHTML = starsHTML(r.rating);
-        document.getElementById('detailDate').textContent = formatDate(r.created_at);
-        document.getElementById('detailText').textContent = r.text;
-        var detailAv = document.getElementById('detailAvatar');
-        detailAv.innerHTML = avatarHTML(r, 50);
-        detailAv.dataset.avatar = r.avatar_url || '';
-        detailOverlay.classList.add('active');
-      });
+            // Kelgan joyidan davom etishi uchun vaqtni to'g'ri hisoblash (Delay)
+            var duration = 40; // CSS dagi animatsiya vaqti (40s)
+            var pct = Math.abs(n) / tw;
+            var delay = -(pct * duration);
 
-      detailClose.addEventListener('click', function() {
-        detailOverlay.classList.remove('active');
-      });
-      detailOverlay.addEventListener('click', function(e) {
-        if (e.target === detailOverlay) detailOverlay.classList.remove('active');
-      });
+            track.style.animation = 'none';
+            track.style.transform = '';
+            void track.offsetHeight; // Reflow triggers trigger qilish
 
-      // ===== AVATAR IMAGE MODAL =====
-      var avatarOverlay = document.getElementById('avatarImageOverlay');
-      var avatarImgFull = document.getElementById('avatarImageFull');
-      var avatarImgClose = document.getElementById('avatarImageClose');
-
-      function openAvatarModal(imageUrl) {
-          avatarOverlay.style.display = "flex";
-
-          if (imageUrl) {
-              avatarImgFull.src = imageUrl;
-          } else {
-              avatarImgFull.src = "/static/images/default-avatar.png";
+            track.style.animation = 'reviewsMarquee ' + duration + 's linear infinite';
+            track.style.animationDelay = delay + 's';
+            
+            currentOffset = n;
+            animRunning = true;
           }
-      }
 
-      function handleAvatarClick(e) {
-        var av = e.target.closest('.review-avatar');
-        if (!av) return;
-        var idx = av.dataset.index;
-        var avatarSrc = '';
-        if (idx !== undefined && reviews[parseInt(idx)]) {
-          avatarSrc = reviews[parseInt(idx)].avatar_url;
-        } else if (av.dataset.avatar) {
-          avatarSrc = av.dataset.avatar;
+          // Mouse events
+          marquee.addEventListener('mousedown', function (e) {
+            isDown = true;
+            startX = e.clientX;
+            
+            // Hozirgi holatni saqlab qolish
+            var matrix = new DOMMatrix(getComputedStyle(track).transform);
+            currentOffset = matrix.m41;
+            scrollOffset = currentOffset;
+            
+            pauseAnim();
+            marquee.style.cursor = 'grabbing';
+            if (resumeTimer) clearTimeout(resumeTimer);
+          });
+
+          document.addEventListener('mousemove', function (e) {
+            if (!isDown) return;
+            var tw = track.scrollWidth / 2;
+            if (tw <= 0) return;
+
+            currentOffset = scrollOffset + (e.clientX - startX);
+            
+            // Marhum karusel chegarasidan chiqib ketishini oldini olish
+            if (currentOffset > 0) currentOffset -= tw;
+            if (currentOffset < -tw) currentOffset += tw;
+
+            track.style.transform = 'translateX(' + currentOffset + 'px)';
+          });
+
+          document.addEventListener('mouseup', function () {
+            if (!isDown) return;
+            isDown = false;
+            marquee.style.cursor = 'grab';
+            resumeTimer = setTimeout(function () {
+              if (!isDown) resumeAnim();
+            }, 1000); // 1 soniyadan keyin avtomatik silliq davom etadi
+          });
+
+          // Touch events (Mobil qurilmalar uchun)
+          marquee.addEventListener('touchstart', function (e) {
+            isDown = true;
+            startX = e.touches[0].clientX;
+            
+            var matrix = new DOMMatrix(getComputedStyle(track).transform);
+            currentOffset = matrix.m41;
+            scrollOffset = currentOffset;
+            
+            pauseAnim();
+            if (resumeTimer) clearTimeout(resumeTimer);
+          }, { passive: true });
+
+          marquee.addEventListener('touchmove', function (e) {
+            if (!isDown) return;
+            var tw = track.scrollWidth / 2;
+            if (tw <= 0) return;
+
+            currentOffset = scrollOffset + (e.touches[0].clientX - startX);
+            
+            if (currentOffset > 0) currentOffset -= tw;
+            if (currentOffset < -tw) currentOffset += tw;
+
+            track.style.transform = 'translateX(' + currentOffset + 'px)';
+          }, { passive: true });
+
+          marquee.addEventListener('touchend', function () {
+            isDown = false;
+            resumeTimer = setTimeout(function () {
+              if (!isDown) resumeAnim();
+            }, 1000);
+          });
+        })();
+
+
+        // ===== DETAIL MODAL =====
+        var detailOverlay = document.getElementById('reviewDetailOverlay');
+        var detailClose = document.getElementById('reviewDetailClose');
+
+        grid.addEventListener('click', function (e) {
+          var btn = e.target.closest('.review-more-btn');
+          if (!btn) return;
+          var idx = parseInt(btn.dataset.index);
+          var r = reviews[idx];
+          if (!r) return;
+          document.getElementById('detailName').textContent = r.name;
+          document.getElementById('detailStars').innerHTML = starsHTML(r.rating);
+          document.getElementById('detailDate').textContent = formatDate(r.created_at);
+          document.getElementById('detailText').textContent = r.text;
+          var detailAv = document.getElementById('detailAvatar');
+          detailAv.innerHTML = avatarHTML(r, 50);
+          detailAv.dataset.avatar = r.avatar_url || '';
+          detailOverlay.classList.add('active');
+        });
+
+        detailClose.addEventListener('click', function () {
+          detailOverlay.classList.remove('active');
+        });
+        detailOverlay.addEventListener('click', function (e) {
+          if (e.target === detailOverlay) detailOverlay.classList.remove('active');
+        });
+
+        // ===== AVATAR IMAGE MODAL =====
+        var avatarOverlay = document.getElementById('avatarImageOverlay');
+        var avatarImgFull = document.getElementById('avatarImageFull');
+        var avatarImgClose = document.getElementById('avatarImageClose');
+
+        function handleAvatarClick(e) {
+          var av = e.target.closest('.review-avatar');
+          if (!av) return;
+          var idx = av.dataset.index;
+          var avatarSrc = '';
+          if (idx !== undefined && reviews[parseInt(idx)]) {
+            avatarSrc = reviews[parseInt(idx)].avatar_url;
+          } else if (av.dataset.avatar) {
+            avatarSrc = av.dataset.avatar;
+          }
+          if (!avatarSrc) {
+            avatarSrc = 'data:image/svg+xml,' + encodeURIComponent('<svg width="300" height="300" viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg"><rect width="300" height="300" fill="#E0DDDB"/><circle cx="150" cy="115" r="52" fill="#B2AEAD"/><ellipse cx="150" cy="240" rx="90" ry="67" fill="#B2AEAD"/></svg>');
+          }
+          avatarImgFull.src = avatarSrc;
+          avatarOverlay.classList.add('active');
         }
-        if (!avatarSrc) {
-          avatarSrc = 'data:image/svg+xml,' + encodeURIComponent('<svg width="300" height="300" viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg"><rect width="300" height="300" fill="#E0DDDB"/><circle cx="150" cy="115" r="52" fill="#B2AEAD"/><ellipse cx="150" cy="240" rx="90" ry="67" fill="#B2AEAD"/></svg>');
+
+        grid.addEventListener('click', function (e) {
+          if (e.target.closest('.review-more-btn')) return;
+          handleAvatarClick(e);
+        });
+        document.getElementById('detailAvatar').addEventListener('click', handleAvatarClick);
+
+        avatarImgClose.addEventListener('click', function () {
+          avatarOverlay.classList.remove('active');
+        });
+        avatarOverlay.addEventListener('click', function (e) {
+          if (e.target === avatarOverlay) avatarOverlay.classList.remove('active');
+        });
+
+        // ===== FORM MODAL =====
+        var formOverlay = document.getElementById('reviewFormOverlay');
+        var formClose = document.getElementById('reviewFormClose');
+        var openBtn = document.getElementById('openReviewFormBtn');
+        var reviewForm = document.getElementById('reviewForm');
+        var successMsg = document.getElementById('reviewSuccessMsg');
+        var errorMsg = document.getElementById('reviewErrorMsg');
+        var submitBtn = document.getElementById('reviewSubmitBtn');
+        var selectedRating = 0;
+
+        openBtn.addEventListener('click', function () {
+          successMsg.style.display = 'none';
+          errorMsg.style.display = 'none';
+          reviewForm.reset();
+          reviewForm.style.display = '';
+          resetStars();
+          document.getElementById('reviewFileName').textContent = '';
+          formOverlay.classList.add('active');
+        });
+
+        formClose.addEventListener('click', function () {
+          formOverlay.classList.remove('active');
+        });
+        formOverlay.addEventListener('click', function (e) {
+          if (e.target === formOverlay) formOverlay.classList.remove('active');
+        });
+
+        // Star rating picker
+        var starPicks = document.querySelectorAll('.star-pick');
+        function resetStars() {
+          selectedRating = 0;
+          starPicks.forEach(function (s) { s.classList.remove('active'); });
         }
-        avatarImgFull.src = avatarSrc;
-        avatarOverlay.classList.add('active');
-      }
-
-      grid.addEventListener('click', function(e) {
-        if (e.target.closest('.review-more-btn')) return;
-        handleAvatarClick(e);
-      });
-      document.getElementById('detailAvatar').addEventListener('click', handleAvatarClick);
-
-      avatarImgClose.addEventListener('click', function() {
-        avatarOverlay.classList.remove('active');
-      });
-      avatarOverlay.addEventListener('click', function(e) {
-        if (e.target === avatarOverlay) avatarOverlay.classList.remove('active');
-      });
-
-      // ===== FORM MODAL =====
-      var formOverlay = document.getElementById('reviewFormOverlay');
-      var formClose = document.getElementById('reviewFormClose');
-      var openBtn = document.getElementById('openReviewFormBtn');
-      var reviewForm = document.getElementById('reviewForm');
-      var successMsg = document.getElementById('reviewSuccessMsg');
-      var errorMsg = document.getElementById('reviewErrorMsg');
-      var submitBtn = document.getElementById('reviewSubmitBtn');
-      var selectedRating = 0;
-
-      openBtn.addEventListener('click', function() {
-        successMsg.style.display = 'none';
-        errorMsg.style.display = 'none';
-        reviewForm.reset();
-        reviewForm.style.display = '';
-        resetStars();
-        document.getElementById('reviewFileName').textContent = '';
-        formOverlay.classList.add('active');
-      });
-
-      formClose.addEventListener('click', function() {
-        formOverlay.classList.remove('active');
-      });
-      formOverlay.addEventListener('click', function(e) {
-        if (e.target === formOverlay) formOverlay.classList.remove('active');
-      });
-
-      // Star rating picker
-      var starPicks = document.querySelectorAll('.star-pick');
-      function resetStars() {
-        selectedRating = 0;
-        starPicks.forEach(function(s) { s.classList.remove('active'); });
-      }
-      starPicks.forEach(function(star) {
-        star.addEventListener('click', function() {
-          selectedRating = parseInt(this.dataset.value);
-          starPicks.forEach(function(s) {
+        starPicks.forEach(function (star) {
+          star.addEventListener('click', function () {
+            selectedRating = parseInt(this.dataset.value);
+            starPicks.forEach(function (s) {
+              s.classList.toggle('active', parseInt(s.dataset.value) <= selectedRating);
+            });
+          });
+          star.addEventListener('mouseenter', function () {
+            var val = parseInt(this.dataset.value);
+            starPicks.forEach(function (s) {
+              s.classList.toggle('active', parseInt(s.dataset.value) <= val);
+            });
+          });
+        });
+        document.getElementById('reviewFormStars').addEventListener('mouseleave', function () {
+          starPicks.forEach(function (s) {
             s.classList.toggle('active', parseInt(s.dataset.value) <= selectedRating);
           });
         });
-        star.addEventListener('mouseenter', function() {
-          var val = parseInt(this.dataset.value);
-          starPicks.forEach(function(s) {
-            s.classList.toggle('active', parseInt(s.dataset.value) <= val);
-          });
-        });
-      });
-      document.getElementById('reviewFormStars').addEventListener('mouseleave', function() {
-        starPicks.forEach(function(s) {
-          s.classList.toggle('active', parseInt(s.dataset.value) <= selectedRating);
-        });
-      });
 
-      // File name display
-      document.getElementById('reviewPhoto').addEventListener('change', function() {
-        var file = this.files[0];
-        if (file) {
-          document.getElementById('reviewFileName').textContent = file.name;
-          // Client-side size check
-          if (file.size > 5 * 1024 * 1024) {
-            errorMsg.textContent = {uz: 'Rasm hajmi 5 MB dan oshmasligi kerak', ru: 'Максимальный размер фото — 5 МБ', en: 'Max photo size is 5 MB'}[LANG] || 'Max 5 MB';
-            errorMsg.style.display = 'block';
-            this.value = '';
-            document.getElementById('reviewFileName').textContent = '';
-          } else {
-            errorMsg.style.display = 'none';
-          }
-        } else {
-          document.getElementById('reviewFileName').textContent = '';
-        }
-      });
-
-      // ===== FORM SUBMIT WITH reCAPTCHA =====
-      reviewForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-        errorMsg.style.display = 'none';
-
-        if (selectedRating === 0) {
-          var ratingMsg = {uz: 'Iltimos, baho tanlang', ru: 'Пожалуйста, выберите оценку', en: 'Please select a rating'}[LANG] || 'Выберите оценку';
-          errorMsg.textContent = ratingMsg;
-          errorMsg.style.display = 'block';
-          return;
-        }
-
-        submitBtn.disabled = true;
-        submitBtn.textContent = {uz: 'Yuborilmoqda...', ru: 'Отправка...', en: 'Submitting...'}[LANG] || 'Отправка...';
-
-        function sendReview(recaptchaToken) {
-          var formData = new FormData();
-          formData.append('name', document.getElementById('reviewName').value.trim());
-          formData.append('rating', selectedRating);
-          formData.append('text', document.getElementById('reviewText').value.trim());
-          formData.append('recaptcha_token', recaptchaToken);
-          var photoFile = document.getElementById('reviewPhoto').files[0];
-          if (photoFile) {
-            formData.append('avatar', photoFile);
-          }
-
-          fetch(API_BASE, {
-            method: 'POST',
-            headers: {
-              'X-CSRFToken': getCookie('csrftoken')
-            },
-            body: formData
-          })
-          .then(function(resp) {
-            if (resp.ok) return resp.json();
-            return resp.json().then(function(err) { throw err; });
-          })
-          .then(function(data) {
-            successMsg.style.display = 'flex';
-            reviewForm.style.display = 'none';
-            resetStars();
-          })
-          .catch(function(err) {
-            var msg = {uz: 'Xatolik yuz berdi', ru: 'Произошла ошибка', en: 'An error occurred'}[LANG] || 'Ошибка';
-            if (err && typeof err === 'object') {
-              var errTexts = [];
-              Object.keys(err).forEach(function(k) {
-                var v = err[k];
-                if (Array.isArray(v)) errTexts.push(v.join(', '));
-                else if (typeof v === 'string') errTexts.push(v);
-              });
-              if (errTexts.length) msg = errTexts.join('. ');
+        // File upload
+        document.getElementById('reviewPhoto').addEventListener('change', function () {
+          var file = this.files[0];
+          if (file) {
+            document.getElementById('reviewFileName').textContent = file.name;
+            if (file.size > 5 * 1024 * 1024) {
+              errorMsg.textContent = { uz: 'Rasm hajmi 5 MB dan oshmasligi kerak', ru: 'Максимальный размер фото — 5 МБ', en: 'Max photo size is 5 MB' }[LANG] || 'Max 5 MB';
+              errorMsg.style.display = 'block';
+              this.value = '';
+              document.getElementById('reviewFileName').textContent = '';
+            } else {
+              errorMsg.style.display = 'none';
             }
-            errorMsg.textContent = msg;
-            errorMsg.style.display = 'block';
-          })
-          .finally(function() {
-            submitBtn.disabled = false;
-            submitBtn.textContent = {uz: 'Yuborish', ru: 'Отправить отзыв', en: 'Submit review'}[LANG] || 'Отправить отзыв';
-          });
-        }
+          } else {
+            document.getElementById('reviewFileName').textContent = '';
+          }
+        });
 
-        // Execute reCAPTCHA v3
-        if (RECAPTCHA_SITE_KEY && typeof grecaptcha !== 'undefined') {
-          grecaptcha.ready(function() {
-            grecaptcha.execute(RECAPTCHA_SITE_KEY, {action: 'submit_review'}).then(function(token) {
-              sendReview(token);
-            }).catch(function() {
-              sendReview('no-recaptcha');
+        // ===== FORM SUBMIT =====
+        reviewForm.addEventListener('submit', function (e) {
+          e.preventDefault();
+          errorMsg.style.display = 'none';
+
+          if (selectedRating === 0) {
+            errorMsg.textContent = { uz: 'Iltimos, baho tanlang', ru: 'Пожалуйста, выберите оценку', en: 'Please select a rating' }[LANG] || 'Выберите оценку';
+            errorMsg.style.display = 'block';
+            return;
+          }
+
+          submitBtn.disabled = true;
+          submitBtn.textContent = { uz: 'Yuborilmoqda...', ru: 'Отправка...', en: 'Submitting...' }[LANG] || 'Отправка...';
+
+          function sendReview(recaptchaToken) {
+            var formData = new FormData();
+            formData.append('name', document.getElementById('reviewName').value.trim());
+            formData.append('rating', selectedRating);
+            formData.append('text', document.getElementById('reviewText').value.trim());
+            formData.append('recaptcha_token', recaptchaToken);
+            var photoFile = document.getElementById('reviewPhoto').files[0];
+            if (photoFile) formData.append('avatar', photoFile);
+
+            fetch(API_BASE, {
+              method: 'POST',
+              headers: { 'X-CSRFToken': getCookie('csrftoken') },
+              body: formData
+            })
+              .then(function (resp) {
+                if (resp.ok) return resp.json();
+                return resp.json().then(function (err) { throw err; });
+              })
+              .then(function () {
+                successMsg.style.display = 'flex';
+                reviewForm.style.display = 'none';
+                resetStars();
+              })
+              .catch(function (err) {
+                var msg = { uz: 'Xatolik yuz berdi', ru: 'Произошла ошибка', en: 'An error occurred' }[LANG] || 'Ошибка';
+                if (err && typeof err === 'object') {
+                  var errTexts = [];
+                  Object.keys(err).forEach(function (k) {
+                    var v = err[k];
+                    if (Array.isArray(v)) errTexts.push(v.join(', '));
+                    else if (typeof v === 'string') errTexts.push(v);
+                  });
+                  if (errTexts.length) msg = errTexts.join('. ');
+                }
+                errorMsg.textContent = msg;
+                errorMsg.style.display = 'block';
+              })
+              .finally(function () {
+                submitBtn.disabled = false;
+                submitBtn.textContent = { uz: 'Yuborish', ru: 'Отправить отзыв', en: 'Submit review' }[LANG] || 'Отправить отзыв';
+              });
+          }
+
+          if (RECAPTCHA_SITE_KEY && typeof grecaptcha !== 'undefined') {
+            grecaptcha.ready(function () {
+              grecaptcha.execute(RECAPTCHA_SITE_KEY, { action: 'submit_review' }).then(function (token) {
+                sendReview(token);
+              }).catch(function () {
+                sendReview('no-recaptcha');
+              });
             });
-          });
-        } else {
-          sendReview('no-recaptcha');
-        }
+          } else {
+            sendReview('no-recaptcha');
+          }
+        });
       });
-    });
     </script>
      <!-- Mijozlar fikrlari (END)  -->
 
@@ -920,8 +999,8 @@
                         <h4 class="contact-detail__title">
                           {% if LANGUAGE_CODE == 'uz' %}Email{% elif LANGUAGE_CODE == 'ru' %}Электронная почта{% else %}Email{% endif %}
                         </h4>
-                        <a href="mailto:info@fawtrucks.uz" class="contact-detail__value">
-                          {% if LANGUAGE_CODE == 'uz' %}example@autoliga.uz{% elif LANGUAGE_CODE == 'ru' %}example@autoliga.uz{% else %}example@autoliga.uz{% endif %}
+                        <a href="mailto:info@autoliga.uz" class="contact-detail__value">
+                          {% if LANGUAGE_CODE == 'uz' %}info@autoliga.uz{% elif LANGUAGE_CODE == 'ru' %}info@autoliga.uz{% else %}info@autoliga.uz{% endif %}
                         </a>
                       </div>
                     </div>
@@ -937,11 +1016,31 @@
                         </h4>
                         <p class="contact-detail__value">
                           {% if LANGUAGE_CODE == 'uz' %}
-                          Toshkent sh., Farog‘at 2-chi avtomashina, 2
+                          Toshkent sh.Yunusobod tumani, Farog‘at ko‘chasi 2-uy (2-tor ko‘cha)
                           {% elif LANGUAGE_CODE == 'ru' %}
-                          Ташкент, Фарогат, 2-й автосервис, 2
+                          г.Ташкент, Юнусабадский район, улица Фарогат, дом 2 (2-й проезд)
                           {% else %}
-                          Tashkent, Farogat 2nd Car Service, 2
+                          Tashkent city, Yunusabad district, Farog‘at street, house 2 (2nd passage)
+                          {% endif %}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div class="contact-detail">
+                      <div class="contact-detail__icon">
+                        <i class="ph-fill ph-clock"></i>
+                      </div>
+                      <div class="contact-detail__content">
+                        <h4 class="contact-detail__title">
+                          {% if LANGUAGE_CODE == 'uz' %}Ish vaqti{% elif LANGUAGE_CODE == 'ru' %}Режим работы{% else %}Working Hours{% endif %}
+                        </h4>
+                        <p class="contact-detail__value">
+                          {% if LANGUAGE_CODE == 'uz' %}
+                          Dushanba – Yakshanba (dam olish kunlarsiz), 09:00–20:00
+                          {% elif LANGUAGE_CODE == 'ru' %}
+                          Понедельник – Воскресенье (без выходных), 09:00–20:00
+                          {% else %}
+                          Monday – Sunday (Open daily), 09:00–20:00
                           {% endif %}
                         </p>
                       </div>
@@ -1620,22 +1719,27 @@ function changeCarImage(imageUrl, productSlug, categorySlug) {
 
 function openBrand(slug, element) {
     const panel = document.getElementById('panel-' + slug);
+    const overlay = document.getElementById('overlay-' + slug);
 
     if (panel && panel.classList.contains('active')) {
         panel.classList.remove('active');
+        if (overlay) overlay.classList.remove('active');
         element.classList.remove('active');
         return;
     }
 
     document.querySelectorAll('.model-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.panel-overlay').forEach(o => o.classList.remove('active'));
     document.querySelectorAll('.brand-card').forEach(el => el.classList.remove('active'));
 
     if (panel) panel.classList.add('active');
+    if (overlay) overlay.classList.add('active');
     element.classList.add('active');
 }
 
 function closePanel() {
     document.querySelectorAll('.model-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.panel-overlay').forEach(o => o.classList.remove('active'));
     document.querySelectorAll('.brand-card').forEach(el => el.classList.remove('active'));
     document.body.style.overflow = '';
 }
@@ -1691,7 +1795,5 @@ document.addEventListener("DOMContentLoaded", function () {
   window.addEventListener('resize', ensureMobilePanelsVisible, { passive: true });
 })();
 </script>
-
-
 
 {% endblock content %}

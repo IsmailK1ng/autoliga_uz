@@ -21335,25 +21335,20 @@ form textarea:required:valid {
 }
 
 .mxd-tech-stack-cards.grid-cards {
-    display: -ms-grid;
     display: grid;
-    -ms-grid-columns: (1fr)[2];
     grid-template-columns: repeat(2, 1fr);
-    grid-column-gap: 3rem;
-    grid-row-gap: 3rem
+    gap: 3rem;
 }
 
 @media only screen and (min-width:768px) {
     .mxd-tech-stack-cards.grid-cards {
-        -ms-grid-columns: (1fr)[3];
-        grid-template-columns: repeat(3, 1fr)
+        grid-template-columns: repeat(3, 1fr);
     }
 }
 
 @media only screen and (min-width:1400px) {
     .mxd-tech-stack-cards.grid-cards {
-        -ms-grid-columns: (1fr)[4];
-        grid-template-columns: repeat(4, 1fr)
+        grid-template-columns: repeat(4, 1fr);
     }
 }
 
@@ -21708,7 +21703,7 @@ form textarea:required:valid {
     line-height: 1.2;
     color: var(--t-medium);
     text-decoration: none;
-    background: -webkit-gradient(linear, left top, right top, from(rgba(0, 0, 0, 0)), to(rgba(0, 0, 0, 0))), -webkit-gradient(linear, left top, right top, from(var(--t-bright)), to(var(--t-bright)));
+    /* background: -webkit-gradient(linear, left top, right top, from(rgba(0, 0, 0, 0)), to(rgba(0, 0, 0, 0))), -webkit-gradient(linear, left top, right top, from(var(--t-bright)), to(var(--t-bright))); */
     background: -moz-linear-gradient(left, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0)), -moz-linear-gradient(left, var(--t-bright), var(--t-bright));
     background: linear-gradient(to right, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0)), linear-gradient(to right, var(--t-bright), var(--t-bright));
     -moz-background-size: 100% 1px, 0 1px;
@@ -22805,3 +22800,4 @@ form textarea:required:valid {
         font-size: 3.4rem
     }
 }
+

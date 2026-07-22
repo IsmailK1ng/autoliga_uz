@@ -24,3 +24,6 @@ do
     echo "[$(date '+%Y-%m-%d %H:%M:%S')] Bot exited with code $EXIT_CODE. Restarting in 5 seconds..." >> "$SUPERVISOR_LOG"
     sleep 5
 done
+
+
+nohup python3 Autoliga_Botfile/run_bot.py > logs/bot.log 2>&1 &

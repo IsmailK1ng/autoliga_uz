@@ -72,7 +72,7 @@
                         <a href="mailto:info@fawtrucks.uz?subject=FAW%20TRUCKS%20inquiry">
                             <span style="font-weight: bold;">
                                 {% if LANGUAGE_CODE == 'uz' %}eMail:{% elif LANGUAGE_CODE == 'ru' %}Эл. почта:{% else %}Email:{% endif %}
-                            </span> example@autoliga.uz
+                            </span> info@autoliga.uz
                         </a>
                     </p>
                     <p class="mxd-point-subtitle">
@@ -94,28 +94,34 @@
                             {% else %}Tashkent city, Yunusabad district, Farog‘at street, house 2 (2nd passage){% endif %}
                         </a>
                     </p>
+
+                    <p class="mxd-point-subtitle">
+                        <i class="ph-fill ph-clock"></i>
+                        <span>
+                            <span style="font-weight: bold;">
+                                {% if LANGUAGE_CODE == 'uz' %}Ish vaqti:{% elif LANGUAGE_CODE == 'ru' %}Режим работы:{% else %}Working Hours:{% endif %}
+                            </span>
+                            {% if LANGUAGE_CODE == 'uz' %}Dushanba – Yakshanba (dam olish kunlarsiz), 09:00 – 20:00
+                            {% elif LANGUAGE_CODE == 'ru' %}Понедельник – Воскресенье (без выходных), 09:00 – 20:00
+                            {% else %}Monday – Sunday (Open daily), 09:00 – 20:00{% endif %}
+                        </span>
+                    </p>
+
+                    
                 </div>
 
                 <div class="footer-blocks__card card-maps"
-                    style="padding:0; overflow:hidden; min-height:250px; height:100%; border-radius:15px; border: 1px solid #ddd;">
+                    style="padding:0; overflow:hidden; border-radius:15px; border: 1px solid #ddd;">
 
                     <div style="position:relative; overflow:hidden; width:100%; height:100%;">
-
-                        <a href="https://yandex.uz/maps/?pt=69.287543,41.375042&z=17&l=map"
-                        target="_blank" rel="noopener noreferrer"
-                        style="color:#fff; font-size:12px; position:absolute; top:10px; left:10px; z-index:10; background:rgba(255, 102, 0, 0.85); padding:6px 12px; border-radius:8px;">
-                        📍 Yunusobod
-                        </a>
-
                         <iframe
                             src="https://yandex.uz/map-widget/v1/?ll=69.287543%2C41.375042&z=17&pt=69.287543%2C41.375042&mode=whatshere"
-                            style="width:100%; height:100%; border:0; display:block;"
+                            class="map-iframe"
+                            style="width:100%; border:0; display:block;"
                             loading="lazy">
                         </iframe>
-
                     </div>
                 </div>
-
 
             </div>
 
@@ -137,15 +143,15 @@
                                 </li>
                                 <li class="footer-socials__item">
                                     <img src="{% static 'images/icons/main-social__icon/instagram.png' %}" alt="Instagram" class="footer-socials__icon" width="24" height="24" loading="lazy">
-                                    <a href="https://www.instagram.com/" class="footer-socials__link" target="_blank" rel="noopener noreferrer">Instagram</a>
+                                    <a href="https://www.instagram.com/autoliga.uz/" class="footer-socials__link" target="_blank" rel="noopener noreferrer">Instagram</a>
                                 </li>
                                 <li class="footer-socials__item">
                                     <img src="{% static 'images/icons/main-social__icon/telegram.png' %}" alt="Telegram" class="footer-socials__icon" width="24" height="24" loading="lazy">
-                                    <a href="https://t.me/" class="footer-socials__link" target="_blank" rel="noopener noreferrer">Telegram</a>
+                                    <a href="https://t.me/avtoligauz" class="footer-socials__link" target="_blank" rel="noopener noreferrer">Telegram</a>
                                 </li>
                                 <li class="footer-socials__item">
                                     <img src="{% static 'images/icons/main-social__icon/youtube.png' %}" alt="YouTube" class="footer-socials__icon" width="24" height="24" loading="lazy">
-                                    <a href="https://www.youtube.com/" class="footer-socials__link" target="_blank" rel="noopener noreferrer">YouTube</a>
+                                    <a href="https://youtube.com/@autoligauz" class="footer-socials__link" target="_blank" rel="noopener noreferrer">YouTube</a>
                                 </li>
                                 <li class="footer-socials__item">
                                     <img src="{% static 'images/icons/main-social__icon/linkedin.png' %}" alt="LinkedIn" class="footer-socials__icon" width="24" height="24" loading="lazy">

@@ -23066,6 +23066,26 @@ form textarea:required:valid {
     box-shadow: 0 40px 100px rgba(0, 0, 0, .45)
 }
 
+.panel-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, .52);
+    z-index: 29;
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+    opacity: 0;
+    transition: opacity .25s ease;
+    pointer-events: none;
+    display: none
+}
+
+.panel-overlay.active {
+    opacity: 1;
+    pointer-events: auto;
+    display: block
+}
+
+
 .model-panel.active {
     opacity: 1;
     /* transform: translateY(-50%) scale(1); */
@@ -23236,12 +23256,15 @@ form textarea:required:valid {
     filter: drop-shadow(0 1px 3px rgba(0, 0, 0, .25))
 }
 
-.mobile-brand-bar .brand-card.active,
+.mobile-brand-bar .brand-card.active {
+    transform: none;
+    border: 1px solid #f7941d !important;
+    box-shadow: 0 0 0 1px rgba(247, 148, 29, .25)
+}
+
 .mobile-brand-bar .brand-card:hover {
-    transform: none; 
-    ;
-    background: rgba(255, 140, 0, 0.322);
-    border-color: rgba(255, 140, 0, .758)
+    transform: none;
+    border-color: var(--card-border)
 }
 
 .scroll-arrow {
@@ -23506,7 +23529,7 @@ form textarea:required:valid {
 
 @media (max-width:768px) {
     .panel-overlay {
-        display: none;
+        display: block;
         position: fixed;
         inset: 0;
         background: rgba(0, 0, 0, .52);
@@ -23519,7 +23542,8 @@ form textarea:required:valid {
     }
 
     .panel-overlay.active {
-        display: block
+        opacity: 1;
+        pointer-events: auto
     }
 
     @keyframes fadeIn {
@@ -23731,10 +23755,10 @@ form textarea:required:valid {
         width: 100% !important;
         max-width: 100% !important;
         height: auto !important;
-        max-height: 180px !important;
+        /* max-height: 180px !important; */
         object-fit: contain !important;
         display: block !important;
-        filter: drop-shadow(0 10px 24px rgba(0, 0, 0, .55)) !important;
+        /* filter: drop-shadow(0 10px 24px rgba(0, 0, 0, .55)) !important; */
         transition: opacity .22s ease !important
     }
 
@@ -23845,8 +23869,8 @@ form textarea:required:valid {
 
 @media (max-width:380px) {
     .mobile-brand-bar {
-        bottom: 10px;
-        margin: 0 10px;
+        bottom: 0;
+        margin: 0;
         padding-bottom: env(safe-area-inset-bottom)
     }
 
@@ -23866,7 +23890,8 @@ form textarea:required:valid {
     }
 
     .mobile-brand-list {
-        gap: 14px
+        gap: 14px;
+        padding: 10px 10px
     }
 }
 
@@ -24651,9 +24676,10 @@ form textarea:required:valid {
 
 .home-team-modal-photo {
     width: 100%;
-    aspect-ratio: 1/1;
+    aspect-ratio: 3/4;
     object-fit: cover;
-    display: block
+    display: block;
+    
 }
 
 .home-team-modal-info {
@@ -24858,16 +24884,21 @@ body[data-theme=dark] .home-team-cta-btn:hover {
     display: flex;
     gap: 16px;
     width: max-content;
-    animation: reviewsMarquee 40s linear infinite
+    animation: reviewsMarquee 40s linear infinite;
+    will-change: transform;          
+    backface-visibility: hidden;     
+    -webkit-backface-visibility: hidden;
 }
+
+
+
 
 @keyframes reviewsMarquee {
     0% {
-        transform: translateX(0)
+        transform: translateX(0);
     }
-
     100% {
-        transform: translateX(-50%)
+        transform: translateX(-50%);
     }
 }
 
@@ -24878,7 +24909,8 @@ body[data-theme=dark] .home-team-cta-btn:hover {
     display: flex;
     flex-direction: column;
     gap: 10px;
-    transition: box-shadow .2s, transform .2s;
+    transition: box-shadow .2s, transform .2s; 
+    
     min-width: 320px;
     width: 320px;
     height: 220px;

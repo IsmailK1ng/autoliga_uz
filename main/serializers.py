@@ -580,6 +580,3 @@ class TestDriveSerializer(serializers.ModelSerializer):
         if not validated_data.get('referer'):
             validated_data['referer'] = 'telegram_bot'
         return super().create(validated_data)
-
-
-# ========== BOT SERIALIZERS ========== (REMOVED - now using BotService)

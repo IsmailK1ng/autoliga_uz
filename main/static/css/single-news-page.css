@@ -482,3 +482,22 @@
     margin-bottom: 0rem;
   }
 }
+
+/* Preserve the original image ratio on news detail while keeping the parallax wrapper. */
+.mxd-divider--image {
+  height: auto;
+}
+
+.mxd-divider--image .mxd-divider__image {
+  height: auto;
+}
+
+.mxd-divider--image .mxd-divider__image img {
+  position: relative;
+  top: auto;
+  left: auto;
+  display: block;
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+}

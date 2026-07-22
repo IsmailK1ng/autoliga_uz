@@ -111,8 +111,8 @@
   {% if block.block_type == 'image' and block.image %}
   <div class="mxd-section padding-pre-title">
     <div class="mxd-container">
-      <div class="mxd-divider">
-        <div class="mxd-divider__image parallax-img">
+      <div class="mxd-divider mxd-divider--image">
+        <div class="mxd-divider__image">
           <img src="{{ block.image.url }}" alt="{{ block.title|default:'Фото' }}">
         </div>
       </div>

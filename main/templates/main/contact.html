@@ -155,6 +155,24 @@
                                                                 </p>
                                                             </div>
                                                         </div>
+
+                                                        <div class="contact-detail">
+                                                            <div class="contact-detail__icon">
+                                                                <i class="ph-fill ph-clock"></i>
+                                                            </div>
+                                                            <div class="contact-detail__content">
+                                                                <h4 class="contact-detail__title">{% if LANGUAGE_CODE == 'uz' %}Ish vaqti{% elif LANGUAGE_CODE == 'ru' %}Режим работы{% else %}Working Hours{% endif %}</h4>
+                                                                <p class="contact-detail__value">
+                                                                    {% if LANGUAGE_CODE == 'uz' %}
+                                                                        Dushanba – Yakshanba (dam olish kunlarsiz), 09:00–20:00
+                                                                    {% elif LANGUAGE_CODE == 'ru' %}
+                                                                        Понедельник – Воскресенье (без выходных), 09:00–20:00
+                                                                    {% else %}
+                                                                        Monday – Sunday (Open daily), 09:00–20:00
+                                                                    {% endif %}
+                                                                </p>
+                                                            </div>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>

@@ -9,6 +9,23 @@ Backend проект на **Django + Django REST Framework** для сайтов
 
 
 
+Autoliga Yunusobod 
+internet 
+tarif reja: Office days star
+tezligi: 100/Mbit/ kunduzi kuni 
+kechki payt 19:00dan 01:00 gacha tezligi 20/Mbit tezlika pasayadi
+texnologiya: Gpon 
+
+
+Static (ip)
+static ip olish uchun xat chiqarilar ekan bo'sh ip bo'lsa taqdim etilar ekan 
+registratsiyasi 150ming so'm ekan 
+50 ming oylik abonet qo'shilar ekan 
+static ip olishda 100/Mbit dan yuqori tariflarga yoqilar ekan shunday deyishi ham mumkin ekan 
+
+
+
+
 Server Error (500)
 
 ---

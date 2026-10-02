@@ -85,12 +85,12 @@
                 </span>
                 <span class="language-arrow">▼</span>
                 <div class="language-dropdown">
-                    <a href="#" class="language-option {% if LANGUAGE_CODE == 'uz' %}active{% endif %}"
-                        data-lang="uz" onclick="switchLanguage('uz'); return false;">O'zbek</a>
-                    <a href="#" class="language-option {% if LANGUAGE_CODE == 'ru' %}active{% endif %}"
-                        data-lang="ru" onclick="switchLanguage('ru'); return false;">Русский</a>
-                    <a href="#" class="language-option {% if LANGUAGE_CODE == 'en' %}active{% endif %}"
-                        data-lang="en" onclick="switchLanguage('en'); return false;">English</a>
+                    <button type="button" class="language-option {% if LANGUAGE_CODE == 'uz' %}active{% endif %}"
+                        data-lang="uz" onclick="switchLanguage('uz')">O'zbek</button>
+                    <button type="button" class="language-option {% if LANGUAGE_CODE == 'ru' %}active{% endif %}"
+                        data-lang="ru" onclick="switchLanguage('ru')">Русский</button>
+                    <button type="button" class="language-option {% if LANGUAGE_CODE == 'en' %}active{% endif %}"
+                        data-lang="en" onclick="switchLanguage('en')">English</button>
                 </div>
             </div>
         </form>

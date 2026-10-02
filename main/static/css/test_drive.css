@@ -426,6 +426,37 @@ body[data-theme=dark] .td-bottom-sheet-item.selected {
     color: #d4571d
 }
 
+.td-agree-copy {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: .25rem .45rem;
+    min-width: 0
+}
+
+.td-agree-policy-link {
+    padding: 0;
+    color: #f66e2e;
+    background: transparent;
+    border: 0;
+    font: inherit;
+    font-size: 1.3rem;
+    line-height: 1.5;
+    text-align: left;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    cursor: pointer
+}
+
+.td-agree-policy-link:hover {
+    color: #d4571d
+}
+
+.td-agree-policy-link:focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 3px
+}
+
 .td-submit-wrapper {
     text-align: center;
     margin-top: 2.2rem

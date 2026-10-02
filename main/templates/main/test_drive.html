@@ -162,11 +162,18 @@
                             <div class="td-form-group full-width">
                                 <div class="td-agree">
                                     <input type="checkbox" name="agree_terms" id="tdAgree" required />
-                                    <label for="tdAgree">
-                                        {% if LANGUAGE_CODE == 'uz' %}Men <a href="#">shaxsiy ma'lumotlarni qayta ishlash shartlariga</a> roziman.
-                                        {% elif LANGUAGE_CODE == 'ru' %}Я согласен с <a href="#">условиями обработки персональных данных</a>.
-                                        {% else %}I agree to the <a href="#">terms of personal data processing</a>.{% endif %}
-                                    </label>
+                                    <div class="td-agree-copy">
+                                        <label for="tdAgree">
+                                            {% if LANGUAGE_CODE == 'uz' %}Men shaxsiy ma'lumotlarim qayta ishlanishiga roziman.
+                                            {% elif LANGUAGE_CODE == 'ru' %}Я согласен на обработку персональных данных.
+                                            {% else %}I agree to the processing of my personal data.{% endif %}
+                                        </label>
+                                        <button class="td-agree-policy-link" type="button" data-legal-trigger="privacy" aria-haspopup="dialog" aria-controls="legal-info-dialog">
+                                            {% if LANGUAGE_CODE == 'uz' %}Shaxsiy ma'lumotlarni qayta ishlash shartlari
+                                            {% elif LANGUAGE_CODE == 'ru' %}Условия обработки персональных данных
+                                            {% else %}Terms of personal data processing{% endif %}
+                                        </button>
+                                    </div>
                                 </div>
 
                                 <div class="td-submit-wrapper">

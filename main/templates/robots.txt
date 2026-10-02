@@ -1,6 +1,14 @@
 User-agent: *
+
 Disallow: /admin/
 Disallow: /api/
 Disallow: /captcha/
 Disallow: /set-language/
+
 Allow: /
+
+User-agent: Yandex
+
+Clean-param: utm_source&utm_medium&utm_campaign&utm_content&utm_term&fbclid&yclid&gclid
+
+Sitemap: https://autoliga.uz/sitemap.xml

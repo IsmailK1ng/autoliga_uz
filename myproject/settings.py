@@ -44,6 +44,9 @@ INSTALLED_APPS = [
     'main',  
 
     'captcha', 
+
+    'django.contrib.sitemaps',
+
 ]
 
 # CAPTCHA sozlamalari

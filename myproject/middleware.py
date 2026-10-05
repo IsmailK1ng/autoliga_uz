@@ -10,6 +10,25 @@ logger = logging.getLogger('django')
 security_logger = logging.getLogger('security')
 
 
+
+from django.http import HttpResponsePermanentRedirect
+
+class NonWWWRedirectMiddleware:
+    """www.autoliga.uz -> https://autoliga.uz (bitta 301 hop)"""
+    WWW_HOST = "www.autoliga.uz"
+    CANONICAL = "https://autoliga.uz"
+
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        host = request.get_host().split(":")[0].lower()
+        if host == self.WWW_HOST:
+            return HttpResponsePermanentRedirect(
+                f"{self.CANONICAL}{request.get_full_path()}"
+            )
+        return self.get_response(request)
+
 # ============ UTILITY ============
 
 def get_client_ip(request):

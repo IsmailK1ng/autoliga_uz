@@ -172,6 +172,8 @@ JAZZMIN_UI_TWEAKS = {
 # ============ MIDDLEWARE ============
 
 MIDDLEWARE = [
+    'myproject.middleware.NonWWWRedirectMiddleware',      # 0. www -> non-www (eng birinchi)
+
     'myproject.middleware.RequestSizeLimitMiddleware',   # 1. Katta requestlarni erta bloklash
     'myproject.middleware.RateLimitMiddleware',           # 2. Rate limit + IP auto-block
     'django.middleware.security.SecurityMiddleware',

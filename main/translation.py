@@ -4,7 +4,7 @@ from main.models import *
 # ========== НОВОСТИ ==========
 @register(News)
 class NewsTranslationOptions(TranslationOptions):
-    fields = ('title', 'desc')
+    fields = ('title', 'desc', 'seo_title', 'seo_description')
 
 
 @register(NewsBlock)
@@ -42,7 +42,7 @@ class VacancyIdealCandidateTranslationOptions(TranslationOptions):
 # ========== КАТЕГОРИИ ПРОДУКТОВ ==========
 @register(ProductCategory)
 class ProductCategoryTranslationOptions(TranslationOptions):
-    fields = ('name', 'description')
+    fields = ('name', 'description', 'seo_title', 'seo_description')
 
 # ========== ПРОДУКТЫ ==========
 @register(Product)
@@ -52,6 +52,8 @@ class ProductTranslationOptions(TranslationOptions):
         'slider_price',
         'slider_power',
         'slider_fuel_consumption',
+        'seo_title',
+        'seo_description',
     )
 
 @register(ProductFeature)
@@ -75,7 +77,14 @@ class ParameterCategoryTranslationOptions(TranslationOptions):
 # ========== DILERLAR ==========
 @register(Dealer)
 class DealerTranslationOptions(TranslationOptions):
-    fields = ('name', 'address', 'working_hours', 'description')
+    fields = (
+        'name',
+        'address',
+        'working_hours',
+        'description',
+        'seo_title',
+        'seo_description',
+    )
 
 @register(DealerImage)
 class DealerImageTranslationOptions(TranslationOptions):

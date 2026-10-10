@@ -255,6 +255,9 @@ class NewsAdmin(ContentAdminMixin, CustomReversionMixin, VersionAdmin, TabbedTra
         ('Автор', {
             'fields': ('author', 'author_photo', 'author_photo_tag')
         }),
+        ('SEO', {
+            'fields': ('seo_title', 'seo_description'),
+        }),
         ('Техническая информация', {
             'fields': ('updated_at',),
             'classes': ('collapse',)
@@ -764,6 +767,9 @@ class ProductCategoryAdmin(ContentAdminMixin, TabbedTranslationAdmin):
         ('Основная информация', {
             'fields': ('name', 'slug', 'description', 'is_active', 'order')
         }),
+        ('SEO', {
+            'fields': ('seo_title', 'seo_description'),
+        }),
         ('Изображения', {
             'fields': ('icon', 'hero_image')
         }),
@@ -936,6 +942,12 @@ class ProductAdmin(ContentAdminMixin, CustomReversionMixin, VersionAdmin, Tabbed
                 'category',  # ✅ Теперь обычный select
                 ('order', 'is_active', 'is_featured'),
                 ('main_image', 'card_image')
+            )
+        }),
+        ('SEO', {
+            'fields': (
+                'seo_title',
+                'seo_description',
             )
         }),
         ('⭐ Настройки главного слайдера', {
@@ -1248,6 +1260,12 @@ class DealerAdmin(ContentAdminMixin, TabbedTranslationAdmin):
         ("Tavsif", {
             'fields': ('description_uz', 'description_ru', 'description_en'),
             'classes': ('collapse',),
+        }),
+        ("SEO", {
+            'fields': (
+                'seo_title_uz', 'seo_title_ru', 'seo_title_en',
+                'seo_description_uz', 'seo_description_ru', 'seo_description_en',
+            ),
         }),
         ("Xarita koordinatalari", {
             'fields': ('latitude', 'longitude'),

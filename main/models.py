@@ -2,7 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.utils.text import slugify
 from unidecode import unidecode
-from ckeditor.fields import RichTextField  
+from ckeditor.fields import RichTextField
 from django.utils import timezone
 from datetime import timedelta
 from django.utils.translation import gettext_lazy as _
@@ -51,9 +51,28 @@ class News(models.Model):
     preview_image = models.ImageField("Главное фото", upload_to="news/previews/", blank=True, null=True)
     is_active = models.BooleanField("Активна", default=True, help_text="Показывать новость на сайте")
     order = models.PositiveIntegerField("Порядок", default=0, help_text="Чем больше число, тем выше в списке")
-    
+    seo_title = models.CharField(
+        "SEO-заголовок",
+        max_length=65,
+        blank=True,
+        help_text="Если поле пустое, используется заголовок новости"
+    )
+    seo_description = models.CharField(
+        "SEO-описание",
+        max_length=160,
+        blank=True,
+        help_text="Если поле пустое, описание формируется автоматически"
+    )
+
+
+
     created_at = models.DateField("Дата публикации", help_text="Введите дату публикации вручную")
     updated_at = models.DateTimeField("Дата обновления", auto_now=True)
+
+
+
+
+
 
     class Meta:
         verbose_name = " - Новость"
@@ -63,27 +82,27 @@ class News(models.Model):
     def __str__(self):
         # ✅ Улучшенный вывод для истории версий
         return f"{self.created_at.strftime('%d.%m.%Y')} — {self.title[:50]}"
-    
+
     def save(self, *args, **kwargs):
         """Автогенерация slug из title при сохранении"""
         if not self.slug:
             title_for_slug = (
-                getattr(self, 'title_uz', None) or 
-                getattr(self, 'title_ru', None) or 
-                self.title or 
+                getattr(self, 'title_uz', None) or
+                getattr(self, 'title_ru', None) or
+                self.title or
                 "novost"
             )
-            
+
             base_slug = slugify(unidecode(title_for_slug))
             slug = base_slug
             counter = 1
-            
+
             while News.objects.filter(slug=slug).exclude(pk=self.pk).exists():
                 slug = f"{base_slug}-{counter}"
                 counter += 1
-            
+
             self.slug = slug
-        
+
         super().save(*args, **kwargs)
 
 
@@ -98,21 +117,21 @@ class NewsBlock(models.Model):
     ]
 
     news = models.ForeignKey(
-        News, 
-        on_delete=models.CASCADE, 
-        related_name="blocks", 
+        News,
+        on_delete=models.CASCADE,
+        related_name="blocks",
         verbose_name="Новость"
     )
     block_type = models.CharField("Тип блока", max_length=10, choices=BLOCK_TYPES)
-    
+
     title = models.CharField(
-        "Заголовок (необязательно)", 
-        max_length=500, 
-        blank=True, 
+        "Заголовок (необязательно)",
+        max_length=500,
+        blank=True,
         null=True,
         help_text="Заголовок H3 перед текстовым блоком"
     )
-    
+
     text = RichTextField("Текст", blank=True, null=True, config_name='default')
     image = models.ImageField("Фото", upload_to="news/images/", blank=True, null=True)
     youtube_url = models.URLField("YouTube ссылка", blank=True, null=True)
@@ -138,12 +157,12 @@ class FeatureIcon(models.Model):
     name = models.CharField("Название", max_length=100, unique=True)
     icon = models.FileField("Иконка", upload_to="features/icons/")
     order = models.PositiveIntegerField("Порядок", default=0)
-    
+
     class Meta:
         verbose_name = "Контент - Иконка"
         verbose_name_plural = "Контент - Иконки"
         ordering = ['order', 'name']
-    
+
     def __str__(self):
         return self.name
 
@@ -153,14 +172,31 @@ class ProductCategory(models.Model):
     slug = models.SlugField("URL", max_length=100, unique=True)
     description = models.TextField("Описание", blank=True, null=True)
     hero_image = models.ImageField(
-        "Фоновое изображение", 
+        "Фоновое изображение",
         upload_to="categories/heroes/",
         blank=True,
         null=True,
         help_text="Изображение для страницы категории"
     )
+
+    seo_title = models.CharField(
+        "SEO-заголовок",
+        max_length=65,
+        blank=True,
+        help_text="Если поле пустое, используется название марки"
+    )
+    seo_description = models.CharField(
+        "SEO-описание",
+        max_length=160,
+        blank=True,
+        help_text="Если поле пустое, используется описание марки"
+    )
+
+
+
+
     icon = models.FileField(
-        "Иконка", 
+        "Иконка",
         upload_to="categories/icons/",
         blank=True,
         null=True
@@ -168,50 +204,65 @@ class ProductCategory(models.Model):
     order = models.PositiveIntegerField("Порядок", default=0)
     is_active = models.BooleanField("Активна", default=True)
     created_at = models.DateTimeField("Дата создания", auto_now_add=True)
-    
+
+
+
     class Meta:
         verbose_name = "Контент - Марка"
         verbose_name_plural = "Контент - Марка автомобиля"
         ordering = ['order', 'name']
-    
+
     def __str__(self):
         return self.name
-    
+
     def save(self, *args, **kwargs):
         if not self.slug:
             from django.utils.text import slugify
             from unidecode import unidecode
-            
+
             name_for_slug = (
-                getattr(self, 'name_uz', None) or 
-                getattr(self, 'name_ru', None) or 
-                self.name or 
+                getattr(self, 'name_uz', None) or
+                getattr(self, 'name_ru', None) or
+                self.name or
                 "category"
             )
-            
+
             base_slug = slugify(unidecode(name_for_slug))
             slug = base_slug
             counter = 1
-            
+
             while ProductCategory.objects.filter(slug=slug).exclude(pk=self.pk).exists():
                 slug = f"{base_slug}-{counter}"
                 counter += 1
-            
+
             self.slug = slug
-        
+
         super().save(*args, **kwargs)
-    
+
     def get_products_count(self):
         """Количество активных продуктов в категории"""
         return self.products.filter(is_active=True).count()
 
 class Product(models.Model):
     """Автомобили"""
-    
+
     # Основные поля
     title = models.CharField("Название модели", max_length=255)
     slug = models.SlugField("URL", max_length=255, unique=True)
-    
+
+    seo_title = models.CharField(
+        "SEO-заголовок",
+        max_length=65,
+        blank=True,
+        help_text="Если поле пустое, используется марка и название модели"
+    )
+    seo_description = models.CharField(
+        "SEO-описание",
+        max_length=160,
+        blank=True,
+        help_text="Если поле пустое, описание формируется автоматически"
+    )
+
     # ✅ ИСПРАВЛЕНО: ForeignKey вместо ManyToMany
     category = models.ForeignKey(
         ProductCategory,
@@ -222,15 +273,15 @@ class Product(models.Model):
         blank=True,
         help_text="Выберите категорию автомобиля"
     )
-    
+
     main_image = models.ImageField("Главное изображение", upload_to="products/main/")
     card_image = models.ImageField(
-        "Изображение для карточки", 
-        upload_to="products/cards/", 
-        blank=True, 
+        "Изображение для карточки",
+        upload_to="products/cards/",
+        blank=True,
         null=True
     )
-    
+
     # ========== ПОЛЯ ДЛЯ СЛАЙДЕРА ==========
     slider_image = models.ImageField(
         "Изображение для слайдера",
@@ -272,10 +323,10 @@ class Product(models.Model):
         help_text="Чем больше число, тем раньше появится в слайдере"
     )
     # ========================================
-    
+
     is_active = models.BooleanField("Активен", default=True)
     is_featured = models.BooleanField(
-        "Показывать на главной", 
+        "Показывать на главной",
         default=False,
         help_text="Продукт будет добавлен в главный слайдер"
     )
@@ -292,7 +343,7 @@ class Product(models.Model):
         if self.category:
             return f"{self.title} ({self.category.name})"
         return self.title
-    
+
     def get_slider_data(self):
         """Возвращает данные для слайдера в формате JSON"""
         return {
@@ -304,7 +355,7 @@ class Product(models.Model):
             'image': (self.slider_image or self.main_image).url if (self.slider_image or self.main_image) else None,
             'link': f'/products/{self.slug}/',
         }
-    
+
     def get_absolute_url(self):
         return reverse('product_detail', args=[self.slug])
 
@@ -356,9 +407,9 @@ class ParameterCategory(models.Model):
 class ProductParameter(models.Model):
 
     product = models.ForeignKey(
-        Product, 
-        on_delete=models.CASCADE, 
-        related_name='parameters', 
+        Product,
+        on_delete=models.CASCADE,
+        related_name='parameters',
         verbose_name='Продукт'
     )
     category = models.ForeignKey(
@@ -371,15 +422,15 @@ class ProductParameter(models.Model):
     )
     text = models.CharField("Параметр", max_length=500)
     order = models.PositiveIntegerField("Порядок", default=0)
-    
+
     class Meta:
         verbose_name = "Параметр"
         verbose_name_plural = "Параметры машины"
-        ordering = ['category__order', 'order']  
+        ordering = ['category__order', 'order']
 
     def __str__(self):
         category_name = self.category.name if self.category else "Без категории"
-        return f"{category_name}: {self.text}"  
+        return f"{category_name}: {self.text}"
 
 
 class ProductFeature(models.Model):
@@ -388,12 +439,12 @@ class ProductFeature(models.Model):
     icon = models.ForeignKey(FeatureIcon, on_delete=models.SET_NULL, null=True, blank=True)
     name = models.CharField("Название", max_length=100)
     order = models.PositiveIntegerField("Порядок", default=0, blank=True)
-    
+
     class Meta:
         verbose_name = "Характеристика"
         verbose_name_plural = "Характеристики с иконками"
         ordering = ['order']
-    
+
     def save(self, *args, **kwargs):
         # Если order не задан (0 или пустой), ставим следующий по порядку
         if not self.order and self.product_id:
@@ -404,7 +455,7 @@ class ProductFeature(models.Model):
             )['order__max'] or 0
             self.order = max_order + 1
         super().save(*args, **kwargs)
-    
+
     def __str__(self):
         return self.name
 
@@ -414,12 +465,12 @@ class ProductCardSpec(models.Model):
     icon = models.ForeignKey(FeatureIcon, on_delete=models.SET_NULL, null=True, blank=True)
     value = models.CharField("Значение", max_length=100)
     order = models.PositiveIntegerField("Порядок", default=0)
-    
+
     class Meta:
         verbose_name = "Характеристика карточки"
         verbose_name_plural = "Характеристики карточки"
         ordering = ['order']
-    
+
     def __str__(self):
         return self.value
 
@@ -429,12 +480,12 @@ class ProductGallery(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='gallery')
     image = models.ImageField("Изображение", upload_to="products/gallery/")
     order = models.PositiveIntegerField("Порядок", default=0)
-    
+
     class Meta:
         verbose_name = "Фото галереи"
         verbose_name_plural = "Галерея"
         ordering = ['order']
-    
+
     def __str__(self):
         return f"Фото {self.order + 1}"
 
@@ -445,11 +496,11 @@ class ContactForm(models.Model):
     name = models.CharField("Имя", max_length=255)
     region = models.CharField("Регион", max_length=100, choices=REGION_CHOICES)
     phone = models.CharField("Телефон", max_length=50)
-    
+
     product = models.CharField(
-        "Модель техники", 
-        max_length=200, 
-        blank=True, 
+        "Модель техники",
+        max_length=200,
+        blank=True,
         null=True,
         help_text="Какую модель автомобиля интересует клиента"
     )
@@ -461,7 +512,7 @@ class ContactForm(models.Model):
         null=True,
         help_text="URL страницы, с которой отправлена заявка"
     )
-    
+
     utm_data = models.TextField(
         "UTM метки",
         blank=True,
@@ -470,26 +521,26 @@ class ContactForm(models.Model):
     )
 
     visitor_uid = models.CharField(
-        max_length=100, 
-        blank=True, 
+        max_length=100,
+        blank=True,
         null=True,
         verbose_name="amoCRM Visitor UID"
     )
-    
+
     created_at = models.DateTimeField("Дата", auto_now_add=True)
     message = models.TextField("Сообщение", blank=True, default='')
     status = models.CharField("Статус", max_length=20, choices=STATUS_CHOICES, default='new')
     priority = models.CharField("Приоритет", max_length=10, choices=PRIORITY_CHOICES, default='medium')
     manager = models.ForeignKey(
-        User, 
-        null=True, 
-        blank=True, 
-        on_delete=models.SET_NULL, 
-        related_name='uz_contacts', 
+        User,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name='uz_contacts',
         verbose_name='Менеджер'
     )
     admin_comment = models.TextField("Комментарий", blank=True, null=True)
-    
+
     # Поля amoCRM (уже есть ниже)
     amocrm_status = models.CharField(
         "Статус amoCRM",
@@ -503,7 +554,7 @@ class ContactForm(models.Model):
         db_index=True,
         help_text="Статус отправки в amoCRM"
     )
-    
+
     amocrm_lead_id = models.CharField(
         "ID лида в amoCRM",
         max_length=50,
@@ -511,20 +562,20 @@ class ContactForm(models.Model):
         null=True,
         help_text="ID лида после успешной отправки"
     )
-    
+
     amocrm_sent_at = models.DateTimeField(
         "Дата отправки в amoCRM",
         blank=True,
         null=True
     )
-    
+
     amocrm_error = models.TextField(
         "Ошибка amoCRM",
         blank=True,
         null=True,
         help_text="Текст последней ошибки при отправке"
     )
-    
+
     class Meta:
         verbose_name = "Заявки - Общая заявка"
         verbose_name_plural = "Заявки - Общие заявки"
@@ -555,7 +606,7 @@ class Vacancy(models.Model):
         # ✅ Улучшенный вывод для истории версий
         status = "✅ Активна" if self.is_active else "❌ Неактивна"
         return f"{self.title} — {status}"
-    
+
     def get_applications_count(self):
         return self.applications.count()
 
@@ -619,9 +670,9 @@ class VacancyIdealCandidate(models.Model):
 class JobApplication(models.Model):
     """Заявки на вакансии"""
     vacancy = models.ForeignKey(
-        Vacancy, 
-        on_delete=models.CASCADE, 
-        related_name='applications', 
+        Vacancy,
+        on_delete=models.CASCADE,
+        related_name='applications',
         verbose_name='Вакансия'
     )
     region = models.CharField("Регион", max_length=100, choices=REGION_CHOICES)
@@ -640,7 +691,7 @@ class JobApplication(models.Model):
 
     def __str__(self):
         return f"{self.vacancy.title} - {self.region}"
-    
+
     def get_file_size(self):
         """Размер файла резюме в MB"""
         return round(self.resume.size / (1024 * 1024), 2) if self.resume else 0
@@ -653,23 +704,23 @@ class AmoCRMToken(models.Model):
     refresh_token = models.TextField("Refresh Token")
     expires_at = models.DateTimeField("Истекает")
     updated_at = models.DateTimeField("Последнее обновление", auto_now=True)
-    
+
     class Meta:
         verbose_name = "amoCRM Токен"
         verbose_name_plural = "amoCRM Токены"
-    
+
     def __str__(self):
         from django.utils import timezone
         if self.expires_at and self.expires_at > timezone.now():
             return f"✅ Токен валиден до {self.expires_at.strftime('%d.%m.%Y %H:%M')}"
         else:
             return f"❌ Токен истёк или не настроен"
-    
+
     def save(self, *args, **kwargs):
         # Всегда только 1 запись в таблице
         self.pk = 1
         super().save(*args, **kwargs)
-    
+
     @classmethod
     def get_instance(cls):
         """Получить единственный экземпляр токена"""
@@ -682,13 +733,13 @@ class AmoCRMToken(models.Model):
             }
         )
         return obj
-    
+
     def is_expired(self):
         """Проверка: токен истёк или скоро истечёт?"""
-        
+
         if not self.access_token or not self.refresh_token:
             return True
-        
+
         # Обновляем за 1 час до истечения
         return timezone.now() + timedelta(hours=1) >= self.expires_at\
 
@@ -737,6 +788,20 @@ class Dealer(models.Model):
         "Tavsif", blank=True,
         help_text="Diler markazi haqida qisqacha ma'lumot"
     )
+
+    seo_title = models.CharField(
+        "SEO sarlavha",
+        max_length=65,
+        blank=True,
+        help_text="Masalan: Geely Yunusobod — rasmiy diler | AUTOLIGA"
+    )
+    seo_description = models.CharField(
+        "SEO tavsif",
+        max_length=160,
+        blank=True,
+        help_text="Google qidiruv natijasi uchun filial tavsifi"
+    )
+
     is_active = models.BooleanField("Faol", default=True)
     order = models.PositiveIntegerField("Tartib", default=0)
 
@@ -842,7 +907,7 @@ class Review(models.Model):
 # ========== Bot telegram   ==========
 class TelegramUser(models.Model):
     """Telegram botdan kelgan foydalanuvchilar"""
-    
+
     telegram_id = models.BigIntegerField(
         "Telegram ID",
         unique=True,
@@ -861,7 +926,7 @@ class TelegramUser(models.Model):
         null=True
     )
     age = models.IntegerField("Yosh", blank=True, null=True)
-    
+
     phone = models.CharField(
         "Telefon",
         max_length=20,

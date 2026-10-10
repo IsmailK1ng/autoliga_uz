@@ -217,7 +217,6 @@
             background: rgba(255, 255, 255, 0.95);
             display: flex;
             justify-content: center;
-            align-items: center;
             z-index: 9999;
         }
         .page-loader .loader {
@@ -266,12 +265,9 @@
                                     <div class="row g-0 more_info-block">
                                         <div class="col-12 col-xl-12 mxd-grid-item no-margin">
                                             <div class="mxd-section-models__title">
-                                                <!-- Заголовок загружается через JS -->
-                                                <h2 class="models_title">
-                                                    {% if LANGUAGE_CODE == 'ru' %}Загрузка...
-                                                    {% elif LANGUAGE_CODE == 'en' %}Loading...
-                                                    {% else %}Yuklanmoqda...{% endif %}
-                                                </h2>
+                                                                                               <h1 class="models_title">
+                                                    {% if product.category and product.category.name not in product.title %}{{ product.category.name }} {% endif %}{{ product.title }}
+                                                </h1>
                                                 <ul class="more_info-link">
                                                     <li>
                                                         <a href="#parametrs">

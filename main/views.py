@@ -539,15 +539,18 @@ def products(request):
             language = getattr(request, 'LANGUAGE_CODE', 'uz')
             
             category_info = {
-                'id': category.id,
-                'title': getattr(category, f'name_{language}', None) or category.name,
-                'slogan': getattr(category, f'description_{language}', None) or category.description or '',
-                'hero_image': category.hero_image.url if category.hero_image else 'images/default_hero.png',
-                'breadcrumb': getattr(category, f'name_{language}', None) or category.name
-            }
+    'id': category.id,
+    'title': getattr(category, f'name_{language}', None) or category.name,
+    'slogan': getattr(category, f'description_{language}', None) or category.description or '',
+    'hero_image': category.hero_image.url if category.hero_image else 'images/default_hero.png',
+    'breadcrumb': getattr(category, f'name_{language}', None) or category.name,
+    'seo_title': getattr(category, f'seo_title_{language}', None) or category.seo_title or '',
+    'seo_description': getattr(category, f'seo_description_{language}', None) or category.seo_description or '',
+}
         else:
-            # Первая активная категория по умолчанию
+            # Birinchi faol kategoriya
             category = ProductCategory.objects.filter(is_active=True).order_by('order').first()
+
             if category:
                 language = getattr(request, 'LANGUAGE_CODE', 'uz')
                 category_info = {
@@ -555,7 +558,9 @@ def products(request):
                     'title': getattr(category, f'name_{language}', None) or category.name,
                     'slogan': getattr(category, f'description_{language}', None) or category.description or '',
                     'hero_image': category.hero_image.url if category.hero_image else 'images/default_hero.png',
-                    'breadcrumb': getattr(category, f'name_{language}', None) or category.name
+                    'breadcrumb': getattr(category, f'name_{language}', None) or category.name,
+                    'seo_title': getattr(category, f'seo_title_{language}', None) or category.seo_title or '',
+                    'seo_description': getattr(category, f'seo_description_{language}', None) or category.seo_description or '',
                 }
                 category_slug = category.slug
             else:

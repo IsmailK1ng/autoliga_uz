@@ -5,101 +5,170 @@
 
 <head>
     <meta charset="UTF-8">
+
     <script src="{% static 'js/utm-tracker.js' %}" defer></script>
-    <meta name="google-site-verification" content="8U0gm09f4g_DQmV00mUaZgV_M7i5M2pVK3YxgEJFccM" />
-    <meta name="yandex-verification" content="94b77cac54c4bd00" />
-    <!-- Заголовок страницы -->
-    <title>{% block title %}Autoliga{% endblock %}</title>
+
+    <meta name="google-site-verification" content="8U0gm09f4g_DQmV00mUaZgV_M7i5M2pVK3YxgEJFccM">
+    <meta name="yandex-verification" content="94b77cac54c4bd00">
+
+    <!-- Asosiy SEO -->
+    <title>{% block title %}AUTOLIGA — rasmiy avtosalonlar va servislar tarmog‘i{% endblock %}</title>
+
+    <meta
+        name="description"
+        content="{% block meta_description %}JETOUR, SOUEAST, JAC va GEELY avtomobillari — AUTOLIGA’da. Avtomobil tanlashdan xaridgacha, texnik xizmatdan ta’mirlashgacha — yoningizdamiz.{% endblock %}"
+    >
+
+    <!-- OpenGraph -->
+    <meta
+        property="og:type"
+        content="{% block og_type %}website{% endblock %}"
+    >
+    <meta
+        property="og:title"
+        content="{% block og_title %}AUTOLIGA — rasmiy avtosalonlar va servislar tarmog‘i{% endblock %}"
+    >
+    <meta
+        property="og:description"
+        content="{% block og_description %}JETOUR, SOUEAST, JAC va GEELY avtomobillari — AUTOLIGA’da. Avtomobil tanlashdan xaridgacha, texnik xizmatdan ta’mirlashgacha — yoningizdamiz.{% endblock %}"
+    >
+    <meta
+        property="og:image"
+        content="{% block og_image %}{{ request.scheme }}://{{ request.get_host }}{% static 'images/logo/autoliga-logo.png' %}{% endblock %}"
+    >
+    <meta
+        property="og:url"
+        content="{% block og_url %}{{ request.build_absolute_uri }}{% endblock %}"
+    >
+    <meta property="og:site_name" content="AUTOLIGA">
+
+    {% if LANGUAGE_CODE == 'ru' %}
+        <meta property="og:locale" content="ru_RU">
+    {% else %}
+        <meta property="og:locale" content="uz_UZ">
+    {% endif %}
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta
+        name="twitter:title"
+        content="{% block twitter_title %}AUTOLIGA — rasmiy avtosalonlar va servislar tarmog‘i{% endblock %}"
+    >
+    <meta
+        name="twitter:description"
+        content="{% block twitter_description %}JETOUR, SOUEAST, JAC va GEELY avtomobillari — AUTOLIGA’da.{% endblock %}"
+    >
+    <meta
+        name="twitter:image"
+        content="{% block twitter_image %}{{ request.scheme }}://{{ request.get_host }}{% static 'images/logo/autoliga-logo.png' %}{% endblock %}"
+    >
 
     {% hreflang_tags %}
     {% canonical_url %}
 
     {% block extra_meta %}{% endblock extra_meta %}
-
     {% block extra_css %}{% endblock %}
 
-    <!-- Мета теги -->
-    <meta name="description" content="{% block meta_description %}Autoliga{% endblock %}">
-    <meta name="keywords" content="{% block meta_keywords %}Autoliga{% endblock %}">
-
-    <!-- Мета viewport -->
+    <!-- Viewport -->
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1, maximum-scale=1"
+    >
 
-    <!-- Универсальный favicon -->
-    <link rel="icon" href="{% static 'images/logo/autoliga-logo.png' %}"/>
-    <!-- Для Apple устройств -->
-    <link rel="apple-touch-icon" href="{% static 'images/logo/autoliga-logo.png' %}">
+    <!-- Favicon -->
+    <link
+        rel="icon"
+        href="{% static 'images/logo/autoliga-logo.png' %}"
+    >
+    <link
+        rel="apple-touch-icon"
+        href="{% static 'images/logo/autoliga-logo.png' %}"
+    >
 
-    <!-- Подключение стилей (начало) -->
-    <link rel="stylesheet" type="text/css" href="{% static 'css/loaders/loader.css' %}">
-    <link rel="stylesheet" type="text/css" href="{% static 'css/plugins.css' %}">
-    <!-- <link rel="stylesheet" type="text/css" href="{% static 'css/brand-selector.css' %}">  bunday file bo'lmaganligi uchun komentga olib qo'ydim -->
-    <link rel="stylesheet" type="text/css" href="{% static 'css/main_site.css' %}">
-    <link rel="stylesheet" type="text/css" href="{% static 'css/site_main.css' %}">
-
-    
+    <!-- Asosiy stillar -->
+    <link
+        rel="stylesheet"
+        type="text/css"
+        href="{% static 'css/loaders/loader.css' %}"
+    >
+    <link
+        rel="stylesheet"
+        type="text/css"
+        href="{% static 'css/plugins.css' %}"
+    >
+    <link
+        rel="stylesheet"
+        type="text/css"
+        href="{% static 'css/main_site.css' %}"
+    >
+    <link
+        rel="stylesheet"
+        type="text/css"
+        href="{% static 'css/site_main.css' %}"
+    >
 
     {% block productcss %}
-
     {% endblock productcss %}
 
     {% block breadcrumbs %}
-
     {% endblock breadcrumbs %}
 
     {% block site_news %}
-
     {% endblock site_news %}
 
     {% block single-news-page %}
-
     {% endblock single-news-page %}
 
     {% block site_contact %}
-
     {% endblock site_contact %}
 
-    <!-- Цвет браузера (начало) -->
-    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#FAF7F6">
-    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#161616">
+    <!-- Brauzer ranglari -->
+    <meta
+        name="theme-color"
+        media="(prefers-color-scheme: light)"
+        content="#FAF7F6"
+    >
+    <meta
+        name="theme-color"
+        media="(prefers-color-scheme: dark)"
+        content="#161616"
+    >
     <meta name="msapplication-navbutton-color" content="#161616">
     <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <!-- Цвет браузера (конец) -->
+    <meta
+        name="apple-mobile-web-app-status-bar-style"
+        content="black-translucent"
+    >
 
     {% block productstyle %}
-
-
     {% endblock productstyle %}
 
     <style>
         #faw-main-contact-form {
-          padding-top: 120px;
+            padding-top: 120px;
         }
 
         .mxd-hero-06__video iframe {
-          position: absolute;
-          top: 50%;
-          left: 50%;
-          width: 110%;
-          height: 110%;
-          pointer-events: none;
-          transform: translate(-50%, -50%) scale(1.08);
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 110%;
+            height: 110%;
+            pointer-events: none;
+            transform: translate(-50%, -50%) scale(1.08);
         }
     </style>
 
-
-    <!-- Дополнительные стили можно добавить в блоке extra_css -->
-
     {% block inline_styles %}{% endblock %}
+    {% block structured_data %}
+    {% endblock structured_data %}
 </head>
 
 <body>
 
-{% block content %}{% endblock %}
+    {% block content %}{% endblock %}
 
 </body>
 
 </html>
-

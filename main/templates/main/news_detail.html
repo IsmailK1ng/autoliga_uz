@@ -3,17 +3,44 @@
 {% load seo_tags %}
 
 {% block title %}
-  {{ news.title }} | Autoliga
+    {% if news.seo_title %}
+        {{ news.seo_title|striptags }}
+    {% else %}
+        {{ news.title|striptags }} | AUTOLIGA
+    {% endif %}
 {% endblock %}
 
 {% block meta_description %}
-  {{ news.desc|striptags|truncatechars:155 }}
+    {% if news.seo_description %}
+        {{ news.seo_description|striptags }}
+    {% else %}
+        {{ news.desc|striptags|truncatechars:155 }}
+    {% endif %}
 {% endblock %}
 
-{% block meta_keywords %}
-  {% if LANGUAGE_CODE == 'uz' %}{{ news.title }}, autoliga yangiliklari, avtomobil yangiliklari{% elif LANGUAGE_CODE == 'ru' %}{{ news.title }}, новости autoliga, авто новости{% else %}{{ news.title }}, autoliga news, automotive updates{% endif %}
+{% block og_title %}
+    {% if news.seo_title %}{{ news.seo_title|striptags }}{% else %}{{ news.title|striptags }} | AUTOLIGA{% endif %}
 {% endblock %}
 
+{% block og_description %}
+    {% if news.seo_description %}{{ news.seo_description|striptags }}{% else %}{{ news.desc|striptags|truncatechars:155 }}{% endif %}
+{% endblock %}
+
+{% block og_image %}
+    {% if news.preview_image %}{{ request.scheme }}://{{ request.get_host }}{{ news.preview_image.url }}{% else %}{{ request.scheme }}://{{ request.get_host }}{% static 'images/logo/autoliga-logo.png' %}{% endif %}
+{% endblock %}
+
+{% block twitter_title %}
+    {% if news.seo_title %}{{ news.seo_title|striptags }}{% else %}{{ news.title|striptags }} | AUTOLIGA{% endif %}
+{% endblock %}
+
+{% block twitter_description %}
+    {% if news.seo_description %}{{ news.seo_description|striptags }}{% else %}{{ news.desc|striptags|truncatechars:155 }}{% endif %}
+{% endblock %}
+
+{% block twitter_image %}
+    {% if news.preview_image %}{{ request.scheme }}://{{ request.get_host }}{{ news.preview_image.url }}{% else %}{{ request.scheme }}://{{ request.get_host }}{% static 'images/logo/autoliga-logo.png' %}{% endif %}
+{% endblock %}
 
 {% block breadcrumbs %}
 <link rel="stylesheet" href="{% static 'css/breadcrumbs.css' %}">
@@ -67,8 +94,7 @@
   <!-- Main Title -->
   <div class="title-after-video">
     <div class="faw-history-title fade-in">
-      <h2 class="reveal-type">{{ news.title }}</h2>
-    </div>
+<h1 class="reveal-type">{{ news.title }}</h1>    </div>
     <div class="mxd-block"></div>
   </div>
 

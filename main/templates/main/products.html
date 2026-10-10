@@ -3,15 +3,31 @@
 {% load seo_tags %}
 
 {% block title %}
-    {% if LANGUAGE_CODE == 'uz' %}Yangi avtomobillar katalogi - Jetour, Omoda, Exeed narxlari | Autoliga{% elif LANGUAGE_CODE == 'ru' %}Каталог новых автомобилей - цены Jetour, Omoda, Exeed | Autoliga{% else %}New car catalog - Jetour, Omoda, Exeed prices | Autoliga{% endif %}
+    {% if category_info.seo_title %}
+        {{ category_info.seo_title|striptags }}
+    {% elif category_info.title %}
+        {{ category_info.title|striptags }} avtomobillari va narxlari | AUTOLIGA
+    {% else %}
+        JETOUR, SOUEAST, JAC va GEELY avtomobillari | AUTOLIGA
+    {% endif %}
 {% endblock %}
 
 {% block meta_description %}
-    {% if LANGUAGE_CODE == 'uz' %}Autoliga katalogi: Jetour T1, T2, Omoda C5, Exeed RX va boshqa modellarning narxlari, texnik xususiyatlari va kredit shartlari.{% elif LANGUAGE_CODE == 'ru' %}Каталог Autoliga: цены, характеристики и кредитные условия для Jetour T1, T2, Omoda C5, Exeed RX и других моделей.{% else %}Autoliga catalog: prices, specs and financing options for Jetour T1, T2, Omoda C5, Exeed RX and more.{% endif %}
+    {% if category_info.seo_description %}
+        {{ category_info.seo_description|striptags }}
+    {% elif category_info.title %}
+        {{ category_info.title|striptags }} avtomobillari: modellar, narxlar, kredit va rasmiy servis. AUTOLIGA’dan batafsil ma’lumot oling.
+    {% else %}
+        JETOUR, SOUEAST, JAC va GEELY avtomobillari: modellar, narxlar, kredit va rasmiy servis xizmatlari.
+    {% endif %}
 {% endblock %}
 
-{% block meta_keywords %}
-    {% if LANGUAGE_CODE == 'uz' %}jetour t1 narxi, jetour t2 narxi, omoda c5 narxi, exeed rx narxi, avtosalon toshkent{% elif LANGUAGE_CODE == 'ru' %}цена jetour t1, цена jetour t2, omoda c5 узбекистан, exeed rx ташкент, автосалон ташкент{% else %}jetour t1 price, jetour t2 price, omoda c5 price, exeed rx price, car dealer tashkent{% endif %}
+{% block og_title %}
+    {% if category_info.seo_title %}{{ category_info.seo_title|striptags }}{% elif category_info.title %}{{ category_info.title|striptags }} avtomobillari | AUTOLIGA{% else %}JETOUR, SOUEAST, JAC va GEELY | AUTOLIGA{% endif %}
+{% endblock %}
+
+{% block og_description %}
+    {% if category_info.seo_description %}{{ category_info.seo_description|striptags }}{% elif category_info.title %}{{ category_info.title|striptags }} modellari, narxlari, kredit va rasmiy servis xizmatlari.{% else %}JETOUR, SOUEAST, JAC va GEELY avtomobillari — AUTOLIGA’da.{% endif %}
 {% endblock %}
 
 
@@ -68,11 +84,17 @@
                                     <div class="row g-0">
                                         <div class="col-12 col-xl-12 mxd-grid-item no-margin">
                                             <div class="mxd-section-models__title">
-                                                <!-- ✅ JavaScript заменит это на название категории -->
-                                                <h2 class="models_title">
-                                                    {% if LANGUAGE_CODE == 'ru' %}Модели{% elif LANGUAGE_CODE == 'en'
-                                                    %}Models{% else %}Modellar{% endif %}
-                                                </h2>
+                                                <h1 class="models_title">
+    {% if category_info.title %}
+        {% if LANGUAGE_CODE == 'ru' %}Автомобили {{ category_info.title }}
+        {% elif LANGUAGE_CODE == 'en' %}{{ category_info.title }} vehicles
+        {% else %}{{ category_info.title }} avtomobillari{% endif %}
+    {% else %}
+        {% if LANGUAGE_CODE == 'ru' %}Модели автомобилей
+        {% elif LANGUAGE_CODE == 'en' %}Car models
+        {% else %}Avtomobil modellari{% endif %}
+    {% endif %}
+</h1>
                                             </div>
                                         </div>
                                         <div class="col-12 col-xl-8 mxd-grid-item no-margin">

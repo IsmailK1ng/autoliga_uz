@@ -1,7 +1,7 @@
 from django.contrib.sitemaps import Sitemap
 from django.urls import reverse
 
-from .models import News, Product
+from .models import Dealer, News, Product
 
 
 class StaticViewSitemap(Sitemap):
@@ -55,3 +55,13 @@ class NewsSitemap(Sitemap):
 
     def lastmod(self, obj):
         return obj.updated_at
+
+class DealerSitemap(Sitemap):
+    changefreq = "weekly"
+    priority = 0.8
+
+    def items(self):
+        return Dealer.objects.filter(is_active=True)
+
+    def location(self, obj):
+        return obj.get_absolute_url()

@@ -50,18 +50,7 @@
 
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta
-        name="twitter:title"
-        content="{% block twitter_title %}AUTOLIGA — rasmiy avtosalonlar va servislar tarmog‘i{% endblock %}"
-    >
-    <meta
-        name="twitter:description"
-        content="{% block twitter_description %}JETOUR, SOUEAST, JAC va GEELY avtomobillari — AUTOLIGA’da.{% endblock %}"
-    >
-    <meta
-        name="twitter:image"
-        content="{% block twitter_image %}{{ request.scheme }}://{{ request.get_host }}{% static 'images/logo/autoliga-logo.png' %}{% endblock %}"
-    >
+    {# twitter:title/description/image are intentionally omitted: X falls back to og:* tags. #}
 
     {% hreflang_tags %}
     {% canonical_url %}

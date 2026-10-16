@@ -30,18 +30,6 @@
     {% if news.preview_image %}{{ request.scheme }}://{{ request.get_host }}{{ news.preview_image.url }}{% else %}{{ request.scheme }}://{{ request.get_host }}{% static 'images/logo/autoliga-logo.png' %}{% endif %}
 {% endblock %}
 
-{% block twitter_title %}
-    {% if news.seo_title %}{{ news.seo_title|striptags }}{% else %}{{ news.title|striptags }} | AUTOLIGA{% endif %}
-{% endblock %}
-
-{% block twitter_description %}
-    {% if news.seo_description %}{{ news.seo_description|striptags }}{% else %}{{ news.desc|striptags|truncatechars:155 }}{% endif %}
-{% endblock %}
-
-{% block twitter_image %}
-    {% if news.preview_image %}{{ request.scheme }}://{{ request.get_host }}{{ news.preview_image.url }}{% else %}{{ request.scheme }}://{{ request.get_host }}{% static 'images/logo/autoliga-logo.png' %}{% endif %}
-{% endblock %}
-
 {% block breadcrumbs %}
 <link rel="stylesheet" href="{% static 'css/breadcrumbs.css' %}">
 {% endblock breadcrumbs %}

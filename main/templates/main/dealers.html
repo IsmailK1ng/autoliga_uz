@@ -26,9 +26,6 @@
 
 {% block og_image %}{{ request.scheme }}://{{ request.get_host }}{% static 'images/autoliga.jpg' %}{% endblock %}
 
-{% block meta_keywords %}
-    {% if LANGUAGE_CODE == 'uz' %}autoliga dilerlar, rasmiy diler toshkent, jetour diler uzbekistan, avtosalon filiallari{% elif LANGUAGE_CODE == 'ru' %}дилеры autoliga, официальный дилер ташкент, дилер jetour узбекистан{% else %}autoliga dealers, official car dealer tashkent, jetour dealer uzbekistan{% endif %}
-{% endblock %}
 
 {% block content %}
     <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-M33GWKMW" height="0" width="0"

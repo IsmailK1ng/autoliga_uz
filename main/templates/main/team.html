@@ -19,9 +19,6 @@
 {% endblock %}
 
 {% block og_image %}{{ request.scheme }}://{{ request.get_host }}{% static 'images/autoliga.jpg' %}{% endblock %}
-{% block meta_keywords %}
-    {% if LANGUAGE_CODE == 'uz' %}autoliga jamoasi, avtosalon menejerlari, autoliga dilerlar, toshkent avtosalon{% elif LANGUAGE_CODE == 'ru' %}команда autoliga, менеджеры автосалона, дилеры autoliga{% else %}autoliga team, car dealer managers, autoliga branches{% endif %}
-{% endblock %}
 
 {% block breadcrumbs %}
 <link rel="stylesheet" href="{% static 'css/breadcrumbs.css' %}">

@@ -19,9 +19,6 @@
 {% endblock %}
 
 {% block og_image %}{{ request.scheme }}://{{ request.get_host }}{% static 'images/autoliga.jpg' %}{% endblock %}
-{% block meta_keywords %}
-    {% if LANGUAGE_CODE == 'uz' %}test drayv, jetour test drayv, omoda test drayv, exeed test drayv, autoliga toshkent{% elif LANGUAGE_CODE == 'ru' %}тест-драйв, тест-драйв jetour, тест-драйв omoda, тест-драйв exeed, autoliga ташкент{% else %}test drive, jetour test drive, omoda test drive, exeed test drive, autoliga tashkent{% endif %}
-{% endblock %}
 
 {% block breadcrumbs %}
 <link rel="stylesheet" href="{% static 'css/breadcrumbs.css' %}">

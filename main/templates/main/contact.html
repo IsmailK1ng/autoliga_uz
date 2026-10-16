@@ -20,10 +20,6 @@
 
 {% block og_image %}{{ request.scheme }}://{{ request.get_host }}{% static 'images/autoliga.jpg' %}{% endblock %}
 
-{% block meta_keywords %}
-    {% if LANGUAGE_CODE == 'uz' %}autoliga kontakt, autoliga manzil, avtosalon toshkent telefon, jetour diler toshkent{% elif LANGUAGE_CODE == 'ru' %}контакты autoliga, адрес автосалона ташкент, дилер jetour ташкент{% else %}autoliga contacts, tashkent car dealer address, jetour dealer tashkent{% endif %}
-{% endblock %}
-
 {% block breadcrumbs %}
 <link rel="stylesheet" href="{% static 'css/breadcrumbs.css' %}">
 {% endblock breadcrumbs %}

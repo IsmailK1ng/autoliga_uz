@@ -358,6 +358,72 @@ class Product(models.Model):
 
     def get_absolute_url(self):
         return reverse('product_detail', args=[self.slug])
+class ProductTrim(models.Model):
+    """Avtomobil komplektatsiyalari va narxlari"""
+
+    product = models.ForeignKey(
+        Product,
+        on_delete=models.CASCADE,
+        related_name='trims',
+        verbose_name="Автомобиль"
+    )
+    name = models.CharField(
+        "Комплектация",
+        max_length=100,
+        help_text="Masalan: Comfort, Premium yoki Luxury"
+    )
+    price = models.PositiveBigIntegerField(
+        "Цена (UZS)",
+        blank=True,
+        null=True,
+        help_text="Narxni faqat raqam bilan kiriting"
+    )
+    engine = models.CharField(
+        "Двигатель",
+        max_length=100,
+        blank=True
+    )
+    power = models.CharField(
+        "Мощность",
+        max_length=100,
+        blank=True
+    )
+    transmission = models.CharField(
+        "Коробка передач",
+        max_length=100,
+        blank=True
+    )
+    fuel_consumption = models.CharField(
+        "Расход топлива",
+        max_length=100,
+        blank=True
+    )
+    dimensions = models.CharField(
+        "Габариты",
+        max_length=100,
+        blank=True
+    )
+    order = models.PositiveIntegerField(
+        "Порядок",
+        default=0
+    )
+    is_active = models.BooleanField(
+        "Активна",
+        default=True
+    )
+
+    class Meta:
+        verbose_name = "Комплектация автомобиля"
+        verbose_name_plural = "Комплектации автомобилей"
+        ordering = ['order', 'name']
+    @property
+    def formatted_price(self):
+        if self.price is None:
+            return ""
+        return f"{self.price:,}".replace(",", " ")
+    def __str__(self):
+        return f"{self.product.title} — {self.name}"
+
 
 class ParameterCategory(models.Model):
     """
@@ -378,7 +444,7 @@ class ParameterCategory(models.Model):
         verbose_name = "Категория параметра"
         verbose_name_plural = "Категории параметров"
         ordering = ['order', 'name']
-
+        
     def __str__(self):
         return self.name
     def save(self, *args, **kwargs):

@@ -921,6 +921,24 @@ class ProductGalleryInline(admin.TabularInline):
     verbose_name = "Фото"
     verbose_name_plural = "🖼️ Галерея"
 
+class ProductTrimInline(admin.TabularInline):
+    model = ProductTrim
+    extra = 1
+    fields = (
+        'name',
+        'price',
+        'engine',
+        'power',
+        'transmission',
+        'fuel_consumption',
+        'dimensions',
+        'order',
+        'is_active',
+    )
+    ordering = ('order', 'name')
+    verbose_name = "Комплектация"
+    verbose_name_plural = "🚘 Комплектации и цены"
+
 
 @admin.register(Product)
 class ProductAdmin(ContentAdminMixin, CustomReversionMixin, VersionAdmin, TabbedTranslationAdmin):
@@ -961,7 +979,13 @@ class ProductAdmin(ContentAdminMixin, CustomReversionMixin, VersionAdmin, Tabbed
         }),
     )
     
-    inlines = [ProductParameterInline, ProductFeatureInline, ProductCardSpecInline, ProductGalleryInline]
+    inlines = [
+    ProductTrimInline,
+    ProductParameterInline,
+    ProductFeatureInline,
+    ProductCardSpecInline,
+    ProductGalleryInline,
+]
     
     def thumbnail(self, obj):
         img = obj.card_image or obj.main_image

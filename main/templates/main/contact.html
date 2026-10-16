@@ -10,6 +10,16 @@
     {% if LANGUAGE_CODE == 'uz' %}Autoliga avtosaloni bilan bog'laning: Toshkentdagi manzil, telefon va ish vaqti. Mutaxassislar model tanlash bo'yicha yordam beradi.{% elif LANGUAGE_CODE == 'ru' %}Свяжитесь с автосалоном Autoliga: адрес в Ташкенте, телефон и график работы. Поможем с выбором автомобиля.{% else %}Contact Autoliga car dealer: Tashkent address, phone number and working hours. Get help choosing the right car.{% endif %}
 {% endblock %}
 
+{% block og_title %}
+    {% if LANGUAGE_CODE == 'uz' %}Bog'lanish va manzil - Autoliga avtosaloni Toshkent{% elif LANGUAGE_CODE == 'ru' %}Контакты и адрес - автосалон Autoliga Ташкент{% else %}Contact and address - Autoliga car dealer Tashkent{% endif %}
+{% endblock %}
+
+{% block og_description %}
+    {% if LANGUAGE_CODE == 'uz' %}Autoliga avtosaloni bilan bog'laning: Toshkentdagi manzil, telefon va ish vaqti. Mutaxassislar model tanlash bo'yicha yordam beradi.{% elif LANGUAGE_CODE == 'ru' %}Свяжитесь с автосалоном Autoliga: адрес в Ташкенте, телефон и график работы. Поможем с выбором автомобиля.{% else %}Contact Autoliga car dealer: Tashkent address, phone number and working hours. Get help choosing the right car.{% endif %}
+{% endblock %}
+
+{% block og_image %}{{ request.scheme }}://{{ request.get_host }}{% static 'images/autoliga.jpg' %}{% endblock %}
+
 {% block meta_keywords %}
     {% if LANGUAGE_CODE == 'uz' %}autoliga kontakt, autoliga manzil, avtosalon toshkent telefon, jetour diler toshkent{% elif LANGUAGE_CODE == 'ru' %}контакты autoliga, адрес автосалона ташкент, дилер jetour ташкент{% else %}autoliga contacts, tashkent car dealer address, jetour dealer tashkent{% endif %}
 {% endblock %}

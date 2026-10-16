@@ -3,13 +3,22 @@
 {% load static seo_tags %}
 
 {% block title %}
-    {% if LANGUAGE_CODE == 'uz' %}Test-drayvga yozilish - Jetour, Omoda, Exeed | Autoliga{% elif LANGUAGE_CODE == 'ru' %}Запись на тест-драйв - Jetour, Omoda, Exeed | Autoliga{% else %}Book a test drive - Jetour, Omoda, Exeed | Autoliga{% endif %}
+    {% if LANGUAGE_CODE == 'uz' %}Test-drayvga onlayn yozilish - Autoliga{% elif LANGUAGE_CODE == 'ru' %}Онлайн-запись на тест-драйв - Autoliga{% else %}Book a test drive online - Autoliga{% endif %}
 {% endblock %}
 
 {% block meta_description %}
-    {% if LANGUAGE_CODE == 'uz' %}Autoliga saytida test-drayvga onlayn yoziling. Jetour, Omoda, Exeed modellari bo'yicha test haydov va konsultatsiya mavjud.{% elif LANGUAGE_CODE == 'ru' %}Запишитесь на тест-драйв онлайн в Autoliga. Доступны модели Jetour, Omoda, Exeed и консультация менеджера.{% else %}Book a test drive online with Autoliga. Jetour, Omoda, Exeed models and manager consultation available.{% endif %}
+    {% if LANGUAGE_CODE == 'uz' %}Autoliga'da test-drayvga onlayn yoziling: modelni, filialni, qulay sana va vaqtni tanlang. Menejer siz bilan bog'lanadi.{% elif LANGUAGE_CODE == 'ru' %}Запишитесь на тест-драйв в Autoliga онлайн: выберите модель, филиал, удобные дату и время. Менеджер свяжется с вами.{% else %}Book an Autoliga test drive online: choose a model, dealership, date and time. A manager will contact you.{% endif %}
 {% endblock %}
 
+{% block og_title %}
+    {% if LANGUAGE_CODE == 'uz' %}Test-drayvga onlayn yozilish - Autoliga{% elif LANGUAGE_CODE == 'ru' %}Онлайн-запись на тест-драйв - Autoliga{% else %}Book a test drive online - Autoliga{% endif %}
+{% endblock %}
+
+{% block og_description %}
+    {% if LANGUAGE_CODE == 'uz' %}Autoliga'da test-drayvga onlayn yoziling: modelni, filialni, qulay sana va vaqtni tanlang. Menejer siz bilan bog'lanadi.{% elif LANGUAGE_CODE == 'ru' %}Запишитесь на тест-драйв в Autoliga онлайн: выберите модель, филиал, удобные дату и время. Менеджер свяжется с вами.{% else %}Book an Autoliga test drive online: choose a model, dealership, date and time. A manager will contact you.{% endif %}
+{% endblock %}
+
+{% block og_image %}{{ request.scheme }}://{{ request.get_host }}{% static 'images/autoliga.jpg' %}{% endblock %}
 {% block meta_keywords %}
     {% if LANGUAGE_CODE == 'uz' %}test drayv, jetour test drayv, omoda test drayv, exeed test drayv, autoliga toshkent{% elif LANGUAGE_CODE == 'ru' %}тест-драйв, тест-драйв jetour, тест-драйв omoda, тест-драйв exeed, autoliga ташкент{% else %}test drive, jetour test drive, omoda test drive, exeed test drive, autoliga tashkent{% endif %}
 {% endblock %}

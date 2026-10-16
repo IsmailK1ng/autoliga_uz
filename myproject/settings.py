@@ -39,7 +39,7 @@ INSTALLED_APPS = [
     'django_filters',
     'corsheaders',
     'reversion',
-    
+    'sorl.thumbnail',
     # Приложения проектов
     'main',  
 

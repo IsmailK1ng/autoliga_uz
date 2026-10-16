@@ -71,16 +71,16 @@
                 <div class="footer-blocks__card">
                     <p class="mxd-point-subtitle">
                         <i class="ph-fill ph-envelope"></i>
-                        <a href="mailto:info@autoliga.uz">
+                        <a href="mailto:{{ SITE_CONTACTS.email }}">
                             <span style="font-weight: bold;">
                                 {% if LANGUAGE_CODE == 'uz' %}eMail:{% elif LANGUAGE_CODE == 'ru' %}Эл. почта:{% else %}Email:{% endif %}
-                            </span> info@autoliga.uz
+                            	</span> {{ SITE_CONTACTS.email }}
                         </a>
                     </p>
 
                     <p class="mxd-point-subtitle">
                         <i class="ph-fill ph-phone"></i>
-                        <a href="tel:+998785557377">
+                        <a href="tel:{{ SITE_CONTACTS.phone }}">
                             <span style="font-weight: bold;">
                                 {% if LANGUAGE_CODE == 'uz' %}
                                 Telefon:
@@ -90,7 +90,7 @@
                                 Phone:
                                 {% endif %}
                             </span>
-                            +998 78 555 73 77
+                            {{ SITE_CONTACTS.phone_display }}
                         </a>
                     </p>
                     <p class="mxd-point-subtitle">
@@ -189,13 +189,13 @@
                 <div class="legal-dialog__copy" data-legal-document="privacy" hidden>
                     {% if LANGUAGE_CODE == 'uz' %}
                         <p>Sayt orqali yuborilgan ariza va murojaatlardagi ma'lumotlar (masalan, ism, telefon raqami va xabar) so'rovingizni ko'rib chiqish va siz bilan bog'lanish uchun ishlatiladi.</p>
-                        <p>Ma'lumotlaringizni yangilash yoki o'chirish bo'yicha <a href="mailto:info@autoliga.uz">info@autoliga.uz</a> manziliga murojaat qilishingiz mumkin.</p>
+                        <p>Ma'lumotlaringizni yangilash yoki o'chirish bo'yicha <a href="mailto:{{ SITE_CONTACTS.email }}">{{ SITE_CONTACTS.email }}</a> manziliga murojaat qilishingiz mumkin.</p>
                     {% elif LANGUAGE_CODE == 'ru' %}
                         <p>Данные, указанные в заявках и обращениях через сайт (например, имя, номер телефона и сообщение), используются для рассмотрения запроса и связи с вами.</p>
-                        <p>Чтобы обновить или удалить свои данные, напишите на <a href="mailto:info@autoliga.uz">info@autoliga.uz</a>.</p>
+                        <p>Чтобы обновить или удалить свои данные, напишите на <a href="mailto:{{ SITE_CONTACTS.email }}">{{ SITE_CONTACTS.email }}</a>.</p>
                     {% else %}
                         <p>Information submitted through website forms, such as your name, phone number, and message, is used to review your request and contact you.</p>
-                        <p>To request an update or deletion of your information, contact <a href="mailto:info@autoliga.uz">info@autoliga.uz</a>.</p>
+                        <p>To request an update or deletion of your information, contact <a href="mailto:{{ SITE_CONTACTS.email }}">{{ SITE_CONTACTS.email }}</a>.</p>
                     {% endif %}
                 </div>
 

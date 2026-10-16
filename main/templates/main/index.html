@@ -4,7 +4,7 @@
 
 
 {% block title %}
-    AUTOLIGA — rasmiy avtosalonlar va servislar tarmog‘i
+    AUTOLIGA - rasmiy dilerlik va xizmat ko’rsatish markazlari tarmog’i
 {% endblock %}
 
 {% block meta_description %}
@@ -30,7 +30,7 @@
     "url": "https://autoliga.uz/",
     "logo": "{{ request.scheme }}://{{ request.get_host }}{% static 'images/logo/autoliga-logo.png' %}",
     "description": "AUTOLIGA — rasmiy avtosalonlar va servislar tarmog‘i. JETOUR, SOUEAST, JAC va GEELY avtomobillari.",
-    "telephone": "+998785557377",
+    "telephone": "{{ SITE_CONTACTS.phone }}",
     "areaServed": {
         "@type": "Country",
         "name": "Uzbekistan"
@@ -978,12 +978,10 @@
                         <i class="ph-fill ph-phone"></i>
                       </div>
                       <div class="contact-detail__content">
-                        <h3class="contact-detail__title">
+                        <h3 class="contact-detail__title">
                           {% if LANGUAGE_CODE == 'uz' %}Telefon{% elif LANGUAGE_CODE == 'ru' %}Телефон{% else %}Phone{% endif %}
                           </h3>
-                        <a href="tel:+998712345678" class="contact-detail__value">
-                          {% if LANGUAGE_CODE == 'uz' %}+998 78 555 73 77{% elif LANGUAGE_CODE == 'ru' %}+998 78 555 73 77{% else %}+998 78 555 73 77{% endif %}
-                        </a>
+                          <a href="tel:{{ SITE_CONTACTS.phone }}" class="contact-detail__value">
                       </div>
                     </div>
 
@@ -996,8 +994,8 @@
                         <h4 class="contact-detail__title">
                           {% if LANGUAGE_CODE == 'uz' %}Email{% elif LANGUAGE_CODE == 'ru' %}Электронная почта{% else %}Email{% endif %}
                         </h4>
-                        <a href="mailto:info@autoliga.uz" class="contact-detail__value">
-                          {% if LANGUAGE_CODE == 'uz' %}info@autoliga.uz{% elif LANGUAGE_CODE == 'ru' %}info@autoliga.uz{% else %}info@autoliga.uz{% endif %}
+                        <a href="mailto:{{ SITE_CONTACTS.email }}" class="contact-detail__value">
+                          {{ SITE_CONTACTS.email }}
                         </a>
                       </div>
                     </div>

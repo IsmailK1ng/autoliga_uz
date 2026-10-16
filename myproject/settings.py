@@ -15,7 +15,12 @@ ALLOWED_HOSTS = str(config('ALLOWED_HOSTS', default='127.0.0.1,localhost')).spli
 
 
 
-
+# ============ SITE CONTACTS ============
+SITE_CONTACTS = {
+    'phone': '+998785557377',
+    'phone_display': '+998 78 555 73 77',
+    'email': 'info@autoliga.uz',
+}
 
 
 
@@ -220,6 +225,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'django.template.context_processors.i18n',
+                'main.context_processors.site_contacts',
             ],
         },
     },

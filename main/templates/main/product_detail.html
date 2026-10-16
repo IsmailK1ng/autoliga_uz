@@ -1,5 +1,5 @@
 {% load static seo_tags %}
-{% load thumbnail %}
+{% load thumbnail l10n %}
 <!DOCTYPE html>
 <html dir="ltr" lang="{{ LANGUAGE_CODE|default:'uz' }}">
 <head>
@@ -322,6 +322,7 @@
         {% thumbnail product.main_image "960x960" as car_960 %}
         {% thumbnail product.main_image "1600x1600" as car_1600 %}
 
+        {% localize off %}
         <img id="main-car-image"
              class="mxd-hero-06__car-image"
              src="{{ car_960.url }}"
@@ -338,6 +339,7 @@
              onload="this.classList.add('loaded')"
              onerror="this.onerror=null;this.removeAttribute('srcset');this.src=this.dataset.defaultSrc;this.classList.add('loaded')">
 
+        {% endlocalize %}
         {% endthumbnail %}
         {% endthumbnail %}
         {% endthumbnail %}

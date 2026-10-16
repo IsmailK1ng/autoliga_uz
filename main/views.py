@@ -12,7 +12,7 @@ from django.http import HttpResponseRedirect
 from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.throttling import AnonRateThrottle
 from .models import ( TelegramUser,
-    News, ContactForm, JobApplication, Vacancy, Product, ProductCategory, 
+    News, ContactForm, JobApplication, Vacancy, Product, ProductCategory, ProductTrim,
     Dealer, DealerImage, Review, TestDriveRequest, BranchManager
 )
 from .serializers import (
@@ -142,11 +142,16 @@ def product_detail(request, product_id):
     # Slug bilan ishlash (SEO uchun to'g'ri)
     product = get_object_or_404(
         Product.objects.select_related('category').prefetch_related(
-            'card_specs__icon',
-            'parameters',
-            'features__icon',
-            'gallery',
-        ),
+    'card_specs__icon',
+    'parameters',
+    'features__icon',
+    'gallery',
+    Prefetch(
+        'trims',
+        queryset=ProductTrim.objects.filter(is_active=True),
+        to_attr='active_trims'
+    ),
+),
         slug=product_id,      # ← slug bilan qidiramiz
         is_active=True
     )

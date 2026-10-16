@@ -1,155 +1,82 @@
-{% load static %}
 {% load static seo_tags %}
+{% load thumbnail %}
 <!DOCTYPE html>
 <html dir="ltr" lang="{{ LANGUAGE_CODE|default:'uz' }}">
-
 <head>
     <meta charset="UTF-8">
-
-    <title>
-        {% if product %}
-            {{ product.title }} narxi | Autoliga
-        {% else %}
-            Autoliga — avtosaloni va narxlari
-        {% endif %}
-    </title>
-
-    <!-- ═══════════════════════════════════════════
-         META — asosiy SEO teglari
-    ═══════════════════════════════════════════ -->
-    <meta name="description" content="
-        {% if product %}
-            {{ product.title }} narxi
-            {% if product.slider_price %}{{ product.slider_price }}{% endif %}.
-            {% if product.slider_power %}Dvigatel: {{ product.slider_power }}.{% endif %}
-            {% if product.slider_fuel_consumption %}Yoqilg'i: {{ product.slider_fuel_consumption }}.{% endif %}
-            Autoliga rasmiy dileri.
-        {% else %}
-            Autoliga — ishonchli avtosalon. Jetour, soueast va boshqa brendlari.">
-        {% endif %} 
-    <meta name="keywords" content="
-        {% if product %}
-            {{ product.title }} narxi,
-            {{ product.title }} toshkent,
-            {{ product.title }} kredit,
-            {% if product.category %}{{ product.category.name }} narxi{% endif %}
-            {{ product.title }} {{ product.slider_year }}
-        {% else %}
-            avtosalon toshkent, yangi mashina narxlari, jetour narxlari, soueast narxlari, boshqa brendlar narxlari
-        {% endif %}
-    ">
-
-    <!-- Google indexlash ruxsati -->
+    <!-- META — AUTOLIGA SEO -->
+    <title>{% if product %}{% if product.seo_title %}{{ product.seo_title|striptags }}{% elif LANGUAGE_CODE == 'ru' %}{{ product.title|striptags }} — цена в Узбекистане | AUTOLIGA{% elif LANGUAGE_CODE == 'en' %}{{ product.title|striptags }} price in Uzbekistan | AUTOLIGA{% else %}{{ product.title|striptags }} narxi O‘zbekistonda | AUTOLIGA{% endif %}{% else %}AUTOLIGA — rasmiy avtosalonlar va servislar tarmog‘i{% endif %}</title>
+    <meta name="description" content="{% if product %}{% if product.seo_description %}{{ product.seo_description|striptags }}{% elif LANGUAGE_CODE == 'ru' %}{{ product.title|striptags }}: цена {% if product.slider_price %}{{ product.slider_price|striptags }}{% else %}по запросу{% endif %}.{% if product.slider_power %} Мощность: {{ product.slider_power|striptags }}.{% endif %}{% if product.slider_fuel_consumption %} Расход топлива: {{ product.slider_fuel_consumption|striptags }}.{% endif %} Характеристики, тест-драйв и сервис AUTOLIGA.{% elif LANGUAGE_CODE == 'en' %}{{ product.title|striptags }}: price {% if product.slider_price %}{{ product.slider_price|striptags }}{% else %}on request{% endif %}.{% if product.slider_power %} Power: {{ product.slider_power|striptags }}.{% endif %}{% if product.slider_fuel_consumption %} Fuel use: {{ product.slider_fuel_consumption|striptags }}.{% endif %} Specifications, test drive and AUTOLIGA service.{% else %}{{ product.title|striptags }}: narxi {% if product.slider_price %}{{ product.slider_price|striptags }}{% else %}so‘rov asosida{% endif %}.{% if product.slider_power %} Dvigatel quvvati: {{ product.slider_power|striptags }}.{% endif %}{% if product.slider_fuel_consumption %} Yoqilg‘i sarfi: {{ product.slider_fuel_consumption|striptags }}.{% endif %} Test-drayv va AUTOLIGA servisi.{% endif %}{% else %}JETOUR, SOUEAST, JAC va GEELY avtomobillari — AUTOLIGA’da. Avtomobil tanlashdan xaridgacha, texnik xizmatdan ta’mirlashgacha — har bir bosqichda yoningizdamiz.{% endif %}">
     <meta name="robots" content="index, follow">
-
-    <!-- ═══════════════════════════════════════════
-         OPEN GRAPH — Telegram, WhatsApp, Facebook
-         share qilganda chiroyli ko'rinsin
-    ═══════════════════════════════════════════ -->
+    <!-- OPEN GRAPH -->
     <meta property="og:type" content="{% if product %}product{% else %}website{% endif %}">
-
-    <meta property="og:title" content="
-        {% if product %}
-            {{ product.title }}{% if product.slider_price %} — {{ product.slider_price }}{% endif %} | Autoliga
-        {% else %}
-            Autoliga — Avtosalon
-        {% endif %}">
-
-    <meta property="og:description" content="
-        {% if product %}
-            {{ product.title }} Toshkentda.
-            {% if product.slider_power %}Quvvat: {{ product.slider_power }}.{% endif %}
-            Kredit shartlari mavjud.
-        {% else %}
-            Jetour, Soueast va boshqa brendlari. 
-        {% endif %}
-    ">
-
-    <meta property="og:image" content="
-        {% if product and product.main_image %}
-            {{ request.scheme }}://{{ request.get_host }}{{ product.main_image.url }}
-        {% else %}
-            {{ request.scheme }}://{{ request.get_host }}{% static 'images/autoliga.jpg' %}
-        {% endif %}
-    ">
-
+    <meta property="og:title" content="{% if product %}{% if product.seo_title %}{{ product.seo_title|striptags }}{% elif LANGUAGE_CODE == 'ru' %}{{ product.title|striptags }} — цена в Узбекистане | AUTOLIGA{% elif LANGUAGE_CODE == 'en' %}{{ product.title|striptags }} price in Uzbekistan | AUTOLIGA{% else %}{{ product.title|striptags }} narxi O‘zbekistonda | AUTOLIGA{% endif %}{% else %}AUTOLIGA — rasmiy avtosalonlar va servislar tarmog‘i{% endif %}">
+    <meta property="og:description" content="{% if product %}{% if product.seo_description %}{{ product.seo_description|striptags }}{% elif LANGUAGE_CODE == 'ru' %}{{ product.title|striptags }}: {% if product.slider_price %}цена {{ product.slider_price|striptags }}.{% else %}цена по запросу.{% endif %}{% if product.slider_power %} Мощность: {{ product.slider_power|striptags }}.{% endif %} Характеристики, тест-драйв и сервис AUTOLIGA.{% elif LANGUAGE_CODE == 'en' %}{{ product.title|striptags }}: {% if product.slider_price %}price {{ product.slider_price|striptags }}.{% else %}price on request.{% endif %}{% if product.slider_power %} Power: {{ product.slider_power|striptags }}.{% endif %} Specifications, test drive and AUTOLIGA service.{% else %}{{ product.title|striptags }}: {% if product.slider_price %}narxi {{ product.slider_price|striptags }}.{% else %}narxi so‘rov asosida.{% endif %}{% if product.slider_power %} Dvigatel quvvati: {{ product.slider_power|striptags }}.{% endif %} Test-drayv va AUTOLIGA servisi.{% endif %}{% else %}JETOUR, SOUEAST, JAC va GEELY avtomobillari — AUTOLIGA’da. Avtomobil tanlashdan xaridgacha, texnik xizmatdan ta’mirlashgacha — har bir bosqichda yoningizdamiz.{% endif %}">
+    <meta property="og:image" content="{% if product and product.main_image %}{{ request.scheme }}://{{ request.get_host }}{{ product.main_image.url }}{% else %}{{ request.scheme }}://{{ request.get_host }}{% static 'images/logo/autoliga-logo.png' %}{% endif %}">
     <meta property="og:url" content="{{ request.build_absolute_uri }}">
-    <meta property="og:site_name" content="autoliga.uz">
-    <meta property="og:locale" content="uz_UZ">
-    <meta property="og:image:width" content="1200">
-    <meta property="og:image:height" content="630">
-
-    <!-- ═══════════════════════════════════════════
-         CANONICAL — duplicate content dan himoya
-         (sizning seo_tags da mavjud)
-    ═══════════════════════════════════════════ -->
+    <meta property="og:site_name" content="AUTOLIGA">
+    <meta property="og:locale" content="{% if LANGUAGE_CODE == 'ru' %}ru_RU{% elif LANGUAGE_CODE == 'en' %}en_US{% else %}uz_UZ{% endif %}">
+    {% if product %}
+    <meta property="og:image:alt" content="{{ product.title|striptags }}">
+    {% endif %}
+    <!-- TWITTER / X -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{% if product %}{% if product.seo_title %}{{ product.seo_title|striptags }}{% else %}{{ product.title|striptags }} | AUTOLIGA{% endif %}{% else %}AUTOLIGA — rasmiy avtosalonlar va servislar tarmog‘i{% endif %}">
+    <meta name="twitter:description" content="{% if product %}{% if product.seo_description %}{{ product.seo_description|striptags }}{% else %}{{ product.title|striptags }}: narxi, texnik xususiyatlari, test-drayv va AUTOLIGA servisi.{% endif %}{% else %}JETOUR, SOUEAST, JAC va GEELY avtomobillari — AUTOLIGA’da. Avtomobil tanlashdan xaridgacha, texnik xizmatdan ta’mirlashgacha — har bir bosqichda yoningizdamiz.{% endif %}">
+    <meta name="twitter:image" content="{% if product and product.main_image %}{{ request.scheme }}://{{ request.get_host }}{{ product.main_image.url }}{% else %}{{ request.scheme }}://{{ request.get_host }}{% static 'images/logo/autoliga-logo.png' %}{% endif %}">
+    <!-- CANONICAL VA HREFLANG -->
     {% canonical_url %}
     {% hreflang_tags %}
-
-    <!-- ═══════════════════════════════════════════
-         JSON-LD STRUCTURED DATA
-         Google Rich Results uchun — eng muhim qism!
-         Qidiruv natijasida narx va rasm ko'rinadi
-    ═══════════════════════════════════════════ -->
+    <!-- JSON-LD STRUCTURED DATA -->
     {% if product %}
     <script type="application/ld+json">
     {
         "@context": "https://schema.org",
         "@type": "Product",
-        "name": "{{ product.title }}",
-        "image": "{{ request.scheme }}://{{ request.get_host }}{{ product.main_image.url }}",
-
-        {% if product.category %}
+        "name": "{{ product.title|escapejs }}"{% if product.main_image %},
+        "image": "{{ request.scheme }}://{{ request.get_host }}{{ product.main_image.url }}"{% endif %}{% if product.category %},
         "brand": {
             "@type": "Brand",
-            "name": "{{ product.category.name }}"
-        },
-        {% endif %}
-
+            "name": "{{ product.category.name|escapejs }}"
+        }{% endif %}{% if product.price_numeric or product.schema_price %},
         "offers": {
             "@type": "Offer",
             "priceCurrency": "UZS",
-            "price": "{{ product.slider_price|default:'0' }}",
-            "availability": "https://schema.org/InStock",
-            "url": "{{ request.build_absolute_uri }}",
+            "price": "{{ product.price_numeric|default:product.schema_price|escapejs }}",
+            "url": "{{ request.build_absolute_uri|escapejs }}",
             "seller": {
                 "@type": "Organization",
-                "name": "Autoliga",
+                "name": "AUTOLIGA",
                 "url": "https://autoliga.uz"
             }
-        },
-
+        }{% endif %},
         "additionalProperty": [
             {% if product.slider_power %}
             {
                 "@type": "PropertyValue",
                 "name": "Dvigatel quvvati",
-                "value": "{{ product.slider_power }}"
+                "value": "{{ product.slider_power|escapejs }}"
             }{% if product.slider_fuel_consumption or product.slider_year %},{% endif %}
             {% endif %}
-
             {% if product.slider_fuel_consumption %}
             {
                 "@type": "PropertyValue",
-                "name": "Yoqilg'i sarfi",
-                "value": "{{ product.slider_fuel_consumption }}"
+                "name": "Yoqilg‘i sarfi",
+                "value": "{{ product.slider_fuel_consumption|escapejs }}"
             }{% if product.slider_year %},{% endif %}
             {% endif %}
-
             {% if product.slider_year %}
             {
                 "@type": "PropertyValue",
-                "name": "Yil",
-                "value": "{{ product.slider_year }}"
+                "name": "Ishlab chiqarilgan yil",
+                "value": "{{ product.slider_year|escapejs }}"
             }
             {% endif %}
-        ],
-
-        "dateModified": "{{ product.updated_at|date:'Y-m-d' }}"
+        ]{% if product.updated_at %},
+        "dateModified": "{{ product.updated_at|date:'Y-m-d' }}"{% endif %}
     }
     </script>
-
-    <!-- Breadcrumb Schema — navigatsiya uchun -->
+    <!-- BREADCRUMB SCHEMA -->
     <script type="application/ld+json">
     {
         "@context": "https://schema.org",
@@ -159,26 +86,26 @@
                 "@type": "ListItem",
                 "position": 1,
                 "name": "Bosh sahifa",
-                "item": "{{ request.scheme }}://{{ request.get_host }}"
+                "item": "{{ request.scheme }}://{{ request.get_host }}{% url 'home' %}"
             }
             {% if product.category %},
             {
                 "@type": "ListItem",
                 "position": 2,
-                "name": "{{ product.category.name }}",
-                "item": "{{ request.scheme }}://{{ request.get_host }}/category/{{ product.category.slug }}/"
+                "name": "{{ product.category.name|escapejs }}",
+                "item": "{{ request.scheme }}://{{ request.get_host }}{% url 'products' %}?category={{ product.category.slug|urlencode }}"
             },
             {
                 "@type": "ListItem",
                 "position": 3,
-                "name": "{{ product.title }}",
+                "name": "{{ product.title|escapejs }}",
                 "item": "{{ request.build_absolute_uri }}"
             }
             {% else %},
             {
                 "@type": "ListItem",
                 "position": 2,
-                "name": "{{ product.title }}",
+                "name": "{{ product.title|escapejs }}",
                 "item": "{{ request.build_absolute_uri }}"
             }
             {% endif %}
@@ -186,34 +113,26 @@
     }
     </script>
     {% endif %}
-
-    <!-- ═══════════════════════════════════════════
-         VIEWPORT + FAVICON
-    ═══════════════════════════════════════════ -->
+    <!-- VIEWPORT VA FAVICON -->
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="icon" href="{% static 'images/logo/autoliga-logo.png' %}">
     <link rel="apple-touch-icon" href="{% static 'images/logo/autoliga-logo.png' %}">
-
-    <!-- ═══════════════════════════════════════════
-         CSS — o'zgarishsiz qoldiramiz
-    ═══════════════════════════════════════════ -->
+    <!-- CSS — MAVJUD FAYLLAR -->
     <link rel="stylesheet" type="text/css" href="{% static 'css/loaders/loader.css' %}">
     <link rel="stylesheet" type="text/css" href="{% static 'css/plugins.css' %}">
     <link rel="stylesheet" type="text/css" href="{% static 'css/main_site.css' %}">
     <link rel="stylesheet" type="text/css" href="{% static 'css/faw_main-models.css' %}">
     <link rel="stylesheet" type="text/css" href="{% static 'css/site_main.css' %}">
     <link rel="stylesheet" type="text/css" href="{% static 'css/more_info.css' %}">
-
-    <!-- utm-tracker eng oxirida, defer bilan -->
     <script src="{% static 'js/utm-tracker.js' %}" defer></script>
-
     <style>
         .page-loader {
             position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
             background: rgba(255, 255, 255, 0.95);
             display: flex;
             justify-content: center;
@@ -234,11 +153,66 @@
             text-align: center;
             padding: 40px;
         }
-        .error-content h1 { font-size: 48px; margin-bottom: 20px; }
-        .error-content p { font-size: 20px; margin-bottom: 30px; color: #666; }
+        .error-content h1 {
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+        .error-content p {
+            font-size: 20px;
+            margin-bottom: 30px;
+            color: #666;
+        }
+        
+/* AUTOLIGA — 5-vazifa: Product Detail dizayn */
+
+.models_title {
+    font-size: clamp(34px, 4.5vw, 68px) !important;
+    line-height: 1.1 !important;
+    overflow-wrap: break-word;
+}
+
+.product-trims .grid-container {
+    width: 100%;
+    max-width: 1440px;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 24px;
+    padding-right: 24px;
+}
+
+.product-trims h2 {
+    font-size: clamp(26px, 3vw, 42px) !important;
+    line-height: 1.2;
+}
+
+.product-trims table {
+    font-size: 15px;
+}
+
+.faw-modal__form .faw-form__textarea {
+    min-height: 110px !important;
+    height: 120px !important;
+    max-height: 220px;
+    resize: vertical;
+}
+
+@media (max-width: 767px) {
+    .models_title {
+        font-size: clamp(30px, 8vw, 44px) !important;
+    }
+
+    .product-trims .grid-container {
+        padding-left: 16px;
+        padding-right: 16px;
+    }
+
+    .product-trims table {
+        font-size: 13px;
+    }
+}
+
     </style>
 </head>
-
 <body>
 <!-- Google Tag Manager (noscript) -->
 <noscript>
@@ -246,13 +220,10 @@
             style="display:none;visibility:hidden"></iframe>
 </noscript>
 <!-- End Google Tag Manager (noscript) -->
-
-<!-- Меню и шапка -->
+<!-- AUTOLIGA — sayt menyusi -->
 {% include 'main/includes/header.html' %}
-
-<!-- Контент страницы -->
-<main id="mxd-page-content" class="mxd-page-content">
-
+<!-- AUTOLIGA — avtomobil sahifasi -->
+<main id="mxd-page-content" class="mxd-page-content" data-product-ssr="true">
     <!-- Секция героя -->
     <div class="mxd-section">
         <div class="mxd-hero-06">
@@ -265,7 +236,7 @@
                                     <div class="row g-0 more_info-block">
                                         <div class="col-12 col-xl-12 mxd-grid-item no-margin">
                                             <div class="mxd-section-models__title">
-                                                                                               <h1 class="models_title">
+                                                <h1 class="models_title">
                                                     {% if product.category and product.category.name not in product.title %}{{ product.category.name }} {% endif %}{{ product.title }}
                                                 </h1>
                                                 <ul class="more_info-link">
@@ -305,60 +276,101 @@
                         <div class="mxd-hero-06__car">
                             <div class="col-12 col-xl-8 mxd-grid-item no-margin">
                                 <div class="mxd-section-title__hrdescr">
-                                        <span class="hero-05-title__row loading__item star_icon-block">
-                                            <em class="hero-05-title__item title-item-image">
-                                                <svg class="mxd-pulse" xmlns="http://www.w3.org/2000/svg" version="1.1"
-                                                     viewBox="0 0 20 20">
-                                                    <path
-                                                            d="M19.6,9.6h-3.9c-.4,0-1.8-.2-1.8-.2-.6,0-1.1-.2-1.6-.6-.5-.3-.9-.8-1.2-1.2-.3-.4-.4-.9-.5-1.4,0,0,0-1.1-.2-1.5V.4c0-.2-.2-.4-.4-.4s-.4.2-.4.4v4.4c0,.4-.2,1.5-.2,1.5,0,.5-.2,1-.5,1.4-.3.5-.7.9-1.2,1.2s-1,.5-1.6.6c0,0-1.2,0-1.7.2H.4c-.2,0-.4.2-.4.4s.2.4.4.4h4.1c.4,0,1.7.2,1.7.2.6,0,1.1.2,1.6.6.4.3.8.7,1.1,1.1.3.5.5,1,.6,1.6,0,0,0,1.3.2,1.7v4.1c0,.2.2.4.4.4s.4-.2.4-.4v-4.1c0-.4.2-1.7.2-1.7,0-.6.2-1.1.6-1.6.3-.4.7-.8,1.1-1.1.5-.3,1-.5,1.6-.6,0,0,1.3,0,1.8-.2h3.9c.2,0,.4-.2.4-.4s-.2-.4-.4-.4h0Z"/>
-                                                </svg>
-                                            </em>
-                                            <em class="hero-05-title__item" style="font-size: 25px; max-width: 400px;">
-                                                <ul class="more_info-link">
-                                                    {% if LANGUAGE_CODE == 'ru' %}Сообщите о любой проблеме на дорогах
-                                                    {% elif LANGUAGE_CODE == 'en' %}Report any problems on the roads
-                                                    {% else %}Har qanday yomon yo'l muammosi to'g'risida xabar bering{% endif %}
-                                                </ul>
-                                            </em>
+                                    <span class="hero-05-title__row loading__item star_icon-block">
+                                        <em class="hero-05-title__item title-item-image">
+                                            <svg class="mxd-pulse" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" aria-hidden="true">
+                                                <path d="M19.6,9.6h-3.9c-.4,0-1.8-.2-1.8-.2-.6,0-1.1-.2-1.6-.6-.5-.3-.9-.8-1.2-1.2-.3-.4-.4-.9-.5-1.4,0,0,0-1.1-.2-1.5V.4c0-.2-.2-.4-.4-.4s-.4.2-.4.4v4.4c0,.4-.2,1.5-.2,1.5,0,.5-.2,1-.5,1.4-.3.5-.7.9-1.2,1.2s-1,.5-1.6.6c0,0,0,1.3.2,1.7v4.1c0,.2.2.4.4.4s.4-.2.4-.4v-4.1c0-.4.2-1.7.2-1.7,0-.6.2-1.1.6-1.6.3-.4.7-.8,1.1-1.1.5-.3,1-.5,1.6-.6,0,0,1.3,0,1.8-.2h3.9c.2,0,.4-.2.4-.4s-.2-.4-.4-.4Z"></path>
+                                            </svg>
+                                        </em>
+                                        <em class="hero-05-title__item" style="font-size:25px;max-width:400px;">
+                                            {% if LANGUAGE_CODE == 'ru' %}Официальные автомобили и сервис AUTOLIGA
+                                            {% elif LANGUAGE_CODE == 'en' %}Official vehicles and AUTOLIGA service
+                                            {% else %}AUTOLIGA — rasmiy avtosalonlar va servislar tarmog‘i{% endif %}
+                                        </em>
+                                    </span>
+                                    <div class="product-price" style="margin:24px 0 8px;">
+                                        <span style="display:block;margin-bottom:6px;">
+                                            {% if LANGUAGE_CODE == 'ru' %}Цена
+                                            {% elif LANGUAGE_CODE == 'en' %}Price
+                                            {% else %}Narxi{% endif %}
                                         </span>
+                                        <strong style="display:block;font-size:clamp(24px,3vw,40px);line-height:1.2;">
+                                            {% if product.slider_price %}
+                                                {{ product.slider_price }}
+                                            {% else %}
+                                                {% if LANGUAGE_CODE == 'ru' %}По запросу
+                                                {% elif LANGUAGE_CODE == 'en' %}On request
+                                                {% else %}So‘rov asosida{% endif %}
+                                            {% endif %}
+                                        </strong>
+                                    </div>
                                     <a class="btn btn-anim btn-default btn-mobile-icon btn-outline slide-right-up mt-3"
                                        href="#faw-main-contact-modal" aria-label="Narxini bilish">
-                                            <span class="btn-caption">
-                                                {% if LANGUAGE_CODE == 'ru' %}Узнать цену
-                                                {% elif LANGUAGE_CODE == 'en' %}Get a Quote
-                                                {% else %}Narxini bilish{% endif %}
-                                            </span>
+                                        <span class="btn-caption">
+                                            {% if LANGUAGE_CODE == 'ru' %}Узнать цену
+                                            {% elif LANGUAGE_CODE == 'en' %}Get a Quote
+                                            {% else %}Narxini bilish{% endif %}
+                                        </span>
                                         <i class="ph-bold ph-arrow-up-right"></i>
                                     </a>
                                 </div>
                             </div>
+                            
+<div class="car-img_block">
+    {% if product.main_image %}
+        {% thumbnail product.main_image "480x480" as car_480 %}
+        {% thumbnail product.main_image "960x960" as car_960 %}
+        {% thumbnail product.main_image "1600x1600" as car_1600 %}
 
-                            
-                            
-                            <div class="car-img_block">
-                                <img id="main-car-image" 
-                                    class="mxd-hero-06__car-image"
-                                    alt="{{ product.name }}"
-                                    {% if product.image %}
-                                        src="{{ product.image.url }}"
-                                    {% else %}
-                                        src="{% static 'images/noobject.avif' %}"
-                                    {% endif %}
-                                    data-default-src="{% static 'images/noobject.avif' %}"
-                                    onload="this.classList.add('loaded')"
-                                    onerror="this.src=this.dataset.defaultSrc; this.classList.add('loaded')">
-                            </div>                        
-                            
+        <img id="main-car-image"
+             class="mxd-hero-06__car-image"
+             src="{{ car_960.url }}"
+             srcset="{{ car_480.url }} {{ car_480.width }}w,
+                     {{ car_960.url }} {{ car_960.width }}w,
+                     {{ car_1600.url }} {{ car_1600.width }}w"
+             sizes="(max-width: 768px) 100vw, 50vw"
+             width="{{ car_960.width }}"
+             height="{{ car_960.height }}"
+             alt="{% if product.category %}{{ product.category.name }} {% endif %}{{ product.title }}"
+             data-default-src="{% static 'images/noobject.avif' %}"
+             fetchpriority="high"
+             decoding="async"
+             onload="this.classList.add('loaded')"
+             onerror="this.onerror=null;this.removeAttribute('srcset');this.src=this.dataset.defaultSrc;this.classList.add('loaded')">
+
+        {% endthumbnail %}
+        {% endthumbnail %}
+        {% endthumbnail %}
+    {% else %}
+        <img id="main-car-image"
+             class="mxd-hero-06__car-image"
+             src="{% static 'images/noobject.avif' %}"
+             alt="{{ product.title }}"
+             fetchpriority="high"
+             decoding="async">
+    {% endif %}
+</div>
 
                             <div class="car-img_block-info">
-                                <!-- 8 характеристик загружаются через JS -->
                                 <div class="car-specs-grid">
-                                    <!-- Loader для характеристик -->
-                                    <div style="grid-column: 1/-1; text-align: center; padding: 20px; color: #999;">
-                                        {% if LANGUAGE_CODE == 'ru' %}Загрузка...
-                                        {% elif LANGUAGE_CODE == 'en' %}Loading...
-                                        {% else %}Yuklanmoqda...{% endif %}
-                                    </div>
+                                    {% for feature in product.features.all|slice:":8" %}
+                                        <div class="car-spec-item">
+                                            {% if feature.icon and feature.icon.icon %}
+                                                <img src="{{ feature.icon.icon.url }}"
+                                                     class="car-spec-icon"
+                                                     alt="">
+                                            {% endif %}
+                                            <div class="car-spec-content">
+                                                <div class="car-spec-label">{{ feature.name }}</div>
+                                            </div>
+                                        </div>
+                                    {% empty %}
+                                        <p style="grid-column:1/-1;text-align:center;padding:20px;color:#888;">
+                                            {% if LANGUAGE_CODE == 'ru' %}Характеристики пока не добавлены
+                                            {% elif LANGUAGE_CODE == 'en' %}Specifications have not been added yet
+                                            {% else %}Xususiyatlar hali qo‘shilmagan{% endif %}
+                                        </p>
+                                    {% endfor %}
                                 </div>
                             </div>
                         </div>
@@ -367,11 +379,118 @@
             </div>
         </div>
     </div>
-
+    {% if product.active_trims %}
+    <section class="mxd-section padding-blog product-trims">
+        <div class="grid-container">
+            <h2 style="margin-bottom:24px;">
+                {% if LANGUAGE_CODE == 'ru' %}Комплектации и цены
+                {% elif LANGUAGE_CODE == 'en' %}Trims and prices
+                {% else %}Komplektatsiyalar va narxlar{% endif %}
+            </h2>
+            <div style="width:100%;overflow-x:auto;">
+                <table style="width:100%;min-width:720px;border-collapse:collapse;">
+                    <thead>
+                        <tr>
+                            <th scope="col" style="padding:14px;border:1px solid #d9d9d9;text-align:left;">
+                                {% if LANGUAGE_CODE == 'ru' %}Характеристика
+                                {% elif LANGUAGE_CODE == 'en' %}Specification
+                                {% else %}Xususiyat{% endif %}
+                            </th>
+                            {% for trim in product.active_trims %}
+                                <th scope="col" style="padding:14px;border:1px solid #d9d9d9;text-align:left;">
+                                    {{ trim.name }}
+                                </th>
+                            {% endfor %}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <th scope="row" style="padding:14px;border:1px solid #d9d9d9;text-align:left;">
+                                {% if LANGUAGE_CODE == 'ru' %}Цена
+                                {% elif LANGUAGE_CODE == 'en' %}Price
+                                {% else %}Narxi{% endif %}
+                            </th>
+                            {% for trim in product.active_trims %}
+                                <td style="padding:14px;border:1px solid #d9d9d9;">
+                                    {% if trim.price %}
+                                        {{ trim.formatted_price|default:trim.price }} UZS
+                                    {% else %}
+                                        {% if LANGUAGE_CODE == 'ru' %}По запросу
+                                        {% elif LANGUAGE_CODE == 'en' %}On request
+                                        {% else %}So‘rov asosida{% endif %}
+                                    {% endif %}
+                                </td>
+                            {% endfor %}
+                        </tr>
+                        <tr>
+                            <th scope="row" style="padding:14px;border:1px solid #d9d9d9;text-align:left;">
+                                {% if LANGUAGE_CODE == 'ru' %}Двигатель
+                                {% elif LANGUAGE_CODE == 'en' %}Engine
+                                {% else %}Dvigatel{% endif %}
+                            </th>
+                            {% for trim in product.active_trims %}
+                                <td style="padding:14px;border:1px solid #d9d9d9;">
+                                    {{ trim.engine|default:"—" }}
+                                </td>
+                            {% endfor %}
+                        </tr>
+                        <tr>
+                            <th scope="row" style="padding:14px;border:1px solid #d9d9d9;text-align:left;">
+                                {% if LANGUAGE_CODE == 'ru' %}Мощность
+                                {% elif LANGUAGE_CODE == 'en' %}Power
+                                {% else %}Quvvat{% endif %}
+                            </th>
+                            {% for trim in product.active_trims %}
+                                <td style="padding:14px;border:1px solid #d9d9d9;">
+                                    {{ trim.power|default:"—" }}
+                                </td>
+                            {% endfor %}
+                        </tr>
+                        <tr>
+                            <th scope="row" style="padding:14px;border:1px solid #d9d9d9;text-align:left;">
+                                {% if LANGUAGE_CODE == 'ru' %}Коробка передач
+                                {% elif LANGUAGE_CODE == 'en' %}Transmission
+                                {% else %}Transmissiya{% endif %}
+                            </th>
+                            {% for trim in product.active_trims %}
+                                <td style="padding:14px;border:1px solid #d9d9d9;">
+                                    {{ trim.transmission|default:"—" }}
+                                </td>
+                            {% endfor %}
+                        </tr>
+                        <tr>
+                            <th scope="row" style="padding:14px;border:1px solid #d9d9d9;text-align:left;">
+                                {% if LANGUAGE_CODE == 'ru' %}Расход топлива
+                                {% elif LANGUAGE_CODE == 'en' %}Fuel consumption
+                                {% else %}Yoqilg‘i sarfi{% endif %}
+                            </th>
+                            {% for trim in product.active_trims %}
+                                <td style="padding:14px;border:1px solid #d9d9d9;">
+                                    {{ trim.fuel_consumption|default:"—" }}
+                                </td>
+                            {% endfor %}
+                        </tr>
+                        <tr>
+                            <th scope="row" style="padding:14px;border:1px solid #d9d9d9;text-align:left;">
+                                {% if LANGUAGE_CODE == 'ru' %}Габариты
+                                {% elif LANGUAGE_CODE == 'en' %}Dimensions
+                                {% else %}Gabaritlar{% endif %}
+                            </th>
+                            {% for trim in product.active_trims %}
+                                <td style="padding:14px;border:1px solid #d9d9d9;">
+                                    {{ trim.dimensions|default:"—" }}
+                                </td>
+                            {% endfor %}
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+    {% endif %}
     <!-- Секция параметров -->
     <div class="mxd-section padding-blog">
         <div class="grid-container">
-
             <!-- Хлебные крошки -->
             <div class="mxd-block">
                 <div class="mxd-section-more_info pre-grid">
@@ -380,21 +499,23 @@
                             <div class="section-more_info">
                                 <div aria-label="breadcrumb">
                                     <ol class="breadcrumb-ol">
-                                        <li><a href="{% url 'home' %}">
-                                            {% if LANGUAGE_CODE == 'ru' %}Главная
-                                            {% elif LANGUAGE_CODE == 'en' %}Home
-                                            {% else %}Bosh sahifa{% endif %}
-                                        </a></li>
-                                        <li><a href="javascript:void(0)">
-                                                {% if LANGUAGE_CODE == 'ru' %}Модели{% elif LANGUAGE_CODE == 'en'
-                                                %}Models{% else %}Modellar{% endif %}
-                                        </a></li>
-                                        <li class="active"><a href="javascript:void(0)">
-                                            {% if LANGUAGE_CODE == 'ru' %}Загрузка...
-                                            {% elif LANGUAGE_CODE == 'en' %}Loading...
-                                            {% else %}Yuklanmoqda...{% endif %}
-                                        </a></li>
-
+                                        <li>
+                                            <a href="{% url 'home' %}">
+                                                {% if LANGUAGE_CODE == 'ru' %}Главная
+                                                {% elif LANGUAGE_CODE == 'en' %}Home
+                                                {% else %}Bosh sahifa{% endif %}
+                                            </a>
+                                        </li>
+                                        {% if product.category %}
+                                            <li>
+                                                <a href="{% url 'products' %}?category={{ product.category.slug|urlencode }}">
+                                                    {{ product.category.name }}
+                                                </a>
+                                            </li>
+                                        {% endif %}
+                                        <li class="active">
+                                            <a href="{{ product.get_absolute_url }}">{{ product.title }}</a>
+                                        </li>
                                     </ol>
                                 </div>
                             </div>
@@ -402,7 +523,6 @@
                     </div>
                 </div>
             </div>
-
             <!-- Параметры (accordion) -->
             <div class="mxd-block" id="parametrs">
                 <div class="mxd-blog-preview">
@@ -414,105 +534,252 @@
                                     {% elif LANGUAGE_CODE == 'en' %}Parameters
                                     {% else %}Parametrlar{% endif %}
                                 </h2>
-                                <!-- Accordion загружается через JS -->
+                                {% regroup product.parameters.all by category as parameter_groups %}
                                 <div class="acardeon-cards_block">
-                                    <div style="text-align: center; padding: 40px; color: #999;">
-                                        {% if LANGUAGE_CODE == 'ru' %}Загрузка...
-                                        {% elif LANGUAGE_CODE == 'en' %}Loading...
-                                        {% else %}Yuklanmoqda...{% endif %}
-                                    </div>
+                                    {% for group in parameter_groups %}
+                                        <div class="acardeon-card">
+                                            <input type="checkbox"
+                                                   id="accordion-{{ forloop.counter0 }}"
+                                                   class="accordion-checkbox"
+                                                   {% if forloop.first %}checked{% endif %}>
+                                            <label for="accordion-{{ forloop.counter0 }}"
+                                                   class="acardeon-card__header">
+                                                <h3 class="acardeon-card__title">
+                                                    {% if group.grouper %}
+                                                        {{ group.grouper.name }}
+                                                    {% else %}
+                                                        {% if LANGUAGE_CODE == 'ru' %}Другие параметры
+                                                        {% elif LANGUAGE_CODE == 'en' %}Other specifications
+                                                        {% else %}Boshqa parametrlar{% endif %}
+                                                    {% endif %}
+                                                </h3>
+                                                <span class="acardeon-card__icon"></span>
+                                            </label>
+                                            <div class="acardeon-card__content">
+                                                <ul class="specs-list custom-marker">
+                                                    {% for parameter in group.list %}
+                                                        <li class="specs-list__item">{{ parameter.text }}</li>
+                                                    {% endfor %}
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    {% empty %}
+                                        <p style="padding:20px;text-align:center;color:#888;">
+                                            {% if LANGUAGE_CODE == 'ru' %}Параметры пока не добавлены
+                                            {% elif LANGUAGE_CODE == 'en' %}Specifications have not been added yet
+                                            {% else %}Parametrlar hali qo‘shilmagan{% endif %}
+                                        </p>
+                                    {% endfor %}
                                 </div>
+                                {% if product.slider_power or product.slider_fuel_consumption or product.slider_year or product.slider_engine or product.slider_transmission or product.slider_dimensions %}
+                                <div style="overflow-x:auto;margin-top:24px;">
+                                    <table style="width:100%;border-collapse:collapse;">
+                                        <caption style="text-align:left;padding:12px 0;">
+                                            {% if LANGUAGE_CODE == 'ru' %}Основные технические характеристики
+                                            {% elif LANGUAGE_CODE == 'en' %}Key specifications
+                                            {% else %}Asosiy texnik xususiyatlar{% endif %}
+                                        </caption>
+                                        <tbody>
+                                            {% if product.slider_engine %}
+                                            <tr>
+                                                <th scope="row" style="padding:12px;border:1px solid #ddd;text-align:left;">
+                                                    {% if LANGUAGE_CODE == 'ru' %}Двигатель{% elif LANGUAGE_CODE == 'en' %}Engine{% else %}Dvigatel{% endif %}
+                                                </th>
+                                                <td style="padding:12px;border:1px solid #ddd;">{{ product.slider_engine }}</td>
+                                            </tr>
+                                            {% endif %}
+                                            {% if product.slider_power %}
+                                            <tr>
+                                                <th scope="row" style="padding:12px;border:1px solid #ddd;text-align:left;">
+                                                    {% if LANGUAGE_CODE == 'ru' %}Мощность{% elif LANGUAGE_CODE == 'en' %}Power{% else %}Quvvat{% endif %}
+                                                </th>
+                                                <td style="padding:12px;border:1px solid #ddd;">{{ product.slider_power }}</td>
+                                            </tr>
+                                            {% endif %}
+                                            {% if product.slider_transmission %}
+                                            <tr>
+                                                <th scope="row" style="padding:12px;border:1px solid #ddd;text-align:left;">
+                                                    {% if LANGUAGE_CODE == 'ru' %}Трансмиссия{% elif LANGUAGE_CODE == 'en' %}Transmission{% else %}Uzatmalar qutisi{% endif %}
+                                                </th>
+                                                <td style="padding:12px;border:1px solid #ddd;">{{ product.slider_transmission }}</td>
+                                            </tr>
+                                            {% endif %}
+                                            {% if product.slider_fuel_consumption %}
+                                            <tr>
+                                                <th scope="row" style="padding:12px;border:1px solid #ddd;text-align:left;">
+                                                    {% if LANGUAGE_CODE == 'ru' %}Расход топлива{% elif LANGUAGE_CODE == 'en' %}Fuel consumption{% else %}Yoqilg‘i sarfi{% endif %}
+                                                </th>
+                                                <td style="padding:12px;border:1px solid #ddd;">{{ product.slider_fuel_consumption }}</td>
+                                            </tr>
+                                            {% endif %}
+                                            {% if product.slider_dimensions %}
+                                            <tr>
+                                                <th scope="row" style="padding:12px;border:1px solid #ddd;text-align:left;">
+                                                    {% if LANGUAGE_CODE == 'ru' %}Размеры{% elif LANGUAGE_CODE == 'en' %}Dimensions{% else %}O‘lchamlar{% endif %}
+                                                </th>
+                                                <td style="padding:12px;border:1px solid #ddd;">{{ product.slider_dimensions }}</td>
+                                            </tr>
+                                            {% endif %}
+                                            {% if product.slider_year %}
+                                            <tr>
+                                                <th scope="row" style="padding:12px;border:1px solid #ddd;text-align:left;">
+                                                    {% if LANGUAGE_CODE == 'ru' %}Год{% elif LANGUAGE_CODE == 'en' %}Year{% else %}Yil{% endif %}
+                                                </th>
+                                                <td style="padding:12px;border:1px solid #ddd;">{{ product.slider_year }}</td>
+                                            </tr>
+                                            {% endif %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                                {% endif %}
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-
         </div>
-
         <!-- Галерея -->
         <div class="mxd-section padding-pre-grid section-galery" id="gallery">
             <div class="grid-container">
                 <div class="mxd-block">
-                    <h2 class="reveal-type" style="text-align: center;">
+                    <h2 class="reveal-type" style="text-align:center;">
                         {% if LANGUAGE_CODE == 'ru' %}Галерея
                         {% elif LANGUAGE_CODE == 'en' %}Gallery
                         {% else %}Galereya{% endif %}
                     </h2>
                     <div class="mxd-demo-swiper mxd-grid-item" data-custom-init="true"
-                         style="min-height: 420px;">
-                        <!-- Галерея загружается через JS -->
+                         style="min-height:420px;">
                         <div class="swiper-wrapper">
-                            <div style="text-align: center; padding: 100px; color: #999;">
-                                {% if LANGUAGE_CODE == 'ru' %}Загрузка...
-                                {% elif LANGUAGE_CODE == 'en' %}Loading...
-                                {% else %}Yuklanmoqda...{% endif %}
-                            </div>
+                            {% for gallery_image in product.gallery.all %}
+                                {% if gallery_image.image %}
+                                <div class="swiper-slide mxd-demo-swiper__slide">
+                                    <div class="slide-content">
+                                        <div class="slide-image">
+                                            <img src="{{ gallery_image.image.url }}"
+                                                 alt="{% if product.category %}{{ product.category.name }} {% endif %}{{ product.title }} — galereya {{ forloop.counter }}"
+                                                 loading="lazy" decoding="async">
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endif %}
+                            {% empty %}
+                                {% if product.main_image %}
+                                <div class="swiper-slide mxd-demo-swiper__slide">
+                                    <div class="slide-content">
+                                        <div class="slide-image">
+                                            <img src="{{ product.main_image.url }}"
+                                                 alt="{% if product.category %}{{ product.category.name }} {% endif %}{{ product.title }}"
+                                                 loading="lazy" decoding="async">
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endif %}
+                            {% endfor %}
                         </div>
                         <!-- Кнопки навигации -->
                         <div class="swiper-button-prev mxd-slider-btn mxd-slider-btn-round-prev v2">
-                            <a class="btn btn-round btn-round-small btn-outline slide-left anim-no-delay" href="#0">
+                            <button type="button" class="btn btn-round btn-round-small btn-outline slide-left anim-no-delay" aria-label="Oldingi rasm">
                                 <i class="ph ph-arrow-left"></i>
-                            </a>
+                            </button>
                         </div>
                         <div class="swiper-button-next mxd-slider-btn mxd-slider-btn-round-next v2">
-                            <a class="btn btn-round btn-round-small btn-outline slide-right anim-no-delay"
-                               href="#0">
+                            <button type="button" class="btn btn-round btn-round-small btn-outline slide-right anim-no-delay" aria-label="Keyingi rasm">
                                 <i class="ph ph-arrow-right"></i>
-                            </a>
+                            </button>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+    <!-- O‘xshash modellar va test-drayv -->
+    <section class="mxd-section padding-blog">
+        <div class="grid-container">
+            {% if related_products %}
+                <h2>
+                    {% if LANGUAGE_CODE == 'ru' %}Похожие модели
+                    {% elif LANGUAGE_CODE == 'en' %}Similar models
+                    {% else %}O‘xshash modellar{% endif %}
+                </h2>
+                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:24px;margin-top:24px;">
+                    {% for related_product in related_products|slice:":5" %}
+                        <article style="border:1px solid #ddd;border-radius:16px;overflow:hidden;">
+                            <a href="{{ related_product.get_absolute_url }}"
+                               style="display:block;color:inherit;text-decoration:none;">
+                                {% if related_product.card_image %}
+                                    <img src="{{ related_product.card_image.url }}"
+                                         alt="{{ related_product.title }}"
+                                         loading="lazy"
+                                         style="width:100%;aspect-ratio:16/10;object-fit:cover;">
+                                {% elif related_product.main_image %}
+                                    <img src="{{ related_product.main_image.url }}"
+                                         alt="{{ related_product.title }}"
+                                         loading="lazy"
+                                         style="width:100%;aspect-ratio:16/10;object-fit:cover;">
+                                {% endif %}
+                                <div style="padding:18px;">
+                                    <h3>{{ related_product.title }}</h3>
+                                    {% if related_product.slider_price %}
+                                        <p>{{ related_product.slider_price }}</p>
+                                    {% endif %}
+                                </div>
+                            </a>
+                        </article>
+                    {% endfor %}
+                </div>
+            {% endif %}
+            <div style="margin-top:32px;">
+                <a class="btn btn-anim btn-default btn-outline slide-right-up"
+                   href="{% url 'test_drive' %}?model={{ product.slug|urlencode }}">
+                    <span class="btn-caption">
+                        {% if LANGUAGE_CODE == 'ru' %}Записаться на тест-драйв
+                        {% elif LANGUAGE_CODE == 'en' %}Book a test drive
+                        {% else %}Test-drayvga yozilish{% endif %}
+                    </span>
+                    <i class="ph-bold ph-arrow-up-right"></i>
+                </a>
+            </div>
+        </div>
+    </section>
 </main>
-
 <!-- Футер -->
 {% include 'main/includes/footer.html' %}
-
 <!-- Кнопка «вверх» -->
-<a href="#0" id="to-top" class="btn btn-to-top slide-up anim-no-delay">
+<a href="#mxd-page-content" id="to-top" class="btn btn-to-top slide-up anim-no-delay">
     <i class="ph ph-arrow-up"></i>
 </a>
-
-<!-- Модальное окно с формой контакта -->
-<div id="faw-modal" class="faw-modal">
+<!-- AUTOLIGA — avtomobil haqida murojaat -->
+<div id="faw-modal" class="faw-modal" role="dialog" aria-modal="true" aria-labelledby="faw-modal-title">
     <div class="faw-modal__overlay"></div>
     <div class="faw-modal__content">
-        <button class="faw-modal__close" aria-label="Закрыть">
+        <button class="faw-modal__close" aria-label="Yopish">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
                  stroke="currentColor" stroke-width="2">
                 <line x1="18" y1="6" x2="6" y2="18"></line>
                 <line x1="6" y1="6" x2="18" y2="18"></line>
             </svg>
         </button>
-
         <div class="faw-modal__header">
-            <h2 class="faw-modal__title">
-                {% if LANGUAGE_CODE == 'ru' %}Связаться с нами
-                {% elif LANGUAGE_CODE == 'en' %}Contact Us
-                {% else %}Biz bilan bog'lanish{% endif %}
+            <h2 class="faw-modal__title" id="faw-modal-title">
+                {% if LANGUAGE_CODE == 'ru' %}Консультация по автомобилю
+                {% elif LANGUAGE_CODE == 'en' %}Car consultation
+                {% else %}Avtomobil bo‘yicha maslahat{% endif %}
             </h2>
             <p class="faw-modal__subtitle">
-                {% if LANGUAGE_CODE == 'ru' %}Оставьте свои контактные данные, и мы свяжемся с вами в ближайшее время.
-                {% elif LANGUAGE_CODE == 'en' %}Leave your contact details and we will get back to you shortly.
-                {% else %}Aloqa ma'lumotlaringizni qoldiring, biz tez orada siz bilan bog'lanamiz.{% endif %}
+                {% if LANGUAGE_CODE == 'ru' %}Оставьте свои контакты — специалист AUTOLIGA ответит на вопросы по выбранному автомобилю.
+                {% elif LANGUAGE_CODE == 'en' %}Leave your contact details and an AUTOLIGA specialist will answer questions about your chosen car.
+                {% else %}Ma’lumotlaringizni qoldiring. AUTOLIGA mutaxassisi tanlagan avtomobilingiz bo‘yicha savollaringizga javob beradi.{% endif %}
             </p>
         </div>
-
         <form class="faw-modal__form" id="faw-contact-form">
             {% csrf_token %}
             <input type="hidden" name="project_name" value="autoliga.uz">
             <input type="hidden" name="admin_email" value="info@autoliga.uz">
-            <input type="hidden" name="form_subject" value="autoliga Contact Form Message">
-
-            <input type="hidden" name="product" id="product-field" value="">
-
+            <input type="hidden" name="form_subject" value="AUTOLIGA — avtomobil bo‘yicha murojaat">
+            <input type="hidden" name="product" id="product-field" value="{{ product.title }}">
             <div class="faw-form__group">
                 <input type="text" name="Name" class="faw-form__input" placeholder="Ismingiz*" required>
             </div>
-
             <div class="faw-form__group">
                 <select name="Region" class="faw-form__select" required>
                     <option value="" disabled selected>
@@ -557,7 +824,7 @@
                     </option>
                     <option value="Navoiy viloyati">
                         {% if LANGUAGE_CODE == 'ru' %}Навоийская область
-                        {% elif LANGUAGE_CODE == 'en' %}Navoiy Region
+                        {% elif LANGUAGE_CODE == 'en' %}Navoi Region
                         {% else %}Navoiy viloyati{% endif %}
                     </option>
                     <option value="Qashqadaryo viloyati">
@@ -592,24 +859,21 @@
                     </option>
                 </select>
             </div>
-
             <div class="faw-form__group">
                 <input type="tel" name="phone" class="faw-form__input" placeholder="+998 (__) ___-__-__"
-                       id="phoneInput" pattern="[+]*[0-9\s\-\(\)]*" data-default="+998" required>
+                       id="phoneInput" pattern="[+]*[0-9\s\\-\\(\\)]*" data-default="+998" required>
             </div>
-
             <div class="faw-form__group">
-                    <textarea name="Message" class="faw-form__textarea"
-                              placeholder="Qanday yuk mashinasiga qiziqasiz? Qo'shimcha savollar*" rows="4"></textarea>
+                <textarea name="Message" class="faw-form__textarea"
+                          placeholder="Qaysi avtomobil sizni qiziqtiryapti? Qo‘shimcha savollaringizni yozing" rows="4"></textarea>
             </div>
-
             <div class="faw-form__group">
                 <button type="submit" class="faw-form__submit">
-                        <span>
-                            {% if LANGUAGE_CODE == 'ru' %}Отправить
-                            {% elif LANGUAGE_CODE == 'en' %}Submit
-                            {% else %}Qong'iroq kutaman{% endif %}
-                        </span>
+                    <span>
+                        {% if LANGUAGE_CODE == 'ru' %}Отправить
+                        {% elif LANGUAGE_CODE == 'en' %}Submit
+                        {% else %}Qo‘ng‘iroq kutaman{% endif %}
+                    </span>
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
                          stroke="currentColor" stroke-width="2">
                         <line x1="7" y1="17" x2="17" y2="7"></line>
@@ -620,47 +884,43 @@
         </form>
     </div>
 </div>
-
-<!-- Модальное окно для галереи -->
+<!-- Galereya modali -->
 <div id="gallery-modal" class="gallery-modal">
     <div class="gallery-modal__overlay"></div>
     <div class="gallery-modal__content">
-        <button class="gallery-modal__close" aria-label="Закрыть">
+        <button class="gallery-modal__close" aria-label="Yopish">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
                  stroke="currentColor" stroke-width="2">
                 <line x1="18" y1="6" x2="6" y2="18"></line>
                 <line x1="6" y1="6" x2="18" y2="18"></line>
             </svg>
         </button>
-        <img id="gallery-modal-img" alt="Галерея" class="gallery-modal__img"/>
+        <img id="gallery-modal-img" alt="Avtomobil galereyasi" class="gallery-modal__img">
     </div>
 </div>
-
-<!-- Подключение скриптов -->
+<!-- Mavjud JS kutubxonalari -->
 <script src="{% static 'js/libs.min.js' %}"></script>
 <script src="{% static 'js/app.js' %}"></script>
 <script src="{% static 'js/error-logger.js' %}"></script>
 <script src="{% static 'js/main-setting.js' %}"></script>
-<!-- Подключение Product Detail JS -->
+<!-- Product Detail JS -->
+<script>window.currentProductTitle = "{{ product.title|escapejs }}";</script>
 <script src="{% static 'js/product_detail.js' %}"></script>
-
 <script>
-
     // ============ ОБРАБОТКА ФОРМЫ ============
     let isSubmitting = false;
-
     document.addEventListener('DOMContentLoaded', function () {
         const modal = document.getElementById('faw-modal');
         const contactForm = document.getElementById('faw-contact-form');
         const phoneInput = contactForm?.querySelector('input[name="phone"]');
         const messageTextarea = contactForm?.querySelector('textarea[name="Message"]');
-
-        if (!contactForm) return;
+        if (!contactForm || !modal) return;
 
         let statusBlock = contactForm.querySelector('.faw-form__status');
         if (!statusBlock) {
             statusBlock = document.createElement('div');
             statusBlock.className = 'faw-form__status hidden';
+            statusBlock.setAttribute('role', 'status');
             const statusText = document.createElement('p');
             statusText.className = 'faw-form__status-text';
             statusBlock.appendChild(statusText);
@@ -671,12 +931,10 @@
         function openModal() {
             modal.classList.add('active');
             document.body.style.overflow = 'hidden';
-
             const productField = document.getElementById('product-field');
             if (window.currentProductTitle && productField) {
                 productField.value = window.currentProductTitle;
             }
-
             if (window.currentProductTitle && messageTextarea) {
                 messageTextarea.value = `Men ${window.currentProductTitle} modeliga qiziqaman.\n\nQo'shimcha savollar: `;
                 messageTextarea.focus();
@@ -698,10 +956,8 @@
 
         const modalClose = document.querySelector('.faw-modal__close');
         const modalOverlay = document.querySelector('.faw-modal__overlay');
-
         if (modalClose) modalClose.addEventListener('click', closeModal);
         if (modalOverlay) modalOverlay.addEventListener('click', closeModal);
-
         document.addEventListener('keydown', function (e) {
             if (e.key === 'Escape' && modal?.classList.contains('active')) {
                 closeModal();
@@ -719,7 +975,6 @@
                 if (value.length >= 5) formatted += ") " + value.slice(5, 8);
                 if (value.length >= 8) formatted += "-" + value.slice(8, 10);
                 if (value.length >= 10) formatted += "-" + value.slice(10, 12);
-
                 e.target.value = formatted;
             });
         }
@@ -729,22 +984,21 @@
             if (isSubmitting) return;
             isSubmitting = true;
 
-            const phone = phoneInput.value.replace(/\D/g, "");
-            if (phone.length !== 12) {
+            const phone = phoneInput ? phoneInput.value.replace(/\D/g, "") : "";
+            if (phone.length !== 12 || !phone.startsWith("998")) {
                 showStatus("❌ Iltimos, telefon raqamingizni to'liq kiriting.", "error");
                 isSubmitting = false;
                 return;
             }
 
             const productField = document.getElementById('product-field');
-            const utmData = window.getUTMData();
-
+            const utmData = typeof window.getUTMData === 'function' ? window.getUTMData() : {};
             const formData = {
-                name: contactForm.Name.value,
-                region: contactForm.Region.value,
+                name: contactForm.elements.namedItem('Name').value,
+                region: contactForm.elements.namedItem('Region').value,
                 phone: phoneInput.value,
                 product: productField?.value || '',
-                message: contactForm.Message.value || '',
+                message: contactForm.elements.namedItem('Message').value || '',
                 referer: document.referrer || window.location.href,
                 utm_data: utmData,
                 visitor_uid: sessionStorage.getItem('amo_visitor_uid') || null
@@ -760,13 +1014,15 @@
                     body: JSON.stringify(formData),
                 });
 
-                const data = await response.json();
+                let data = {};
+                try {
+                    data = await response.json();
+                } catch (_error) {}
 
                 if (response.ok) {
                     (window.dataLayer = window.dataLayer || []).push({
                         event: "lead_form_submitted"
                     });
-
                     showStatus("✅ Xabar yuborildi! Tez orada siz bilan bog'lanamiz.", "success");
                     contactForm.reset();
 
@@ -789,7 +1045,6 @@
             statusText.textContent = message;
             statusBlock.className = `faw-form__status ${type} show`;
             statusBlock.classList.remove("hidden");
-
             setTimeout(() => {
                 statusBlock.classList.remove("show");
                 setTimeout(() => statusBlock.classList.add("hidden"), 400);
@@ -805,22 +1060,23 @@
         document.addEventListener('click', function (e) {
             if (e.target.closest('.swiper-wrapper img')) {
                 const img = e.target.closest('.swiper-wrapper img');
+                if (!galleryModal || !galleryModalImg) return;
                 galleryModal.classList.add('active');
-                galleryModalImg.src = img.src;
+                galleryModalImg.src = img.currentSrc || img.src;
                 galleryModalImg.alt = img.alt || '';
                 document.body.style.overflow = 'hidden';
             }
         });
 
         function closeGalleryModal() {
+            if (!galleryModal || !galleryModalImg) return;
             galleryModal.classList.remove('active');
-            galleryModalImg.src = '';
+            galleryModalImg.removeAttribute('src');
             document.body.style.overflow = '';
         }
 
         if (galleryModalClose) galleryModalClose.addEventListener('click', closeGalleryModal);
         if (galleryModalOverlay) galleryModalOverlay.addEventListener('click', closeGalleryModal);
-
         document.addEventListener('keydown', function (e) {
             if (e.key === 'Escape' && galleryModal?.classList.contains('active')) {
                 closeGalleryModal();
@@ -828,9 +1084,5 @@
         });
     });
 </script>
-
 </body>
-
 </html>
-
-<!-- #ffffff80; --> 

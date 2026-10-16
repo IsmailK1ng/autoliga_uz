@@ -99,16 +99,45 @@ class ProductDetail {
     }
 
     async init() {
-        const pathParts = window.location.pathname.split('/').filter(p => p);
-        const slug = pathParts[pathParts.length - 1];
+    const ssrContent = document.querySelector('[data-product-ssr="true"]');
 
-        if (!slug) {
-            this.showError(this.t('notFound'));
-            return;
+    if (ssrContent) {
+        const titleElement = document.querySelector('.models_title');
+
+        window.currentProductTitle = titleElement
+            ? titleElement.textContent.trim()
+            : '';
+
+        const startGallery = () => {
+            const serverSlides = document.querySelector(
+                '.swiper-wrapper .swiper-slide'
+            );
+
+            if (serverSlides) {
+                this.initSwiper();
+            }
+        };
+
+        if (document.readyState === 'complete') {
+            startGallery();
+        } else {
+            window.addEventListener('load', startGallery, { once: true });
         }
 
-        await this.loadProduct(slug);
+        this.hideLoader();
+        return;
     }
+
+    const pathParts = window.location.pathname.split('/').filter(p => p);
+    const slug = pathParts[pathParts.length - 1];
+
+    if (!slug) {
+        this.showError(this.t('notFound'));
+        return;
+    }
+
+    await this.loadProduct(slug);
+}
 
     async loadProduct(slug) {
         try {

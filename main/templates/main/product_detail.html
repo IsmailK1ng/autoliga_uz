@@ -634,7 +634,7 @@
                                     <div class="slide-content">
                                         <div class="slide-image">
                                             <img src="{{ gallery_image.image.url }}"
-                                                 alt="{% if product.category %}{{ product.category.name }} {% endif %}{{ product.title }} — galereya {{ forloop.counter }}"
+                                                 alt="{{ product.display_name }}, {% if LANGUAGE_CODE == 'ru' %}изображение{% elif LANGUAGE_CODE == 'en' %}image{% else %}rasm{% endif %} {{ forloop.counter }}"
                                                  loading="lazy" decoding="async">
                                         </div>
                                     </div>
@@ -646,7 +646,7 @@
                                     <div class="slide-content">
                                         <div class="slide-image">
                                             <img src="{{ product.main_image.url }}"
-                                                 alt="{% if product.category %}{{ product.category.name }} {% endif %}{{ product.title }}"
+                                                 alt="{{ product.display_name }}"
                                                  loading="lazy" decoding="async">
                                         </div>
                                     </div>

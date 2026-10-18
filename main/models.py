@@ -358,6 +358,21 @@ class Product(models.Model):
 
     def get_absolute_url(self):
         return reverse('product_detail', args=[self.slug])
+
+    @property
+    def display_name(self):
+        """Brand + title for headings and alt text; the brand is not repeated
+        when the title already starts with it (case-insensitive, whole word)."""
+        brand = (self.category.name or '').strip() if self.category else ''
+        title = (self.title or '').strip()
+        if not brand:
+            return title
+        lowered_title, lowered_brand = title.lower(), brand.lower()
+        if lowered_title == lowered_brand or lowered_title.startswith(lowered_brand + ' '):
+            return title
+        return f"{brand} {title}"
+
+
 class ProductTrim(models.Model):
     """Avtomobil komplektatsiyalari va narxlari"""
 

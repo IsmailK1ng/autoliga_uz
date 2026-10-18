@@ -2,6 +2,7 @@
 
 from django import template
 from django.urls import reverse, NoReverseMatch
+from django.utils.http import urlencode
 from django.utils.safestring import mark_safe
 
 register = template.Library()
@@ -56,10 +57,18 @@ def canonical_url(context):
         return ''
     
     # Р В Р’В Р РЋРЎСџР В Р’В Р РЋРІР‚СћР В Р’В Р вЂ™Р’В»Р В Р Р‹Р РЋРІР‚СљР В Р Р‹Р Р†Р вЂљР Р‹Р В Р’В Р вЂ™Р’В°Р В Р’В Р вЂ™Р’ВµР В Р’В Р РЋ Р В Р Р‹Р Р†Р вЂљР Р‹Р В Р’В Р РЋРІР‚Р В Р Р‹Р В РЎвЂњР В Р Р‹Р Р†Р вЂљРЎв„ўР В Р Р‹Р Р†Р вЂљРІвЂћвЂ“Р В Р’В Р Р†РІР‚С›РІР‚вЂњ URL Р В Р’В Р вЂ™Р’В±Р В Р’В Р вЂ™Р’ВµР В Р’В Р вЂ™Р’В· Р В Р’В Р РЋРІР‚вЂќР В Р’В Р вЂ™Р’В°Р В Р Р‹Р В РІР‚С™Р В Р’В Р вЂ™Р’В°Р В Р’В Р РЋР В Р’В Р вЂ™Р’ВµР В Р Р‹Р Р†Р вЂљРЎв„ўР В Р Р‹Р В РІР‚С™Р В Р’В Р РЋРІР‚СћР В Р’В Р В РІР‚В 
-    scheme = request.scheme  
-    host = request.get_host()  
-    path = request.path  
-    
+    scheme = request.scheme
+    host = request.get_host()
+    path = request.path
+
     canonical = f"{scheme}://{host}{path}"
+
+    # Brand listings: ?category=<slug> is the one canonical form; ?brand= is an
+    # alias for it. Every other query parameter (utm_*, fbclid, page, ...) is dropped.
+    url_name = request.resolver_match.url_name if request.resolver_match else None
+    if url_name == 'products':
+        category = request.GET.get('brand') or request.GET.get('category')
+        if category:
+            canonical += '?' + urlencode({'category': category})
     
     return mark_safe(f'<link rel="canonical" href="{canonical}" />')

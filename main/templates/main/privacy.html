@@ -1,0 +1,34 @@
+{% extends "main/legal_base.html" %}
+
+{% block title %}
+    {% if LANGUAGE_CODE == 'uz' %}Maxfiylik siyosati - Autoliga{% elif LANGUAGE_CODE == 'ru' %}Политика конфиденциальности - Autoliga{% else %}Privacy policy - Autoliga{% endif %}
+{% endblock %}
+
+{% block meta_description %}
+    {% if LANGUAGE_CODE == 'uz' %}Autoliga saytidagi arizalar orqali yuborilgan shaxsiy ma'lumotlar qanday ishlatilishi haqida.{% elif LANGUAGE_CODE == 'ru' %}Как Autoliga использует персональные данные, отправленные через формы на сайте.{% else %}How Autoliga uses personal information submitted through website forms.{% endif %}
+{% endblock %}
+
+{% block og_title %}
+    {% if LANGUAGE_CODE == 'uz' %}Maxfiylik siyosati - Autoliga{% elif LANGUAGE_CODE == 'ru' %}Политика конфиденциальности - Autoliga{% else %}Privacy policy - Autoliga{% endif %}
+{% endblock %}
+
+{% block og_description %}
+    {% if LANGUAGE_CODE == 'uz' %}Autoliga saytidagi arizalar orqali yuborilgan shaxsiy ma'lumotlar qanday ishlatilishi haqida.{% elif LANGUAGE_CODE == 'ru' %}Как Autoliga использует персональные данные, отправленные через формы на сайте.{% else %}How Autoliga uses personal information submitted through website forms.{% endif %}
+{% endblock %}
+
+{% block legal_breadcrumb %}{% if LANGUAGE_CODE == 'uz' %}Maxfiylik siyosati{% elif LANGUAGE_CODE == 'ru' %}Политика конфиденциальности{% else %}Privacy policy{% endif %}{% endblock %}
+
+{% block legal_heading %}{% if LANGUAGE_CODE == 'uz' %}Maxfiylik siyosati{% elif LANGUAGE_CODE == 'ru' %}Политика конфиденциальности{% else %}Privacy policy{% endif %}{% endblock %}
+
+{% block legal_body %}
+    {% if LANGUAGE_CODE == 'uz' %}
+        <p>Sayt orqali yuborilgan ariza va murojaatlardagi ma'lumotlar (masalan, ism, telefon raqami va xabar) so'rovingizni ko'rib chiqish va siz bilan bog'lanish uchun ishlatiladi.</p>
+        <p>Ma'lumotlaringizni yangilash yoki o'chirish bo'yicha <a href="mailto:{{ SITE_CONTACTS.email }}">{{ SITE_CONTACTS.email }}</a> manziliga murojaat qilishingiz mumkin.</p>
+    {% elif LANGUAGE_CODE == 'ru' %}
+        <p>Данные, указанные в заявках и обращениях через сайт (например, имя, номер телефона и сообщение), используются для рассмотрения запроса и связи с вами.</p>
+        <p>Чтобы обновить или удалить свои данные, напишите на <a href="mailto:{{ SITE_CONTACTS.email }}">{{ SITE_CONTACTS.email }}</a>.</p>
+    {% else %}
+        <p>Information submitted through website forms, such as your name, phone number, and message, is used to review your request and contact you.</p>
+        <p>To request an update or deletion of your information, contact <a href="mailto:{{ SITE_CONTACTS.email }}">{{ SITE_CONTACTS.email }}</a>.</p>
+    {% endif %}
+{% endblock %}

@@ -393,7 +393,7 @@ class ProductDetail {
     const productLink = breadcrumbLinks[2];
     if (productLink) {
         productLink.textContent = this.product.title;
-        productLink.href = 'javascript:void(0)';
+        productLink.href = window.location.pathname;
     }
 
 // 2-chi link = category

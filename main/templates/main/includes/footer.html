@@ -55,12 +55,12 @@
                     </div>
 
                     <div class="footer-blocks__links footer-legal-links">
-                        <button class="btn btn-line-xsmall btn-muted slide-right anim-no-delay footer-legal-link" type="button" data-legal-trigger="privacy" aria-haspopup="dialog" aria-controls="legal-info-dialog">
+                        <a class="btn btn-line-xsmall btn-muted slide-right anim-no-delay footer-legal-link" href="{% url 'privacy' %}">
                             <span class="btn-caption">{% if LANGUAGE_CODE == 'uz' %}Maxfiylik siyosati{% elif LANGUAGE_CODE == 'ru' %}Политика конфиденциальности{% else %}Privacy policy{% endif %}</span>
-                        </button>
-                        <button class="btn btn-line-xsmall btn-muted slide-right anim-no-delay footer-legal-link" type="button" data-legal-trigger="terms" aria-haspopup="dialog" aria-controls="legal-info-dialog">
+                        </a>
+                        <a class="btn btn-line-xsmall btn-muted slide-right anim-no-delay footer-legal-link" href="{% url 'terms' %}">
                             <span class="btn-caption">{% if LANGUAGE_CODE == 'uz' %}Foydalanish shartlari{% elif LANGUAGE_CODE == 'ru' %}Условия использования{% else %}Terms of use{% endif %}</span>
-                        </button>
+                        </a>
                     </div>
                     
                 </div>
@@ -181,63 +181,4 @@
                 </div>
             </div>
         </div>
-        <dialog class="legal-dialog" id="legal-info-dialog" aria-labelledby="legal-dialog-title">
-            <div class="legal-dialog__content" data-lenis-prevent>
-                <button class="legal-dialog__close" type="button" data-legal-close aria-label="{% if LANGUAGE_CODE == 'uz' %}Yopish{% elif LANGUAGE_CODE == 'ru' %}Закрыть{% else %}Close{% endif %}">&times;</button>
-                <h2 class="legal-dialog__title" id="legal-dialog-title"></h2>
-
-                <div class="legal-dialog__copy" data-legal-document="privacy" hidden>
-                    {% if LANGUAGE_CODE == 'uz' %}
-                        <p>Sayt orqali yuborilgan ariza va murojaatlardagi ma'lumotlar (masalan, ism, telefon raqami va xabar) so'rovingizni ko'rib chiqish va siz bilan bog'lanish uchun ishlatiladi.</p>
-                        <p>Ma'lumotlaringizni yangilash yoki o'chirish bo'yicha <a href="mailto:{{ SITE_CONTACTS.email }}">{{ SITE_CONTACTS.email }}</a> manziliga murojaat qilishingiz mumkin.</p>
-                    {% elif LANGUAGE_CODE == 'ru' %}
-                        <p>Данные, указанные в заявках и обращениях через сайт (например, имя, номер телефона и сообщение), используются для рассмотрения запроса и связи с вами.</p>
-                        <p>Чтобы обновить или удалить свои данные, напишите на <a href="mailto:{{ SITE_CONTACTS.email }}">{{ SITE_CONTACTS.email }}</a>.</p>
-                    {% else %}
-                        <p>Information submitted through website forms, such as your name, phone number, and message, is used to review your request and contact you.</p>
-                        <p>To request an update or deletion of your information, contact <a href="mailto:{{ SITE_CONTACTS.email }}">{{ SITE_CONTACTS.email }}</a>.</p>
-                    {% endif %}
-                </div>
-
-                <div class="legal-dialog__copy" data-legal-document="terms" hidden>
-                    {% if LANGUAGE_CODE == 'uz' %}
-                        <p>Saytdagi avtomobillar, narxlar, komplektatsiya va mavjudlik haqidagi ma'lumotlar tanishish uchun berilgan. Yakuniy narx, mavjudlik va xarid shartlarini diler bilan tasdiqlang.</p>
-                        <p>Sayt materiallaridan qonunchilik va mualliflik huquqlariga rioya qilgan holda foydalaning. Materiallarni ruxsatsiz ko'chirish yoki tarqatish mumkin emas.</p>
-                    {% elif LANGUAGE_CODE == 'ru' %}
-                        <p>Информация на сайте об автомобилях, ценах, комплектациях и наличии носит ознакомительный характер. Итоговую цену, наличие и условия покупки уточняйте у дилера.</p>
-                        <p>Используйте материалы сайта с соблюдением законодательства и авторских прав. Копирование и распространение материалов без разрешения не допускаются.</p>
-                    {% else %}
-                        <p>Vehicle, price, trim, and availability information on this website is provided for reference. Confirm final pricing, availability, and purchase terms with the dealer.</p>
-                        <p>Use website materials in compliance with applicable law and copyright. Copying or distributing materials without permission is not allowed.</p>
-                    {% endif %}
-                </div>
-            </div>
-        </dialog>
-
-        <script>
-            (() => {
-                const dialog = document.getElementById('legal-info-dialog');
-                if (!dialog) return;
-
-                const title = document.getElementById('legal-dialog-title');
-                const documents = dialog.querySelectorAll('[data-legal-document]');
-
-                document.querySelectorAll('[data-legal-trigger]').forEach((trigger) => {
-                    trigger.addEventListener('click', (event) => {
-                        event.preventDefault();
-                        const documentType = trigger.dataset.legalTrigger;
-                        documents.forEach((document) => {
-                            document.hidden = document.dataset.legalDocument !== documentType;
-                        });
-                        title.textContent = trigger.querySelector('.btn-caption').textContent.trim();
-                        dialog.showModal();
-                    });
-                });
-
-                dialog.querySelector('[data-legal-close]').addEventListener('click', () => dialog.close());
-                dialog.addEventListener('click', (event) => {
-                    if (event.target === dialog) dialog.close();
-                });
-            })();
-        </script>
     </footer>

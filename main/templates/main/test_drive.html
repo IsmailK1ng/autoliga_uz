@@ -174,11 +174,11 @@
                                             {% elif LANGUAGE_CODE == 'ru' %}Я согласен на обработку персональных данных.
                                             {% else %}I agree to the processing of my personal data.{% endif %}
                                         </label>
-                                        <button class="td-agree-policy-link" type="button" data-legal-trigger="privacy" aria-haspopup="dialog" aria-controls="legal-info-dialog">
+                                        <a class="td-agree-policy-link" href="{% url 'privacy' %}" target="_blank" rel="noopener">
                                             {% if LANGUAGE_CODE == 'uz' %}Shaxsiy ma'lumotlarni qayta ishlash shartlari
                                             {% elif LANGUAGE_CODE == 'ru' %}Условия обработки персональных данных
                                             {% else %}Terms of personal data processing{% endif %}
-                                        </button>
+                                        </a>
                                     </div>
                                 </div>
 

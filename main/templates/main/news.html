@@ -309,11 +309,10 @@
 
       // ========== ФУНКЦИЯ: СОЗДАТЬ КНОПКУ НАВИГАЦИИ ==========
       function createNavigationButton(type, text, icon, slideClass, iconAfter = false) {
-        const button = document.createElement('a');
-        button.href = 'javascript:void(0);';
+        const button = document.createElement('button');
+        button.type = 'button';
         button.className = `mxd-blog-pagination__item blog-pagination-control ${type} btn btn-anim btn-line-small btn-bright anim-no-delay ${slideClass}`;
         button.dataset.page = type;
-        button.setAttribute('role', 'button');
         button.setAttribute('aria-label', text);
 
         button.innerHTML = iconAfter
@@ -337,12 +336,11 @@
 
       // ========== ФУНКЦИЯ: СОЗДАТЬ КНОПКУ СТРАНИЦЫ ==========
       function createPageButton(pageNumber) {
-        const button = document.createElement('a');
-        button.href = 'javascript:void(0);';
+        const button = document.createElement('button');
+        button.type = 'button';
         button.className = `mxd-blog-pagination__item blog-pagination-number btn btn-anim`;
         button.dataset.page = pageNumber;
         button.innerHTML = `<span class="btn-caption">${pageNumber}</span>`;
-        button.setAttribute('role', 'button');
         button.setAttribute('aria-label', `Sahifa ${pageNumber}`);
 
         if (pageNumber === currentPage) {

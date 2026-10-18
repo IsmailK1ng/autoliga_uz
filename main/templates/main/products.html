@@ -158,7 +158,7 @@
                                             </a>
                                         </li>
                                         <li>
-                                            <a href="javascript:void(0)">
+                                            <a href="{% url 'products' %}">
                                                 {% if LANGUAGE_CODE == 'ru' %}
                                                 Модели
                                                 {% elif LANGUAGE_CODE == 'en' %}
@@ -169,8 +169,10 @@
                                             </a>
                                         </li>
                                         <li class="active">
-                                            <a href="javascript:void(0)">
-                                                {% if LANGUAGE_CODE == 'ru' %}
+                                            <a href="{% url 'products' %}{% if category_slug %}?category={{ category_slug|urlencode }}{% endif %}">
+                                                {% if category_info.breadcrumb %}
+                                                {{ category_info.breadcrumb }}
+                                                {% elif LANGUAGE_CODE == 'ru' %}
                                                 Категория
                                                 {% elif LANGUAGE_CODE == 'en' %}
                                                 Category

@@ -73,7 +73,7 @@ class ProductsManager {
   async init() {
     // Получаем категорию из URL
     const urlParams = new URLSearchParams(window.location.search);
-    this.currentCategory = urlParams.get('category');
+    this.currentCategory = urlParams.get('brand') || urlParams.get('category');
 
     // ✅ Загружаем категории из API
     await this.loadCategories();
@@ -396,8 +396,8 @@ async loadCategories() {
 
     // Номера страниц
     for (let i = 1; i <= totalPages; i++) {
-      const pageButton = document.createElement('a');
-      pageButton.href = 'javascript:void(0);';
+      const pageButton = document.createElement('button');
+      pageButton.type = 'button';
       pageButton.className = `mxd-blog-pagination__item blog-pagination-number btn btn-anim ${i === this.currentPage ? 'active' : ''}`;
       pageButton.innerHTML = `<span class="btn-caption">${i}</span>`;
       pageButton.addEventListener('click', (e) => {
@@ -425,8 +425,8 @@ async loadCategories() {
   }
 
   createButton(type, text, enabled) {
-    const button = document.createElement('a');
-    button.href = 'javascript:void(0);';
+    const button = document.createElement('button');
+    button.type = 'button';
     button.className = `mxd-blog-pagination__item blog-pagination-control ${type} btn btn-anim btn-line-small btn-bright anim-no-delay slide-${type === 'prev' ? 'left' : 'right'}`;
 
     if (!enabled) button.classList.add('disabled');

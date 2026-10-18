@@ -8,7 +8,9 @@ from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAdminUser
-from django.http import HttpResponseRedirect
+from django.http import Http404, HttpResponseRedirect
+from django.urls import reverse
+from django.utils.http import urlencode
 from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.throttling import AnonRateThrottle
 from .models import ( TelegramUser,
@@ -517,7 +519,11 @@ class ProductViewSet(viewsets.ReadOnlyModelViewSet):
                 'gallery'
             ).order_by('order', 'title')
             
-            category_slug = self.request.query_params.get('category', None)
+            # ?brand= is an alias for ?category= (used by /brand/<slug>/)
+            category_slug = (
+                self.request.query_params.get('brand')
+                or self.request.query_params.get('category')
+            )
             if category_slug:
                 queryset = queryset.filter(
                     category__slug=category_slug,  # ✅ ИСПРАВЛЕНО
@@ -534,11 +540,18 @@ class ProductViewSet(viewsets.ReadOnlyModelViewSet):
             return ProductDetailSerializer
         return ProductCardSerializer
 
+
+def brand_redirect(request, slug):
+    """/brand/<slug>/ -> /products/?brand=<slug> (302)"""
+    return redirect(f"{reverse('products')}?{urlencode({'brand': slug})}")
+
+
 def products(request):
     """Страница со списком продуктов по категориям"""
     try:
-        category_slug = request.GET.get('category')
-        
+        # ?brand= is an alias for ?category= (used by /brand/<slug>/)
+        category_slug = request.GET.get('brand') or request.GET.get('category')
+
         if category_slug:
             category = get_object_or_404(ProductCategory, slug=category_slug, is_active=True)
             language = getattr(request, 'LANGUAGE_CODE', 'uz')
@@ -580,6 +593,9 @@ def products(request):
             'category_info': category_info,
             'all_categories': all_categories
         })
+    except Http404:
+        # Unknown ?brand= / ?category= must stay a real 404, not an empty 200 page
+        raise
     except Exception as e:
         logger.error(f"Ошибка на странице продуктов: {str(e)}", exc_info=True)
         return render(request, 'main/products.html', {

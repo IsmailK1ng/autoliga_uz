@@ -8,6 +8,7 @@ urlpatterns = [
     path('contact/', views.contact, name='contact'),
     path('products/', views.products, name='products'),
     path('products/<slug:product_id>/', views.product_detail, name='product_detail'),
+    path('brand/<slug:slug>/', views.brand_redirect, name='brand'),
     path('news/', views.news, name='news'),
     path('news/<slug:slug>/', views.news_detail, name='news_detail'),
     path('test-utm/', TemplateView.as_view(template_name='test-utm.html'), name='test_utm'),
@@ -18,4 +19,6 @@ urlpatterns = [
     path('dealers/<int:pk>/', views.dealer_detail, name='dealer_detail'),
     path('team/', views.team, name='team'),
     path('test-drive/', views.test_drive, name='test_drive'),
-]   
+    path('privacy/', TemplateView.as_view(template_name='main/privacy.html'), name='privacy'),
+    path('terms/', TemplateView.as_view(template_name='main/terms.html'), name='terms'),
+]

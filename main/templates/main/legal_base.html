@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% comment %}
+    Shared layout for the privacy and terms pages.
+    Child templates fill: title, meta_description, og_title, og_description,
+    legal_heading (the page <h1>) and legal_body.
+{% endcomment %}
+
+{% block extra_meta %}
+    <meta name="robots" content="noindex, follow">
+{% endblock extra_meta %}
+
+{% block og_image %}{{ request.scheme }}://{{ request.get_host }}{% static 'images/autoliga.jpg' %}{% endblock %}
+
+{% block breadcrumbs %}
+<link rel="stylesheet" href="{% static 'css/breadcrumbs.css' %}">
+{% endblock breadcrumbs %}
+
+{% block inline_styles %}
+<style>
+    .legal-page { padding-top: 4rem; padding-bottom: 8rem; }
+    .legal-page__title { margin-bottom: 3rem; }
+    .legal-page__body { max-width: 80rem; }
+    .legal-page__body p { margin-bottom: 1.6rem; }
+    .legal-page__body a { text-decoration: underline; }
+</style>
+{% endblock inline_styles %}
+
+{% block content %}
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-M33GWKMW" height="0" width="0"
+            style="display:none;visibility:hidden"></iframe></noscript>
+
+    {% include 'main/includes/header.html' %}
+
+    <div class="mxd-block loading-wrap"></div>
+
+    <!-- Breadcrumbs -->
+    <div class="mxd-section-filter pre-grid">
+        <div class="mxd-section-filter__inner animate-card-3">
+            <div class="mxd-grid-item-1">
+                <div class="section-filter">
+                    <div aria-label="breadcrumb">
+                        <ol class="breadcrumb-ol">
+                            <li><a href="{% url 'home' %}">{% if LANGUAGE_CODE == 'uz' %}Bosh sahifa{% elif LANGUAGE_CODE == 'ru' %}Главная{% else %}Home{% endif %}</a></li>
+                            <li class="active">
+                                <a href="{{ request.path }}">{% block legal_breadcrumb %}{% endblock legal_breadcrumb %}</a>
+                            </li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <main id="mxd-page-content" class="mxd-page-content inner-page-content">
+        <div class="mxd-section legal-page">
+            <div class="mxd-container grid-container">
+                <h1 class="legal-page__title">{% block legal_heading %}{% endblock legal_heading %}</h1>
+                <div class="legal-page__body">
+                    {% block legal_body %}{% endblock legal_body %}
+                </div>
+            </div>
+        </div>
+    </main>
+
+    {% include 'main/includes/footer.html' %}
+
+    <a href="#0" id="to-top" class="btn btn-to-top slide-up anim-no-delay">
+        <i class="ph ph-arrow-up"></i>
+    </a>
+
+    <script src="{% static 'js/libs.min.js' %}"></script>
+    <script src="{% static 'js/app.js' %}"></script>
+    <script src="{% static 'js/error-logger.js' %}"></script>
+    <script src="{% static 'js/main-setting.js' %}"></script>
+{% endblock content %}

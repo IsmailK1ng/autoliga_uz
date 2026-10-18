@@ -1,0 +1,34 @@
+{% extends "main/legal_base.html" %}
+
+{% block title %}
+    {% if LANGUAGE_CODE == 'uz' %}Foydalanish shartlari - Autoliga{% elif LANGUAGE_CODE == 'ru' %}Условия использования - Autoliga{% else %}Terms of use - Autoliga{% endif %}
+{% endblock %}
+
+{% block meta_description %}
+    {% if LANGUAGE_CODE == 'uz' %}Autoliga saytidagi ma'lumotlar va materiallardan foydalanish shartlari.{% elif LANGUAGE_CODE == 'ru' %}Условия использования информации и материалов сайта Autoliga.{% else %}Terms for using information and materials on the Autoliga website.{% endif %}
+{% endblock %}
+
+{% block og_title %}
+    {% if LANGUAGE_CODE == 'uz' %}Foydalanish shartlari - Autoliga{% elif LANGUAGE_CODE == 'ru' %}Условия использования - Autoliga{% else %}Terms of use - Autoliga{% endif %}
+{% endblock %}
+
+{% block og_description %}
+    {% if LANGUAGE_CODE == 'uz' %}Autoliga saytidagi ma'lumotlar va materiallardan foydalanish shartlari.{% elif LANGUAGE_CODE == 'ru' %}Условия использования информации и материалов сайта Autoliga.{% else %}Terms for using information and materials on the Autoliga website.{% endif %}
+{% endblock %}
+
+{% block legal_breadcrumb %}{% if LANGUAGE_CODE == 'uz' %}Foydalanish shartlari{% elif LANGUAGE_CODE == 'ru' %}Условия использования{% else %}Terms of use{% endif %}{% endblock %}
+
+{% block legal_heading %}{% if LANGUAGE_CODE == 'uz' %}Foydalanish shartlari{% elif LANGUAGE_CODE == 'ru' %}Условия использования{% else %}Terms of use{% endif %}{% endblock %}
+
+{% block legal_body %}
+    {% if LANGUAGE_CODE == 'uz' %}
+        <p>Saytdagi avtomobillar, narxlar, komplektatsiya va mavjudlik haqidagi ma'lumotlar tanishish uchun berilgan. Yakuniy narx, mavjudlik va xarid shartlarini diler bilan tasdiqlang.</p>
+        <p>Sayt materiallaridan qonunchilik va mualliflik huquqlariga rioya qilgan holda foydalaning. Materiallarni ruxsatsiz ko'chirish yoki tarqatish mumkin emas.</p>
+    {% elif LANGUAGE_CODE == 'ru' %}
+        <p>Информация на сайте об автомобилях, ценах, комплектациях и наличии носит ознакомительный характер. Итоговую цену, наличие и условия покупки уточняйте у дилера.</p>
+        <p>Используйте материалы сайта с соблюдением законодательства и авторских прав. Копирование и распространение материалов без разрешения не допускаются.</p>
+    {% else %}
+        <p>Vehicle, price, trim, and availability information on this website is provided for reference. Confirm final pricing, availability, and purchase terms with the dealer.</p>
+        <p>Use website materials in compliance with applicable law and copyright. Copying or distributing materials without permission is not allowed.</p>
+    {% endif %}
+{% endblock %}

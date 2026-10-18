@@ -573,7 +573,7 @@
                                         </p>
                                     {% endfor %}
                                 </div>
-                                {% if product.slider_power or product.slider_fuel_consumption or product.slider_year or product.slider_engine or product.slider_transmission or product.slider_dimensions %}
+                                {% if product.slider_power or product.slider_fuel_consumption or product.slider_year %}
                                 <div style="overflow-x:auto;margin-top:24px;">
                                     <table style="width:100%;border-collapse:collapse;">
                                         <caption style="text-align:left;padding:12px 0;">
@@ -582,14 +582,6 @@
                                             {% else %}Asosiy texnik xususiyatlar{% endif %}
                                         </caption>
                                         <tbody>
-                                            {% if product.slider_engine %}
-                                            <tr>
-                                                <th scope="row" style="padding:12px;border:1px solid #ddd;text-align:left;">
-                                                    {% if LANGUAGE_CODE == 'ru' %}Двигатель{% elif LANGUAGE_CODE == 'en' %}Engine{% else %}Dvigatel{% endif %}
-                                                </th>
-                                                <td style="padding:12px;border:1px solid #ddd;">{{ product.slider_engine }}</td>
-                                            </tr>
-                                            {% endif %}
                                             {% if product.slider_power %}
                                             <tr>
                                                 <th scope="row" style="padding:12px;border:1px solid #ddd;text-align:left;">
@@ -598,28 +590,12 @@
                                                 <td style="padding:12px;border:1px solid #ddd;">{{ product.slider_power }}</td>
                                             </tr>
                                             {% endif %}
-                                            {% if product.slider_transmission %}
-                                            <tr>
-                                                <th scope="row" style="padding:12px;border:1px solid #ddd;text-align:left;">
-                                                    {% if LANGUAGE_CODE == 'ru' %}Трансмиссия{% elif LANGUAGE_CODE == 'en' %}Transmission{% else %}Uzatmalar qutisi{% endif %}
-                                                </th>
-                                                <td style="padding:12px;border:1px solid #ddd;">{{ product.slider_transmission }}</td>
-                                            </tr>
-                                            {% endif %}
                                             {% if product.slider_fuel_consumption %}
                                             <tr>
                                                 <th scope="row" style="padding:12px;border:1px solid #ddd;text-align:left;">
                                                     {% if LANGUAGE_CODE == 'ru' %}Расход топлива{% elif LANGUAGE_CODE == 'en' %}Fuel consumption{% else %}Yoqilg‘i sarfi{% endif %}
                                                 </th>
                                                 <td style="padding:12px;border:1px solid #ddd;">{{ product.slider_fuel_consumption }}</td>
-                                            </tr>
-                                            {% endif %}
-                                            {% if product.slider_dimensions %}
-                                            <tr>
-                                                <th scope="row" style="padding:12px;border:1px solid #ddd;text-align:left;">
-                                                    {% if LANGUAGE_CODE == 'ru' %}Размеры{% elif LANGUAGE_CODE == 'en' %}Dimensions{% else %}O‘lchamlar{% endif %}
-                                                </th>
-                                                <td style="padding:12px;border:1px solid #ddd;">{{ product.slider_dimensions }}</td>
                                             </tr>
                                             {% endif %}
                                             {% if product.slider_year %}

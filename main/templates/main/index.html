@@ -981,7 +981,9 @@
                         <h3 class="contact-detail__title">
                           {% if LANGUAGE_CODE == 'uz' %}Telefon{% elif LANGUAGE_CODE == 'ru' %}Телефон{% else %}Phone{% endif %}
                           </h3>
-                          <a href="tel:{{ SITE_CONTACTS.phone }}" class="contact-detail__value">
+                        <a href="tel:{{ SITE_CONTACTS.phone }}" class="contact-detail__value">
+                          {{ SITE_CONTACTS.phone_display }}
+                        </a>
                       </div>
                     </div>
 
@@ -1337,7 +1339,7 @@ cards.forEach(function(card, i) {
             var phoneBtn = document.getElementById('htmPhone');
 
             if (phone) {
-                phoneBtn.href = 'tel:' + phone;
+                phoneBtn.href = 'tel:' + phone.replace(/\s/g, '');
                 document.getElementById('htmPhoneNum').textContent = phone;
                 phoneBtn.style.display = 'inline-flex';
             } else {

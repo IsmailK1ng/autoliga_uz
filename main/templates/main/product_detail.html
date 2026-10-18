@@ -776,7 +776,7 @@
         <form class="faw-modal__form" id="faw-contact-form">
             {% csrf_token %}
             <input type="hidden" name="project_name" value="autoliga.uz">
-            <input type="hidden" name="admin_email" value="info@autoliga.uz">
+            <input type="hidden" name="admin_email" value="{{ SITE_CONTACTS.email }}">
             <input type="hidden" name="form_subject" value="AUTOLIGA — avtomobil bo‘yicha murojaat">
             <input type="hidden" name="product" id="product-field" value="{{ product.title }}">
             <div class="faw-form__group">

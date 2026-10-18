@@ -206,7 +206,7 @@
 
         var phoneBtn = document.getElementById('tmPhone');
         if (phone) {
-            phoneBtn.href = 'tel:' + phone;
+            phoneBtn.href = 'tel:' + phone.replace(/\s/g, '');
             document.getElementById('tmPhoneNum').textContent = phone;
             phoneBtn.style.display = 'inline-flex';
         } else {

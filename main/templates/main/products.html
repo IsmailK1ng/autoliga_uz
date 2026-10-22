@@ -60,9 +60,33 @@
     }
 
 
+
+    .brand-filter {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 16px;
+    }
+
+    .brand-filter__link {
+      padding: 6px 14px;
+      border: 1px solid var(--border-color, #d9d9d9);
+      border-radius: 999px;
+      font-size: 1.4rem;
+      text-decoration: none;
+    }
+
+    .brand-filter__link.active {
+      background: var(--t-bright, #111);
+      color: var(--base, #fff);
+    }
 </style>
 {% endblock productstyle %}
 
+
+{% block extra_meta %}
+    {% if search_query %}<meta name="robots" content="noindex, follow">{% endif %}
+{% endblock extra_meta %}
 
 {% block content %}
 
@@ -90,9 +114,9 @@
         {% elif LANGUAGE_CODE == 'en' %}{{ category_info.title }} vehicles
         {% else %}{{ category_info.title }} avtomobillari{% endif %}
     {% else %}
-        {% if LANGUAGE_CODE == 'ru' %}Модели автомобилей
-        {% elif LANGUAGE_CODE == 'en' %}Car models
-        {% else %}Avtomobil modellari{% endif %}
+        {% if LANGUAGE_CODE == 'ru' %}Каталог новых автомобилей
+        {% elif LANGUAGE_CODE == 'en' %}New car catalog
+        {% else %}Yangi avtomobillar katalogi{% endif %}
     {% endif %}
 </h1>
                                             </div>
@@ -157,7 +181,7 @@
                                                 {% endif %}
                                             </a>
                                         </li>
-                                        <li>
+                                        <li{% if not category_slug %} class="active"{% endif %}>
                                             <a href="{% url 'products' %}">
                                                 {% if LANGUAGE_CODE == 'ru' %}
                                                 Модели
@@ -168,32 +192,34 @@
                                                 {% endif %}
                                             </a>
                                         </li>
+                                        {% if category_slug %}
                                         <li class="active">
-                                            <a href="{% url 'products' %}{% if category_slug %}?category={{ category_slug|urlencode }}{% endif %}">
-                                                {% if category_info.breadcrumb %}
-                                                {{ category_info.breadcrumb }}
-                                                {% elif LANGUAGE_CODE == 'ru' %}
-                                                Категория
-                                                {% elif LANGUAGE_CODE == 'en' %}
-                                                Category
-                                                {% elif LANGUAGE_CODE == 'uz' %}
-                                                Kategoriya
-                                                {% endif %}
-                                            </a>
+                                            <a href="{% url 'products' %}?category={{ category_slug|urlencode }}">{{ category_info.breadcrumb }}</a>
                                         </li>
+                                        {% endif %}
                                     </ol>
 
 
                                 </div>
                                 <div class="filter-container">
-                                    <div class="filter-search">
-                                        <input type="text" class="filter-search__input"
+                                    <form class="filter-search" method="get" action="{% url 'products' %}" role="search">
+                                        {% if category_slug %}<input type="hidden" name="category" value="{{ category_slug }}">{% endif %}
+                                        <input type="search" name="q" value="{{ search_query }}" class="filter-search__input"
+                                               aria-label="{% if LANGUAGE_CODE == 'ru' %}Поиск модели{% elif LANGUAGE_CODE == 'en' %}Search models{% else %}Model qidirish{% endif %}"
                                                placeholder="{% if LANGUAGE_CODE == 'ru' %}Поиск...{% elif LANGUAGE_CODE == 'en' %}Search...{% else %}Qidirish...{% endif %}">
-                                        <button class="filter-search__btn" aria-label="Search">
-                                            <img src="{% static 'images/icons/sistem-icons/search.svg' %}" alt="Search">
+                                        <button type="submit" class="filter-search__btn" aria-label="Search">
+                                            <img src="{% static 'images/icons/sistem-icons/search.svg' %}" alt="">
                                         </button>
-                                    </div>
+                                    </form>
                                 </div>
+                                {% if all_categories %}
+                                <nav class="brand-filter" aria-label="{% if LANGUAGE_CODE == 'ru' %}Бренды{% elif LANGUAGE_CODE == 'en' %}Brands{% else %}Brendlar{% endif %}">
+                                    <a href="{% url 'products' %}" class="brand-filter__link{% if not category_slug %} active{% endif %}">{% if LANGUAGE_CODE == 'ru' %}Все{% elif LANGUAGE_CODE == 'en' %}All{% else %}Barchasi{% endif %}</a>
+                                    {% for cat in all_categories %}
+                                    <a href="{% url 'products' %}?category={{ cat.slug|urlencode }}" class="brand-filter__link{% if cat.slug == category_slug %} active{% endif %}">{{ cat.name }}</a>
+                                    {% endfor %}
+                                </nav>
+                                {% endif %}
                             </div>
                         </div>
                     </div>
@@ -203,17 +229,46 @@
 
             <!-- Карточки продуктов -->
             <div class="mxd-block">
+                <h2 class="visually-hidden">{% if LANGUAGE_CODE == 'ru' %}Модели{% elif LANGUAGE_CODE == 'en' %}Models{% else %}Modellar{% endif %}</h2>
                 <div class="mxd-blog-preview">
                     <div class="container-fluid p-0">
-                        <div class="g-0 card_block faw-truck-card-container">
+                        <div class="g-0 card_block faw-truck-card-container" data-ssr="true">
                             
-                            <!-- ✅ Loader - JavaScript заменит на карточки -->
-                            <div class="loader-container">
-                                <div class="loader">
-                                    {% if LANGUAGE_CODE == 'ru' %}Загрузка...{% elif LANGUAGE_CODE == 'en'
-                                    %}Loading...{% else %}Yuklanmoqda...{% endif %}
+                            {% for product in products %}
+                            <div class="product-card-wrapper">
+                                <div class="faw-truck-card">
+                                    <div class="truck-image-container">
+                                        {% if product.category %}<div class="brand-badge">{{ product.category.name }}</div>{% endif %}
+                                        {% with image=product.card_image|default:product.main_image %}
+                                        {% if image %}<img src="{{ image.url }}" class="truck-image" alt="{{ product.display_name }}" loading="lazy" decoding="async">{% endif %}
+                                        {% endwith %}
+                                    </div>
+                                    <div class="truck-info">
+                                        <h3 class="truck-title">{{ product.title }}</h3>
+                                        {% if product.slider_price %}
+                                        <div class="truck-price">
+                                            <span>{{ product.slider_price }}</span>
+                                        </div>
+                                        {% endif %}
+                                        {% if product.card_specs.all %}
+                                        <div class="truck-specs">
+                                            {% for spec in product.card_specs.all %}
+                                            <div class="spec-item">
+                                                {% if spec.icon and spec.icon.icon %}<img class="spec-icon" src="{{ spec.icon.icon.url }}" alt="">{% endif %}
+                                                <span class="spec-value">{{ spec.value }}</span>
+                                            </div>
+                                            {% endfor %}
+                                        </div>
+                                        {% endif %}
+                                        <div class="truck-cta">
+                                            <a href="{% url 'product_detail' product.slug %}" class="btn-details">{% if LANGUAGE_CODE == 'ru' %}Подробнее{% elif LANGUAGE_CODE == 'en' %}Read more{% else %}Batafsil o'qish{% endif %}</a>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
+                            {% empty %}
+                            <div class="no-results"><p>{% if LANGUAGE_CODE == 'ru' %}Товары не найдены{% elif LANGUAGE_CODE == 'en' %}No products found{% else %}Mahsulotlar topilmadi{% endif %}</p></div>
+                            {% endfor %}
                         </div>
                     </div>
                 </div>

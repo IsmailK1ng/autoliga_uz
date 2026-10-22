@@ -569,32 +569,31 @@ def products(request):
     'seo_description': getattr(category, f'seo_description_{language}', None) or category.seo_description or '',
 }
         else:
-            # Birinchi faol kategoriya
-            category = ProductCategory.objects.filter(is_active=True).order_by('order').first()
+            # No brand selected: catalog of all models (task 4)
+            category_info = {}
+            category_slug = None
 
-            if category:
-                language = getattr(request, 'LANGUAGE_CODE', 'uz')
-                category_info = {
-                    'id': category.id,
-                    'title': getattr(category, f'name_{language}', None) or category.name,
-                    'slogan': getattr(category, f'description_{language}', None) or category.description or '',
-                    'hero_image': category.hero_image.url if category.hero_image else 'images/default_hero.png',
-                    'breadcrumb': getattr(category, f'name_{language}', None) or category.name,
-                    'seo_title': getattr(category, f'seo_title_{language}', None) or category.seo_title or '',
-                    'seo_description': getattr(category, f'seo_description_{language}', None) or category.seo_description or '',
-                }
-                category_slug = category.slug
-            else:
-                category_info = {}
-                category_slug = None
-        
+        # Server-rendered cards, same filter as ProductViewSet; JS re-renders them
+        products_qs = Product.objects.filter(is_active=True).select_related('category').prefetch_related(
+            'card_specs__icon'
+        ).order_by('order', 'title')
+        if category_slug:
+            products_qs = products_qs.filter(category__slug=category_slug, category__is_active=True)
+
+        # ?q= model search (used by the 404 page); result pages are noindex
+        search_query = request.GET.get('q', '').strip()[:100]
+        if search_query:
+            products_qs = products_qs.filter(title__icontains=search_query)
+
         # Получаем все категории для навигации
         all_categories = ProductCategory.objects.filter(is_active=True).order_by('order')
-        
+
         return render(request, 'main/products.html', {
             'category_slug': category_slug,
             'category_info': category_info,
-            'all_categories': all_categories
+            'all_categories': all_categories,
+            'products': products_qs,
+            'search_query': search_query,
         })
     except Http404:
         # Unknown ?brand= / ?category= must stay a real 404, not an empty 200 page
@@ -604,7 +603,9 @@ def products(request):
         return render(request, 'main/products.html', {
             'category_slug': None,
             'category_info': {},
-            'all_categories': []
+            'all_categories': [],
+            'products': [],
+            'search_query': '',
         })
 
 @api_view(['POST'])

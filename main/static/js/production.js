@@ -86,6 +86,14 @@ class ProductsManager {
 
     // Инициализируем поиск
     this.initSearch();
+
+    // ?q= from the search form or the 404 page: reuse the live search filter
+    const query = urlParams.get('q');
+    const searchInput = document.querySelector('.filter-search__input');
+    if (query && searchInput) {
+      searchInput.value = query;
+      searchInput.dispatchEvent(new Event('input'));
+    }
   }
 
 async loadCategories() {
@@ -507,6 +515,8 @@ async loadCategories() {
 
   showLoader() {
     const container = document.querySelector('.faw-truck-card-container');
+    // Server-rendered cards stay visible until the API cards replace them
+    if (container && container.dataset.ssr === 'true') return;
     if (container) {
       container.innerHTML = `<div class="loader-container"><div class="loader">${this.t('loading')}</div></div>`;
     }

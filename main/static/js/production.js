@@ -144,12 +144,7 @@ async loadCategories() {
 
     console.log('🔄 Обновляем контент страницы для:', this.currentCategoryData.name);
 
-    // 1. ✅ Обновляем заголовок
-    const titleElement = document.querySelector('.models_title');
-    if (titleElement) {
-      titleElement.textContent = this.currentCategoryData.name;
-      console.log('✅ Заголовок обновлён:', this.currentCategoryData.name);
-    }
+    // H1, breadcrumb and <title> are rendered on the server; do not overwrite them
 
     // 2. ✅ Обновляем описание
     const descriptionElement = document.querySelector('.hero-05-title__item:not(.title-item-image)');
@@ -172,16 +167,6 @@ async loadCategories() {
       console.log('⚠️ Элемент hero изображения не найден');
     }
 
-    // 4. ✅ Обновляем хлебные крошки
-    const breadcrumbActive = document.querySelector('.breadcrumb-ol .active a');
-    if (breadcrumbActive) {
-      breadcrumbActive.textContent = this.currentCategoryData.name;
-      console.log('✅ Хлебные крошки обновлены');
-    }
-
-    // 5. ✅ Обновляем title страницы
-    document.title = `${this.currentCategoryData.name} - Autoliga`;
-    console.log('✅ Title страницы обновлён');
   }
 
   async loadProducts() {

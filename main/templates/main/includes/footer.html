@@ -78,7 +78,7 @@
                         <ul class="footer-models">
                             {% for brand in SITE_MENU %}
                             <li class="footer-models__brand">
-                                <a class="footer-models__brand-link" href="{% url 'products' %}?category={{ brand.slug|urlencode }}">{{ brand.name|default:brand.name_uz }}</a>
+                                <a class="footer-models__brand-link" href="{% url 'brand' brand.slug %}">{{ brand.name|default:brand.name_uz }}</a>
                                 {% if brand.menu_products %}
                                 <ul class="footer-models__list">
                                     {% for model in brand.menu_products %}

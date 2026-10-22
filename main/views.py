@@ -8,7 +8,8 @@ from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAdminUser
-from django.http import Http404, HttpResponseRedirect
+from django.http import Http404, HttpResponsePermanentRedirect, HttpResponseRedirect
+from django.core.validators import slug_re
 from django.urls import reverse
 from django.utils.html import strip_tags
 from rest_framework.decorators import action, api_view, permission_classes
@@ -589,8 +590,19 @@ def brand_detail(request, slug):
 def products(request):
     """Страница со списком продуктов по категориям"""
     try:
-        # ?brand= is an alias for ?category= (used by /brand/<slug>/)
+        # ?brand= is an alias for ?category=
         category_slug = request.GET.get('brand') or request.GET.get('category')
+        search_query = request.GET.get('q', '').strip()[:100]
+
+        # Brand listings live on /brand/<slug>/ (task 8): 301, keep other params (utm_*, ...)
+        if category_slug and not search_query:
+            if not slug_re.fullmatch(category_slug):
+                raise Http404('Unknown brand')
+            params = request.GET.copy()
+            params.pop('category', None)
+            params.pop('brand', None)
+            url = reverse('brand', kwargs={'slug': category_slug})
+            return HttpResponsePermanentRedirect(f"{url}?{params.urlencode()}" if params else url)
 
         if category_slug:
             category = get_object_or_404(ProductCategory, slug=category_slug, is_active=True)
@@ -618,7 +630,6 @@ def products(request):
             products_qs = products_qs.filter(category__slug=category_slug, category__is_active=True)
 
         # ?q= model search (used by the 404 page); result pages are noindex
-        search_query = request.GET.get('q', '').strip()[:100]
         if search_query:
             products_qs = products_qs.filter(title__icontains=search_query)
 

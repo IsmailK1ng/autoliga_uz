@@ -4,7 +4,6 @@ from django import template
 from django.conf import settings
 from django.urls import reverse, NoReverseMatch
 from django.utils import translation
-from django.utils.http import urlencode
 from django.utils.safestring import mark_safe
 
 register = template.Library()
@@ -20,14 +19,23 @@ TRANSLATED_OBJECTS = {
 }
 
 
-def _canonical_query(request, url_name):
-    """Brand listings: ?category=<slug> is the one canonical form (?brand= is an
-    alias). Every other query parameter (utm_*, fbclid, page, q, ...) is dropped."""
-    if url_name == 'products':
-        category = request.GET.get('brand') or request.GET.get('category')
-        if category:
-            return '?' + urlencode({'category': category})
-    return ''
+def _canonical_base(request, url_name):
+    """Unprefixed (default-language) path of the canonical form of this page.
+
+    Query parameters (utm_*, fbclid, page, q, ...) are dropped. A catalog search
+    inside a brand (/products/?category=<slug>&q=..., noindex) points to the
+    brand page /brand/<slug>/ (task 8); without q those URLs 301 there anyway.
+    """
+    with translation.override(settings.LANGUAGE_CODE):
+        if url_name == 'products':
+            category = request.GET.get('brand') or request.GET.get('category')
+            if category:
+                return reverse('brand', kwargs={'slug': category})
+        return reverse(url_name, kwargs=request.resolver_match.kwargs)
+
+
+def _language_prefix(lang):
+    return '' if lang == settings.LANGUAGE_CODE else f'/{lang}'
 
 
 def _available_languages(context, request, url_name):
@@ -65,12 +73,10 @@ def hreflang_tags(context):
 
     default = settings.LANGUAGE_CODE
     try:
-        # Reverse in the default language: gives the unprefixed uz path even on /ru/ and /en/ pages
-        with translation.override(default):
-            path = reverse(url_name, kwargs=request.resolver_match.kwargs)
+        # Default-language path: unprefixed uz URL even on /ru/ and /en/ pages
+        path = _canonical_base(request, url_name)
     except NoReverseMatch:
         return ''
-    path += _canonical_query(request, url_name)
 
     languages = _available_languages(context, request, url_name)
     if len(languages) < 2:
@@ -79,8 +85,7 @@ def hreflang_tags(context):
     domain = request.build_absolute_uri('/').rstrip('/')
     tags = []
     for lang in languages:
-        prefix = '' if lang == default else f'/{lang}'
-        tags.append(f'<link rel="alternate" hreflang="{lang}" href="{domain}{prefix}{path}" />')
+        tags.append(f'<link rel="alternate" hreflang="{lang}" href="{domain}{_language_prefix(lang)}{path}" />')
     if default in languages:
         tags.append(f'<link rel="alternate" hreflang="x-default" href="{domain}{path}" />')
     return mark_safe('\n    '.join(tags))
@@ -93,5 +98,11 @@ def canonical_url(context):
         return ''
 
     url_name = request.resolver_match.url_name if request.resolver_match else None
-    canonical = f"{request.scheme}://{request.get_host()}{request.path}{_canonical_query(request, url_name)}"
+    path = request.path
+    if url_name:
+        try:
+            path = _language_prefix(translation.get_language()) + _canonical_base(request, url_name)
+        except NoReverseMatch:
+            pass
+    canonical = f"{request.scheme}://{request.get_host()}{path}"
     return mark_safe(f'<link rel="canonical" href="{canonical}" />')

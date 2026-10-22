@@ -59,7 +59,7 @@
                                         </li>
                                         {% for brand in SITE_MENU %}
                                         <li class="submenu__item submenu__item--brand">
-                                            <a class="submenu__link" href="{% url 'products' %}?category={{ brand.slug|urlencode }}">{{ brand.name|default:brand.name_uz }}</a>
+                                            <a class="submenu__link" href="{% url 'brand' brand.slug %}">{{ brand.name|default:brand.name_uz }}</a>
                                             {% if brand.menu_products %}
                                             <ul class="submenu__models">
                                                 {% for model in brand.menu_products %}

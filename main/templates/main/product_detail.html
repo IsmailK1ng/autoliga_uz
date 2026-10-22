@@ -93,7 +93,7 @@
                 "@type": "ListItem",
                 "position": 2,
                 "name": "{{ product.category.name|escapejs }}",
-                "item": "{{ request.scheme }}://{{ request.get_host }}{% url 'products' %}?category={{ product.category.slug|urlencode }}"
+                "item": "{{ request.scheme }}://{{ request.get_host }}{% url 'brand' product.category.slug %}"
             },
             {
                 "@type": "ListItem",
@@ -516,7 +516,7 @@
                                         </li>
                                         {% if product.category %}
                                             <li>
-                                                <a href="{% url 'products' %}?category={{ product.category.slug|urlencode }}">
+                                                <a href="{% url 'brand' product.category.slug %}">
                                                     {{ product.category.name }}
                                                 </a>
                                             </li>

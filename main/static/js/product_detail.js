@@ -431,7 +431,8 @@ if (categoryLink) {
     }
 
     categoryLink.textContent = categoryName;
-    categoryLink.href = "/#models";
+    const categorySlug = this.product.category && this.product.category.slug;
+    categoryLink.href = categorySlug ? `/brand/${categorySlug}/` : "/products/";
 
 }
 
@@ -463,7 +464,7 @@ document.title = `${this.product.title} - Autoliga`;
                         <div class="error-content">
                             <h1>❌ ${this.t('error')}</h1>
                             <p>${message}</p>
-                            <a href="/products/?category=samosval" class="btn btn-primary">
+                            <a href="/products/" class="btn btn-primary">
                                 <span>${this.t('backToHome')}</span>
                             </a>
                         </div>

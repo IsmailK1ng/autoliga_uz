@@ -4,19 +4,19 @@
 
 
 {% block title %}
-    AUTOLIGA - rasmiy dilerlik va xizmat ko’rsatish markazlari tarmog’i
+    {% if LANGUAGE_CODE == 'ru' %}AUTOLIGA - сеть официальных дилерских и сервисных центров{% elif LANGUAGE_CODE == 'en' %}AUTOLIGA - network of official dealership and service centers{% else %}AUTOLIGA - rasmiy dilerlik va xizmat ko’rsatish markazlari tarmog’i{% endif %}
 {% endblock %}
 
 {% block meta_description %}
-    JETOUR, SOUEAST, JAC va GEELY avtomobillari — AUTOLIGA’da. Avtomobil tanlashdan xaridgacha, texnik xizmatdan ta’mirlashgacha — har bir bosqichda yoningizdamiz.
+    {% if LANGUAGE_CODE == 'ru' %}Автомобили JETOUR, SOUEAST, JAC и GEELY — в AUTOLIGA. От выбора автомобиля до покупки, от техобслуживания до ремонта — мы рядом на каждом этапе.{% elif LANGUAGE_CODE == 'en' %}JETOUR, SOUEAST, JAC and GEELY cars at AUTOLIGA. From choosing a car to buying it, from maintenance to repair — we are with you at every step.{% else %}JETOUR, SOUEAST, JAC va GEELY avtomobillari — AUTOLIGA’da. Avtomobil tanlashdan xaridgacha, texnik xizmatdan ta’mirlashgacha — har bir bosqichda yoningizdamiz.{% endif %}
 {% endblock %}
 
 {% block og_title %}
-    AUTOLIGA — rasmiy avtosalonlar va servislar tarmog‘i
+    {% if LANGUAGE_CODE == 'ru' %}AUTOLIGA — сеть официальных автосалонов и сервисов{% elif LANGUAGE_CODE == 'en' %}AUTOLIGA — network of official car dealerships and services{% else %}AUTOLIGA — rasmiy avtosalonlar va servislar tarmog‘i{% endif %}
 {% endblock %}
 
 {% block og_description %}
-    JETOUR, SOUEAST, JAC va GEELY avtomobillari — AUTOLIGA’da. Avtomobil tanlashdan xaridgacha, texnik xizmatdan ta’mirlashgacha — har bir bosqichda yoningizdamiz.
+    {% if LANGUAGE_CODE == 'ru' %}Автомобили JETOUR, SOUEAST, JAC и GEELY — в AUTOLIGA. От выбора автомобиля до покупки, от техобслуживания до ремонта — мы рядом на каждом этапе.{% elif LANGUAGE_CODE == 'en' %}JETOUR, SOUEAST, JAC and GEELY cars at AUTOLIGA. From choosing a car to buying it, from maintenance to repair — we are with you at every step.{% else %}JETOUR, SOUEAST, JAC va GEELY avtomobillari — AUTOLIGA’da. Avtomobil tanlashdan xaridgacha, texnik xizmatdan ta’mirlashgacha — har bir bosqichda yoningizdamiz.{% endif %}
 {% endblock %}
 {% block og_image %}{{ request.scheme }}://{{ request.get_host }}{% static 'images/autoliga.jpg' %}{% endblock %}
 
@@ -109,7 +109,7 @@
                 </div>
               </div>
               <div class="hero-06-headline__content">
-<h1 class="hero-06-headline__title">AUTOLIGA — rasmiy avtosalonlar va servislar tarmog‘i</h1>                <div class="mxd-hero-06__marquee loading__item"></div>
+<h1 class="hero-06-headline__title">{% if LANGUAGE_CODE == 'ru' %}AUTOLIGA — сеть официальных автосалонов и сервисов{% elif LANGUAGE_CODE == 'en' %}AUTOLIGA — network of official car dealerships and services{% else %}AUTOLIGA — rasmiy avtosalonlar va servislar tarmog‘i{% endif %}</h1>                <div class="mxd-hero-06__marquee loading__item"></div>
               </div>
             </div>
           </div>

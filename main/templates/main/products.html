@@ -3,31 +3,19 @@
 {% load seo_tags %}
 
 {% block title %}
-    {% if category_info.seo_title %}
-        {{ category_info.seo_title|striptags }}
-    {% elif category_info.title %}
-        {{ category_info.title|striptags }} avtomobillari va narxlari | AUTOLIGA
-    {% else %}
-        JETOUR, SOUEAST, JAC va GEELY avtomobillari | AUTOLIGA
-    {% endif %}
+    {% if category_info.seo_title %}{{ category_info.seo_title|striptags }}{% elif category_info.title %}{% if LANGUAGE_CODE == 'ru' %}Автомобили {{ category_info.title|striptags }} и цены | AUTOLIGA{% elif LANGUAGE_CODE == 'en' %}{{ category_info.title|striptags }} cars and prices | AUTOLIGA{% else %}{{ category_info.title|striptags }} avtomobillari va narxlari | AUTOLIGA{% endif %}{% else %}{% if LANGUAGE_CODE == 'ru' %}Автомобили JETOUR, SOUEAST, JAC и GEELY | AUTOLIGA{% elif LANGUAGE_CODE == 'en' %}JETOUR, SOUEAST, JAC and GEELY cars | AUTOLIGA{% else %}JETOUR, SOUEAST, JAC va GEELY avtomobillari | AUTOLIGA{% endif %}{% endif %}
 {% endblock %}
 
 {% block meta_description %}
-    {% if category_info.seo_description %}
-        {{ category_info.seo_description|striptags }}
-    {% elif category_info.title %}
-        {{ category_info.title|striptags }} avtomobillari: modellar, narxlar, kredit va rasmiy servis. AUTOLIGA’dan batafsil ma’lumot oling.
-    {% else %}
-        JETOUR, SOUEAST, JAC va GEELY avtomobillari: modellar, narxlar, kredit va rasmiy servis xizmatlari.
-    {% endif %}
+    {% if category_info.seo_description %}{{ category_info.seo_description|striptags }}{% elif category_info.title %}{% if LANGUAGE_CODE == 'ru' %}Автомобили {{ category_info.title|striptags }}: модели, цены, кредит и официальный сервис. Подробная информация — в AUTOLIGA.{% elif LANGUAGE_CODE == 'en' %}{{ category_info.title|striptags }} cars: models, prices, financing and official service. Get full details from AUTOLIGA.{% else %}{{ category_info.title|striptags }} avtomobillari: modellar, narxlar, kredit va rasmiy servis. AUTOLIGA’dan batafsil ma’lumot oling.{% endif %}{% else %}{% if LANGUAGE_CODE == 'ru' %}Автомобили JETOUR, SOUEAST, JAC и GEELY: модели, цены, кредит и официальный сервис.{% elif LANGUAGE_CODE == 'en' %}JETOUR, SOUEAST, JAC and GEELY cars: models, prices, financing and official service.{% else %}JETOUR, SOUEAST, JAC va GEELY avtomobillari: modellar, narxlar, kredit va rasmiy servis xizmatlari.{% endif %}{% endif %}
 {% endblock %}
 
 {% block og_title %}
-    {% if category_info.seo_title %}{{ category_info.seo_title|striptags }}{% elif category_info.title %}{{ category_info.title|striptags }} avtomobillari | AUTOLIGA{% else %}JETOUR, SOUEAST, JAC va GEELY | AUTOLIGA{% endif %}
+    {% if category_info.seo_title %}{{ category_info.seo_title|striptags }}{% elif category_info.title %}{% if LANGUAGE_CODE == 'ru' %}Автомобили {{ category_info.title|striptags }} и цены | AUTOLIGA{% elif LANGUAGE_CODE == 'en' %}{{ category_info.title|striptags }} cars and prices | AUTOLIGA{% else %}{{ category_info.title|striptags }} avtomobillari va narxlari | AUTOLIGA{% endif %}{% else %}{% if LANGUAGE_CODE == 'ru' %}Автомобили JETOUR, SOUEAST, JAC и GEELY | AUTOLIGA{% elif LANGUAGE_CODE == 'en' %}JETOUR, SOUEAST, JAC and GEELY cars | AUTOLIGA{% else %}JETOUR, SOUEAST, JAC va GEELY avtomobillari | AUTOLIGA{% endif %}{% endif %}
 {% endblock %}
 
 {% block og_description %}
-    {% if category_info.seo_description %}{{ category_info.seo_description|striptags }}{% elif category_info.title %}{{ category_info.title|striptags }} modellari, narxlari, kredit va rasmiy servis xizmatlari.{% else %}JETOUR, SOUEAST, JAC va GEELY avtomobillari — AUTOLIGA’da.{% endif %}
+    {% if category_info.seo_description %}{{ category_info.seo_description|striptags }}{% elif category_info.title %}{% if LANGUAGE_CODE == 'ru' %}Автомобили {{ category_info.title|striptags }}: модели, цены, кредит и официальный сервис. Подробная информация — в AUTOLIGA.{% elif LANGUAGE_CODE == 'en' %}{{ category_info.title|striptags }} cars: models, prices, financing and official service. Get full details from AUTOLIGA.{% else %}{{ category_info.title|striptags }} avtomobillari: modellar, narxlar, kredit va rasmiy servis. AUTOLIGA’dan batafsil ma’lumot oling.{% endif %}{% else %}{% if LANGUAGE_CODE == 'ru' %}Автомобили JETOUR, SOUEAST, JAC и GEELY: модели, цены, кредит и официальный сервис.{% elif LANGUAGE_CODE == 'en' %}JETOUR, SOUEAST, JAC and GEELY cars: models, prices, financing and official service.{% else %}JETOUR, SOUEAST, JAC va GEELY avtomobillari: modellar, narxlar, kredit va rasmiy servis xizmatlari.{% endif %}{% endif %}
 {% endblock %}
 
 

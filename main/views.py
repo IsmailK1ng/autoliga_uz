@@ -27,6 +27,7 @@ from django.utils import timezone
 import logging
 import json
 from django.db.models import Prefetch
+from .seo import product_seo
 
 
 logger = logging.getLogger('django')
@@ -164,21 +165,13 @@ def product_detail(request, product_id):
         is_active=True
     ).exclude(pk=product.pk).order_by('order')[:4]
 
-    # SEO description — Python da tayyorlaymiz (160 belgi limit)
-    seo_parts = [f"{product.title} Toshkentda"]
-    if product.slider_price:
-        seo_parts.append(f"narx {product.slider_price}")
-    if product.slider_power:
-        seo_parts.append(f"dvigatel {product.slider_power}")
-    if product.slider_fuel_consumption:
-        seo_parts.append(f"yoqilg'i {product.slider_fuel_consumption}")
-    seo_parts.append("Kredit shartlari mavjud. Autoliga rasmiy dileri.")
-    seo_description = '. '.join(seo_parts)[:160]
+    # Title / description / H1 by the TZ patterns (main/seo.py)
+    seo = product_seo(product, getattr(request, 'LANGUAGE_CODE', 'uz'))
 
     return render(request, 'main/product_detail.html', {
         'product': product,                      # ← SEO uchun asosiy
         'related_products': related_products,    # ← internal linking
-        'seo_description': seo_description,      # ← tayyor description
+        'seo': seo,                              # ← title, description, h1
         'product_id': product_id,                # ← eski kod uchun (agar JS ishlatsa)
     })
 

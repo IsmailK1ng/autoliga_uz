@@ -104,9 +104,9 @@ class ProductDetail {
     if (ssrContent) {
         const titleElement = document.querySelector('.models_title');
 
-        window.currentProductTitle = titleElement
-            ? titleElement.textContent.trim()
-            : '';
+        // Keep the plain model name set by the template (the H1 also has brand and year)
+        window.currentProductTitle = window.currentProductTitle
+            || (titleElement ? titleElement.textContent.trim() : '');
 
         const startGallery = () => {
             const serverSlides = document.querySelector(

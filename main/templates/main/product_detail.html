@@ -5,24 +5,24 @@
 <head>
     <meta charset="UTF-8">
     <!-- META — AUTOLIGA SEO -->
-    <title>{% if product %}{% if product.seo_title %}{{ product.seo_title|striptags }}{% elif LANGUAGE_CODE == 'ru' %}{{ product.title|striptags }} — цена в Узбекистане | AUTOLIGA{% elif LANGUAGE_CODE == 'en' %}{{ product.title|striptags }} price in Uzbekistan | AUTOLIGA{% else %}{{ product.title|striptags }} narxi O‘zbekistonda | AUTOLIGA{% endif %}{% else %}AUTOLIGA — rasmiy avtosalonlar va servislar tarmog‘i{% endif %}</title>
-    <meta name="description" content="{% if product %}{% if product.seo_description %}{{ product.seo_description|striptags }}{% elif LANGUAGE_CODE == 'ru' %}{{ product.title|striptags }}: цена {% if product.slider_price %}{{ product.slider_price|striptags }}{% else %}по запросу{% endif %}.{% if product.slider_power %} Мощность: {{ product.slider_power|striptags }}.{% endif %}{% if product.slider_fuel_consumption %} Расход топлива: {{ product.slider_fuel_consumption|striptags }}.{% endif %} Характеристики, тест-драйв и сервис AUTOLIGA.{% elif LANGUAGE_CODE == 'en' %}{{ product.title|striptags }}: price {% if product.slider_price %}{{ product.slider_price|striptags }}{% else %}on request{% endif %}.{% if product.slider_power %} Power: {{ product.slider_power|striptags }}.{% endif %}{% if product.slider_fuel_consumption %} Fuel use: {{ product.slider_fuel_consumption|striptags }}.{% endif %} Specifications, test drive and AUTOLIGA service.{% else %}{{ product.title|striptags }}: narxi {% if product.slider_price %}{{ product.slider_price|striptags }}{% else %}so‘rov asosida{% endif %}.{% if product.slider_power %} Dvigatel quvvati: {{ product.slider_power|striptags }}.{% endif %}{% if product.slider_fuel_consumption %} Yoqilg‘i sarfi: {{ product.slider_fuel_consumption|striptags }}.{% endif %} Test-drayv va AUTOLIGA servisi.{% endif %}{% else %}JETOUR, SOUEAST, JAC va GEELY avtomobillari — AUTOLIGA’da. Avtomobil tanlashdan xaridgacha, texnik xizmatdan ta’mirlashgacha — har bir bosqichda yoningizdamiz.{% endif %}">
+    <title>{{ seo.title }}</title>
+    <meta name="description" content="{{ seo.description }}">
     <meta name="robots" content="index, follow">
     <!-- OPEN GRAPH -->
     <meta property="og:type" content="{% if product %}product{% else %}website{% endif %}">
-    <meta property="og:title" content="{% if product %}{% if product.seo_title %}{{ product.seo_title|striptags }}{% elif LANGUAGE_CODE == 'ru' %}{{ product.title|striptags }} — цена в Узбекистане | AUTOLIGA{% elif LANGUAGE_CODE == 'en' %}{{ product.title|striptags }} price in Uzbekistan | AUTOLIGA{% else %}{{ product.title|striptags }} narxi O‘zbekistonda | AUTOLIGA{% endif %}{% else %}AUTOLIGA — rasmiy avtosalonlar va servislar tarmog‘i{% endif %}">
-    <meta property="og:description" content="{% if product %}{% if product.seo_description %}{{ product.seo_description|striptags }}{% elif LANGUAGE_CODE == 'ru' %}{{ product.title|striptags }}: {% if product.slider_price %}цена {{ product.slider_price|striptags }}.{% else %}цена по запросу.{% endif %}{% if product.slider_power %} Мощность: {{ product.slider_power|striptags }}.{% endif %} Характеристики, тест-драйв и сервис AUTOLIGA.{% elif LANGUAGE_CODE == 'en' %}{{ product.title|striptags }}: {% if product.slider_price %}price {{ product.slider_price|striptags }}.{% else %}price on request.{% endif %}{% if product.slider_power %} Power: {{ product.slider_power|striptags }}.{% endif %} Specifications, test drive and AUTOLIGA service.{% else %}{{ product.title|striptags }}: {% if product.slider_price %}narxi {{ product.slider_price|striptags }}.{% else %}narxi so‘rov asosida.{% endif %}{% if product.slider_power %} Dvigatel quvvati: {{ product.slider_power|striptags }}.{% endif %} Test-drayv va AUTOLIGA servisi.{% endif %}{% else %}JETOUR, SOUEAST, JAC va GEELY avtomobillari — AUTOLIGA’da. Avtomobil tanlashdan xaridgacha, texnik xizmatdan ta’mirlashgacha — har bir bosqichda yoningizdamiz.{% endif %}">
+    <meta property="og:title" content="{{ seo.title }}">
+    <meta property="og:description" content="{{ seo.description }}">
     <meta property="og:image" content="{% if product and product.main_image %}{{ request.scheme }}://{{ request.get_host }}{{ product.main_image.url }}{% else %}{{ request.scheme }}://{{ request.get_host }}{% static 'images/logo/autoliga-logo.png' %}{% endif %}">
     <meta property="og:url" content="{{ request.build_absolute_uri }}">
     <meta property="og:site_name" content="AUTOLIGA">
     <meta property="og:locale" content="{% if LANGUAGE_CODE == 'ru' %}ru_RU{% elif LANGUAGE_CODE == 'en' %}en_US{% else %}uz_UZ{% endif %}">
     {% if product %}
-    <meta property="og:image:alt" content="{{ product.title|striptags }}">
+    <meta property="og:image:alt" content="{{ product.display_name }}">
     {% endif %}
     <!-- TWITTER / X -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="{% if product %}{% if product.seo_title %}{{ product.seo_title|striptags }}{% else %}{{ product.title|striptags }} | AUTOLIGA{% endif %}{% else %}AUTOLIGA — rasmiy avtosalonlar va servislar tarmog‘i{% endif %}">
-    <meta name="twitter:description" content="{% if product %}{% if product.seo_description %}{{ product.seo_description|striptags }}{% else %}{{ product.title|striptags }}: narxi, texnik xususiyatlari, test-drayv va AUTOLIGA servisi.{% endif %}{% else %}JETOUR, SOUEAST, JAC va GEELY avtomobillari — AUTOLIGA’da. Avtomobil tanlashdan xaridgacha, texnik xizmatdan ta’mirlashgacha — har bir bosqichda yoningizdamiz.{% endif %}">
+    <meta name="twitter:title" content="{{ seo.title }}">
+    <meta name="twitter:description" content="{{ seo.description }}">
     <meta name="twitter:image" content="{% if product and product.main_image %}{{ request.scheme }}://{{ request.get_host }}{{ product.main_image.url }}{% else %}{{ request.scheme }}://{{ request.get_host }}{% static 'images/logo/autoliga-logo.png' %}{% endif %}">
     <!-- CANONICAL VA HREFLANG -->
     {% canonical_url %}
@@ -237,7 +237,7 @@
                                         <div class="col-12 col-xl-12 mxd-grid-item no-margin">
                                             <div class="mxd-section-models__title">
                                                 <h1 class="models_title">
-                                                    {% if product.category and product.category.name not in product.title %}{{ product.category.name }} {% endif %}{{ product.title }}
+                                                    {{ seo.h1 }}
                                                 </h1>
                                                 <ul class="more_info-link">
                                                     <li>

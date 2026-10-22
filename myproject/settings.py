@@ -22,6 +22,10 @@ SITE_CONTACTS = {
     'email': 'info@autoliga.uz',
 }
 
+# ============ SEO ============
+# Year used in model/brand titles and H1 ("Jetour T1 2026"); change once a year.
+SEO_YEAR = 2026
+
 
 
 # ============ ПРИЛОЖЕНИЯ ============
@@ -226,6 +230,7 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
                 'django.template.context_processors.i18n',
                 'main.context_processors.site_contacts',
+                'main.context_processors.seo',
             ],
         },
     },

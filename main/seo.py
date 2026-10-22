@@ -81,3 +81,64 @@ def product_seo(product, language):
         'description': description,
         'h1': f"{name} {year}",
     }
+
+
+# Brand page /brand/<slug>/ (task 8): H1 "{Brend} narxlari 2026 Toshkentda",
+# title/description follow the model patterns of task 3.
+BRAND_TITLE = {
+    'uz': "{name} narxlari {year} Toshkentda | Autoliga rasmiy diler",
+    'ru': "Цены {name} {year} в Ташкенте | Autoliga официальный дилер",
+    'en': "{name} prices {year} in Tashkent | Autoliga official dealer",
+}
+
+BRAND_H1 = {
+    'uz': "{name} narxlari {year} Toshkentda",
+    'ru': "Цены {name} {year} в Ташкенте",
+    'en': "{name} prices {year} in Tashkent",
+}
+
+BRAND_DESCRIPTION = {
+    # (with a lowest price, without a price)
+    'uz': ("{name} avtomobillari: narxlari {price} so'mdan. ", "{name} avtomobillari: narxi so‘rov asosida. "),
+    'ru': ("Автомобили {name}: цены от {price} сум. ", "Автомобили {name}: цена по запросу. "),
+    'en': ("{name} cars: prices from {price} UZS. ", "{name} cars: price on request. "),
+}
+
+CARD_PRICE = {
+    # (from the lowest trim price, no price)
+    'uz': ("{price} so'mdan", "Narxi so‘rov asosida"),
+    'ru': ("от {price} сум", "Цена по запросу"),
+    'en': ("from {price} UZS", "Price on request"),
+}
+
+
+def price_label(product, language):
+    """Card/table price: lowest active trim price, else the free-text slider_price."""
+    lang = language if language in CARD_PRICE else 'uz'
+    from_price, no_price = CARD_PRICE[lang]
+    min_price = min_trim_price(product)
+    if min_price:
+        return from_price.format(price=format_price(min_price))
+    return clean(product.slider_price) or no_price
+
+
+def brand_seo(brand, products, language):
+    """Return dict(title, description, h1) for a brand page in the given language."""
+    lang = language if language in BRAND_TITLE else 'uz'
+    year = settings.SEO_YEAR
+    name = clean(brand.name) or clean(getattr(brand, 'name_uz', ''))
+
+    title = clean(brand.seo_title) or BRAND_TITLE[lang].format(name=name, year=year)
+
+    description = clean(brand.seo_description)
+    if not description:
+        prices = [p for p in (min_trim_price(product) for product in products) if p]
+        with_price, without_price = BRAND_DESCRIPTION[lang]
+        head = with_price.format(name=name, price=format_price(min(prices))) if prices else without_price.format(name=name)
+        description = head + PRODUCT_DESCRIPTION_TAIL[lang]
+
+    return {
+        'title': title,
+        'description': description,
+        'h1': BRAND_H1[lang].format(name=name, year=year),
+    }

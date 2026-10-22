@@ -10,7 +10,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAdminUser
 from django.http import Http404, HttpResponseRedirect
 from django.urls import reverse
-from django.utils.http import urlencode
+from django.utils.html import strip_tags
 from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.throttling import AnonRateThrottle
 from .models import ( TelegramUser,
@@ -27,7 +27,7 @@ from django.utils import timezone
 import logging
 import json
 from django.db.models import Prefetch
-from .seo import product_seo
+from .seo import brand_seo, price_label, product_seo
 
 
 logger = logging.getLogger('django')
@@ -545,9 +545,45 @@ class ProductViewSet(viewsets.ReadOnlyModelViewSet):
         return ProductCardSerializer
 
 
-def brand_redirect(request, slug):
-    """/brand/<slug>/ -> /products/?brand=<slug> (302)"""
-    return redirect(f"{reverse('products')}?{urlencode({'brand': slug})}")
+def brand_detail(request, slug):
+    """Brand landing page /brand/<slug>/ (task 8): models, comparison table, FAQ."""
+    brand = get_object_or_404(ProductCategory, slug=slug, is_active=True)
+    language = getattr(request, 'LANGUAGE_CODE', 'uz')
+
+    products = list(
+        brand.products.filter(is_active=True)
+        .select_related('category')
+        .prefetch_related(
+            'card_specs__icon',
+            Prefetch('trims', queryset=ProductTrim.objects.filter(is_active=True), to_attr='active_trims'),
+        )
+        .order_by('order', 'title')
+    )
+    for product in products:
+        product.price_label = price_label(product, language)
+
+    # Only FAQ items that exist in this language (no fallback to another language)
+    faqs = [f for f in brand.faqs.filter(is_active=True) if (f.question or '').strip() and (f.answer or '').strip()]
+    faq_jsonld = ''
+    if faqs:
+        faq_jsonld = json.dumps({
+            '@context': 'https://schema.org',
+            '@type': 'FAQPage',
+            'mainEntity': [{
+                '@type': 'Question',
+                'name': ' '.join(f.question.split()),
+                'acceptedAnswer': {'@type': 'Answer', 'text': ' '.join(strip_tags(f.answer).split())},
+            } for f in faqs],
+        }, ensure_ascii=False).replace('</', '<\\/')
+
+    return render(request, 'main/brand_detail.html', {
+        'brand': brand,
+        'brand_name': brand.name or brand.name_uz,
+        'products': products,
+        'faqs': faqs,
+        'faq_jsonld': faq_jsonld,
+        'seo': brand_seo(brand, products, language),
+    })
 
 
 def products(request):

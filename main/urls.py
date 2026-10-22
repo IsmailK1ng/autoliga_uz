@@ -8,7 +8,7 @@ urlpatterns = [
     path('contact/', views.contact, name='contact'),
     path('products/', views.products, name='products'),
     path('products/<slug:product_id>/', views.product_detail, name='product_detail'),
-    path('brand/<slug:slug>/', views.brand_redirect, name='brand'),
+    path('brand/<slug:slug>/', views.brand_detail, name='brand'),
     path('news/', views.news, name='news'),
     path('news/<slug:slug>/', views.news_detail, name='news_detail'),
     path('test-utm/', TemplateView.as_view(template_name='test-utm.html'), name='test_utm'),

@@ -16,6 +16,7 @@ TRANSLATED_OBJECTS = {
     'product_detail': ('product', 'title'),
     'news_detail': ('news', 'title'),
     'dealer_detail': ('dealer', 'name'),
+    'brand': ('brand', 'name'),
 }
 
 

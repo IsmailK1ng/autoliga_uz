@@ -9,7 +9,7 @@ from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 from main.views import set_language_get
 from django.views.generic import TemplateView
 from django.contrib.sitemaps.views import sitemap
-from main.sitemaps import DealerSitemap, NewsSitemap, ProductSitemap, StaticViewSitemap
+from main.sitemaps import BrandSitemap, DealerSitemap, NewsSitemap, ProductSitemap, StaticViewSitemap
 
 admin.site.site_header = "AUTOLIGA ADMIN"
 admin.site.site_title = "AUTOLIGA"
@@ -17,6 +17,7 @@ admin.site.index_title = "Админ панель Autoliga Site"
 
 sitemaps = {
     "static": StaticViewSitemap,
+    "brands": BrandSitemap,
     "products": ProductSitemap,
     "news": NewsSitemap,
     "dealers": DealerSitemap,

@@ -1,7 +1,9 @@
 # main/templatetags/seo_tags.py
 
 from django import template
+from django.conf import settings
 from django.urls import reverse, NoReverseMatch
+from django.utils import translation
 from django.utils.safestring import mark_safe
 
 register = template.Library()
@@ -29,17 +31,21 @@ def hreflang_tags(context):
     tags = []
     
     try:
+        # Reverse in the default language: on /ru/ and /en/ pages reverse() would
+        # otherwise return an already prefixed path (/ru/ru/..., /en/ru/...)
+        with translation.override(settings.LANGUAGE_CODE):
+            base_url = reverse(url_name, kwargs=url_kwargs)
         # Р В Р’В Р В РІвЂљВ¬Р В Р’В Р вЂ™Р’В·Р В Р’В Р вЂ™Р’В±Р В Р’В Р вЂ™Р’ВµР В Р’В Р РЋРІР‚СњР В Р Р‹Р В РЎвЂњР В Р’В Р РЋРІР‚СњР В Р’В Р РЋРІР‚Р В Р’В Р Р†РІР‚С›РІР‚вЂњ (Р В Р’В Р СћРІР‚Р В Р’В Р вЂ™Р’ВµР В Р Р‹Р Р†Р вЂљРЎвЂєР В Р’В Р РЋРІР‚СћР В Р’В Р вЂ™Р’В»Р В Р Р‹Р Р†Р вЂљРЎв„ўР В Р’В Р В РІР‚В¦Р В Р Р‹Р Р†Р вЂљРІвЂћвЂ“Р В Р’В Р Р†РІР‚С›РІР‚вЂњ, Р В Р’В Р вЂ™Р’В±Р В Р’В Р вЂ™Р’ВµР В Р’В Р вЂ™Р’В· Р В Р’В Р РЋРІР‚вЂќР В Р Р‹Р В РІР‚С™Р В Р’В Р вЂ™Р’ВµР В Р Р‹Р Р†Р вЂљРЎвЂєР В Р’В Р РЋРІР‚Р В Р’В Р РЋРІР‚СњР В Р Р‹Р В РЎвЂњР В Р’В Р вЂ™Р’В°)
-        uz_url = reverse(url_name, kwargs=url_kwargs)
+        uz_url = base_url
         tags.append(f'<link rel="alternate" hreflang="uz" href="{domain}{uz_url}" />')
         tags.append(f'<link rel="alternate" hreflang="x-default" href="{domain}{uz_url}" />')
         
         # Р В Р’В Р вЂ™Р’В Р В Р Р‹Р РЋРІР‚СљР В Р Р‹Р В РЎвЂњР В Р Р‹Р В РЎвЂњР В Р’В Р РЋРІР‚СњР В Р’В Р РЋРІР‚Р В Р’В Р Р†РІР‚С›РІР‚вЂњ (Р В Р Р‹Р В РЎвЂњ Р В Р’В Р РЋРІР‚вЂќР В Р Р‹Р В РІР‚С™Р В Р’В Р вЂ™Р’ВµР В Р Р‹Р Р†Р вЂљРЎвЂєР В Р’В Р РЋРІР‚Р В Р’В Р РЋРІР‚СњР В Р Р‹Р В РЎвЂњР В Р’В Р РЋРІР‚СћР В Р’В Р РЋ /ru/)
-        ru_url = f"/ru{reverse(url_name, kwargs=url_kwargs)}"
+        ru_url = f"/ru{base_url}"
         tags.append(f'<link rel="alternate" hreflang="ru" href="{domain}{ru_url}" />')
         
         # Р В Р’В Р РЋРІР‚в„ўР В Р’В Р В РІР‚В¦Р В Р’В Р РЋРІР‚вЂњР В Р’В Р вЂ™Р’В»Р В Р’В Р РЋРІР‚Р В Р’В Р Р†РІР‚С›РІР‚вЂњР В Р Р‹Р В РЎвЂњР В Р’В Р РЋРІР‚СњР В Р’В Р РЋРІР‚Р В Р’В Р Р†РІР‚С›РІР‚вЂњ (Р В Р Р‹Р В РЎвЂњ Р В Р’В Р РЋРІР‚вЂќР В Р Р‹Р В РІР‚С™Р В Р’В Р вЂ™Р’ВµР В Р Р‹Р Р†Р вЂљРЎвЂєР В Р’В Р РЋРІР‚Р В Р’В Р РЋРІР‚СњР В Р Р‹Р В РЎвЂњР В Р’В Р РЋРІР‚СћР В Р’В Р РЋ /en/)
-        en_url = f"/en{reverse(url_name, kwargs=url_kwargs)}"
+        en_url = f"/en{base_url}"
         tags.append(f'<link rel="alternate" hreflang="en" href="{domain}{en_url}" />')
         
     except NoReverseMatch:

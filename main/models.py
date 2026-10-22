@@ -201,9 +201,17 @@ class ProductCategory(models.Model):
         blank=True,
         null=True
     )
+    brand_text = RichTextField(
+        "Текст страницы бренда",
+        blank=True,
+        null=True,
+        config_name='default',
+        help_text="Текст о бренде на странице /brand/<slug>/. Пусто — блок не показывается."
+    )
     order = models.PositiveIntegerField("Порядок", default=0)
     is_active = models.BooleanField("Активна", default=True)
     created_at = models.DateTimeField("Дата создания", auto_now_add=True)
+    updated_at = models.DateTimeField("Дата обновления", auto_now=True, null=True)
 
 
 
@@ -242,6 +250,32 @@ class ProductCategory(models.Model):
     def get_products_count(self):
         """Количество активных продуктов в категории"""
         return self.products.filter(is_active=True).count()
+
+    def get_absolute_url(self):
+        return reverse('brand', kwargs={'slug': self.slug})
+
+
+class BrandFAQ(models.Model):
+    """FAQ на странице бренда (/brand/<slug>/) + FAQPage schema"""
+    category = models.ForeignKey(
+        ProductCategory,
+        on_delete=models.CASCADE,
+        related_name='faqs',
+        verbose_name="Марка"
+    )
+    question = models.CharField("Вопрос", max_length=255)
+    answer = RichTextField("Ответ", config_name='default')
+    order = models.PositiveIntegerField("Порядок", default=0)
+    is_active = models.BooleanField("Активен", default=True)
+
+    class Meta:
+        verbose_name = "Вопрос-ответ (FAQ)"
+        verbose_name_plural = "Вопросы и ответы (FAQ)"
+        ordering = ['order', 'id']
+
+    def __str__(self):
+        return self.question
+
 
 class Product(models.Model):
     """Автомобили"""

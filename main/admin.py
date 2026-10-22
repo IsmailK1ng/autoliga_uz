@@ -755,6 +755,15 @@ class FeatureIconAdmin(ContentAdminMixin, admin.ModelAdmin):
 
 # ============ ПРОДУКТЫ ============
 
+class BrandFAQInline(TranslationStackedInline):
+    model = BrandFAQ
+    extra = 0
+    fields = ('question', 'answer', 'order', 'is_active')
+    ordering = ('order', 'id')
+    verbose_name = "Вопрос-ответ"
+    verbose_name_plural = "❓ FAQ на странице бренда"
+
+
 @admin.register(ProductCategory)
 class ProductCategoryAdmin(ContentAdminMixin, TabbedTranslationAdmin):
     list_display = ['icon_preview', 'name', 'slug', 'products_count', 'is_active', 'order']
@@ -770,6 +779,9 @@ class ProductCategoryAdmin(ContentAdminMixin, TabbedTranslationAdmin):
         ('SEO', {
             'fields': ('seo_title', 'seo_description'),
         }),
+        ('Страница бренда (/brand/<slug>/)', {
+            'fields': ('brand_text',),
+        }),
         ('Изображения', {
             'fields': ('icon', 'hero_image')
         }),
@@ -778,6 +790,7 @@ class ProductCategoryAdmin(ContentAdminMixin, TabbedTranslationAdmin):
             'classes': ('collapse',)
         }),
     )
+    inlines = [BrandFAQInline]
     
     def icon_preview(self, obj):
         if obj.icon:

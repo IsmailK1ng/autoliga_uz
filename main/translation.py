@@ -42,7 +42,12 @@ class VacancyIdealCandidateTranslationOptions(TranslationOptions):
 # ========== КАТЕГОРИИ ПРОДУКТОВ ==========
 @register(ProductCategory)
 class ProductCategoryTranslationOptions(TranslationOptions):
-    fields = ('name', 'description', 'seo_title', 'seo_description')
+    fields = ('name', 'description', 'seo_title', 'seo_description', 'brand_text')
+
+
+@register(BrandFAQ)
+class BrandFAQTranslationOptions(TranslationOptions):
+    fields = ('question', 'answer')
 
 # ========== ПРОДУКТЫ ==========
 @register(Product)

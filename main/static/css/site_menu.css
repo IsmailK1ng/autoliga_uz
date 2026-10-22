@@ -54,6 +54,44 @@
     }
 }
 
+/* Footer "Modellar" column (same fonts/colours as the footer social links) */
+.footer-models {
+    display: flex;
+    flex-direction: column;
+    gap: 1.6rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.footer-models__brand-link {
+    font: normal var(--fw-medium) 2.2rem/1.4 var(--_font-accent);
+    color: var(--t-bright);
+}
+
+.footer-models__list {
+    display: flex;
+    flex-direction: column;
+    gap: .4rem;
+    margin: .6rem 0 0;
+    padding: 0;
+    list-style: none;
+}
+
+.footer-models__link {
+    font: normal var(--fw-regular) 1.7rem/1.5 var(--_font-accent);
+    color: var(--t-medium);
+}
+
+.no-touch .footer-models__brand-link:hover,
+.no-touch .footer-models__link:hover {
+    color: var(--t-medium);
+}
+
+.no-touch .footer-models__link:hover {
+    color: var(--t-bright);
+}
+
 /* ------------------------------------------------------------------ desktop */
 @media only screen and (min-width: 1200px) {
 

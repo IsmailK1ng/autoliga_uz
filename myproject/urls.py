@@ -63,6 +63,9 @@ urlpatterns += [
     path('captcha/', include('captcha.urls'))
     ]
 
+# Custom 404 (task 15): real 404 status with menu, links and model search
+handler404 = 'main.views.page_not_found'
+
 # ========== МЕДИА И СТАТИКА (только DEBUG) ==========
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

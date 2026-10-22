@@ -52,8 +52,11 @@
     <meta name="twitter:card" content="summary_large_image">
     {# twitter:title/description/image are intentionally omitted: X falls back to og:* tags. #}
 
+    {# canonical + hreflang; error pages (404.html) empty this block #}
+    {% block alternates %}
     {% hreflang_tags %}
     {% canonical_url %}
+    {% endblock alternates %}
 
     {% block extra_meta %}{% endblock extra_meta %}
     {% block extra_css %}{% endblock %}

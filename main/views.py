@@ -341,6 +341,14 @@ def news_detail(request, slug):
         return redirect('news')
 
 
+def page_not_found(request, exception=None):
+    """Custom 404 page (task 15): real 404 status, menu, main links and model search."""
+    popular_products = Product.objects.filter(is_active=True).select_related('category').order_by(
+        '-is_featured', 'order', 'title'
+    )[:6]
+    return render(request, '404.html', {'popular_products': popular_products}, status=404)
+
+
 def set_language_get(request):
     """Переключение языка ТОЛЬКО для сайта"""
     language = request.GET.get('language') or request.POST.get('language')

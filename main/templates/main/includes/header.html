@@ -22,54 +22,90 @@
         </a>
     </div>
 
-    <!-- Десктопное меню -->
-    <div class="mxd-header__nav loading__fade">
-        <ul class="desktop-menu">
-            <li class="desktop-menu__item active">
-                <a href="{% url 'home' %}" class="desktop-menu__link">
-                    {% if LANGUAGE_CODE == 'ru' %}Главная{% elif LANGUAGE_CODE == 'en' %}Home{% else %}Bosh sahifa{% endif %}
-                </a>
-            </li>
-            <li class="desktop-menu__item ">
-                <a href="{% url 'dealers' %}" class="desktop-menu__link">
-                    {% if LANGUAGE_CODE == 'ru' %}Дилеры{% elif LANGUAGE_CODE == 'en' %}Dealers{% else %}Dilerlar   {% endif %}
-                </a>
-            </li>
-            <li class="desktop-menu__item">
-                <a href="{% url 'products' %}" class="desktop-menu__link">
-                    {% if LANGUAGE_CODE == 'ru' %}Бренды{% elif LANGUAGE_CODE == 'en' %}Brands{% else %}Brendlar{% endif %}
-                    <span class="desktop-menu__arrow">▼</span>
-                </a>
-                <!-- ✅ Меню будет заполнено динамически через JS -->
-                <ul class="desktop-submenu">
-                    <li class="desktop-submenu__item">
-                        <span style="color: #999;">
-                            {% if LANGUAGE_CODE == 'ru' %}Загрузка...{% elif LANGUAGE_CODE == 'en' %}Loading...{% else %}Yuklanmoqda...{% endif %}
-                        </span>
-                    </li>
-                </ul>
-            </li>
-            <li class="desktop-menu__item">
-                <a href="{% url 'news' %}" class="desktop-menu__link">
-                    {% if LANGUAGE_CODE == 'ru' %}Новости{% elif LANGUAGE_CODE == 'en' %}News{% else %}Yangiliklar{% endif %}
-                </a>
-            </li>
-            <li class="desktop-menu__item">
-                <a href="{% url 'team' %}" class="desktop-menu__link">
-                    {% if LANGUAGE_CODE == 'ru' %}Команда{% elif LANGUAGE_CODE == 'en' %}Team{% else %}Jamoa{% endif %}
-                </a>
-            </li>
-            <li class="desktop-menu__item">
-                <a href="{% url 'test_drive' %}" class="desktop-menu__link">
-                    {% if LANGUAGE_CODE == 'ru' %}Тест-драйв{% elif LANGUAGE_CODE == 'en' %}Test drive{% else %}Test-drayv{% endif %}
-                </a>
-            </li>
-            <li class="desktop-menu__item">
-                <a href="{% url 'contact' %}" class="desktop-menu__link">
-                    {% if LANGUAGE_CODE == 'ru' %}Контакты{% elif LANGUAGE_CODE == 'en' %}Contacts{% else %}Bog'lanish{% endif %}
-                </a>
-            </li>
-        </ul>
+    <!-- Menyu (task 6): bitta HTML. <1200px: hamburger overlay (app.js); >=1200px: header'da gorizontal (css/site_menu.css) -->
+    <div class="mxd-menu__wrapper">
+        <div class="mxd-menu__base"></div>
+        <div class="mxd-menu__contain">
+            <div class="mxd-menu__inner">
+                <div class="mxd-menu__left">
+                    <p class="mxd-menu__caption menu-fade-in">
+                        Autoliga Uzbekistan<br>
+                        {% if LANGUAGE_CODE == 'ru' %}Надежные транспортные решения{% elif LANGUAGE_CODE == 'en' %}Reliable transport solutions{% else %}AUTOLIGA — rasmiy avtosalonlar va servislar tarmog‘i{% endif %}
+                    </p>
+                    <div class="main-menu">
+                        <nav class="main-menu__content" aria-label="{% if LANGUAGE_CODE == 'ru' %}Главное меню{% elif LANGUAGE_CODE == 'en' %}Main menu{% else %}Asosiy menyu{% endif %}">
+                            <ul id="main-menu" class="main-menu__accordion">
+                                <li class="main-menu__item{% if request.resolver_match.url_name == 'home' %} active{% endif %}">
+                                    <a class="main-menu__link btn" href="{% url 'home' %}">
+                                        <span class="btn-caption">{% if LANGUAGE_CODE == 'ru' %}Главная{% elif LANGUAGE_CODE == 'en' %}Home{% else %}Bosh sahifa{% endif %}</span>
+                                    </a>
+                                </li>
+                                <li class="main-menu__item{% if request.resolver_match.url_name == 'dealers' %} active{% endif %}">
+                                    <a class="main-menu__link btn" href="{% url 'dealers' %}">
+                                        <span class="btn-caption">{% if LANGUAGE_CODE == 'ru' %}Дилеры{% elif LANGUAGE_CODE == 'en' %}Dealers{% else %}Dilerlar{% endif %}</span>
+                                    </a>
+                                </li>
+                                <li class="main-menu__item main-menu__item--brands{% if request.resolver_match.url_name == 'products' or request.resolver_match.url_name == 'product_detail' %} active{% endif %}">
+                                    <button type="button" class="main-menu__toggle" aria-expanded="false" aria-controls="main-menu-brands">
+                                        <span class="main-menu__link">
+                                            <span class="main-menu__label main-menu__label--desktop">{% if LANGUAGE_CODE == 'ru' %}Бренды{% elif LANGUAGE_CODE == 'en' %}Brands{% else %}Brendlar{% endif %}</span>
+                                            <span class="main-menu__label main-menu__label--mobile">{% if LANGUAGE_CODE == 'ru' %}Модели{% elif LANGUAGE_CODE == 'en' %}Models{% else %}Modellar{% endif %}</span>
+                                            <span class="main-menu__arrow" aria-hidden="true">▼</span>
+                                        </span>
+                                    </button>
+                                    <ul class="submenu" id="main-menu-brands">
+                                        <li class="submenu__item submenu__item--all">
+                                            <a class="submenu__link" href="{% url 'products' %}">{% if LANGUAGE_CODE == 'ru' %}Все модели{% elif LANGUAGE_CODE == 'en' %}All models{% else %}Barcha modellar{% endif %}</a>
+                                        </li>
+                                        {% for brand in SITE_MENU %}
+                                        <li class="submenu__item submenu__item--brand">
+                                            <a class="submenu__link" href="{% url 'products' %}?category={{ brand.slug|urlencode }}">{{ brand.name|default:brand.name_uz }}</a>
+                                            {% if brand.menu_products %}
+                                            <ul class="submenu__models">
+                                                {% for model in brand.menu_products %}
+                                                <li><a class="submenu__model-link" href="{% url 'product_detail' model.slug %}">{{ model.title|default:model.title_uz }}</a></li>
+                                                {% endfor %}
+                                            </ul>
+                                            {% endif %}
+                                        </li>
+                                        {% endfor %}
+                                    </ul>
+                                </li>
+                                <li class="main-menu__item{% if request.resolver_match.url_name == 'news' %} active{% endif %}">
+                                    <a class="main-menu__link btn" href="{% url 'news' %}">
+                                        <span class="btn-caption">{% if LANGUAGE_CODE == 'ru' %}Новости{% elif LANGUAGE_CODE == 'en' %}News{% else %}Yangiliklar{% endif %}</span>
+                                    </a>
+                                </li>
+                                <li class="main-menu__item{% if request.resolver_match.url_name == 'team' %} active{% endif %}">
+                                    <a class="main-menu__link btn" href="{% url 'team' %}">
+                                        <span class="btn-caption">{% if LANGUAGE_CODE == 'ru' %}Команда{% elif LANGUAGE_CODE == 'en' %}Team{% else %}Jamoa{% endif %}</span>
+                                    </a>
+                                </li>
+                                <li class="main-menu__item{% if request.resolver_match.url_name == 'test_drive' %} active{% endif %}">
+                                    <a class="main-menu__link btn" href="{% url 'test_drive' %}">
+                                        <span class="btn-caption">{% if LANGUAGE_CODE == 'ru' %}Тест-драйв{% elif LANGUAGE_CODE == 'en' %}Test drive{% else %}Test-drayv{% endif %}</span>
+                                    </a>
+                                </li>
+                                <li class="main-menu__item{% if request.resolver_match.url_name == 'contact' %} active{% endif %}">
+                                    <a class="main-menu__link btn" href="{% url 'contact' %}">
+                                        <span class="btn-caption">{% if LANGUAGE_CODE == 'ru' %}Контакты{% elif LANGUAGE_CODE == 'en' %}Contacts{% else %}Bog'lanish{% endif %}</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+                <div class="mxd-menu__data menu-fade-in">
+                    <p class="t-xsmall">
+                        Autoliga Uzbekistan
+                    </p>
+                    <p class="t-xsmall">
+                        <i class="ph ph-copyright"></i>
+                        {% now "Y" %}
+                    </p>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Элементы управления -->
@@ -115,99 +151,31 @@
         </a>
     </div>
 
-    <!-- Мобильное меню -->
-    <div class="mxd-menu__wrapper">
-        <div class="mxd-menu__base"></div>
-        <div class="mxd-menu__contain">
-            <div class="mxd-menu__inner">
-                <div class="mxd-menu__left">
-                    <p class="mxd-menu__caption menu-fade-in">
-                        Autoliga Uzbekistan<br>
-                        {% if LANGUAGE_CODE == 'ru' %}Надежные транспортные решения{% elif LANGUAGE_CODE == 'en' %}Reliable transport solutions{% else %}AUTOLIGA — rasmiy avtosalonlar va servislar tarmog‘i{% endif %}
-                    </p>
-                    <div class="main-menu">
-                        <nav class="main-menu__content">
-                            <ul id="main-menu" class="main-menu__accordion">
-                                <li class="main-menu__item">
-                                    <a class="main-menu__link btn" href="{% url 'home' %}">
-                                        <span class="btn-caption">
-                                            {% if LANGUAGE_CODE == 'ru' %}Главная{% elif LANGUAGE_CODE == 'en' %}Home{% else %}Bosh sahifa{% endif %}
-                                        </span>
-                                    </a>
-                                </li>
-                                <li class="main-menu__item">
-                                    <a class="main-menu__link btn" href="{% url 'dealers' %}">
-                                        <span class="btn-caption">
-                                            {% if LANGUAGE_CODE == 'ru' %}Дилеры{% elif LANGUAGE_CODE == 'en' %}Dealers{% else %}Dilerlar{% endif %}
-                                        </span>
-                                    </a>
-                                </li>
-                                <li class="main-menu__item">
-                                    <div class="main-menu__toggle">
-                                        <span class="main-menu__link">
-                                            {% if LANGUAGE_CODE == 'ru' %}Модели{% elif LANGUAGE_CODE == 'en' %}Models{% else %}Modellar{% endif %}
-                                            <span class="main-menu__arrow" style="font-size: 15px;">▼</span>
-                                        </span>
-                                    </div>
-                                    <!-- ✅ Меню будет заполнено динамически через JS -->
-                                    <ul class="submenu">
-                                        <li class="submenu__item">
-                                            <span style="color: #999;">
-                                                {% if LANGUAGE_CODE == 'ru' %}Загрузка...{% elif LANGUAGE_CODE == 'en' %}Loading...{% else %}Yuklanmoqda...{% endif %}
-                                            </span>
-                                        </li>
-                                    </ul>
-                                </li>
-                                <li class="main-menu__item">
-                                <a class="main-menu__link btn" href="{% url 'news' %}">
-                                    <span class="btn-caption">
-                                        {% if LANGUAGE_CODE == 'ru' %}Новости{% elif LANGUAGE_CODE == 'en' %}News{% else %}Yangiliklar{% endif %}
-                                    </span>
-                                </a>
-                            </li>
-
-                                <li class="main-menu__item">
-                                    <a class="main-menu__link btn" href="{% url 'team' %}">
-                                        <span class="btn-caption">
-                                            {% if LANGUAGE_CODE == 'ru' %}Команда{% elif LANGUAGE_CODE == 'en' %}Team{% else %}Jamoa{% endif %}
-                                        </span>
-                                    </a>
-                                </li>
-                                <li class="main-menu__item">
-                                    <a class="main-menu__link btn" href="{% url 'test_drive' %}">
-                                        <span class="btn-caption">
-                                            {% if LANGUAGE_CODE == 'ru' %}Тест-драйв{% elif LANGUAGE_CODE == 'en' %}Test drive{% else %}Test-drayv{% endif %}
-                                        </span>
-                                    </a>
-                                </li>
-                                <li class="main-menu__item">
-                                    <a class="main-menu__link btn" href="{% url 'contact' %}">
-                                        <span class="btn-caption">
-                                            {% if LANGUAGE_CODE == 'ru' %}Контакты{% elif LANGUAGE_CODE == 'en' %}Contacts{% else %}Bog'lanish{% endif %}
-                                        </span>
-                                    </a>
-                                </li>
-                            </ul>
-                        </nav>
-                    </div>
-                </div>
-                <div class="mxd-menu__data menu-fade-in">
-                    <p class="t-xsmall">
-                        Autoliga Uzbekistan
-                    </p>
-                    <p class="t-xsmall">
-                        <i class="ph ph-copyright"></i>
-                        {% now "Y" %}
-                    </p>
-                </div>
-            </div>
-        </div>
-    </div>
 </nav>
 
-<!-- ✅ ДОБАВЛЯЕМ СКРИПТ ДИНАМИЧЕСКОГО МЕНЮ -->
-<script src="{% static 'js/dynamic-menu.js' %}"></script>
 <script src="{% static 'js/error-logger.js' %}"></script>
+<script>
+/* Brands submenu: aria-expanded + keyboard (task 6). The mobile slide is app.js (#main-menu accordion). */
+(function () {
+    var item = document.querySelector('#main-menu .main-menu__item--brands');
+    if (!item) return;
+    var toggle = item.querySelector('.main-menu__toggle');
+    var desktop = window.matchMedia('(min-width: 1200px)');
+    function sync() { toggle.setAttribute('aria-expanded', item.classList.contains('open') ? 'true' : 'false'); }
+    function close() { item.classList.remove('open'); sync(); }
+    /* app.js toggles .open on mobile; on desktop the dropdown also opens on hover/focus (CSS) */
+    toggle.addEventListener('click', function () { setTimeout(sync, 0); });
+    item.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && item.classList.contains('open')) { close(); toggle.focus(); }
+    });
+    item.addEventListener('focusout', function (e) {
+        if (desktop.matches && !item.contains(e.relatedTarget)) close();
+    });
+    document.addEventListener('click', function (e) {
+        if (desktop.matches && !item.contains(e.target)) close();
+    });
+})();
+</script>
 <script>
 function switchLanguage(lang) {
     console.log('Switching to language:', lang);

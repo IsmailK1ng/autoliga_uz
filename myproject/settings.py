@@ -231,6 +231,7 @@ TEMPLATES = [
                 'django.template.context_processors.i18n',
                 'main.context_processors.site_contacts',
                 'main.context_processors.seo',
+                'main.context_processors.site_menu',
             ],
         },
     },

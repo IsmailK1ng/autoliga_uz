@@ -1,0 +1,347 @@
+/* ==========================================================================
+   Site menu (SEO TZ task 6): ONE menu HTML for mobile and desktop.
+
+   Markup: #main-menu inside .mxd-menu__wrapper (main/includes/header.html),
+   brands and models rendered on the server (main.context_processors.site_menu).
+
+   < 1200px  the theme overlay styles (main_site.css) and app.js (hamburger,
+             GSAP stagger, accordion) apply unchanged.
+   >= 1200px the overlay containers become transparent (display: contents)
+             and #main-menu is laid out like the former .desktop-menu, with
+             the same values as site_main.css (.desktop-menu*, .desktop-submenu*).
+   ========================================================================== */
+
+/* The brands toggle is a real <button> now: drop the native button look */
+.main-menu__toggle {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: none;
+    font: inherit;
+    color: inherit;
+    text-align: left;
+    cursor: pointer;
+}
+
+/* Desktop says "Brendlar", the mobile overlay says "Modellar" (as before) */
+.main-menu__label--desktop {
+    display: none;
+}
+
+/* Arrow size of the former inline style in the mobile menu */
+.main-menu__arrow {
+    font-size: 15px;
+}
+
+/* Models under each brand in the mobile accordion */
+.submenu__models {
+    display: flex;
+    flex-direction: column;
+    gap: .8rem;
+    margin: 1rem 0 .4rem;
+    padding: 0 0 0 1.5rem;
+    list-style: none;
+}
+
+#main-menu .submenu__models a {
+    font-size: 1.6rem;
+    opacity: .85;
+}
+
+@media only screen and (min-width: 1400px) {
+    #main-menu .submenu__models a {
+        font-size: 1.8rem;
+    }
+}
+
+/* ------------------------------------------------------------------ desktop */
+@media only screen and (min-width: 1200px) {
+
+    /* Overlay containers disappear; the <nav> takes the place of .mxd-header__nav */
+    #header .mxd-menu__wrapper,
+    #header .mxd-menu__contain,
+    #header .mxd-menu__inner,
+    #header .mxd-menu__left,
+    #header .main-menu {
+        display: contents !important;
+        color: inherit !important;
+        font-family: inherit !important;
+    }
+
+    #header .mxd-menu__base,
+    #header .mxd-menu__caption,
+    #header .mxd-menu__data {
+        display: none !important;
+    }
+
+    #header .main-menu__content {
+        display: flex;
+        align-items: center;
+        gap: 40px;
+        color: inherit;
+        font-family: inherit;
+    }
+
+    .main-menu__label--desktop {
+        display: inline;
+    }
+
+    .main-menu__label--mobile {
+        display: none;
+    }
+
+    /* = .desktop-menu */
+    #main-menu {
+        display: flex !important;
+        flex-direction: row !important;
+        flex-wrap: wrap;
+        align-items: center !important;
+        justify-content: center;
+        gap: 0 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        list-style: none !important;
+        z-index: 1001 !important;
+    }
+
+    /* = .desktop-menu__item (GSAP sets inline opacity/transform for the overlay;
+       the theme gives .main-menu__item width: 100% and the overlay text colour) */
+    #main-menu > .main-menu__item {
+        position: relative !important;
+        display: block;
+        flex: 0 0 auto;
+        width: auto !important;
+        margin: 0 15px !important;
+        color: inherit;
+        opacity: 1 !important;
+        visibility: visible !important;
+        transform: none !important;
+        transition: color .1s cubic-bezier(.4, 0, .2, 1), background .3s cubic-bezier(.4, 0, .2, 1);
+    }
+
+    #main-menu > .main-menu__item:hover,
+    #main-menu > .main-menu__item:focus-within {
+        color: #062987;
+    }
+
+    #main-menu > .main-menu__item::before {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: #062987;
+        opacity: 0;
+        transform: scaleX(0);
+        transition: opacity .3s cubic-bezier(.4, 0, .2, 1), transform .3s cubic-bezier(.4, 0, .2, 1);
+        pointer-events: none;
+    }
+
+    #main-menu > .main-menu__item:hover::before,
+    #main-menu > .main-menu__item:focus-within::before {
+        opacity: 1;
+        transform: scaleX(1);
+    }
+
+    /* = .desktop-menu__link (theme .btn / .main-menu__link reset) */
+    #main-menu > .main-menu__item > .main-menu__link,
+    #main-menu > .main-menu__item > .main-menu__toggle > .main-menu__link {
+        position: relative;
+        display: inline;
+        height: auto;
+        min-height: 0;
+        margin: 0;
+        padding: 8px 0 !important;
+        border: 0;
+        border-radius: 20px !important;
+        background: none;
+        box-shadow: none;
+        overflow: visible;
+        color: inherit !important;
+        font-family: inherit;
+        font-size: 20px !important;
+        font-weight: 500 !important;
+        font-style: normal;
+        line-height: 1.6;
+        letter-spacing: normal;
+        text-decoration: none !important;
+        white-space: nowrap !important;
+        transition: color .3s ease !important;
+    }
+
+    #main-menu > .main-menu__item > .main-menu__link .btn-caption {
+        display: inline;
+        height: auto;
+        line-height: inherit;
+    }
+
+    #main-menu > .main-menu__item > .main-menu__toggle {
+        position: static;
+        display: inline;
+        width: auto;
+    }
+
+    /* = .desktop-menu__arrow */
+    #main-menu .main-menu__arrow {
+        display: inline-block;
+        margin-left: 5px;
+        font-size: .8rem;
+        transition: transform .3s ease;
+    }
+
+    #main-menu > .main-menu__item:hover .main-menu__arrow,
+    #main-menu > .main-menu__item.open .main-menu__arrow {
+        transform: rotate(180deg);
+    }
+
+    /* = .desktop-submenu (display !important beats app.js slideToggle inline styles) */
+    #main-menu .submenu {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        display: block !important;
+        height: auto !important;
+        min-width: 200px;
+        max-height: calc(100vh - 120px);
+        overflow-y: auto;
+        margin: 0;
+        padding: 10px 0 !important;
+        list-style: none;
+        background: #fff;
+        border: 1px solid var(--color-border-base);
+        border-radius: 8px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, .1);
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(-10px);
+        transition: all .3s ease;
+        z-index: 1002 !important;
+    }
+
+    /* mouse: hover; keyboard/click: .open (button, aria-expanded kept in sync) */
+    #main-menu > .main-menu__item:hover > .submenu,
+    #main-menu > .main-menu__item.open > .submenu {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+    }
+
+    /* = .desktop-submenu__item / __link */
+    #main-menu .submenu__item {
+        display: block;
+        width: auto;
+        margin: 0;
+        padding: 0;
+    }
+
+    #main-menu .submenu__item a {
+        display: block;
+        height: auto;
+        padding: 8px 20px;
+        color: var(--color-text-muted);
+        font-family: inherit;
+        font-size: 17px;
+        font-weight: 400;
+        line-height: 1.6;
+        text-decoration: none;
+        white-space: nowrap;
+        transform: none;
+        transition: all .3s ease;
+    }
+
+    #main-menu .submenu__item a:hover {
+        color: var(--color-accent);
+        background: var(--color-bg-accent);
+        transform: none;
+    }
+
+    /* Models under a brand: same box, indented and smaller */
+    #main-menu .submenu__models {
+        display: block;
+        margin: 0;
+        padding: 0;
+        gap: 0;
+    }
+
+    #main-menu .submenu__models a {
+        padding: 4px 20px 4px 34px;
+        font-size: 15px;
+        opacity: 1;
+    }
+}
+
+/* Theme colours of the dropdown (same as the .desktop-submenu rules) */
+@media (prefers-color-scheme: dark) and (min-width: 1200px) {
+    #main-menu .submenu {
+        background: #161616 !important;
+        border: 1px solid rgba(255, 255, 255, .1) !important;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, .3) !important;
+    }
+
+    #main-menu .submenu__item a {
+        color: #fff !important;
+    }
+
+    #main-menu .submenu__item a:hover {
+        background: rgba(255, 255, 255, .1) !important;
+    }
+}
+
+@media (prefers-color-scheme: light) and (min-width: 1200px) {
+    #main-menu .submenu {
+        background: #fff !important;
+        border: 1px solid rgba(0, 0, 0, .1) !important;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, .1) !important;
+    }
+
+    #main-menu .submenu__item a {
+        color: #161616 !important;
+    }
+
+    #main-menu .submenu__item a:hover {
+        background: rgba(0, 0, 0, .05) !important;
+    }
+}
+
+@media (min-width: 1200px) {
+    [color-scheme=light] #main-menu .submenu,
+    body.light-mode #main-menu .submenu,
+    body[data-theme=light] #main-menu .submenu {
+        background: #fff !important;
+        border: 1px solid rgba(0, 0, 0, .1) !important;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, .1) !important;
+    }
+
+    [color-scheme=light] #main-menu .submenu__item a,
+    body.light-mode #main-menu .submenu__item a,
+    body[data-theme=light] #main-menu .submenu__item a {
+        color: #161616 !important;
+    }
+
+    [color-scheme=light] #main-menu .submenu__item a:hover,
+    body.light-mode #main-menu .submenu__item a:hover,
+    body[data-theme=light] #main-menu .submenu__item a:hover {
+        background: rgba(0, 0, 0, .05) !important;
+    }
+
+    [color-scheme=dark] #main-menu .submenu,
+    body.dark-mode #main-menu .submenu,
+    body[data-theme=dark] #main-menu .submenu {
+        background: #161616 !important;
+        border: 1px solid rgba(255, 255, 255, .1) !important;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, .3) !important;
+    }
+
+    [color-scheme=dark] #main-menu .submenu__item a,
+    body.dark-mode #main-menu .submenu__item a,
+    body[data-theme=dark] #main-menu .submenu__item a {
+        color: #fff !important;
+    }
+
+    [color-scheme=dark] #main-menu .submenu__item a:hover,
+    body.dark-mode #main-menu .submenu__item a:hover,
+    body[data-theme=dark] #main-menu .submenu__item a:hover {
+        background: rgba(255, 255, 255, .1) !important;
+    }
+}

@@ -9,72 +9,88 @@ from django.utils.safestring import mark_safe
 
 register = template.Library()
 
+# Pages backed by a translated object: (context variable, field that must be
+# filled for the page to exist in a language). Other pages have their ru/en
+# text in the templates and exist in every language.
+TRANSLATED_OBJECTS = {
+    'product_detail': ('product', 'title'),
+    'news_detail': ('news', 'title'),
+    'dealer_detail': ('dealer', 'name'),
+}
+
+
+def _canonical_query(request, url_name):
+    """Brand listings: ?category=<slug> is the one canonical form (?brand= is an
+    alias). Every other query parameter (utm_*, fbclid, page, q, ...) is dropped."""
+    if url_name == 'products':
+        category = request.GET.get('brand') or request.GET.get('category')
+        if category:
+            return '?' + urlencode({'category': category})
+    return ''
+
+
+def _available_languages(context, request, url_name):
+    """Languages in which this page really has content."""
+    languages = [code for code, _name in settings.LANGUAGES]
+    obj, field = None, None
+    if url_name in TRANSLATED_OBJECTS:
+        key, field = TRANSLATED_OBJECTS[url_name]
+        obj = context.get(key)
+    elif url_name == 'products':
+        slug = request.GET.get('brand') or request.GET.get('category')
+        if slug:
+            from main.models import ProductCategory
+            obj, field = ProductCategory.objects.filter(slug=slug).first(), 'name'
+    if obj is None:
+        return languages
+    return [lang for lang in languages if str(getattr(obj, f'{field}_{lang}', '') or '').strip()]
+
+
 @register.simple_tag(takes_context=True)
 def hreflang_tags(context):
     """
-    Р В Р’В Р Р†Р вЂљРЎС™Р В Р’В Р вЂ™Р’ВµР В Р’В Р В РІР‚В¦Р В Р’В Р вЂ™Р’ВµР В Р Р‹Р В РІР‚С™Р В Р’В Р РЋРІР‚Р В Р Р‹Р В РІР‚С™Р В Р Р‹Р РЋРІР‚СљР В Р’В Р вЂ™Р’ВµР В Р Р‹Р Р†Р вЂљРЎв„ў hreflang Р В Р Р‹Р Р†Р вЂљРЎв„ўР В Р’В Р вЂ™Р’ВµР В Р’В Р РЋРІР‚вЂњР В Р’В Р РЋРІР‚ Р В Р’В Р СћРІР‚Р В Р’В Р вЂ™Р’В»Р В Р Р‹Р В Р РЏ Р В Р Р‹Р Р†Р вЂљРЎв„ўР В Р’В Р вЂ™Р’ВµР В Р’В Р РЋРІР‚СњР В Р Р‹Р РЋРІР‚СљР В Р Р‹Р Р†Р вЂљР’В°Р В Р’В Р вЂ™Р’ВµР В Р’В Р Р†РІР‚С›РІР‚вЂњ Р В Р Р‹Р В РЎвЂњР В Р Р‹Р Р†Р вЂљРЎв„ўР В Р Р‹Р В РІР‚С™Р В Р’В Р вЂ™Р’В°Р В Р’В Р В РІР‚В¦Р В Р’В Р РЋРІР‚Р В Р Р‹Р Р†Р вЂљР’В Р В Р Р‹Р Р†Р вЂљРІвЂћвЂ“.
-    
-    Р В Р’В Р В Р Р‹Р В РЎвЂњР В Р’В Р РЋРІР‚вЂќР В Р’В Р РЋРІР‚СћР В Р’В Р вЂ™Р’В»Р В Р Р‹Р В Р вЂ°Р В Р’В Р вЂ™Р’В·Р В Р’В Р РЋРІР‚СћР В Р’В Р В РІР‚В Р В Р’В Р вЂ™Р’В°Р В Р’В Р В РІР‚В¦Р В Р’В Р РЋРІР‚Р В Р’В Р вЂ™Р’Вµ Р В Р’В Р В РІР‚В  Р В Р Р‹Р Р†РІР‚С™Р’В¬Р В Р’В Р вЂ™Р’В°Р В Р’В Р вЂ™Р’В±Р В Р’В Р вЂ™Р’В»Р В Р’В Р РЋРІР‚СћР В Р’В Р В РІР‚В¦Р В Р’В Р вЂ™Р’Вµ:
-    {% load seo_tags %}
-    {% hreflang_tags %}
+    <link rel="alternate" hreflang> for the languages this page exists in.
+
+    uz has no prefix, ru/en are /ru/ and /en/; x-default is the uz URL.
+    A product, news item, dealer or brand without a translation in a language
+    gets no hreflang for that language. Fewer than two languages -> no tags.
     """
     request = context.get('request')
-    if not request:
+    if not request or not request.resolver_match:
         return ''
-    
-    url_name = request.resolver_match.url_name if request.resolver_match else None
+    url_name = request.resolver_match.url_name
     if not url_name:
         return ''
-    
-    domain = request.build_absolute_uri('/').rstrip('/')
-    url_kwargs = request.resolver_match.kwargs if request.resolver_match else {}
-    
-    tags = []
-    
+
+    default = settings.LANGUAGE_CODE
     try:
-        # Reverse in the default language: on /ru/ and /en/ pages reverse() would
-        # otherwise return an already prefixed path (/ru/ru/..., /en/ru/...)
-        with translation.override(settings.LANGUAGE_CODE):
-            base_url = reverse(url_name, kwargs=url_kwargs)
-        # Р В Р’В Р В РІвЂљВ¬Р В Р’В Р вЂ™Р’В·Р В Р’В Р вЂ™Р’В±Р В Р’В Р вЂ™Р’ВµР В Р’В Р РЋРІР‚СњР В Р Р‹Р В РЎвЂњР В Р’В Р РЋРІР‚СњР В Р’В Р РЋРІР‚Р В Р’В Р Р†РІР‚С›РІР‚вЂњ (Р В Р’В Р СћРІР‚Р В Р’В Р вЂ™Р’ВµР В Р Р‹Р Р†Р вЂљРЎвЂєР В Р’В Р РЋРІР‚СћР В Р’В Р вЂ™Р’В»Р В Р Р‹Р Р†Р вЂљРЎв„ўР В Р’В Р В РІР‚В¦Р В Р Р‹Р Р†Р вЂљРІвЂћвЂ“Р В Р’В Р Р†РІР‚С›РІР‚вЂњ, Р В Р’В Р вЂ™Р’В±Р В Р’В Р вЂ™Р’ВµР В Р’В Р вЂ™Р’В· Р В Р’В Р РЋРІР‚вЂќР В Р Р‹Р В РІР‚С™Р В Р’В Р вЂ™Р’ВµР В Р Р‹Р Р†Р вЂљРЎвЂєР В Р’В Р РЋРІР‚Р В Р’В Р РЋРІР‚СњР В Р Р‹Р В РЎвЂњР В Р’В Р вЂ™Р’В°)
-        uz_url = base_url
-        tags.append(f'<link rel="alternate" hreflang="uz" href="{domain}{uz_url}" />')
-        tags.append(f'<link rel="alternate" hreflang="x-default" href="{domain}{uz_url}" />')
-        
-        # Р В Р’В Р вЂ™Р’В Р В Р Р‹Р РЋРІР‚СљР В Р Р‹Р В РЎвЂњР В Р Р‹Р В РЎвЂњР В Р’В Р РЋРІР‚СњР В Р’В Р РЋРІР‚Р В Р’В Р Р†РІР‚С›РІР‚вЂњ (Р В Р Р‹Р В РЎвЂњ Р В Р’В Р РЋРІР‚вЂќР В Р Р‹Р В РІР‚С™Р В Р’В Р вЂ™Р’ВµР В Р Р‹Р Р†Р вЂљРЎвЂєР В Р’В Р РЋРІР‚Р В Р’В Р РЋРІР‚СњР В Р Р‹Р В РЎвЂњР В Р’В Р РЋРІР‚СћР В Р’В Р РЋ /ru/)
-        ru_url = f"/ru{base_url}"
-        tags.append(f'<link rel="alternate" hreflang="ru" href="{domain}{ru_url}" />')
-        
-        # Р В Р’В Р РЋРІР‚в„ўР В Р’В Р В РІР‚В¦Р В Р’В Р РЋРІР‚вЂњР В Р’В Р вЂ™Р’В»Р В Р’В Р РЋРІР‚Р В Р’В Р Р†РІР‚С›РІР‚вЂњР В Р Р‹Р В РЎвЂњР В Р’В Р РЋРІР‚СњР В Р’В Р РЋРІР‚Р В Р’В Р Р†РІР‚С›РІР‚вЂњ (Р В Р Р‹Р В РЎвЂњ Р В Р’В Р РЋРІР‚вЂќР В Р Р‹Р В РІР‚С™Р В Р’В Р вЂ™Р’ВµР В Р Р‹Р Р†Р вЂљРЎвЂєР В Р’В Р РЋРІР‚Р В Р’В Р РЋРІР‚СњР В Р Р‹Р В РЎвЂњР В Р’В Р РЋРІР‚СћР В Р’В Р РЋ /en/)
-        en_url = f"/en{base_url}"
-        tags.append(f'<link rel="alternate" hreflang="en" href="{domain}{en_url}" />')
-        
+        # Reverse in the default language: gives the unprefixed uz path even on /ru/ and /en/ pages
+        with translation.override(default):
+            path = reverse(url_name, kwargs=request.resolver_match.kwargs)
     except NoReverseMatch:
         return ''
-    
+    path += _canonical_query(request, url_name)
+
+    languages = _available_languages(context, request, url_name)
+    if len(languages) < 2:
+        return ''
+
+    domain = request.build_absolute_uri('/').rstrip('/')
+    tags = []
+    for lang in languages:
+        prefix = '' if lang == default else f'/{lang}'
+        tags.append(f'<link rel="alternate" hreflang="{lang}" href="{domain}{prefix}{path}" />')
+    if default in languages:
+        tags.append(f'<link rel="alternate" hreflang="x-default" href="{domain}{path}" />')
     return mark_safe('\n    '.join(tags))
 
 
 @register.simple_tag(takes_context=True)
 def canonical_url(context):
-
     request = context.get('request')
     if not request:
         return ''
-    
-    # Р В Р’В Р РЋРЎСџР В Р’В Р РЋРІР‚СћР В Р’В Р вЂ™Р’В»Р В Р Р‹Р РЋРІР‚СљР В Р Р‹Р Р†Р вЂљР Р‹Р В Р’В Р вЂ™Р’В°Р В Р’В Р вЂ™Р’ВµР В Р’В Р РЋ Р В Р Р‹Р Р†Р вЂљР Р‹Р В Р’В Р РЋРІР‚Р В Р Р‹Р В РЎвЂњР В Р Р‹Р Р†Р вЂљРЎв„ўР В Р Р‹Р Р†Р вЂљРІвЂћвЂ“Р В Р’В Р Р†РІР‚С›РІР‚вЂњ URL Р В Р’В Р вЂ™Р’В±Р В Р’В Р вЂ™Р’ВµР В Р’В Р вЂ™Р’В· Р В Р’В Р РЋРІР‚вЂќР В Р’В Р вЂ™Р’В°Р В Р Р‹Р В РІР‚С™Р В Р’В Р вЂ™Р’В°Р В Р’В Р РЋР В Р’В Р вЂ™Р’ВµР В Р Р‹Р Р†Р вЂљРЎв„ўР В Р Р‹Р В РІР‚С™Р В Р’В Р РЋРІР‚СћР В Р’В Р В РІР‚В 
-    scheme = request.scheme
-    host = request.get_host()
-    path = request.path
 
-    canonical = f"{scheme}://{host}{path}"
-
-    # Brand listings: ?category=<slug> is the one canonical form; ?brand= is an
-    # alias for it. Every other query parameter (utm_*, fbclid, page, ...) is dropped.
     url_name = request.resolver_match.url_name if request.resolver_match else None
-    if url_name == 'products':
-        category = request.GET.get('brand') or request.GET.get('category')
-        if category:
-            canonical += '?' + urlencode({'category': category})
-    
+    canonical = f"{request.scheme}://{request.get_host()}{request.path}{_canonical_query(request, url_name)}"
     return mark_safe(f'<link rel="canonical" href="{canonical}" />')

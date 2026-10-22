@@ -339,7 +339,10 @@ def news_detail(request, slug):
             'blocks': news.blocks.all(),
             'breadcrumbs': breadcrumbs.get(language, breadcrumbs['uz'])
         })
-    
+
+    except Http404:
+        # Unknown or inactive news must be a real 404, not a redirect to /news/
+        raise
     except Exception as e:
         logger.error(f"Ошибка на странице новости {slug}: {str(e)}", exc_info=True)
         return redirect('news')

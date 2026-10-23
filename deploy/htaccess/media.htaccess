@@ -1,0 +1,31 @@
+# Copy to: /home/autolig1/public_html/media/.htaccess   (SEO TZ task 11)
+#
+# Only uploaded files live here; Passenger never runs here.
+# Uploaded files never change under the same name (Django gives a new upload a
+# new name), the WebP copies in _resp/ carry a content hash in their name and the
+# sorl cache files are hashed too — so they can be cached for a year.
+# The _resp/*.json sidecars are rewritten in place: never cached.
+
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE image/svg+xml application/json
+</IfModule>
+
+<IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresByType image/png      "access plus 1 year"
+    ExpiresByType image/jpeg     "access plus 1 year"
+    ExpiresByType image/webp     "access plus 1 year"
+    ExpiresByType image/avif     "access plus 1 year"
+    ExpiresByType image/gif      "access plus 1 year"
+    ExpiresByType image/svg+xml  "access plus 1 year"
+    ExpiresByType video/mp4      "access plus 1 year"
+</IfModule>
+
+<IfModule mod_headers.c>
+    <FilesMatch "\.(png|jpe?g|webp|avif|gif|svg|mp4|webm)$">
+        Header set Cache-Control "public, max-age=31536000, immutable"
+    </FilesMatch>
+    <FilesMatch "\.json$">
+        Header set Cache-Control "no-cache"
+    </FilesMatch>
+</IfModule>

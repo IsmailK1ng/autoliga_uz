@@ -1,0 +1,20 @@
+# OPTIONAL — gzip for the HTML pages Django returns (SEO TZ task 11).
+#
+# Where: /home/autolig1/public_html/.htaccess, ABOVE or BELOW the block that
+# cPanel manages:
+#     # DO NOT REMOVE. CLOUDLINUX PASSENGER CONFIGURATION BEGIN
+#     ...
+#     # DO NOT REMOVE. CLOUDLINUX PASSENGER CONFIGURATION END
+# Never paste inside that block and never edit its lines: cPanel rewrites it when
+# the Python app is restarted / changed in "Setup Python App".
+# Make a copy of the file first (cp .htaccess .htaccess.bak-YYYYMMDD).
+#
+# Everything is inside <IfModule>, so a server without mod_deflate ignores it.
+# If the site shows a 500 error after saving, restore the .bak file.
+# Preferred alternative: ask Ahost to enable compression at server level (deploy/AHOST_REQUEST.md).
+
+# BEGIN Autoliga compression
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/html text/plain text/xml application/xml application/rss+xml application/json
+</IfModule>
+# END Autoliga compression

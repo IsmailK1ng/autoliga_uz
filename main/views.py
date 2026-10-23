@@ -29,6 +29,7 @@ import logging
 import json
 from django.db.models import Prefetch
 from .dealer_info import dealer_card, group_by_region, map_embed_url
+from .images import image_info
 from .redirects import find_redirect
 from .seo import brand_seo, news_body_text, news_description, price_label, product_seo
 
@@ -93,10 +94,12 @@ def index(request):
                 'link': f'/products/{product.slug}/',
             }
             
-            if product.slider_image:
-                slider_item['image'] = product.slider_image.url
-            elif product.main_image:
-                slider_item['image'] = product.main_image.url
+            picture = product.slider_image or product.main_image
+            if picture:
+                # task 11: ~960px WebP copy when it exists; the original stays the fallback
+                info = image_info(picture)
+                slider_item['image'] = info['medium'] if info else picture.url
+                slider_item['fallback'] = picture.url
             
             slider_data.append(slider_item)
         

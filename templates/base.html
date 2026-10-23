@@ -78,6 +78,11 @@
         href="{% static 'images/logo/autoliga-logo.png' %}"
     >
 
+    <!-- Fonts (task 11): one request instead of two @imports inside main_site.css; display=swap -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Funnel+Display:wght@300..800&family=Funnel+Sans:ital,wght@0,300..800;1,300..800&display=swap">
+    <link rel="preload" href="{% static 'fonts/Phosphor/Phosphor.woff2' %}" as="font" type="font/woff2" crossorigin>
     <!-- Asosiy stillar -->
     <link
         rel="stylesheet"

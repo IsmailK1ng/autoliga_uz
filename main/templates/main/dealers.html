@@ -209,10 +209,9 @@
         <i class="ph ph-arrow-up"></i>
     </a>
 
-    <script src="{% static 'js/libs.min.js' %}"></script>
-    <script src="{% static 'js/app.js' %}"></script>
-    <script src="{% static 'js/error-logger.js' %}"></script>
-    <script src="{% static 'js/main-setting.js' %}"></script>
+    <script src="{% static 'js/libs.min.js' %}" defer></script>
+    <script src="{% static 'js/app.js' %}" defer></script>
+    <script src="{% static 'js/main-setting.js' %}" defer></script>
 
     {% if dealer_groups %}
     <script src="{% static 'js/uzbekistan-mapdata.js' %}"></script>

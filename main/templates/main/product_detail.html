@@ -37,6 +37,11 @@
     <link rel="icon" href="{% static 'images/logo/autoliga-logo.png' %}">
     <link rel="apple-touch-icon" href="{% static 'images/logo/autoliga-logo.png' %}">
     <!-- CSS — MAVJUD FAYLLAR -->
+    <!-- Fonts (task 11): one request instead of two @imports inside main_site.css; display=swap -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Funnel+Display:wght@300..800&family=Funnel+Sans:ital,wght@0,300..800;1,300..800&display=swap">
+    <link rel="preload" href="{% static 'fonts/Phosphor/Phosphor.woff2' %}" as="font" type="font/woff2" crossorigin>
     <link rel="stylesheet" type="text/css" href="{% static 'css/loaders/loader.css' %}">
     <link rel="stylesheet" type="text/css" href="{% static 'css/plugins.css' %}">
     <link rel="stylesheet" type="text/css" href="{% static 'css/main_site.css' %}">
@@ -795,13 +800,12 @@
     </div>
 </div>
 <!-- Mavjud JS kutubxonalari -->
-<script src="{% static 'js/libs.min.js' %}"></script>
-<script src="{% static 'js/app.js' %}"></script>
-<script src="{% static 'js/error-logger.js' %}"></script>
-<script src="{% static 'js/main-setting.js' %}"></script>
+<script src="{% static 'js/libs.min.js' %}" defer></script>
+<script src="{% static 'js/app.js' %}" defer></script>
+<script src="{% static 'js/main-setting.js' %}" defer></script>
 <!-- Product Detail JS -->
 <script>window.currentProductTitle = "{{ product.title|escapejs }}";</script>
-<script src="{% static 'js/product_detail.js' %}"></script>
+<script src="{% static 'js/product_detail.js' %}" defer></script>
 <script>
     // ============ ОБРАБОТКА ФОРМЫ ============
     let isSubmitting = false;

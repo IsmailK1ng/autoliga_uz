@@ -1,3 +1,4 @@
+{% load image_tags %}
 {% load static seo_tags %}
 {% load thumbnail l10n %}
 <!DOCTYPE html>
@@ -241,6 +242,8 @@
         {% thumbnail product.main_image "1600x1600" as car_1600 %}
 
         {% localize off %}
+        {% webp_srcset product.main_image as hero_webp %}
+        {% if hero_webp %}<picture style="display:contents"><source type="image/webp" srcset="{{ hero_webp }}" sizes="(max-width: 768px) 100vw, 50vw">{% endif %}
         <img id="main-car-image"
              class="mxd-hero-06__car-image"
              src="{{ car_960.url }}"
@@ -256,6 +259,7 @@
              decoding="async"
              onload="this.classList.add('loaded')"
              onerror="this.onerror=null;this.removeAttribute('srcset');this.src=this.dataset.defaultSrc;this.classList.add('loaded')">
+        {% if hero_webp %}</picture>{% endif %}
 
         {% endlocalize %}
         {% endthumbnail %}
@@ -556,9 +560,8 @@
                                 <div class="swiper-slide mxd-demo-swiper__slide">
                                     <div class="slide-content">
                                         <div class="slide-image">
-                                            <img src="{{ gallery_image.image.url }}"
-                                                 alt="{% if gallery_image.alt_text %}{{ gallery_image.alt_text }}{% else %}{{ product.display_name }}, {% if LANGUAGE_CODE == 'ru' %}изображение{% elif LANGUAGE_CODE == 'en' %}image{% else %}rasm{% endif %} {{ forloop.counter }}{% endif %}"
-                                                 loading="lazy" decoding="async">
+                                            {% gallery_alt gallery_image product forloop.counter as gallery_alt_text %}
+                                            {% responsive_img gallery_image.image alt=gallery_alt_text sizes="(max-width: 768px) 92vw, 50vw" data_full=gallery_image.image.url %}
                                         </div>
                                     </div>
                                 </div>
@@ -568,9 +571,7 @@
                                 <div class="swiper-slide mxd-demo-swiper__slide">
                                     <div class="slide-content">
                                         <div class="slide-image">
-                                            <img src="{{ product.main_image.url }}"
-                                                 alt="{{ product.image_alt }}"
-                                                 loading="lazy" decoding="async">
+                                            {% responsive_img product.main_image alt=product.image_alt sizes="(max-width: 768px) 92vw, 50vw" data_full=product.main_image.url %}
                                         </div>
                                     </div>
                                 </div>
@@ -608,15 +609,9 @@
                             <a href="{{ related_product.get_absolute_url }}"
                                style="display:block;color:inherit;text-decoration:none;">
                                 {% if related_product.card_image %}
-                                    <img src="{{ related_product.card_image.url }}"
-                                         alt="{{ related_product.image_alt }}"
-                                         loading="lazy"
-                                         style="width:100%;aspect-ratio:16/10;object-fit:cover;">
+                                    {% responsive_img related_product.card_image alt=related_product.image_alt sizes="(max-width: 768px) 92vw, 320px" style="width:100%;aspect-ratio:16/10;object-fit:cover;" %}
                                 {% elif related_product.main_image %}
-                                    <img src="{{ related_product.main_image.url }}"
-                                         alt="{{ related_product.image_alt }}"
-                                         loading="lazy"
-                                         style="width:100%;aspect-ratio:16/10;object-fit:cover;">
+                                    {% responsive_img related_product.main_image alt=related_product.image_alt sizes="(max-width: 768px) 92vw, 320px" style="width:100%;aspect-ratio:16/10;object-fit:cover;" %}
                                 {% endif %}
                                 <div style="padding:18px;">
                                     <h3>{{ related_product.title }}</h3>
@@ -963,7 +958,7 @@
                 const img = e.target.closest('.swiper-wrapper img');
                 if (!galleryModal || !galleryModalImg) return;
                 galleryModal.classList.add('active');
-                galleryModalImg.src = img.currentSrc || img.src;
+                galleryModalImg.src = img.dataset.full || img.currentSrc || img.src;
                 galleryModalImg.alt = img.alt || '';
                 document.body.style.overflow = 'hidden';
             }

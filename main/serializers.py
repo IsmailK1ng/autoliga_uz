@@ -1,4 +1,5 @@
 # main/serializers.py
+from django.utils import translation
 from rest_framework import serializers
 from main.serializers_base import LanguageSerializerMixin
 
@@ -161,6 +162,10 @@ class ProductCardSerializer(LanguageSerializerMixin, serializers.ModelSerializer
     """Карточки продуктов для списка"""
     card_specs = ProductCardSpecSerializer(many=True, read_only=True)
     image_url = serializers.SerializerMethodField()
+    image_alt = serializers.SerializerMethodField()
+    image_srcset = serializers.SerializerMethodField()
+    image_width = serializers.SerializerMethodField()
+    image_height = serializers.SerializerMethodField()
     category = serializers.SerializerMethodField()
     slider_price = serializers.CharField(read_only=True)  # 👈 SHU YERGA QO‘SH
 
@@ -170,7 +175,8 @@ class ProductCardSerializer(LanguageSerializerMixin, serializers.ModelSerializer
         fields = [
             'id', 'title', 'slug',
             'category',
-            'image_url', 'card_specs', 'slider_price', 'is_featured', 'order'
+            'image_url', 'image_alt', 'image_srcset', 'image_width', 'image_height',
+            'card_specs', 'slider_price', 'is_featured', 'order'
         ]
     
     def get_category(self, obj):
@@ -194,6 +200,30 @@ class ProductCardSerializer(LanguageSerializerMixin, serializers.ModelSerializer
                 return request.build_absolute_uri(image.url)
             return image.url
         return None
+
+    # Task 11/12: alt text and WebP copies for the catalog cards drawn by production.js
+    def _card_image_info(self, obj):
+        from .images import image_info
+        if not hasattr(obj, '_card_image_info'):
+            obj._card_image_info = image_info(obj.card_image if obj.card_image else obj.main_image)
+        return obj._card_image_info
+
+    def get_image_alt(self, obj):
+        with translation.override(self.get_current_language()):
+            return obj.image_alt
+
+    def get_image_srcset(self, obj):
+        info = self._card_image_info(obj)
+        return info['srcset'] if info else ''
+
+    def get_image_width(self, obj):
+        info = self._card_image_info(obj)
+        return info['width'] if info else None
+
+    def get_image_height(self, obj):
+        info = self._card_image_info(obj)
+        return info['height'] if info else None
+
 
 class ProductFeatureSerializer(LanguageSerializerMixin, serializers.ModelSerializer):
     """8 характеристик с иконками"""

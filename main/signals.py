@@ -65,3 +65,18 @@ def save_slug_history(sender, instance, created, **kwargs):
         from main.redirects import record_slug_change
         record_slug_change(instance, old_slug)
         instance._old_slug = None
+
+
+# ========== WebP copies of uploaded images (SEO task 11) ==========
+
+@receiver(post_save, sender='main.Product')
+@receiver(post_save, sender='main.ProductGallery')
+@receiver(post_save, sender='main.News')
+@receiver(post_save, sender='main.NewsBlock')
+def make_responsive_copies(sender, instance, **kwargs):
+    """480/960/1600 WebP copies for new or replaced images; existing current copies are skipped.
+    Errors are logged, never raised (an admin save must not fail because of a picture)."""
+    if kwargs.get('raw'):
+        return
+    from main.images import generate_for_instance
+    generate_for_instance(instance)

@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load image_tags %}
 {% load static %}
 {% load seo_tags %}
 
@@ -122,7 +123,7 @@
     </div>
     {% if news.preview_image %}
     <figure class="news-cover mxd-container">
-      <img src="{{ news.preview_image.url }}" alt="{{ news.preview_image_alt|default:news.title }}" fetchpriority="high" decoding="async">
+      {% responsive_img news.preview_image alt=news.preview_image_alt|default:news.title sizes="(max-width: 1200px) 92vw, 1200px" loading="eager" fetchpriority="high" %}
     </figure>
     {% endif %}
     <div class="mxd-block"></div>
@@ -169,7 +170,7 @@
     <div class="mxd-container">
       <div class="mxd-divider mxd-divider--image">
         <div class="mxd-divider__image">
-          <img src="{{ block.image.url }}" alt="{{ block.alt_text|default:block.title|default:news.title }}" loading="lazy" decoding="async">
+          {% responsive_img block.image alt=block.alt_text|default:block.title|default:news.title sizes="(max-width: 1200px) 92vw, 1200px" %}
         </div>
       </div>
     </div>
@@ -204,7 +205,7 @@
         {% with url=product.get_absolute_url %}
         <article class="news-model">
           <a class="news-model__image" href="{{ url }}" tabindex="-1" aria-hidden="true">
-            {% with image=product.card_image|default:product.main_image %}{% if image %}<img src="{{ image.url }}" alt="" loading="lazy" decoding="async">{% endif %}{% endwith %}
+            {% with image=product.card_image|default:product.main_image %}{% if image %}{% responsive_img image alt="" sizes="(max-width: 768px) 92vw, 400px" %}{% endif %}{% endwith %}
           </a>
           <div class="news-model__body">
             <h3 class="news-model__title"><a href="{{ url }}">{{ product.display_name }}</a></h3>

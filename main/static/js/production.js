@@ -327,6 +327,14 @@ async loadCategories() {
 
       // 2. Ma'lumotlarni tayyorlash
       const imageUrl = product.image_url || product.image || product.main_image || '';
+      // Task 11/12: alt text, WebP copies and size from the API (attribute values escaped)
+      const esc = (v) => String(v == null ? '' : v).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
+      const imageAlt = product.image_alt || '';
+      const sizeAttrs = product.image_width && product.image_height ? ` width="${product.image_width}" height="${product.image_height}" data-resp` : '';
+      const imgTag = imageUrl ? `<img src="${esc(imageUrl)}" class="truck-image" alt="${esc(imageAlt)}" loading="lazy" decoding="async"${sizeAttrs}>` : '';
+      const imageHTML = imageUrl && product.image_srcset
+        ? `<picture style="display:contents"><source type="image/webp" srcset="${esc(product.image_srcset)}" sizes="(max-width: 768px) 92vw, 420px">${imgTag}</picture>`
+        : imgTag;
       const productSlug = product.slug || '';
       const buttonText = this.t('buttonText');
       const brandName = product.category ? product.category.name : '';
@@ -339,7 +347,7 @@ async loadCategories() {
         <div class="faw-truck-card">
           <div class="truck-image-container">
             ${brandName ? `<div class="brand-badge">${brandName}</div>` : ''}
-            ${imageUrl ? `<img src="${imageUrl}" class="truck-image">` : ''}
+            ${imageHTML}
           </div>
           
           <div class="truck-info">

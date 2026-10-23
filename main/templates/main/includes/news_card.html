@@ -1,3 +1,4 @@
+{% load image_tags %}
 {% load static %}
 <!-- Компонент карточки новости (переиспользуемый) -->
 <div class="swiper-slide mxd-demo-swiper__slide">
@@ -25,9 +26,9 @@
     <!-- Фото -->
     <div class="slide-image">
       {% if news.preview_image %}
-        <img src="{{ news.preview_image.url }}" alt="{{ news.title }}">
+        {% responsive_img news.preview_image alt=news.title sizes="(max-width: 768px) 92vw, 33vw" %}
       {% else %}
-        <img src="{% static 'images/news/placeholder.jpg' %}" alt="{{ news.title }}">
+        <img src="{% static 'images/news/placeholder.jpg' %}" alt="{{ news.title }}" loading="lazy" decoding="async">
       {% endif %}
     </div>
   </a>

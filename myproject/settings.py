@@ -196,8 +196,7 @@ MIDDLEWARE = [
     'django.contrib.sessions.middleware.SessionMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
-    'django.middleware.locale.LocaleMiddleware',
-    'myproject.middleware.ForceRussianMiddleware',
+    'main.language.SiteLanguageMiddleware',               # language from the URL prefix only (task 14)
     'main.redirects.RedirectFallbackMiddleware',          # 301 for old URLs, only on 404 (task 13)
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',

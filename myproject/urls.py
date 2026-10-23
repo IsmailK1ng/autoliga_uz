@@ -51,10 +51,8 @@ urlpatterns = [
     path('api/docs/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
 ]
 
-urlpatterns += [
-    path('', include('main.urls')), 
-]
-
+# Site pages: /... is uz, /ru/... and /en/... (task 14: the language comes from the URL only;
+# the extra unprefixed include that served cookie languages on unprefixed URLs is gone)
 urlpatterns += i18n_patterns(
     path('', include('main.urls')),
     prefix_default_language=False  

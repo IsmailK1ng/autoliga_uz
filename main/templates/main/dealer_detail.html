@@ -39,32 +39,7 @@
     {% if dealer.seo_description %}{{ dealer.seo_description|striptags }}{% else %}{{ dealer.name|striptags }} — AUTOLIGA rasmiy diler va servis markazi.{% endif %}
 {% endblock %}
 {% block structured_data %}
-<script type="application/ld+json">
-{
-    "@context": "https://schema.org",
-    "@type": "AutoDealer",
-    "name": "{{ dealer.name|striptags|escapejs }}",
-    "url": "{{ request.build_absolute_uri }}",
-    "description": "{{ dealer.seo_description|default:dealer.description|default:dealer.name|striptags|escapejs }}",
-    "telephone": "{{ dealer.phone|escapejs }}",
-    "address": {
-        "@type": "PostalAddress",
-        "streetAddress": "{{ dealer.address|striptags|escapejs }}",
-        "addressRegion": "{{ dealer.get_region_display|escapejs }}",
-        "addressCountry": "UZ"
-    },
-    "parentOrganization": {
-        "@type": "Organization",
-        "name": "AUTOLIGA",
-        "url": "https://autoliga.uz/"
-    }{% if dealer.latitude and dealer.longitude %},
-    "geo": {
-        "@type": "GeoCoordinates",
-        "latitude": {{ dealer.latitude|floatformat:"6u" }},
-        "longitude": {{ dealer.longitude|floatformat:"6u" }}
-    }{% endif %}
-}
-</script>
+{% dealer_jsonld dealer images %}
 {% endblock structured_data %}
 {% block content %}
     <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-M33GWKMW" height="0" width="0"

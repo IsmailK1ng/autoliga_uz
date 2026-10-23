@@ -27,92 +27,9 @@
     <!-- CANONICAL VA HREFLANG -->
     {% canonical_url %}
     {% hreflang_tags %}
-    <!-- JSON-LD STRUCTURED DATA -->
-    {% if product %}
-    <script type="application/ld+json">
-    {
-        "@context": "https://schema.org",
-        "@type": "Product",
-        "name": "{{ product.title|escapejs }}"{% if product.main_image %},
-        "image": "{{ request.scheme }}://{{ request.get_host }}{{ product.main_image.url }}"{% endif %}{% if product.category %},
-        "brand": {
-            "@type": "Brand",
-            "name": "{{ product.category.name|escapejs }}"
-        }{% endif %}{% if product.price_numeric or product.schema_price %},
-        "offers": {
-            "@type": "Offer",
-            "priceCurrency": "UZS",
-            "price": "{{ product.price_numeric|default:product.schema_price|escapejs }}",
-            "url": "{{ request.build_absolute_uri|escapejs }}",
-            "seller": {
-                "@type": "Organization",
-                "name": "AUTOLIGA",
-                "url": "https://autoliga.uz"
-            }
-        }{% endif %},
-        "additionalProperty": [
-            {% if product.slider_power %}
-            {
-                "@type": "PropertyValue",
-                "name": "Dvigatel quvvati",
-                "value": "{{ product.slider_power|escapejs }}"
-            }{% if product.slider_fuel_consumption or product.slider_year %},{% endif %}
-            {% endif %}
-            {% if product.slider_fuel_consumption %}
-            {
-                "@type": "PropertyValue",
-                "name": "Yoqilg‘i sarfi",
-                "value": "{{ product.slider_fuel_consumption|escapejs }}"
-            }{% if product.slider_year %},{% endif %}
-            {% endif %}
-            {% if product.slider_year %}
-            {
-                "@type": "PropertyValue",
-                "name": "Ishlab chiqarilgan yil",
-                "value": "{{ product.slider_year|escapejs }}"
-            }
-            {% endif %}
-        ]{% if product.updated_at %},
-        "dateModified": "{{ product.updated_at|date:'Y-m-d' }}"{% endif %}
-    }
-    </script>
-    <!-- BREADCRUMB SCHEMA -->
-    <script type="application/ld+json">
-    {
-        "@context": "https://schema.org",
-        "@type": "BreadcrumbList",
-        "itemListElement": [
-            {
-                "@type": "ListItem",
-                "position": 1,
-                "name": "Bosh sahifa",
-                "item": "{{ request.scheme }}://{{ request.get_host }}{% url 'home' %}"
-            }
-            {% if product.category %},
-            {
-                "@type": "ListItem",
-                "position": 2,
-                "name": "{{ product.category.name|escapejs }}",
-                "item": "{{ request.scheme }}://{{ request.get_host }}{% url 'brand' product.category.slug %}"
-            },
-            {
-                "@type": "ListItem",
-                "position": 3,
-                "name": "{{ product.title|escapejs }}",
-                "item": "{{ request.build_absolute_uri }}"
-            }
-            {% else %},
-            {
-                "@type": "ListItem",
-                "position": 2,
-                "name": "{{ product.title|escapejs }}",
-                "item": "{{ request.build_absolute_uri }}"
-            }
-            {% endif %}
-        ]
-    }
-    </script>
-    {% endif %}
+    <!-- JSON-LD (task 7): Organization + BreadcrumbList + Car -->
+    {% site_jsonld %}
+    {% if product %}{% car_jsonld product %}{% endif %}
     <!-- VIEWPORT VA FAVICON -->
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">

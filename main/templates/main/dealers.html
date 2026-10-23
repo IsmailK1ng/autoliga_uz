@@ -27,6 +27,10 @@
 {% block og_image %}{{ request.scheme }}://{{ request.get_host }}{% static 'images/autoliga.jpg' %}{% endblock %}
 
 
+{% block structured_data %}
+{% dealers_jsonld %}
+{% endblock structured_data %}
+
 {% block content %}
     <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-M33GWKMW" height="0" width="0"
             style="display:none;visibility:hidden"></iframe></noscript>

@@ -6,6 +6,8 @@ from django.urls import reverse, NoReverseMatch
 from django.utils import translation
 from django.utils.safestring import mark_safe
 
+from main import structured_data as sd
+
 register = template.Library()
 
 # Pages backed by a translated object: (context variable, field that must be
@@ -106,3 +108,48 @@ def canonical_url(context):
             pass
     canonical = f"{request.scheme}://{request.get_host()}{path}"
     return mark_safe(f'<link rel="canonical" href="{canonical}" />')
+
+
+# ---------------------------------------------------------------- JSON-LD (task 7)
+
+def _jsonld_language(context):
+    return context.get('LANGUAGE_CODE') or translation.get_language() or settings.LANGUAGE_CODE
+
+
+@register.simple_tag(takes_context=True)
+def site_jsonld(context):
+    """Organization (every page) + BreadcrumbList (internal pages)."""
+    request = context.get('request')
+    if request is None:
+        return ''
+    language = _jsonld_language(context)
+    brands = context.get('SITE_MENU') or []
+    url_name = request.resolver_match.url_name if request.resolver_match else None
+    scripts = [sd.to_script(sd.organization(request, language, brands))]
+    if url_name:
+        scripts.append(sd.to_script(sd.breadcrumb_list(request, url_name, context.flatten(), language)))
+    return mark_safe('\n    '.join(s for s in scripts if s))
+
+
+@register.simple_tag(takes_context=True)
+def car_jsonld(context, product):
+    return mark_safe(sd.to_script(sd.car(context['request'], product, _jsonld_language(context))))
+
+
+@register.simple_tag(takes_context=True)
+def news_jsonld(context, news):
+    return mark_safe(sd.to_script(sd.news_article(context['request'], news, _jsonld_language(context))))
+
+
+@register.simple_tag(takes_context=True)
+def dealer_jsonld(context, dealer, images=None):
+    data = {'@context': 'https://schema.org', **sd.auto_dealer(context['request'], dealer, images)}
+    return mark_safe(sd.to_script(data))
+
+
+@register.simple_tag(takes_context=True)
+def dealers_jsonld(context):
+    """One AutoDealer per active dealer (/dealers/, /contact/)."""
+    from main.models import Dealer
+    dealers = Dealer.objects.filter(is_active=True).order_by('order', 'name')
+    return mark_safe(sd.to_script(sd.auto_dealers(context['request'], dealers)))

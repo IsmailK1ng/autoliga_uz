@@ -28,36 +28,9 @@
 <link rel="stylesheet" type="text/css" href="{% static 'css/site_contact.css' %}" />
 {% endblock site_contact %}
 
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "AutoDealer",
-  "name": "Autoliga",
-  "address": {
-    "@type": "PostalAddress",
-    "streetAddress": "2-й проезд Фарогат, 2, Ташкент",
-    "addressLocality": "Tashkent",
-    "addressRegion": "Tashkent",
-    "postalCode": "100000",
-    "addressCountry": "UZ"
-  },
-  "geo": {
-    "@type": "GeoCoordinates",
-    "latitude": "41.375042", "longitude": "69.287543"
-  },
-  "telephone": "{{ SITE_CONTACTS.phone }}",
-  "openingHoursSpecification": [
-    {
-      "@type": "OpeningHoursSpecification",
-      "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
-      "opens": "09:00",
-      "closes": "19:00"
-    }
-  ],
-  "url": "https://autoliga.uz/contact/",
-  "image": "{% static 'images/logo/autoliga-logo.png' %}"
-}
-</script>
+{% block structured_data %}
+{% dealers_jsonld %}
+{% endblock structured_data %}
 
 {% block content %}
     <!-- Google Tag Manager (noscript) -->

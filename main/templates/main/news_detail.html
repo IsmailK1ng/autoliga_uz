@@ -30,6 +30,10 @@
     {% if news.preview_image %}{{ request.scheme }}://{{ request.get_host }}{{ news.preview_image.url }}{% else %}{{ request.scheme }}://{{ request.get_host }}{% static 'images/logo/autoliga-logo.png' %}{% endif %}
 {% endblock %}
 
+{% block structured_data %}
+{% news_jsonld news %}
+{% endblock structured_data %}
+
 {% block breadcrumbs %}
 <link rel="stylesheet" href="{% static 'css/breadcrumbs.css' %}">
 {% endblock breadcrumbs %}

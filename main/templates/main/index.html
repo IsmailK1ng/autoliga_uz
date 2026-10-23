@@ -21,43 +21,6 @@
 {% block og_image %}{{ request.scheme }}://{{ request.get_host }}{% static 'images/autoliga.jpg' %}{% endblock %}
 
 {% block structured_data %}
-<script type="application/ld+json">
-{
-    "@context": "https://schema.org",
-    "@type": "Organization",
-    "name": "AUTOLIGA",
-    "alternateName": "AUTOLIGA Uzbekistan",
-    "url": "https://autoliga.uz/",
-    "logo": "{{ request.scheme }}://{{ request.get_host }}{% static 'images/logo/autoliga-logo.png' %}",
-    "description": "AUTOLIGA — rasmiy avtosalonlar va servislar tarmog‘i. JETOUR, SOUEAST, JAC va GEELY avtomobillari.",
-    "telephone": "{{ SITE_CONTACTS.phone }}",
-    "areaServed": {
-        "@type": "Country",
-        "name": "Uzbekistan"
-    },
-    "brand": [
-        {
-            "@type": "Brand",
-            "name": "JETOUR"
-        },
-        {
-            "@type": "Brand",
-            "name": "SOUEAST"
-        },
-        {
-            "@type": "Brand",
-            "name": "JAC"
-        },
-        {
-            "@type": "Brand",
-            "name": "GEELY"
-        }
-    ],
-    "sameAs": [
-        "https://t.me/avtoligauz"
-    ]
-}
-</script>
 {% endblock %}
 
 {% block content %}

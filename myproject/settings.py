@@ -20,6 +20,12 @@ SITE_CONTACTS = {
     'phone': '+998785557377',
     'phone_display': '+998 78 555 73 77',
     'email': 'info@autoliga.uz',
+    # Organization sameAs in JSON-LD (task 7); the same profiles as the footer icons
+    'social': [
+        'https://www.instagram.com/autoliga.uz/',
+        'https://t.me/avtoligauz',
+        'https://youtube.com/@autoligauz',
+    ],
 }
 
 # ============ SEO ============

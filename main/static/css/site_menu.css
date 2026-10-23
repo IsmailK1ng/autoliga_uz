@@ -393,3 +393,9 @@
 /* Task 11: images with width/height attributes (CLS) keep their aspect ratio.
    :where() has zero specificity, so every existing size rule of the theme still wins. */
 :where(img[data-resp]) { height: auto; }
+
+/* Task 14: language links also open with the keyboard (hover already opens them) */
+.language-switcher:focus-within .language-dropdown { opacity: 1; visibility: visible; transform: translateY(0); }
+.language-switcher:focus-within .language-arrow { transform: rotate(180deg); }
+/* links instead of the old <button>s: same line height as the buttons had */
+a.language-option { line-height: normal; }

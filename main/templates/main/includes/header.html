@@ -1,3 +1,4 @@
+{% load seo_tags %}
 {% load static %}
 <style>
     .mxd-logo_txt {
@@ -110,26 +111,20 @@
 
     <!-- Элементы управления -->
     <div class="mxd-header__controls loading__fade">
-        <!-- Переключатель языка -->
-        <form action="{% url 'set_language' %}" method="post" class="language-switcher-form"
-            style="display: inline;">
-            {% csrf_token %}
-            <input type="hidden" name="language" value="" id="language-input">
-            <div class="language-switcher">
-                <span class="language-current">
+        <!-- Language switcher (task 14): plain links to the same page in each language, no JS needed -->
+        {% language_links as language_links %}
+        <div class="language-switcher-form" style="display: inline;">
+            <nav class="language-switcher" aria-label="{% if LANGUAGE_CODE == 'ru' %}Язык сайта{% elif LANGUAGE_CODE == 'en' %}Site language{% else %}Sayt tili{% endif %}">
+                <span class="language-current" tabindex="0">
                     {% if LANGUAGE_CODE == 'ru' %}RU{% elif LANGUAGE_CODE == 'en' %}EN{% else %}UZ{% endif %}
                 </span>
-                <span class="language-arrow">▼</span>
+                <span class="language-arrow" aria-hidden="true">▼</span>
                 <div class="language-dropdown">
-                    <button type="button" class="language-option {% if LANGUAGE_CODE == 'uz' %}active{% endif %}"
-                        data-lang="uz" onclick="switchLanguage('uz')">O'zbek</button>
-                    <button type="button" class="language-option {% if LANGUAGE_CODE == 'ru' %}active{% endif %}"
-                        data-lang="ru" onclick="switchLanguage('ru')">Русский</button>
-                    <button type="button" class="language-option {% if LANGUAGE_CODE == 'en' %}active{% endif %}"
-                        data-lang="en" onclick="switchLanguage('en')">English</button>
+                    {% for link in language_links %}<a class="language-option{% if link.current %} active{% endif %}" href="{{ link.href }}" hreflang="{{ link.code }}" lang="{{ link.code }}"{% if link.nofollow %} rel="nofollow"{% endif %}{% if link.current %} aria-current="page"{% endif %}>{{ link.label }}</a>
+                    {% endfor %}
                 </div>
-            </div>
-        </form>
+            </nav>
+        </div>
 
         <button id="color-switcher" class="mxd-color-switcher" type="button" role="switch"
             aria-label="light/dark mode" aria-checked="true"></button>
@@ -175,12 +170,4 @@
         if (desktop.matches && !item.contains(e.target)) close();
     });
 })();
-</script>
-<script>
-function switchLanguage(lang) {
-    console.log('Switching to language:', lang);
-    document.getElementById('language-input').value = lang;
-    sessionStorage.setItem('languageChanged', 'true');
-    document.querySelector('.language-switcher-form').submit();
-}
 </script>

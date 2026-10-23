@@ -11,6 +11,7 @@ from rest_framework.permissions import AllowAny, IsAdminUser
 from django.http import Http404, HttpResponsePermanentRedirect, HttpResponseRedirect
 from django.core.validators import slug_re
 from django.urls import reverse
+from django.views.decorators.csrf import csrf_exempt
 from django.utils.html import strip_tags
 from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.throttling import AnonRateThrottle
@@ -365,25 +366,42 @@ def page_not_found(request, exception=None):
     return render(request, '404.html', {'popular_products': popular_products}, status=404)
 
 
+@csrf_exempt  # old cached pages post a stale token; switching the language is harmless
 def set_language_get(request):
-    """Переключение языка ТОЛЬКО для сайта"""
+    """Language switch (task 14).
+
+    GET  /set-language/?language=uz&next=/ru/products/x/   (switcher O'zbek link during the cookie transition)
+    POST /set-language/  language=..  (old switcher form in cached HTML; the page comes from the Referer)
+
+    Sets the django_language cookie and sends ONE 302 to the same page in the chosen
+    language (whatever language `next` / the Referer was in). Only local paths are used.
+    """
+    from urllib.parse import urlsplit
+    from django.utils.http import url_has_allowed_host_and_scheme
+    from .redirects import LANG_PREFIX_RE
+
     language = request.GET.get('language') or request.POST.get('language')
-    
-    if language and language in ['uz', 'ru', 'en']:
-        request.session['_language'] = language
-        next_url = request.META.get('HTTP_REFERER', '/')
-        
-        response = redirect(next_url)
-        response.set_cookie(
-            settings.LANGUAGE_COOKIE_NAME,
-            language,
-            max_age=365*24*60*60,
-            path='/',
-            samesite='Lax'
-        )
-        return response
-    
-    return redirect('/')
+    codes = [code for code, _name in settings.LANGUAGES]
+    if language not in codes:
+        return redirect('/')
+
+    target = request.GET.get('next') or request.POST.get('next') or request.META.get('HTTP_REFERER') or '/'
+    if not url_has_allowed_host_and_scheme(target, allowed_hosts={request.get_host()}, require_https=request.is_secure()):
+        target = '/'
+    parts = urlsplit(target)
+    path = parts.path if parts.path.startswith('/') and not parts.path.startswith('//') else '/'
+    path = LANG_PREFIX_RE.sub('', path) or '/'
+    prefix = '' if language == settings.LANGUAGE_CODE else f'/{language}'
+    location = prefix + path + (f'?{parts.query}' if parts.query else '')
+
+    response = HttpResponseRedirect(location)
+    response.set_cookie(
+        settings.LANGUAGE_COOKIE_NAME, language,
+        max_age=settings.LANGUAGE_COOKIE_AGE, path='/', samesite='Lax', secure=settings.LANGUAGE_COOKIE_SECURE,
+    )
+    response['Cache-Control'] = 'private, no-store, max-age=0'
+    response['X-Accel-Expires'] = '0'  # nginx / Engintron: never cache (Set-Cookie)
+    return response
 
 
 # === API ViewSets ===

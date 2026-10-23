@@ -113,6 +113,53 @@ def canonical_url(context):
     return mark_safe(f'<link rel="canonical" href="{canonical}" />')
 
 
+
+# ---------------------------------------------------------------- language switcher (task 14)
+
+LANGUAGE_LABELS = {'uz': "O'zbek", 'ru': 'Русский', 'en': 'English'}
+# A page that does not exist in a language (untranslated object): the switcher goes to this list instead
+LANGUAGE_FALLBACK_PAGE = {'product_detail': 'products', 'brand': 'products', 'news_detail': 'news', 'dealer_detail': 'dealers'}
+
+
+@register.simple_tag(takes_context=True)
+def language_links(context):
+    """Switcher links: the same page in every language as plain <a href>.
+
+    While the cookie transition lasts (main.language), the O'zbek link goes through
+    /set-language/?language=uz&next=<page> (rel="nofollow"): it sets the cookie to uz
+    and lands on the unprefixed page, so an old ru/en cookie cannot bounce the visitor
+    back. Crawlers still reach every language through the plain ru/en links, the
+    hreflang tags and the sitemap.
+    """
+    from urllib.parse import urlencode
+    from main.language import transition_active
+
+    request = context.get('request')
+    current = translation.get_language() or settings.LANGUAGE_CODE
+    url_name = request.resolver_match.url_name if request is not None and request.resolver_match else None
+    base, available = '/', [code for code, _name in settings.LANGUAGES]
+    if url_name:
+        try:
+            base = _canonical_base(request, url_name)
+            available = _available_languages(context, request, url_name)
+        except NoReverseMatch:
+            base = '/'
+    links = []
+    for code, _name in settings.LANGUAGES:
+        path = base
+        if code not in available:
+            fallback = LANGUAGE_FALLBACK_PAGE.get(url_name)
+            with translation.override(settings.LANGUAGE_CODE):
+                path = reverse(fallback) if fallback else '/'
+        href = _language_prefix(code) + path
+        nofollow = code == settings.LANGUAGE_CODE and transition_active()
+        if nofollow:
+            href = '/set-language/?' + urlencode({'language': code, 'next': href})
+        links.append({'code': code, 'label': LANGUAGE_LABELS.get(code, code), 'href': href,
+                      'current': code == current, 'nofollow': nofollow})
+    return links
+
+
 # ---------------------------------------------------------------- JSON-LD (task 7)
 
 def _jsonld_language(context):

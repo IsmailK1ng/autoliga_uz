@@ -104,6 +104,8 @@
                                 <div class="td-select-wrapper">
                                     <select name="dealer" id="tdDealer" required>
                                         <option value="" disabled selected>{% if LANGUAGE_CODE == 'uz' %}Diler markazni tanlang{% elif LANGUAGE_CODE == 'ru' %}Выберите дилерский центр{% else %}Select dealer center{% endif %}</option>
+                                        {% for dealer in dealers %}<option value="{{ dealer.id }}">{{ dealer.name }}{% if dealer.address %} — {{ dealer.address }}{% endif %}</option>
+                                        {% endfor %}
                                     </select>
                                 </div>
                             </div>
@@ -113,7 +115,9 @@
                                 <label>{% if LANGUAGE_CODE == 'uz' %}Modelni tanlash{% elif LANGUAGE_CODE == 'ru' %}Выбор модели{% else %}Select model{% endif %}*</label>
                                 <div class="td-select-wrapper">
                                     <select name="product" id="tdProduct" required>
-                                        <option value="" disabled selected>{% if LANGUAGE_CODE == 'uz' %}Modelni tanlang{% elif LANGUAGE_CODE == 'ru' %}Выберите модель{% else %}Select model{% endif %}</option>
+                                        <option value="" disabled{% if not selected_model %} selected{% endif %}>{% if LANGUAGE_CODE == 'uz' %}Modelni tanlang{% elif LANGUAGE_CODE == 'ru' %}Выберите модель{% else %}Select model{% endif %}</option>
+                                        {% for product in products %}<option value="{{ product.id }}"{% if product.slug == selected_model %} selected{% endif %}>{{ product.title|default:product.title_uz }}</option>
+                                        {% endfor %}
                                     </select>
                                 </div>
                             </div>
@@ -261,25 +265,9 @@
         };
         const months = MONTHS[currentLang] || MONTHS['uz'];
 
-        // === Загрузка дилеров ===
-        const dealersData = {{ dealers_json|safe }};
+        // Dealer and model options are server HTML (task 10)
         const dealerSelect = document.getElementById("tdDealer");
-        dealersData.forEach(d => {
-            const opt = document.createElement("option");
-            opt.value = d.id;
-            opt.textContent = d.name + (d.address ? ' — ' + d.address : '');
-            dealerSelect.appendChild(opt);
-        });
-
-        // === Загрузка продуктов ===
-        const productsData = {{ products_json|safe }};
         const productSelect = document.getElementById("tdProduct");
-        productsData.forEach(p => {
-            const opt = document.createElement("option");
-            opt.value = p.id;
-            opt.textContent = p.title;
-            productSelect.appendChild(opt);
-        });
 
         // === Маска телефона ===
         phoneInput.addEventListener("input", (e) => {

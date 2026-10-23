@@ -31,6 +31,28 @@
 {% dealers_jsonld %}
 {% endblock structured_data %}
 
+{% block inline_styles %}
+<style>
+    /* Task 10: server-rendered dealer list (visible without JavaScript) */
+    .dealer-list { margin-top: 6rem; }
+    .dealer-list__group { margin-bottom: 4.8rem; scroll-margin-top: 120px; }
+    .dealer-list__group[hidden] { display: none; }
+    .dealer-list__region { margin-bottom: 2rem; font-size: clamp(2.4rem, 2.4vw, 3.4rem); }
+    .dealer-list__items { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr)); gap: 2rem; }
+    .dealer-list__item { display: flex; flex-direction: column; gap: 1.2rem; padding: 2.4rem; border: 1px solid rgba(127,127,127,.25); border-radius: 20px; scroll-margin-top: 120px; transition: box-shadow .3s; }
+    .dealer-list__item.is-highlighted { box-shadow: 0 0 0 2px #F07800; }
+    .dealer-list__name { margin: 0; font-size: 2.2rem; line-height: 1.25; overflow-wrap: anywhere; }
+    .dealer-list__name a { color: inherit; text-decoration: none; }
+    .dealer-list__row { display: flex; gap: 1rem; margin: 0; font-size: 1.6rem; font-style: normal; line-height: 1.45; overflow-wrap: anywhere; }
+    .dealer-list__row i { flex: none; margin-top: .3rem; }
+    .dealer-list__row a { color: inherit; }
+    .dealer-list__phones { display: flex; flex-direction: column; }
+    .dealer-list__links { display: flex; flex-wrap: wrap; gap: 1.6rem; margin-top: auto; padding-top: .8rem; font-size: 1.5rem; }
+    .dealer-list__links a { display: inline-flex; align-items: center; gap: .6rem; min-height: 44px; color: inherit; }
+    .dealer-list__reset { margin-bottom: 2.4rem; padding: .8rem 1.8rem; border: 1px solid currentColor; border-radius: 999px; background: none; color: inherit; font: inherit; font-size: 1.5rem; cursor: pointer; }
+</style>
+{% endblock inline_styles %}
+
 {% block content %}
     <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-M33GWKMW" height="0" width="0"
             style="display:none;visibility:hidden"></iframe></noscript>
@@ -68,7 +90,7 @@
     <div class="mxd-section padding-default dealers-section">
         <div class="mxd-container">
 
-            {% if dealers_json != '[]' %}
+            {% if dealer_groups %}
 
             <!-- Mobile title (hidden on desktop) -->
 <div class="dealers-page-heading dealers-heading-mobile">{% if LANGUAGE_CODE == 'uz' %}Autoliga rasmiy dilerlar{% elif LANGUAGE_CODE == 'ru' %}Официальные дилеры Autoliga{% else %}Autoliga Official Dealers{% endif %}</div>
@@ -130,12 +152,35 @@
                         </div>
                     </div>
 
-                    <!-- Mobile dealer list (appears below map after region selected) -->
-                    <div class="mob-dealer-list" id="mobDealerList"></div>
-
                 </div><!-- /dealers-map-area -->
 
             </div><!-- /dealers-layout -->
+
+            <!-- Task 10: every active dealer as server HTML, grouped by region.
+                 id="<region>" prepares future /dealers/<region>/ pages; the map and the
+                 region filter above only show / filter this list. -->
+            <section class="dealer-list" id="dealer-list" aria-label="{% if LANGUAGE_CODE == 'ru' %}Список дилерских центров{% elif LANGUAGE_CODE == 'en' %}Dealer centers list{% else %}Diler markazlari ro'yxati{% endif %}">
+                <button type="button" class="dealer-list__reset" id="dealerListReset" hidden>{% if LANGUAGE_CODE == 'ru' %}Все дилеры{% elif LANGUAGE_CODE == 'en' %}All dealers{% else %}Barcha dilerlar{% endif %}</button>
+                {% for region, label, items in dealer_groups %}
+                <div class="dealer-list__group" id="{{ region }}" data-region="{{ region }}">
+                    <h2 class="dealer-list__region">{{ label }}</h2>
+                    <div class="dealer-list__items">
+                        {% for dealer in items %}
+                        <article class="dealer-list__item" id="dealer-{{ dealer.id }}">
+                            <h3 class="dealer-list__name"><a href="{{ dealer.detail_url }}">{{ dealer.name }}</a></h3>
+                            {% if dealer.address %}<address class="dealer-list__row"><i class="ph ph-map-pin" aria-hidden="true"></i><span>{{ dealer.address }}</span></address>{% endif %}
+                            {% if dealer.phones %}<p class="dealer-list__row"><i class="ph ph-phone" aria-hidden="true"></i><span class="dealer-list__phones">{% for display, tel in dealer.phones %}{% if tel %}<a href="{{ tel }}">{{ display }}</a>{% else %}<span>{{ display }}</span>{% endif %}{% endfor %}</span></p>{% endif %}
+                            {% if dealer.working_hours %}<p class="dealer-list__row"><i class="ph ph-clock" aria-hidden="true"></i><span>{{ dealer.working_hours }}</span></p>{% endif %}
+                            <div class="dealer-list__links">
+                                {% if dealer.map_url %}<a href="{{ dealer.map_url }}" target="_blank" rel="noopener">{% if LANGUAGE_CODE == 'ru' %}Показать на карте{% elif LANGUAGE_CODE == 'en' %}View on map{% else %}Xaritada ko'rish{% endif %} <i class="ph ph-arrow-up-right" aria-hidden="true"></i></a>{% endif %}
+                                <a href="{{ dealer.detail_url }}">{% if LANGUAGE_CODE == 'ru' %}Подробнее{% elif LANGUAGE_CODE == 'en' %}Details{% else %}Batafsil{% endif %} <i class="ph ph-arrow-right" aria-hidden="true"></i></a>
+                            </div>
+                        </article>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endfor %}
+            </section>
 
             {% else %}
             <div class="mxd-block">
@@ -169,14 +214,14 @@
     <script src="{% static 'js/error-logger.js' %}"></script>
     <script src="{% static 'js/main-setting.js' %}"></script>
 
-    {% if dealers_json != '[]' %}
+    {% if dealer_groups %}
     <script src="{% static 'js/uzbekistan-mapdata.js' %}"></script>
     <script src="{% static 'js/countrymap.js' %}"></script>
     {% endif %}
 
 
 
-    {% if dealers_json != '[]' %}
+    {% if dealer_groups %}
     <script id="dealers-data" type="application/json">{{ dealers_json|safe }}</script>
 
     <script>
@@ -410,7 +455,7 @@
                 simplemaps_countrymap_mapdata.locations = buildLocations(region);
                 simplemaps_countrymap.refresh();
 
-                if (isMobile()) renderMobDealerList(region);
+                if (isMobile()) filterDealerList(region);
             }
 
             // ── Xaritada viloyat bosilganda ───────────────────────────
@@ -431,11 +476,7 @@
                 const dealer = DEALERS.find(d => String(d.id) === id);
                 if (!dealer) return;
                 if (isMobile()) {
-                    const card = document.getElementById('mob-item-' + id);
-                    if (card) {
-                        openMobDealerItem(card, dealer);
-                        card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-                    }
+                    showDealerInList(dealer.id);
                 } else {
                     showDealerCard(dealer);
                 }
@@ -454,11 +495,7 @@
                         const dealer = DEALERS.find(d => String(d.id) === locId);
                         if (!dealer) return;
                         if (isMobile()) {
-                            const card = document.getElementById('mob-item-' + locId);
-                            if (card) {
-                                openMobDealerItem(card, dealer);
-                                card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-                            }
+                            showDealerInList(dealer.id);
                         } else {
                             showDealerCard(dealer);
                         }
@@ -481,84 +518,30 @@
                 }, { passive: false, capture: true });
             })();
 
-            // ── MOBILE: Dealer ro'yxati ────────────────────────────────
-            const mobDealerList = document.getElementById('mobDealerList');
+            // ── Server-rendered list (task 10): filter by region, highlight a dealer ──
+            const listReset = document.getElementById('dealerListReset');
 
-            function renderMobDealerList(region) {
-                const regionDealers = region ? DEALERS.filter(d => d.region === region) : DEALERS;
-                mobDealerList.innerHTML = '';
-
-                if (!regionDealers.length) {
-                    mobDealerList.classList.add('hidden');
-                    return;
-                }
-
-                const title = document.createElement('div');
-                title.className = 'mob-dealer-list-title';
-                title.textContent = region ? (labels[region] || region) + ' — diler markazlar' : 'Barcha diler markazlar';
-                mobDealerList.appendChild(title);
-
-                const cardsWrap = document.createElement('div');
-                cardsWrap.className = 'mob-dealer-cards';
-
-                regionDealers.forEach(dealer => {
-                    const item = document.createElement('div');
-                    item.className = 'mob-dealer-item';
-                    item.id = 'mob-item-' + dealer.id;
-
-                    const initial = dealer.name ? dealer.name[0].toUpperCase() : 'D';
-                    const hasLogo = Boolean(dealer.logo);
-                    const logoHtml = hasLogo
-                        ? `<img src="${dealer.logo}" alt="${dealer.name}" onerror="this.parentElement.classList.add('no-logo');this.outerHTML='${initial}'">`
-                        : initial;
-                    const logoClass = hasLogo ? 'mob-dealer-item-logo' : 'mob-dealer-item-logo no-logo';
-
-                    item.innerHTML = `
-                    <div class="mob-dealer-item-header">
-                        <div class="${logoClass}">${logoHtml}</div>
-                        <span class="mob-dealer-item-name">${dealer.name || '—'}</span>
-                        <i class="ph ph-caret-right mob-dealer-item-arrow"></i>
-                    </div>
-                    <div class="mob-dealer-detail">
-                        ${dealer.address ? `<div class="mob-dealer-detail-row"><i class="ph ph-map-pin"></i><span>${dealer.address}</span></div>` : ''}
-                        ${dealer.phone ? `<div class="mob-dealer-detail-row"><i class="ph ph-phone"></i><a href="tel:${dealer.phone.replace(/\s/g, '')}">${dealer.phone}</a></div>` : ''}
-                        ${dealer.working_hours ? `<div class="mob-dealer-detail-row"><i class="ph ph-clock"></i><span>${dealer.working_hours}</span></div>` : ''}
-                        ${buildSocialsHtml(dealer)}
-                        ${dealer.detail_url ? `<a href="${dealer.detail_url}" class="mob-dealer-detail-link">{% if LANGUAGE_CODE == 'uz' %}Batafsil{% elif LANGUAGE_CODE == 'ru' %}Подробнее{% else %}Details{% endif %} <i class="ph ph-arrow-right"></i></a>` : ''}
-                    </div>`;
-
-                    item.querySelector('.mob-dealer-item-header').addEventListener('click', () => {
-                        openMobDealerItem(item, dealer);
-                    });
-
-                    cardsWrap.appendChild(item);
+            function filterDealerList(region) {
+                document.querySelectorAll('.dealer-list__group').forEach(group => {
+                    group.hidden = Boolean(region) && group.dataset.region !== region;
                 });
-
-                mobDealerList.appendChild(cardsWrap);
-                mobDealerList.classList.remove('hidden');
+                listReset.hidden = !region;
             }
 
-            function openMobDealerItem(item, dealer) {
-                const isActive = item.classList.contains('active');
-                document.querySelectorAll('.mob-dealer-item.active').forEach(el =>
-                    el.classList.remove('active')
-                );
-                if (!isActive) item.classList.add('active');
+            function showDealerInList(id) {
+                const item = document.getElementById('dealer-' + id);
+                if (!item) return;
+                const group = item.closest('.dealer-list__group');
+                if (group && group.hidden) filterDealerList(null);
+                document.querySelectorAll('.dealer-list__item.is-highlighted').forEach(el => el.classList.remove('is-highlighted'));
+                item.classList.add('is-highlighted');
+                item.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
             }
 
-            function buildSocialsHtml(dealer) {
-                const socials = [
-                    { key: 'instagram', icon: 'ph-instagram-logo' },
-                    { key: 'telegram', icon: 'ph-telegram-logo' },
-                    { key: 'facebook', icon: 'ph-facebook-logo' },
-                    { key: 'youtube', icon: 'ph-youtube-logo' },
-                ];
-                const links = socials
-                    .filter(s => dealer[s.key])
-                    .map(s => `<a href="${dealer[s.key]}" target="_blank" rel="noopener noreferrer"><i class="ph ${s.icon}"></i></a>`)
-                    .join('');
-                return links ? `<div class="mob-dealer-socials">${links}</div>` : '';
-            }
+            listReset.addEventListener('click', () => {
+                filterDealerList(null);
+                mobAllText.textContent = labelAll;
+            });
 
             // ── DESKTOP: Dealer info card ──────────────────────────────
             document.getElementById('cardClose').addEventListener('click', hideDealerCard);
@@ -630,8 +613,6 @@
                 card.style.display = '';
             }
 
-            // Mobile da barcha dilerlarni ko'rsat
-            if (isMobile()) renderMobDealerList(null);
         }
 
         // DOM tayyor bo'lgach ishga tushir

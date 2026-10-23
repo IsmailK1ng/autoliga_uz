@@ -28,6 +28,7 @@ from django.utils import timezone
 import logging
 import json
 from django.db.models import Prefetch
+from .dealer_info import dealer_card, group_by_region, map_embed_url
 from .seo import brand_seo, news_body_text, news_description, price_label, product_seo
 
 
@@ -196,41 +197,13 @@ def news(request):
 
 
 def dealers(request):
-    dealers_qs = Dealer.objects.filter(is_active=True).order_by('order', 'name')
-    dealers_data = []
-    for d in dealers_qs:
-        # modeltranslation: d.name joriy tilga qarab qaytaradi.
-        # Agar bo'sh bo'lsa, boshqa tillardan olish
-        name = (d.name or
-                getattr(d, 'name_uz', '') or
-                getattr(d, 'name_ru', '') or
-                getattr(d, 'name_en', '') or '')
-        address = (d.address or
-                   getattr(d, 'address_uz', '') or
-                   getattr(d, 'address_ru', '') or
-                   getattr(d, 'address_en', '') or '')
-        working_hours = (d.working_hours or
-                         getattr(d, 'working_hours_uz', '') or
-                         getattr(d, 'working_hours_ru', '') or
-                         getattr(d, 'working_hours_en', '') or '')
-        dealers_data.append({
-            'id': d.id,
-            'name': name,
-            'region': d.region,
-            'address': address,
-            'phone': d.phone or '',
-            'working_hours': working_hours,
-            'instagram': d.instagram or '',
-            'telegram': d.telegram or '',
-            'facebook': d.facebook or '',
-            'youtube': d.youtube or '',
-            'logo': d.logo.url if d.logo else '',
-            'lat': float(d.latitude) if d.latitude else None,
-            'lng': float(d.longitude) if d.longitude else None,
-            'detail_url': d.get_absolute_url(),
-        })
+    """Task 10: every active dealer as server HTML (grouped by region); the map
+    script reads the same data from dealers_json."""
+    language = getattr(request, 'LANGUAGE_CODE', 'uz')
+    cards = [dealer_card(d, language) for d in Dealer.objects.filter(is_active=True).order_by('order', 'name')]
     return render(request, 'main/dealers.html', {
-        'dealers_json': json.dumps(dealers_data, ensure_ascii=False),
+        'dealer_groups': group_by_region(cards),
+        'dealers_json': json.dumps(cards, ensure_ascii=False),
     })
 
 
@@ -257,22 +230,23 @@ def dealer_detail(request, pk):
 
     return render(request, 'main/dealer_detail.html', {
         'dealer': dealer,
+        'card': dealer_card(dealer, getattr(request, 'LANGUAGE_CODE', 'uz')),
+        'map_embed_url': map_embed_url(dealer),
         'images': images,
         'managers': managers,
     })
 
 
 def test_drive(request):
-    """Страница записи на тест-драйв"""
-    products = Product.objects.filter(is_active=True).order_by('order', 'title')
-    products_data = [{'id': p.id, 'title': p.title} for p in products]
-
+    """Страница записи на тест-драйв. Model and dealer options are server HTML
+    (task 10); ?model=<slug> (link from the model page) preselects the model."""
+    products = Product.objects.filter(is_active=True).select_related('category').order_by('order', 'title')
     dealers = Dealer.objects.filter(is_active=True).order_by('order', 'name')
-    dealers_data = [{'id': d.id, 'name': d.name, 'address': d.address or ''} for d in dealers]
 
     return render(request, 'main/test_drive.html', {
-        'products_json': json.dumps(products_data, ensure_ascii=False),
-        'dealers_json': json.dumps(dealers_data, ensure_ascii=False),
+        'products': products,
+        'dealers': [dealer_card(d, getattr(request, 'LANGUAGE_CODE', 'uz')) for d in dealers],
+        'selected_model': request.GET.get('model', ''),
         'RECAPTCHA_SITE_KEY': getattr(settings, 'RECAPTCHA_SITE_KEY', ''),
     })
 

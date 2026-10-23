@@ -83,12 +83,12 @@
                     </div>
                 </div>
                 <div class="dd-hero-actions">
-                    {% if dealer.phone %}
-                        <a href="tel:{{ dealer.phone|cut:' ' }}" class="dd-btn dd-btn-primary">
+                    {% for display, tel in card.phones %}{% if tel %}
+                        <a href="{{ tel }}" class="dd-btn dd-btn-primary">
                             <i class="ph ph-phone"></i>
-                            <span>{{ dealer.phone }}</span>
+                            <span>{{ display }}</span>
                         </a>
-                    {% endif %}
+                    {% endif %}{% endfor %}
                     <div class="dd-hero-socials">
                         {% if dealer.instagram %}
                             <a href="{{ dealer.instagram }}" target="_blank" rel="noopener noreferrer" class="dd-social-link"><i class="ph ph-instagram-logo"></i></a>
@@ -166,11 +166,17 @@
                         {% if dealer.address %}
                             <p class="dd-card-text">{{ dealer.address }}</p>
                         {% endif %}
-                        {% if dealer.phone %}
+                        {% for display, tel in card.phones %}
                             <p class="dd-card-text dd-phone-row">
                                 <i class="ph ph-phone"></i>
-                                <a href="tel:{{ dealer.phone|cut:' ' }}">{{ dealer.phone }}</a>
+                                {% if tel %}<a href="{{ tel }}">{{ display }}</a>{% else %}{{ display }}{% endif %}
                             </p>
+                        {% endfor %}
+                        {% if card.map_url %}
+                            <p class="dd-card-text"><a href="{{ card.map_url }}" target="_blank" rel="noopener">{% if LANGUAGE_CODE == 'ru' %}Показать на карте{% elif LANGUAGE_CODE == 'en' %}View on map{% else %}Xaritada ko'rish{% endif %} <i class="ph ph-arrow-up-right" aria-hidden="true"></i></a></p>
+                        {% endif %}
+                        {% if map_embed_url %}
+                            <iframe class="dd-map" src="{{ map_embed_url }}" title="{{ card.name }} — {% if LANGUAGE_CODE == 'ru' %}карта{% elif LANGUAGE_CODE == 'en' %}map{% else %}xarita{% endif %}" loading="lazy" referrerpolicy="no-referrer-when-downgrade" style="width:100%;height:320px;margin-top:1.6rem;border:0;border-radius:16px;"></iframe>
                         {% endif %}
                     </div>
                 </div>

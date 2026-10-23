@@ -255,31 +255,37 @@ def opening_hours(text):
     return f"{days} {h1:02d}:{match['m1']}-{h2:02d}:{match['m2']}"
 
 
-def auto_dealer(request, dealer, images=None):
-    url = absolute(request, dealer.get_absolute_url())
+def auto_dealer(request, dealer, images=None, language=None):
+    """AutoDealer from the same data as the visible dealer text (main/dealer_info.py)."""
+    from .dealer_info import dealer_card
+    card = dealer_card(dealer, _lang(language))
+    url = absolute(request, card['detail_url'])
     data = {
         '@type': 'AutoDealer',
         '@id': f"{url}#dealer",
-        'name': clean(dealer.name or dealer.name_uz),
+        'name': card['name'],
         'url': url,
         'parentOrganization': {'@id': organization_id(request)},
     }
     description = clean(dealer.seo_description) or clean(dealer.description)
     if description:
         data['description'] = description
-    if clean(dealer.phone):
-        data['telephone'] = clean(dealer.phone)
-    address = clean(dealer.address or dealer.address_uz)
-    if address:
+    # First number of the phone field, in the same form as the visible tel: link
+    linked = [tel[len('tel:'):] for _display, tel in card['phones'] if tel]
+    if linked:
+        data['telephone'] = linked[0]
+    if card['address']:
         data['address'] = {
             '@type': 'PostalAddress',
-            'streetAddress': address,
-            'addressRegion': dealer.get_region_display(),
+            'streetAddress': card['address'],
+            'addressRegion': card['region_label'],
             'addressCountry': 'UZ',
         }
-    if dealer.latitude is not None and dealer.longitude is not None:
-        data['geo'] = {'@type': 'GeoCoordinates', 'latitude': float(dealer.latitude), 'longitude': float(dealer.longitude)}
-    hours = opening_hours(dealer.working_hours or dealer.working_hours_uz)
+    if card['lat'] is not None and card['lng'] is not None:
+        data['geo'] = {'@type': 'GeoCoordinates', 'latitude': card['lat'], 'longitude': card['lng']}
+    if card['map_url']:
+        data['hasMap'] = card['map_url']
+    hours = opening_hours(card['working_hours'])
     if hours:
         data['openingHours'] = hours
     pictures = [absolute(request, dealer.logo.url)] if dealer.logo else []
@@ -292,8 +298,8 @@ def auto_dealer(request, dealer, images=None):
     return data
 
 
-def auto_dealers(request, dealers):
-    nodes = [auto_dealer(request, d) for d in dealers]
+def auto_dealers(request, dealers, language=None):
+    nodes = [auto_dealer(request, d, language=language) for d in dealers]
     if not nodes:
         return None
     return {'@context': 'https://schema.org', '@graph': nodes}

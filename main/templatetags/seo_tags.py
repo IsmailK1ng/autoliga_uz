@@ -147,7 +147,7 @@ def news_jsonld(context, news):
 
 @register.simple_tag(takes_context=True)
 def dealer_jsonld(context, dealer, images=None):
-    data = {'@context': 'https://schema.org', **sd.auto_dealer(context['request'], dealer, images)}
+    data = {'@context': 'https://schema.org', **sd.auto_dealer(context['request'], dealer, images, _jsonld_language(context))}
     return mark_safe(sd.to_script(data))
 
 
@@ -156,4 +156,4 @@ def dealers_jsonld(context):
     """One AutoDealer per active dealer (/dealers/, /contact/)."""
     from main.models import Dealer
     dealers = Dealer.objects.filter(is_active=True).order_by('order', 'name')
-    return mark_safe(sd.to_script(sd.auto_dealers(context['request'], dealers)))
+    return mark_safe(sd.to_script(sd.auto_dealers(context['request'], dealers, _jsonld_language(context))))

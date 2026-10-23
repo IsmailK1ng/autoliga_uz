@@ -60,6 +60,10 @@ def _available_languages(context, request, url_name):
     return [lang for lang in languages if str(getattr(obj, f'{field}_{lang}', '') or '').strip()]
 
 
+# Pages that are always noindex,follow (legal pages)
+NOINDEX_PAGES = {'privacy', 'terms'}
+
+
 @register.simple_tag(takes_context=True)
 def hreflang_tags(context):
     """
@@ -83,6 +87,9 @@ def hreflang_tags(context):
     except NoReverseMatch:
         return ''
 
+    # privacy / terms are noindex,follow by design (legal_base.html): no hreflang on noindex pages
+    if url_name in NOINDEX_PAGES:
+        return ''
     languages = _available_languages(context, request, url_name)
     # task 14: an untranslated page (noindex in this language) carries no hreflang at all
     if translation.get_language() not in languages:

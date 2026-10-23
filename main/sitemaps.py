@@ -1,12 +1,22 @@
-from django.conf import settings
 from django.contrib.sitemaps import Sitemap
 from django.urls import reverse
 
+from .language import object_languages
 from .models import Dealer, News, Product, ProductCategory
-from .seo import news_body_text
 
 
-class StaticViewSitemap(Sitemap):
+class LanguageSitemap(Sitemap):
+    """Task 14: every page once per language it really exists in (/..., /ru/..., /en/...),
+    with <xhtml:link> alternates and x-default = the uz URL. Untranslated pages are left out."""
+    i18n = True
+    alternates = True
+    x_default = True
+
+    def get_languages_for_item(self, item):
+        return object_languages(item)
+
+
+class StaticViewSitemap(LanguageSitemap):
     priority = 0.8
     changefreq = "weekly"
 
@@ -25,12 +35,12 @@ class StaticViewSitemap(Sitemap):
         return reverse(item)
 
 
-class ProductSitemap(Sitemap):
+class ProductSitemap(LanguageSitemap):
     changefreq = "weekly"
     priority = 0.8
 
     def items(self):
-        return Product.objects.filter(is_active=True)
+        return Product.objects.filter(is_active=True).order_by("order", "slug")
 
     def location(self, obj):
         return reverse(
@@ -42,7 +52,7 @@ class ProductSitemap(Sitemap):
         return obj.updated_at
 
 
-class BrandSitemap(Sitemap):
+class BrandSitemap(LanguageSitemap):
     """/brand/<slug>/ pages (task 8): same brands as the menu (with active models)"""
     changefreq = "weekly"
     priority = 0.8
@@ -57,14 +67,13 @@ class BrandSitemap(Sitemap):
         return obj.updated_at
 
 
-class NewsSitemap(Sitemap):
+class NewsSitemap(LanguageSitemap):
     changefreq = "weekly"
     priority = 0.7
 
     def items(self):
-        # News without body text is noindex (task 9): keep it out of the sitemap
-        news = News.objects.filter(is_active=True).prefetch_related("blocks").order_by("-created_at", "pk")
-        return [item for item in news if news_body_text(item.blocks.all(), settings.LANGUAGE_CODE)]
+        # News without body text in a language is noindex there (task 9): object_languages() leaves it out
+        return list(News.objects.filter(is_active=True).prefetch_related("blocks").order_by("-created_at", "pk"))
 
     def location(self, obj):
         return reverse(
@@ -75,12 +84,12 @@ class NewsSitemap(Sitemap):
     def lastmod(self, obj):
         return obj.updated_at
 
-class DealerSitemap(Sitemap):
+class DealerSitemap(LanguageSitemap):
     changefreq = "weekly"
     priority = 0.8
 
     def items(self):
-        return Dealer.objects.filter(is_active=True)
+        return Dealer.objects.filter(is_active=True).order_by("order", "pk")
 
     def location(self, obj):
         return obj.get_absolute_url()

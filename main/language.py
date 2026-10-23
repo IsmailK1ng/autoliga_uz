@@ -45,6 +45,25 @@ def _activate(request, language):
     request.LANGUAGE_CODE = language
 
 
+# Field that must be filled for an object page to exist in a language (same rule as the
+# hreflang tags in main/templatetags/seo_tags.py); news also need body text (task 9).
+OBJECT_LANGUAGE_FIELD = {'Product': 'title', 'ProductCategory': 'name', 'Dealer': 'name', 'News': 'title'}
+
+
+def object_languages(obj):
+    """Languages in which an object page really exists (sitemap entries, task 14)."""
+    codes = [code for code, _name in settings.LANGUAGES]
+    field = OBJECT_LANGUAGE_FIELD.get(type(obj).__name__)
+    if field is None:
+        return codes
+    filled = [code for code in codes if str(getattr(obj, f'{field}_{code}', '') or '').strip()]
+    if type(obj).__name__ == 'News':
+        from .seo import news_body_text
+        blocks = list(obj.blocks.all())
+        filled = [code for code in filled if news_body_text(blocks, code)]
+    return filled
+
+
 def transition_active(today=None):
     return (today or timezone.localdate()) <= COOKIE_REDIRECT_UNTIL
 

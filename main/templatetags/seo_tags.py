@@ -84,6 +84,9 @@ def hreflang_tags(context):
         return ''
 
     languages = _available_languages(context, request, url_name)
+    # task 14: an untranslated page (noindex in this language) carries no hreflang at all
+    if translation.get_language() not in languages:
+        return ''
     if len(languages) < 2:
         return ''
 

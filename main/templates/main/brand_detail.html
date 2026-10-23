@@ -14,7 +14,8 @@
 {% block og_description %}{{ seo.description }}{% endblock %}
 {% block extra_meta %}
     {# A brand without active models is a thin "coming soon" page: keep it out of the index #}
-    {% if not products %}<meta name="robots" content="noindex, follow">{% endif %}
+    {# no active models, or no brand name in this language (task 14) #}
+    {% if not products or not page_translated %}<meta name="robots" content="noindex, follow">{% endif %}
 {% endblock extra_meta %}
 {% block og_image %}{% if brand.hero_image %}{{ request.scheme }}://{{ request.get_host }}{{ brand.hero_image.url }}{% else %}{{ request.scheme }}://{{ request.get_host }}{% static 'images/autoliga.jpg' %}{% endif %}{% endblock %}
 

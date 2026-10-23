@@ -25,7 +25,7 @@
 
 {% block extra_meta %}
     {# Task 9: a news item without body text in this language stays out of the index until text is added #}
-    {% if not has_body %}<meta name="robots" content="noindex, follow">{% endif %}
+    {% if not has_body or not page_translated %}<meta name="robots" content="noindex, follow">{% endif %}
 {% endblock extra_meta %}
 
 {% block structured_data %}

@@ -8,7 +8,8 @@
     <!-- META — AUTOLIGA SEO -->
     <title>{{ seo.title }}</title>
     <meta name="description" content="{{ seo.description }}">
-    <meta name="robots" content="index, follow">
+    {# task 14: noindex,follow when the model has no title in this language (no hreflang, not in the sitemap) #}
+    <meta name="robots" content="{% if page_translated %}index, follow{% else %}noindex, follow{% endif %}">
     <!-- OPEN GRAPH -->
     <meta property="og:type" content="{% if product %}product{% else %}website{% endif %}">
     <meta property="og:title" content="{{ seo.title }}">

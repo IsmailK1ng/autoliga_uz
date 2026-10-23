@@ -31,6 +31,7 @@ import json
 from django.db.models import Prefetch
 from .dealer_info import dealer_card, group_by_region, map_embed_url
 from .images import image_info
+from .language import object_languages
 from .redirects import find_redirect
 from .seo import brand_seo, news_body_text, news_description, price_label, product_seo
 
@@ -182,6 +183,8 @@ def product_detail(request, product_id):
         'product': product,                      # ← SEO uchun asosiy
         'related_products': related_products,    # ← internal linking
         'seo': seo,                              # ← title, description, h1
+        # task 14: a model without a title in this language is noindex,follow here
+        'page_translated': translation.get_language() in object_languages(product),
         'product_id': product_id,                # ← eski kod uchun (agar JS ishlatsa)
     })
 
@@ -239,6 +242,7 @@ def dealer_detail(request, pk):
     return render(request, 'main/dealer_detail.html', {
         'dealer': dealer,
         'card': dealer_card(dealer, getattr(request, 'LANGUAGE_CODE', 'uz')),
+        'page_translated': translation.get_language() in object_languages(dealer),  # task 14
         'map_embed_url': map_embed_url(dealer),
         'images': images,
         'managers': managers,
@@ -343,6 +347,8 @@ def news_detail(request, slug):
             'blocks': blocks,
             'breadcrumbs': breadcrumbs.get(language, breadcrumbs['uz']),
             'has_body': bool(body_text),
+            # task 14: title and body text in this language, else noindex,follow (same rule as hreflang)
+            'page_translated': translation.get_language() in hreflang_languages,
             'news_description': news_description(news, body_text),
             'show_updated': news.updated_at and timezone.localtime(news.updated_at).date() > news.created_at,
             'hreflang_languages': hreflang_languages,
@@ -617,6 +623,7 @@ def brand_detail(request, slug):
         'faqs': faqs,
         'faq_jsonld': faq_jsonld,
         'seo': brand_seo(brand, products, language),
+        'page_translated': translation.get_language() in object_languages(brand),  # task 14
     })
 
 

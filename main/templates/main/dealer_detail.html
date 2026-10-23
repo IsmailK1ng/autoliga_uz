@@ -38,6 +38,11 @@
 {% block og_description %}
     {% if dealer.seo_description %}{{ dealer.seo_description|striptags }}{% else %}{{ dealer.name|striptags }} — AUTOLIGA rasmiy diler va servis markazi.{% endif %}
 {% endblock %}
+{% block extra_meta %}
+    {# task 14: no dealer name in this language -> noindex,follow (no hreflang, not in the sitemap) #}
+    {% if not page_translated %}<meta name="robots" content="noindex, follow">{% endif %}
+{% endblock extra_meta %}
+
 {% block structured_data %}
 {% dealer_jsonld dealer images %}
 {% endblock structured_data %}

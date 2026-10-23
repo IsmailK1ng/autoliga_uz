@@ -1,4 +1,4 @@
-from django.db.models.signals import post_save, post_delete
+from django.db.models.signals import post_delete, post_save, pre_save
 from django.dispatch import receiver
 from django.core.cache import cache
 
@@ -41,3 +41,27 @@ def clear_product_cache(sender, instance, **kwargs):
 @receiver(post_delete, sender='main.Dealer')
 def clear_dealer_cache(sender, instance, **kwargs):
     _clear_bot_cache('Dealer', instance)
+
+
+# ========== Slug history -> 301 (SEO task 13) ==========
+
+@receiver(pre_save, sender='main.Product')
+@receiver(pre_save, sender='main.ProductCategory')
+@receiver(pre_save, sender='main.News')
+def remember_old_slug(sender, instance, **kwargs):
+    instance._old_slug = None
+    if instance.pk:
+        old = sender.objects.filter(pk=instance.pk).values_list('slug', flat=True).first()
+        if old and old != instance.slug:
+            instance._old_slug = old
+
+
+@receiver(post_save, sender='main.Product')
+@receiver(post_save, sender='main.ProductCategory')
+@receiver(post_save, sender='main.News')
+def save_slug_history(sender, instance, created, **kwargs):
+    old_slug = getattr(instance, '_old_slug', None)
+    if old_slug and not created and not kwargs.get('raw'):
+        from main.redirects import record_slug_change
+        record_slug_change(instance, old_slug)
+        instance._old_slug = None

@@ -1231,3 +1231,60 @@ class BranchManager(models.Model):
     def photo_alt(self):
         """alt for the manager photo (task 12): "{Name}, {position}"."""
         return ', '.join(part for part in (' '.join((self.full_name or '').split()), ' '.join((self.position or '').split())) if part)
+
+
+# ========== SEO - РЕДИРЕКТЫ 301 (task 13) ==========
+
+class Redirect(models.Model):
+    """301 со старого адреса. Срабатывает только если по старому адресу страницы нет (404).
+    Смена slug модели, бренда или новости создаёт запись автоматически (main/redirects.py)."""
+    old_path = models.CharField(
+        "Старый адрес",
+        max_length=500,
+        unique=True,
+        help_text="Путь без домена и языка, например /products/soueast/. Версии /ru/ и /en/ и параметры (?utm_...) работают автоматически."
+    )
+    target_product = models.ForeignKey(
+        'Product', on_delete=models.CASCADE, null=True, blank=True,
+        related_name='redirects', verbose_name="Модель (цель)"
+    )
+    target_brand = models.ForeignKey(
+        'ProductCategory', on_delete=models.CASCADE, null=True, blank=True,
+        related_name='redirects', verbose_name="Бренд (цель)"
+    )
+    target_news = models.ForeignKey(
+        'News', on_delete=models.CASCADE, null=True, blank=True,
+        related_name='redirects', verbose_name="Новость (цель)"
+    )
+    target_url = models.CharField(
+        "Адрес (цель)",
+        max_length=500,
+        blank=True,
+        help_text="Если цель не модель/бренд/новость: путь на сайте (/dealers/) или полный адрес другого сайта."
+    )
+    is_active = models.BooleanField("Активен", default=True)
+    is_automatic = models.BooleanField("Создан автоматически (смена slug)", default=False, editable=False)
+    created_at = models.DateTimeField("Дата создания", auto_now_add=True)
+
+    class Meta:
+        verbose_name = "SEO - Редирект 301"
+        verbose_name_plural = "SEO - Редиректы 301"
+        ordering = ['-created_at']
+
+    def __str__(self):
+        from .redirects import target_location
+        location, _internal = target_location(self)
+        return f"{self.old_path} → {location or '—'}"
+
+    def clean(self):
+        from .redirects import validate
+        validate(self)
+
+    def save(self, *args, **kwargs):
+        from .redirects import after_save, collapse, normalize_path, points_to_itself
+        self.old_path = normalize_path(self.old_path)
+        collapse(self)
+        if points_to_itself(self):
+            raise ValueError(f"Redirect {self.old_path} points to itself")
+        super().save(*args, **kwargs)
+        after_save(self)

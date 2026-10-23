@@ -198,6 +198,7 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.locale.LocaleMiddleware',
     'myproject.middleware.ForceRussianMiddleware',
+    'main.redirects.RedirectFallbackMiddleware',          # 301 for old URLs, only on 404 (task 13)
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'myproject.middleware.AdminBruteForceMiddleware',     # Auth keyin (login natijasini bilish uchun)

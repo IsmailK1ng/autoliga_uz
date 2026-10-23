@@ -29,6 +29,7 @@ import logging
 import json
 from django.db.models import Prefetch
 from .dealer_info import dealer_card, group_by_region, map_embed_url
+from .redirects import find_redirect
 from .seo import brand_seo, news_body_text, news_description, price_label, product_seo
 
 
@@ -613,6 +614,10 @@ def products(request):
             params.pop('category', None)
             params.pop('brand', None)
             url = reverse('brand', kwargs={'slug': category_slug})
+            # Old brand slug (task 13): go straight to the brand's current page, one hop
+            if not ProductCategory.objects.filter(slug=category_slug, is_active=True).exists():
+                url = find_redirect(request, url) or url
+                url = url.split('?')[0]
             return HttpResponsePermanentRedirect(f"{url}?{params.urlencode()}" if params else url)
 
         if category_slug:

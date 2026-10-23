@@ -1510,3 +1510,29 @@ class TelegramUserAdmin(admin.ModelAdmin):
 
 
     
+
+
+# ============ SEO - РЕДИРЕКТЫ 301 (task 13) ============
+
+@admin.register(Redirect)
+class RedirectAdmin(admin.ModelAdmin):
+    list_display = ['old_path', 'target_display', 'is_active', 'is_automatic', 'created_at']
+    list_filter = ['is_active', 'is_automatic']
+    search_fields = ['old_path', 'target_url', 'target_product__slug', 'target_brand__slug', 'target_news__slug']
+    autocomplete_fields = ['target_product', 'target_brand', 'target_news']
+    readonly_fields = ['is_automatic', 'created_at']
+    fieldsets = (
+        (None, {
+            'fields': ('old_path', 'is_active'),
+            'description': 'Срабатывает только если по старому адресу страницы нет (404). Смена slug модели, '
+                           'бренда или новости создаёт запись сама. Укажите одну цель.',
+        }),
+        ('Цель (одна из)', {'fields': ('target_product', 'target_brand', 'target_news', 'target_url')}),
+        ('Служебное', {'fields': ('is_automatic', 'created_at'), 'classes': ('collapse',)}),
+    )
+
+    def target_display(self, obj):
+        from .redirects import target_location
+        location, _internal = target_location(obj)
+        return location or '— (цель не активна)'
+    target_display.short_description = "Куда"

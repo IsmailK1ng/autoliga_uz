@@ -6,6 +6,8 @@ cookie get one 302 from an unprefixed page to `/ru/...` or `/en/...`) ends on
 (`transition_active()` returns False), so this cleanup is tidy-up, not a fix.
 Do it in one small commit and run the Task 14 tests afterwards.
 
+**Rollback: revert the whole Task 14, never a single group** (`git revert --no-commit deploy-stage1..<last Task 14 commit>`, newest first; verified to give a tree identical to `deploy-stage1`).
+
 ## Remove
 
 1. **Cookie redirect** — `main/language.py`

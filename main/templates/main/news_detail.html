@@ -169,7 +169,7 @@
     <div class="mxd-container">
       <div class="mxd-divider mxd-divider--image">
         <div class="mxd-divider__image">
-          <img src="{{ block.image.url }}" alt="{{ block.title|default:news.title }}" loading="lazy" decoding="async">
+          <img src="{{ block.image.url }}" alt="{{ block.alt_text|default:block.title|default:news.title }}" loading="lazy" decoding="async">
         </div>
       </div>
     </div>

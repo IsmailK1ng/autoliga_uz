@@ -110,7 +110,7 @@
                                          data-photo="{% if manager.photo %}{{ manager.photo.url }}{% endif %}"
                                          data-dealer="{{ dealer.name }}">
                                         {% if manager.photo %}
-                                        <img src="{{ manager.photo.url }}" alt="{{ manager.full_name }}" class="team-card-photo" loading="lazy" />
+                                        <img src="{{ manager.photo.url }}" alt="{{ manager.photo_alt }}" class="team-card-photo" loading="lazy" />
                                         {% else %}
                                         <div class="team-card-photo" style="display:flex;align-items:center;justify-content:center;">
                                             <i class="ph ph-user" style="font-size:4rem;color:#d0d5dd;"></i>
@@ -198,7 +198,7 @@
         var photoEl = document.getElementById('tmPhoto');
         if (photo) {
             photoEl.src = photo;
-            photoEl.alt = name;
+            photoEl.alt = [name, position].filter(Boolean).join(', ');
             photoWrap.style.display = 'block';
         } else {
             photoWrap.style.display = 'none';

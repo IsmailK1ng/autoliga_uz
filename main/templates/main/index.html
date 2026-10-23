@@ -41,7 +41,7 @@
 
           <!-- Orqa fon (eski) -->
           <div class="mxd-hero-06__video">
-            <img src="{% static 'images/autoliga.jpg' %}" alt="" class="mxd-hero-07_image">
+            <img src="{% static 'images/autoliga.jpg' %}" alt="{% if LANGUAGE_CODE == 'ru' %}Здание автосалона Autoliga{% elif LANGUAGE_CODE == 'en' %}Autoliga showroom building{% else %}Autoliga avtosaloni binosi{% endif %}" class="mxd-hero-07_image">
             <div class="hero-06-video__cover"></div>
             <div class="hero-06-video__cover"></div>
           </div>
@@ -67,7 +67,7 @@
                       </g>
                     </svg>
                     <img class="btn-rotating__image" src="{% static 'images/logo/autoliga-logo.png' %}"
-                      style="filter: brightness(0) invert(1);" alt="Object">
+                      style="filter: brightness(0) invert(1);" alt="Autoliga">
                   </a>
                 </div>
               </div>
@@ -97,7 +97,7 @@
               </text>
             </g>
           </svg>
-          <img class="btn-rotating__image" src="{% static 'images/logo/autoliga-logo.png' %}" alt="Object">
+          <img class="btn-rotating__image" src="{% static 'images/logo/autoliga-logo.png' %}" alt="Autoliga">
         </a>
       </div>
 
@@ -122,11 +122,11 @@
          data-brand="{{ category.slug }}"
          onclick="openBrand('{{ category.slug }}', this); return false;"
          
-         aria-label="{{ category.name }} narxlari ">
+         aria-label="{% if LANGUAGE_CODE == 'ru' %}Цены {{ category.name }}{% elif LANGUAGE_CODE == 'en' %}{{ category.name }} prices{% else %}{{ category.name }} narxlari{% endif %}">
 
         <img src="{{ category.icon.url }}"
            
-             alt="{{ category.name }} narxi "
+             alt="{{ category.name }}"
              loading="lazy"
              width="120"
              height="80">
@@ -152,11 +152,11 @@
            class="brand-card"
            data-brand="{{ category.slug }}"
            onclick="openBrand('{{ category.slug }}', this); return false;"
-           aria-label="{{ category.name }} narxlari">
+           aria-label="{% if LANGUAGE_CODE == 'ru' %}Цены {{ category.name }}{% elif LANGUAGE_CODE == 'en' %}{{ category.name }} prices{% else %}{{ category.name }} narxlari{% endif %}">
 
           <img src="{{ category.icon.url }}" 
               
-               alt="{{ category.name }} narxi"
+               alt="{{ category.name }}"
                loading="lazy"
                width="60" 
                height="40">
@@ -191,7 +191,8 @@
                 onclick="changeCarImage(
                     '{{ product.main_image.url }}', 
                     '{{ product.slug }}',
-                    '{{ category.slug }}')">
+                    '{{ category.slug }}',
+                    '{{ product.image_alt|escapejs }}')">
                 {{ product.title }}
             </div>
             {% endfor %}
@@ -208,7 +209,7 @@
             <img id="carImage-{{ category.slug }}"
                  class="car-image"
                  src="{{ first_product.main_image.url }}"
-                 alt="Car">
+                 alt="{{ first_product.image_alt }}">
         </div>
 
         <a href="{% url 'product_detail' first_product.slug %}"
@@ -387,7 +388,7 @@
     <div class="review-modal-overlay" id="avatarImageOverlay">
       <div class="avatar-image-modal">
         <button class="review-modal-close" id="avatarImageClose">&times;</button>
-        <img id="avatarImageFull" src="{% static 'images/default-avatar.png' %}" alt="Avatar">
+        <img id="avatarImageFull" src="{% static 'images/default-avatar.png' %}" alt="">
       </div>
     </div>
 
@@ -739,6 +740,7 @@
             avatarSrc = 'data:image/svg+xml,' + encodeURIComponent('<svg width="300" height="300" viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg"><rect width="300" height="300" fill="#E0DDDB"/><circle cx="150" cy="115" r="52" fill="#B2AEAD"/><ellipse cx="150" cy="240" rx="90" ry="67" fill="#B2AEAD"/></svg>');
           }
           avatarImgFull.src = avatarSrc;
+          avatarImgFull.alt = (idx !== undefined && reviews[parseInt(idx)] && reviews[parseInt(idx)].name) || '';
           avatarOverlay.classList.add('active');
         }
 
@@ -1158,7 +1160,7 @@
            data-dealer="{{ m.dealer.name }}">
         <div class="ht3d-card-img">
           {% if m.photo %}
-          <img src="{{ m.photo.url }}" alt="{{ m.full_name }}" loading="lazy" />
+          <img src="{{ m.photo.url }}" alt="{{ m.photo_alt }}" loading="lazy" />
           {% else %}
           <div class="ht3d-card-placeholder"><i class="ph ph-user"></i></div>
           {% endif %}
@@ -1194,7 +1196,7 @@
     <button class="home-team-modal-close" onclick="document.getElementById('homeTeamModal').style.display='none'">&times;</button>
     <div class="home-team-modal-body">
       <div class="home-team-modal-photo-wrap" id="htmPhotoWrap">
-          <img id="htmPhoto" alt="Team member" class="home-team-modal-photo">
+          <img id="htmPhoto" alt="" class="home-team-modal-photo">
       </div>
       <div class="home-team-modal-info">
         <h2 class="home-team-modal-name" id="htmName">—</h2>
@@ -1291,10 +1293,10 @@ cards.forEach(function(card, i) {
             //  DEFAULT IMAGE LOGIC
             if (photo) {
                 photoEl.src = photo;
-                photoEl.alt = name || 'User';
+                photoEl.alt = [name, position].filter(Boolean).join(', ');
             } else {
                 photoEl.src = "/static/images/default-avatar.png";
-                photoEl.alt = "No image";
+                photoEl.alt = '';
             }
 
             photoWrap.style.display = 'block';
@@ -1663,9 +1665,9 @@ cards.forEach(function(card, i) {
 <!-- ===== JAVASCRIPT ===== -->
 
 <script>
-function changeCarImage(imageUrl, productSlug, categorySlug) {
+function changeCarImage(imageUrl, productSlug, categorySlug, imageAlt) {
     const img = document.getElementById('carImage-' + categorySlug);
-    if (img) img.src = imageUrl;
+    if (img) { img.src = imageUrl; img.alt = imageAlt || ''; }
 
     const btn = document.getElementById('detailBtn-' + categorySlug);
     if (btn) btn.href = '/products/' + productSlug + '/';

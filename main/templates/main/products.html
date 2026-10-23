@@ -195,7 +195,7 @@
                                         <input type="search" name="q" value="{{ search_query }}" class="filter-search__input"
                                                aria-label="{% if LANGUAGE_CODE == 'ru' %}Поиск модели{% elif LANGUAGE_CODE == 'en' %}Search models{% else %}Model qidirish{% endif %}"
                                                placeholder="{% if LANGUAGE_CODE == 'ru' %}Поиск...{% elif LANGUAGE_CODE == 'en' %}Search...{% else %}Qidirish...{% endif %}">
-                                        <button type="submit" class="filter-search__btn" aria-label="Search">
+                                        <button type="submit" class="filter-search__btn" aria-label="{% if LANGUAGE_CODE == 'ru' %}Найти{% elif LANGUAGE_CODE == 'en' %}Search{% else %}Qidirish{% endif %}">
                                             <img src="{% static 'images/icons/sistem-icons/search.svg' %}" alt="">
                                         </button>
                                     </form>
@@ -228,7 +228,7 @@
                                     <div class="truck-image-container">
                                         {% if product.category %}<div class="brand-badge">{{ product.category.name }}</div>{% endif %}
                                         {% with image=product.card_image|default:product.main_image %}
-                                        {% if image %}<img src="{{ image.url }}" class="truck-image" alt="{{ product.display_name }}" loading="lazy" decoding="async">{% endif %}
+                                        {% if image %}<img src="{{ image.url }}" class="truck-image" alt="{{ product.image_alt }}" loading="lazy" decoding="async">{% endif %}
                                         {% endwith %}
                                     </div>
                                     <div class="truck-info">

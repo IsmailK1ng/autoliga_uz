@@ -107,7 +107,7 @@
                                     <div class="truck-image-container">
                                         <div class="brand-badge">{{ brand_name }}</div>
                                         {% with image=product.card_image|default:product.main_image %}
-                                        {% if image %}<img src="{{ image.url }}" class="truck-image" alt="{{ product.display_name }}" loading="lazy" decoding="async">{% endif %}
+                                        {% if image %}<img src="{{ image.url }}" class="truck-image" alt="{{ product.image_alt }}" loading="lazy" decoding="async">{% endif %}
                                         {% endwith %}
                                     </div>
                                     <div class="truck-info">

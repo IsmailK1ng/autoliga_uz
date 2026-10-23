@@ -250,7 +250,7 @@
              sizes="(max-width: 768px) 100vw, 50vw"
              width="{{ car_960.width }}"
              height="{{ car_960.height }}"
-             alt="{% if product.category %}{{ product.category.name }} {% endif %}{{ product.title }}"
+             alt="{{ product.image_alt }}"
              data-default-src="{% static 'images/noobject.avif' %}"
              fetchpriority="high"
              decoding="async"
@@ -265,7 +265,7 @@
         <img id="main-car-image"
              class="mxd-hero-06__car-image"
              src="{% static 'images/noobject.avif' %}"
-             alt="{{ product.title }}"
+             alt="{{ product.image_alt }}"
              fetchpriority="high"
              decoding="async">
     {% endif %}
@@ -557,7 +557,7 @@
                                     <div class="slide-content">
                                         <div class="slide-image">
                                             <img src="{{ gallery_image.image.url }}"
-                                                 alt="{{ product.display_name }}, {% if LANGUAGE_CODE == 'ru' %}изображение{% elif LANGUAGE_CODE == 'en' %}image{% else %}rasm{% endif %} {{ forloop.counter }}"
+                                                 alt="{% if gallery_image.alt_text %}{{ gallery_image.alt_text }}{% else %}{{ product.display_name }}, {% if LANGUAGE_CODE == 'ru' %}изображение{% elif LANGUAGE_CODE == 'en' %}image{% else %}rasm{% endif %} {{ forloop.counter }}{% endif %}"
                                                  loading="lazy" decoding="async">
                                         </div>
                                     </div>
@@ -569,7 +569,7 @@
                                     <div class="slide-content">
                                         <div class="slide-image">
                                             <img src="{{ product.main_image.url }}"
-                                                 alt="{{ product.display_name }}"
+                                                 alt="{{ product.image_alt }}"
                                                  loading="lazy" decoding="async">
                                         </div>
                                     </div>
@@ -609,12 +609,12 @@
                                style="display:block;color:inherit;text-decoration:none;">
                                 {% if related_product.card_image %}
                                     <img src="{{ related_product.card_image.url }}"
-                                         alt="{{ related_product.title }}"
+                                         alt="{{ related_product.image_alt }}"
                                          loading="lazy"
                                          style="width:100%;aspect-ratio:16/10;object-fit:cover;">
                                 {% elif related_product.main_image %}
                                     <img src="{{ related_product.main_image.url }}"
-                                         alt="{{ related_product.title }}"
+                                         alt="{{ related_product.image_alt }}"
                                          loading="lazy"
                                          style="width:100%;aspect-ratio:16/10;object-fit:cover;">
                                 {% endif %}
@@ -796,7 +796,7 @@
                 <line x1="6" y1="6" x2="18" y2="18"></line>
             </svg>
         </button>
-        <img id="gallery-modal-img" alt="Avtomobil galereyasi" class="gallery-modal__img">
+        <img id="gallery-modal-img" alt="" class="gallery-modal__img">
     </div>
 </div>
 <!-- Mavjud JS kutubxonalari -->

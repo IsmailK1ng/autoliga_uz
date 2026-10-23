@@ -197,7 +197,7 @@ class ProductDetail {
         features.forEach(feature => {
             const featureHTML = `
                 <div class="car-spec-item">
-                    <img src="${feature.icon.icon_url}" class="car-spec-icon" alt="${feature.icon.name}">
+                    <img src="${feature.icon.icon_url}" class="car-spec-icon" alt="">
                     <div class="car-spec-content">
                         <div class="car-spec-label">${feature.name}</div>
                     </div>

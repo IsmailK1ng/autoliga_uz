@@ -225,7 +225,7 @@ class CustomReversionMixin:
 class NewsBlockInline(TranslationStackedInline): 
     model = NewsBlock
     extra = 1
-    fields = ('block_type', 'title', 'text', 'image', 'youtube_url', 'video_file', 'order')
+    fields = ('block_type', 'title', 'text', 'image', 'alt_text', 'youtube_url', 'video_file', 'order')
 
     class Media:
         js = ('js/admin/news_block_dynamic.js',) 
@@ -932,10 +932,10 @@ class ProductCardSpecInline(TranslationTabularInline):
     verbose_name_plural = "📄 Характеристики карточки"
 
 
-class ProductGalleryInline(admin.TabularInline):
+class ProductGalleryInline(TranslationTabularInline):
     model = ProductGallery
     extra = 1
-    fields = ('image', 'order')
+    fields = ('image', 'alt_text', 'order')
     verbose_name = "Фото"
     verbose_name_plural = "🖼️ Галерея"
 
@@ -977,7 +977,8 @@ class ProductAdmin(ContentAdminMixin, CustomReversionMixin, VersionAdmin, Tabbed
                 ('title', 'slug'),
                 'category',  # ✅ Теперь обычный select
                 ('order', 'is_active', 'is_featured'),
-                ('main_image', 'card_image')
+                ('main_image', 'card_image'),
+                'alt_text',
             )
         }),
         ('SEO', {

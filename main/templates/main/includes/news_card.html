@@ -6,9 +6,9 @@
     <div class="slide-header-row">
       <div class="slide-avatar">
         {% if news.author_photo %}
-          <img src="{{ news.author_photo.url }}" alt="{{ news.author.username }}" class="avatar-image">
+          <img src="{{ news.author_photo.url }}" alt="{{ news.author.get_full_name }}" class="avatar-image">
         {% else %}
-          <img src="{% static 'images/avatars/default.jpg' %}" alt="Автор" class="avatar-image">
+          <img src="{% static 'images/avatars/default.jpg' %}" alt="" class="avatar-image">
         {% endif %}
       </div>
       <div class="slide-header">

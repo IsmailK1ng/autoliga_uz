@@ -147,6 +147,12 @@ class NewsBlock(models.Model):
 
     text = RichTextField("Текст", blank=True, null=True, config_name='default')
     image = models.ImageField("Фото", upload_to="news/images/", blank=True, null=True)
+    alt_text = models.CharField(
+        "Alt-текст фото",
+        max_length=255,
+        blank=True,
+        help_text="Только для блока «Изображение». Пусто — заголовок блока или новости"
+    )
     youtube_url = models.URLField("YouTube ссылка", blank=True, null=True)
     video_file = models.FileField("Видео файл", upload_to="news/videos/", blank=True, null=True)
     order = models.PositiveIntegerField("Порядок", default=0)
@@ -322,6 +328,12 @@ class Product(models.Model):
     )
 
     main_image = models.ImageField("Главное изображение", upload_to="products/main/")
+    alt_text = models.CharField(
+        "Alt-текст фото",
+        max_length=255,
+        blank=True,
+        help_text="Описание фото модели для Google и незрячих (главное фото, карточка, слайдер). Пусто — «{Бренд} {Модель}»"
+    )
     card_image = models.ImageField(
         "Изображение для карточки",
         upload_to="products/cards/",
@@ -405,6 +417,11 @@ class Product(models.Model):
 
     def get_absolute_url(self):
         return reverse('product_detail', args=[self.slug])
+
+    @property
+    def image_alt(self):
+        """alt for the model's own images (task 12): admin alt_text, else "{Brand} {Model}"."""
+        return ' '.join((self.alt_text or '').split()) or self.display_name
 
     @property
     def display_name(self):
@@ -607,6 +624,12 @@ class ProductGallery(models.Model):
     """Галерея продукта"""
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='gallery')
     image = models.ImageField("Изображение", upload_to="products/gallery/")
+    alt_text = models.CharField(
+        "Alt-текст фото",
+        max_length=255,
+        blank=True,
+        help_text="Что на фото (например, салон, вид сзади). Пусто — «{Бренд} {Модель}, фото N»"
+    )
     order = models.PositiveIntegerField("Порядок", default=0)
 
     class Meta:
@@ -1203,3 +1226,8 @@ class BranchManager(models.Model):
 
     def __str__(self):
         return f"{self.full_name} — {self.position} ({self.dealer.name})"
+
+    @property
+    def photo_alt(self):
+        """alt for the manager photo (task 12): "{Name}, {position}"."""
+        return ', '.join(part for part in (' '.join((self.full_name or '').split()), ' '.join((self.position or '').split())) if part)

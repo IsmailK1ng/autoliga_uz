@@ -9,7 +9,7 @@ class NewsTranslationOptions(TranslationOptions):
 
 @register(NewsBlock)
 class NewsBlockTranslationOptions(TranslationOptions):
-    fields = ('title', 'text')
+    fields = ('title', 'text', 'alt_text')
 
 
 # ========== ВАКАНСИИ ==========
@@ -59,7 +59,14 @@ class ProductTranslationOptions(TranslationOptions):
         'slider_fuel_consumption',
         'seo_title',
         'seo_description',
+        'alt_text',
     )
+
+
+@register(ProductGallery)
+class ProductGalleryTranslationOptions(TranslationOptions):
+    fields = ('alt_text',)
+
 
 @register(ProductFeature)
 class ProductFeatureTranslationOptions(TranslationOptions):

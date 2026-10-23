@@ -65,7 +65,7 @@ def index(request):
                 'products',
                 queryset=Product.objects.filter(
                     is_active=True
-                ).only('id', 'slug', 'title', 'main_image'),  # faqat kerakli fieldlar
+                ).select_related('category'),  # category: image alt "{Brand} {Model}" without extra queries
                 to_attr='active_products'  #  cache'ga oladi
             )
         )
@@ -84,6 +84,7 @@ def index(request):
             slider_item = {
                 'year': product.slider_year,
                 'title': title,
+                'alt': product.image_alt,  # task 12: admin alt_text, else "{Brand} {Model}"
                 'price': price,
                 'power': power,
                 'mpg': fuel,
@@ -105,7 +106,9 @@ def index(request):
 
         context = {
             'news_list': news_list,
-            'slider_products': json.dumps(slider_data, ensure_ascii=False),
+            # rendered raw inside a <div>: escape <, > and & (JSON.parse restores them)
+            'slider_products': json.dumps(slider_data, ensure_ascii=False)
+                .replace('<', '\\u003c').replace('>', '\\u003e').replace('&', '\\u0026'),
             'featured_count': len(slider_data),
             'productCategory': productCategory,
             'RECAPTCHA_SITE_KEY': getattr(settings, 'RECAPTCHA_SITE_KEY', ''),

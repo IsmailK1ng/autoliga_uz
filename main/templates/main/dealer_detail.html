@@ -191,7 +191,7 @@
                     <div class="dd-team-grid" id="teamGrid">
                         {% for m in managers %}
                         <div class="dd-team-card" data-name="{{ m.full_name }}" data-position="{{ m.position }}" data-phone="{{ m.phone }}" data-photo="{{ m.photo.url }}">
-                            <img src="{{ m.photo.url }}" alt="{{ m.full_name }}" class="dd-team-photo">
+                            <img src="{{ m.photo.url }}" alt="{{ m.photo_alt }}" class="dd-team-photo">
                             <div class="dd-team-info">
                                 <h4 class="dd-team-name">{{ m.full_name }}</h4>
                                 <p class="dd-team-position">{{ m.position }}</p>
@@ -279,6 +279,7 @@
             document.querySelectorAll('.dd-team-card').forEach(card => {
                 card.addEventListener('click', function() {
                     document.getElementById('modalPhoto').src = this.dataset.photo;
+                    document.getElementById('modalPhoto').alt = [this.dataset.name, this.dataset.position].filter(Boolean).join(', ');
                     document.getElementById('modalName').textContent = this.dataset.name;
                     document.getElementById('modalPosition').textContent = this.dataset.position;
                     const phoneBtn = document.getElementById('modalPhoneBtn');

@@ -49,6 +49,19 @@ class News(models.Model):
     author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, verbose_name="Автор")
     author_photo = models.ImageField("Фото автора", upload_to="authors/", blank=True, null=True)
     preview_image = models.ImageField("Главное фото", upload_to="news/previews/", blank=True, null=True)
+    preview_image_alt = models.CharField(
+        "Alt главного фото",
+        max_length=255,
+        blank=True,
+        help_text="Описание фото для Google и незрячих. Пусто — используется заголовок новости"
+    )
+    related_products = models.ManyToManyField(
+        'Product',
+        blank=True,
+        related_name='news_items',
+        verbose_name="Модели в новости",
+        help_text="Карточка модели с ценой внизу новости (ссылка на страницу модели)"
+    )
     is_active = models.BooleanField("Активна", default=True, help_text="Показывать новость на сайте")
     order = models.PositiveIntegerField("Порядок", default=0, help_text="Чем больше число, тем выше в списке")
     seo_title = models.CharField(

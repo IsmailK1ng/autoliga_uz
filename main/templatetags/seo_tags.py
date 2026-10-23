@@ -43,6 +43,9 @@ def _language_prefix(lang):
 def _available_languages(context, request, url_name):
     """Languages in which this page really has content."""
     languages = [code for code, _name in settings.LANGUAGES]
+    # A view can decide itself (news: title and body text in that language)
+    if context.get('hreflang_languages') is not None:
+        return [lang for lang in languages if lang in context['hreflang_languages']]
     obj, field = None, None
     if url_name in TRANSLATED_OBJECTS:
         key, field = TRANSLATED_OBJECTS[url_name]
@@ -138,7 +141,8 @@ def car_jsonld(context, product):
 
 @register.simple_tag(takes_context=True)
 def news_jsonld(context, news):
-    return mark_safe(sd.to_script(sd.news_article(context['request'], news, _jsonld_language(context))))
+    return mark_safe(sd.to_script(sd.news_article(context['request'], news, _jsonld_language(context),
+                                                  description=context.get('news_description'))))
 
 
 @register.simple_tag(takes_context=True)

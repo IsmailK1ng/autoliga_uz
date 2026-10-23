@@ -4,7 +4,7 @@ from main.models import *
 # ========== НОВОСТИ ==========
 @register(News)
 class NewsTranslationOptions(TranslationOptions):
-    fields = ('title', 'desc', 'seo_title', 'seo_description')
+    fields = ('title', 'desc', 'seo_title', 'seo_description', 'preview_image_alt')
 
 
 @register(NewsBlock)

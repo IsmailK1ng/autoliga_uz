@@ -243,6 +243,7 @@ class NewsAdmin(ContentAdminMixin, CustomReversionMixin, VersionAdmin, TabbedTra
     readonly_fields = ['preview_image_tag', 'author_photo_tag', 'slug', 'updated_at']
     prepopulated_fields = {}
     inlines = [NewsBlockInline]
+    autocomplete_fields = ['related_products']
     history_latest_first = True
     
     fieldsets = (
@@ -250,7 +251,11 @@ class NewsAdmin(ContentAdminMixin, CustomReversionMixin, VersionAdmin, TabbedTra
             'fields': ('title', 'slug', 'created_at', 'is_active', 'order'),
         }),
         ('Карточка новости', {
-            'fields': ('desc', 'preview_image', 'preview_image_tag'),
+            'fields': ('desc', 'preview_image', 'preview_image_tag', 'preview_image_alt'),
+        }),
+        ('Модели в новости', {
+            'fields': ('related_products',),
+            'description': 'Внизу новости: карточка модели и кнопка с ценой. Укажите хотя бы одну модель.',
         }),
         ('Автор', {
             'fields': ('author', 'author_photo', 'author_photo_tag')

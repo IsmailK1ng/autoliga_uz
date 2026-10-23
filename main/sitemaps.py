@@ -1,7 +1,9 @@
+from django.conf import settings
 from django.contrib.sitemaps import Sitemap
 from django.urls import reverse
 
 from .models import Dealer, News, Product, ProductCategory
+from .seo import news_body_text
 
 
 class StaticViewSitemap(Sitemap):
@@ -60,7 +62,9 @@ class NewsSitemap(Sitemap):
     priority = 0.7
 
     def items(self):
-        return News.objects.filter(is_active=True)
+        # News without body text is noindex (task 9): keep it out of the sitemap
+        news = News.objects.filter(is_active=True).prefetch_related("blocks").order_by("-created_at", "pk")
+        return [item for item in news if news_body_text(item.blocks.all(), settings.LANGUAGE_CODE)]
 
     def location(self, obj):
         return reverse(

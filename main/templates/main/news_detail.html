@@ -10,29 +10,57 @@
     {% endif %}
 {% endblock %}
 
-{% block meta_description %}
-    {% if news.seo_description %}
-        {{ news.seo_description|striptags }}
-    {% else %}
-        {{ news.desc|striptags|truncatechars:155 }}
-    {% endif %}
-{% endblock %}
+{% block meta_description %}{{ news_description }}{% endblock %}
 
 {% block og_title %}
     {% if news.seo_title %}{{ news.seo_title|striptags }}{% else %}{{ news.title|striptags }} | AUTOLIGA{% endif %}
 {% endblock %}
 
-{% block og_description %}
-    {% if news.seo_description %}{{ news.seo_description|striptags }}{% else %}{{ news.desc|striptags|truncatechars:155 }}{% endif %}
-{% endblock %}
+{% block og_description %}{{ news_description }}{% endblock %}
 
 {% block og_image %}
     {% if news.preview_image %}{{ request.scheme }}://{{ request.get_host }}{{ news.preview_image.url }}{% else %}{{ request.scheme }}://{{ request.get_host }}{% static 'images/logo/autoliga-logo.png' %}{% endif %}
 {% endblock %}
 
+{% block extra_meta %}
+    {# Task 9: a news item without body text in this language stays out of the index until text is added #}
+    {% if not has_body %}<meta name="robots" content="noindex, follow">{% endif %}
+{% endblock extra_meta %}
+
 {% block structured_data %}
 {% news_jsonld news %}
 {% endblock structured_data %}
+
+{% block inline_styles %}
+<style>
+    .news-meta { display: flex; flex-wrap: wrap; justify-content: center; gap: .4rem 2.4rem; margin-top: 2rem; padding: 0 2rem; font-size: 1.6rem; opacity: .7; text-align: center; }
+    .news-cover { margin-top: 4rem; }
+    .news-cover img { display: block; width: 100%; height: auto; max-height: 85vh; object-fit: cover; border-radius: 20px; }
+    /* block titles became H2 (no H1 -> H3 jump); keep the theme's h3 look */
+    .news-block__title { font: normal var(--fw-medium) 3.6rem/1.2 var(--_font-accent); letter-spacing: normal; color: var(--t-bright); }
+    @media only screen and (min-width: 768px) { .news-block__title { font-size: 5rem; } }
+    .news-extra { padding-top: 8rem; padding-bottom: 2rem; }
+    .news-extra h2 { margin-bottom: 2.4rem; font-size: clamp(2.4rem, 2.6vw, 3.6rem); }
+    .news-models { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); gap: 2rem; }
+    .news-model { display: flex; flex-direction: column; border: 1px solid var(--stroke-elements, rgba(127,127,127,.25)); border-radius: 20px; overflow: hidden; }
+    .news-model__image { display: block; aspect-ratio: 2 / 1; background: rgba(127,127,127,.08); }
+    .news-model__image img { width: 100%; height: 100%; object-fit: contain; }
+    .news-model__body { display: flex; flex: 1; flex-direction: column; gap: 1.4rem; padding: 2rem; }
+    .news-model__title { margin: 0; font-size: 2.2rem; overflow-wrap: anywhere; }
+    .news-model__title a { color: inherit; text-decoration: none; }
+    .news-model__actions { display: flex; flex-wrap: wrap; gap: 1rem; margin-top: auto; }
+    .news-model__actions a { display: inline-flex; align-items: center; min-height: 44px; padding: .8rem 1.8rem; border-radius: 999px; font-size: 1.5rem; text-decoration: none; }
+    /* dark mode on this site = body[data-theme=dark] (main-setting.js), not the theme tokens */
+    .news-model a.news-model__price { background: #161616; color: #FAF7F6; }
+    /* !important: the site forces white link text in dark mode */
+    body[data-theme=dark] .news-model a.news-model__price { background: #FAF7F6; color: #161616 !important; }
+    .news-model__link { border: 1px solid currentColor; color: inherit; }
+    .news-other { list-style: none; margin: 0; padding: 0; display: grid; gap: 1.2rem; }
+    .news-other li { display: flex; flex-wrap: wrap; justify-content: space-between; gap: .4rem 2rem; padding-bottom: 1.2rem; border-bottom: 1px solid var(--stroke-elements, rgba(127,127,127,.25)); }
+    .news-other a { color: inherit; font-size: 1.8rem; overflow-wrap: anywhere; }
+    .news-other time { opacity: .6; font-size: 1.5rem; white-space: nowrap; }
+</style>
+{% endblock inline_styles %}
 
 {% block breadcrumbs %}
 <link rel="stylesheet" href="{% static 'css/breadcrumbs.css' %}">
@@ -86,7 +114,17 @@
   <!-- Main Title -->
   <div class="title-after-video">
     <div class="faw-history-title fade-in">
-<h1 class="reveal-type">{{ news.title }}</h1>    </div>
+      <h1 class="reveal-type">{{ news.title }}</h1>
+      <p class="news-meta">
+        <span>{% if LANGUAGE_CODE == 'ru' %}Опубликовано{% elif LANGUAGE_CODE == 'en' %}Published{% else %}Nashr etilgan{% endif %}: <time datetime="{{ news.created_at|date:'Y-m-d' }}">{{ news.created_at|date:'d.m.Y' }}</time></span>
+        {% if show_updated %}<span>{% if LANGUAGE_CODE == 'ru' %}Обновлено{% elif LANGUAGE_CODE == 'en' %}Updated{% else %}Yangilangan{% endif %}: <time datetime="{{ news.updated_at|date:'c' }}">{{ news.updated_at|date:'d.m.Y' }}</time></span>{% endif %}
+      </p>
+    </div>
+    {% if news.preview_image %}
+    <figure class="news-cover mxd-container">
+      <img src="{{ news.preview_image.url }}" alt="{{ news.preview_image_alt|default:news.title }}" fetchpriority="high" decoding="async">
+    </figure>
+    {% endif %}
     <div class="mxd-block"></div>
   </div>
 
@@ -131,7 +169,7 @@
     <div class="mxd-container">
       <div class="mxd-divider mxd-divider--image">
         <div class="mxd-divider__image">
-          <img src="{{ block.image.url }}" alt="{{ block.title|default:'Фото' }}">
+          <img src="{{ block.image.url }}" alt="{{ block.title|default:news.title }}" loading="lazy" decoding="async">
         </div>
       </div>
     </div>
@@ -145,7 +183,7 @@
       <div class="mxd-manifest reveal-type">
         {% if block.title %}
         <div class="faw-history-title fade-in">
-          <h3>{{ block.title }}</h3>
+          <h2 class="news-block__title">{{ block.title }}</h2>
         </div>
         {% endif %}
         {{ block.text|safe }}
@@ -155,6 +193,47 @@
   {% endif %}
 
   {% endfor %}
+
+  {% if related_products %}
+  <!-- Task 9: model page card + price button -->
+  <section class="mxd-section news-extra">
+    <div class="mxd-container grid-container">
+      <h2>{% if LANGUAGE_CODE == 'ru' %}Страница модели{% elif LANGUAGE_CODE == 'en' %}Model page{% else %}Model sahifasi{% endif %}</h2>
+      <div class="news-models">
+        {% for product in related_products %}
+        {% with url=product.get_absolute_url %}
+        <article class="news-model">
+          <a class="news-model__image" href="{{ url }}" tabindex="-1" aria-hidden="true">
+            {% with image=product.card_image|default:product.main_image %}{% if image %}<img src="{{ image.url }}" alt="" loading="lazy" decoding="async">{% endif %}{% endwith %}
+          </a>
+          <div class="news-model__body">
+            <h3 class="news-model__title"><a href="{{ url }}">{{ product.display_name }}</a></h3>
+            <div class="news-model__actions">
+              <a class="news-model__price" href="{{ url }}{% if product.active_trims %}#narxlar{% endif %}">{{ product.price_label }}</a>
+              <a class="news-model__link" href="{{ url }}">{% if LANGUAGE_CODE == 'ru' %}Страница модели{% elif LANGUAGE_CODE == 'en' %}Model page{% else %}Model sahifasi{% endif %}</a>
+            </div>
+          </div>
+        </article>
+        {% endwith %}
+        {% endfor %}
+      </div>
+    </div>
+  </section>
+  {% endif %}
+
+  {% if other_news %}
+  <!-- Task 9: other news -->
+  <section class="mxd-section news-extra">
+    <div class="mxd-container grid-container">
+      <h2>{% if LANGUAGE_CODE == 'ru' %}Другие новости{% elif LANGUAGE_CODE == 'en' %}More news{% else %}Boshqa yangiliklar{% endif %}</h2>
+      <ul class="news-other">
+        {% for item in other_news %}
+        <li><a href="{% url 'news_detail' item.slug %}">{{ item.title }}</a> <time datetime="{{ item.created_at|date:'Y-m-d' }}">{{ item.created_at|date:'d.m.Y' }}</time></li>
+        {% endfor %}
+      </ul>
+    </div>
+  </section>
+  {% endif %}
 
   <!-- Footer -->
   {% include 'main/includes/footer.html' %}

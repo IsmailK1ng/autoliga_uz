@@ -301,7 +301,7 @@ def auto_dealers(request, dealers):
 
 # ----------------------------------------------------------------- NewsArticle
 
-def news_article(request, news, language):
+def news_article(request, news, language, description=None):
     url = absolute(request, request.path)
     headline = clean(news.title or news.title_uz)
     data = {
@@ -314,7 +314,8 @@ def news_article(request, news, language):
         'publisher': organization_ref(request),
         'author': organization_ref(request),
     }
-    description = clean(news.seo_description) or clean(strip_tags(news.desc or ''))
+    # Same text as the meta description (views.news_detail -> seo.news_description)
+    description = description or clean(news.seo_description) or clean(strip_tags(news.desc or ''))
     if description:
         data['description'] = description
     if news.preview_image:

@@ -11,7 +11,12 @@ Model page (uz pattern from the TZ, ru/en are translations of it):
 seo_title / seo_description filled in the admin always win over the pattern.
 """
 
+import html
+import re
+
 from django.conf import settings
+from django.utils.html import strip_tags
+from django.utils.text import Truncator
 
 PRODUCT_TITLE = {
     'uz': "{name} narxi {year} Toshkentda | Autoliga rasmiy diler",
@@ -142,3 +147,34 @@ def brand_seo(brand, products, language):
         'description': description,
         'h1': BRAND_H1[lang].format(name=name, year=year),
     }
+
+
+BLOCK_TAG_RE = re.compile(r'<(?:br|hr|/?(?:p|div|li|ul|ol|h[1-6]|tr|td|th|blockquote|table))\b[^>]*>', re.I)
+
+
+def html_to_text(value):
+    """Rich text -> plain text: tags stripped, entities decoded, whitespace collapsed.
+    Block-level tags become a space so "...</p><p>Next" does not glue two words."""
+    value = BLOCK_TAG_RE.sub(' ', value or '')
+    return clean(html.unescape(strip_tags(value)))
+
+
+def news_body_text(blocks, language=None):
+    """Plain text of the news body (text blocks) in the current language, or in
+    `language` (text_uz / text_ru / text_en) when given. No fallback to another language."""
+    field = f'text_{language}' if language else 'text'
+    return clean(' '.join(
+        html_to_text(getattr(block, field, ''))
+        for block in blocks if block.block_type == 'text'
+    ))
+
+
+def news_description(news, body_text):
+    """Task 9: seo_description from the admin, else the first 155 characters of
+    the body, else the card text (desc), else the title."""
+    return (
+        clean(news.seo_description)
+        or Truncator(body_text).chars(155)
+        or html_to_text(news.desc)
+        or clean(news.title)
+    )

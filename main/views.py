@@ -28,7 +28,7 @@ from django.utils import timezone
 import logging
 import json
 from django.db.models import Prefetch
-from .seo import brand_seo, price_label, product_seo
+from .seo import brand_seo, news_body_text, news_description, price_label, product_seo
 
 
 logger = logging.getLogger('django')
@@ -303,13 +303,41 @@ def jobs(request):
 def news_detail(request, slug):
     """Детальная страница новости"""
     try:
+        related_qs = (
+            Product.objects.filter(is_active=True)
+            .select_related('category')
+            .prefetch_related(
+                'card_specs__icon',
+                Prefetch('trims', queryset=ProductTrim.objects.filter(is_active=True), to_attr='active_trims'),
+            )
+            .order_by('order', 'title')
+        )
         news = get_object_or_404(
-            News.objects.prefetch_related('blocks'), 
-            slug=slug, 
+            News.objects.prefetch_related('blocks', Prefetch('related_products', queryset=related_qs)),
+            slug=slug,
             is_active=True
         )
-        
+
         language = getattr(request, 'LANGUAGE_CODE', 'uz')
+        blocks = list(news.blocks.all())
+
+        # Task 9: the body is the text blocks of this language; without it the
+        # page is noindex,follow and gets no hreflang for that language.
+        body_text = news_body_text(blocks)
+        hreflang_languages = [
+            code for code, _name in settings.LANGUAGES
+            if (getattr(news, f'title_{code}', '') or '').strip() and news_body_text(blocks, code)
+        ]
+
+        related_products = list(news.related_products.all())
+        for product in related_products:
+            product.price_label = price_label(product, language)
+
+        # "Boshqa yangiliklar": up to 4 other news that have a title in this language
+        other_news = [
+            item for item in News.objects.filter(is_active=True).exclude(pk=news.pk).order_by('-order', '-created_at')[:12]
+            if (item.title or '').strip()
+        ][:4]
         breadcrumbs = {
             'uz': {
                 'home': 'Bosh sahifa',
@@ -330,8 +358,14 @@ def news_detail(request, slug):
         
         return render(request, 'main/news_detail.html', {
             'news': news,
-            'blocks': news.blocks.all(),
-            'breadcrumbs': breadcrumbs.get(language, breadcrumbs['uz'])
+            'blocks': blocks,
+            'breadcrumbs': breadcrumbs.get(language, breadcrumbs['uz']),
+            'has_body': bool(body_text),
+            'news_description': news_description(news, body_text),
+            'show_updated': news.updated_at and timezone.localtime(news.updated_at).date() > news.created_at,
+            'hreflang_languages': hreflang_languages,
+            'related_products': related_products,
+            'other_news': other_news,
         })
 
     except Http404:

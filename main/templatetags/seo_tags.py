@@ -90,6 +90,9 @@ def hreflang_tags(context):
     # privacy / terms are noindex,follow by design (legal_base.html): no hreflang on noindex pages
     if url_name in NOINDEX_PAGES:
         return ''
+    # ?q= catalog search results are noindex,follow (products.html): no hreflang either (task 15)
+    if context.get('search_query'):
+        return ''
     languages = _available_languages(context, request, url_name)
     # task 14: an untranslated page (noindex in this language) carries no hreflang at all
     if translation.get_language() not in languages:

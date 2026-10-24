@@ -59,16 +59,25 @@
                                             <a class="submenu__link" href="{% url 'products' %}">{% if LANGUAGE_CODE == 'ru' %}Все модели{% elif LANGUAGE_CODE == 'en' %}All models{% else %}Barcha modellar{% endif %}</a>
                                         </li>
                                         {% for brand in SITE_MENU %}
+                                        {% with brand_name=brand.name|default:brand.name_uz %}
+                                        {# Brand row = toggle; its models stay in the HTML and only collapse when JS runs (html.menu-js), so aria-expanded starts "true" #}
                                         <li class="submenu__item submenu__item--brand">
-                                            <a class="submenu__link" href="{% url 'brand' brand.slug %}">{{ brand.name|default:brand.name_uz }}</a>
-                                            {% if brand.menu_products %}
-                                            <ul class="submenu__models">
-                                                {% for model in brand.menu_products %}
-                                                <li><a class="submenu__model-link" href="{% url 'product_detail' model.slug %}">{{ model.title|default:model.title_uz }}</a></li>
-                                                {% endfor %}
-                                            </ul>
-                                            {% endif %}
+                                            <button type="button" class="submenu__brand-toggle" aria-expanded="true" aria-controls="menu-brand-{{ brand.slug }}">
+                                                <span class="submenu__brand-name">{{ brand_name }}</span>
+                                                <span class="submenu__chevron" aria-hidden="true">▼</span>
+                                            </button>
+                                            <div class="submenu__panel" id="menu-brand-{{ brand.slug }}">
+                                                <div class="submenu__panel-inner">
+                                                    <ul class="submenu__models">
+                                                        <li><a class="submenu__model-link submenu__model-link--all" href="{% url 'brand' brand.slug %}">{% if LANGUAGE_CODE == 'ru' %}Все модели {{ brand_name }}{% elif LANGUAGE_CODE == 'en' %}All {{ brand_name }} models{% else %}Barcha {{ brand_name }} modellari{% endif %}</a></li>
+                                                        {% for model in brand.menu_products %}
+                                                        <li><a class="submenu__model-link" href="{% url 'product_detail' model.slug %}">{{ model.title|default:model.title_uz }}</a></li>
+                                                        {% endfor %}
+                                                    </ul>
+                                                </div>
+                                            </div>
                                         </li>
+                                        {% endwith %}
                                         {% endfor %}
                                     </ul>
                                 </li>
@@ -169,5 +178,32 @@
     document.addEventListener('click', function (e) {
         if (desktop.matches && !item.contains(e.target)) close();
     });
+
+    /* Brand rows (menu UX): one brand open at a time. Panels collapse only once this
+       runs (html.menu-js); without JS every panel stays open. The brand of the current
+       brand / model page starts open. Not app.js's accordion: that one slides up every
+       other .submenu, the brands list itself included. */
+    var brandToggles = item.querySelectorAll('.submenu__brand-toggle');
+    if (!brandToggles.length) return;
+    function setBrand(btn, open) {
+        btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+        document.getElementById(btn.getAttribute('aria-controls')).classList.toggle('is-open', open);
+    }
+    var current = null;
+    Array.prototype.forEach.call(brandToggles, function (btn) {
+        var panel = document.getElementById(btn.getAttribute('aria-controls'));
+        Array.prototype.forEach.call(panel.querySelectorAll('a'), function (a) {
+            if (a.pathname === window.location.pathname) current = btn;
+        });
+        btn.addEventListener('click', function () {
+            var open = btn.getAttribute('aria-expanded') !== 'true';
+            /* desktop: the list changes height under the mouse, so keep the dropdown open
+               (as a click on "Brendlar" does) instead of relying on hover */
+            if (desktop.matches) { item.classList.add('open'); sync(); }
+            Array.prototype.forEach.call(brandToggles, function (other) { setBrand(other, other === btn && open); });
+        });
+    });
+    Array.prototype.forEach.call(brandToggles, function (btn) { setBrand(btn, btn === current); });
+    document.documentElement.classList.add('menu-js');
 })();
 </script>

@@ -48,6 +48,84 @@
     opacity: .85;
 }
 
+/* Brand rows (menu UX): each brand is a toggle; its models sit in a collapsible panel.
+   html.menu-js is set by the menu script in header.html, so without JavaScript every
+   panel stays open. The links are always in the HTML; collapsed ones are visibility:
+   hidden, which also takes them out of the Tab order. */
+.submenu__brand-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: .8rem;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: none;
+    font: normal var(--fw-regular-opp) 2rem/1.2 var(--_font-accent);
+    color: var(--t-opp-bright);
+    text-align: left;
+    cursor: pointer;
+    transition: color .3s ease, transform .3s ease;
+}
+
+.no-touch .submenu__brand-toggle:hover {
+    color: var(--t-opp-medium);
+    transform: translateX(1rem);
+}
+
+.submenu__chevron {
+    display: inline-block;
+    font-size: 1.1rem;
+    transition: transform .3s ease;
+}
+
+.submenu__brand-toggle[aria-expanded="true"] .submenu__chevron {
+    transform: rotate(180deg);
+}
+
+/* the theme removes every button focus outline (button:focus { outline: 0 !important }) */
+.submenu__brand-toggle:focus-visible,
+#main-menu .submenu__panel a:focus-visible {
+    outline: 2px solid currentColor !important;
+    outline-offset: 2px;
+}
+
+/* the links' "transition: all" would also animate the visibility they inherit from a
+   closing panel and keep them visible (and focusable) for another .3s */
+#main-menu .submenu__panel .submenu__model-link {
+    transition-property: color, background-color, opacity, transform;
+}
+
+.menu-js .submenu__panel {
+    display: grid;
+    grid-template-rows: 0fr;
+    visibility: hidden;
+    transition: grid-template-rows .3s ease, visibility 0s linear .3s;
+}
+
+.menu-js .submenu__panel.is-open {
+    grid-template-rows: 1fr;
+    visibility: visible;
+    transition: grid-template-rows .3s ease, visibility 0s linear 0s;
+}
+
+/* clip only the height (the collapse); "clip" is not a scroll container, so long
+   names still widen the dropdown. overflow: hidden is the fallback for old browsers. */
+.submenu__panel-inner {
+    min-height: 0;
+    overflow: hidden;
+    overflow-x: visible;
+    overflow-y: clip;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .menu-js .submenu__panel,
+    .menu-js .submenu__panel.is-open,
+    .submenu__chevron,
+    .submenu__brand-toggle {
+        transition: none;
+    }
+}
+
 @media only screen and (min-width: 1400px) {
     #main-menu .submenu__models a {
         font-size: 1.8rem;
@@ -313,6 +391,41 @@
         font-size: 15px;
         opacity: 1;
     }
+
+    /* Brand toggle row: same box, font and hover as the brand link it replaces */
+    #main-menu .submenu__brand-toggle {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        width: 100%;
+        padding: 8px 20px;
+        color: var(--color-text-muted);
+        font-family: inherit;
+        font-size: 17px;
+        font-weight: 400;
+        font-style: normal;
+        line-height: 1.6;
+        white-space: nowrap;
+        transform: none;
+        transition: all .3s ease;
+    }
+
+    #main-menu .submenu__brand-toggle:hover {
+        color: var(--color-accent);
+        background: var(--color-bg-accent);
+        transform: none;
+    }
+
+    #main-menu .submenu__chevron {
+        font-size: .8rem;
+    }
+
+    /* the dropdown scrolls (overflow-y: auto): keep the focus ring inside the row */
+    #main-menu .submenu__brand-toggle:focus-visible,
+    #main-menu .submenu__panel a:focus-visible {
+        outline-offset: -2px;
+    }
 }
 
 /* Theme colours of the dropdown (same as the .desktop-submenu rules) */
@@ -323,11 +436,13 @@
         box-shadow: 0 4px 20px rgba(0, 0, 0, .3) !important;
     }
 
-    #main-menu .submenu__item a {
+    #main-menu .submenu__item a,
+    #main-menu .submenu__brand-toggle {
         color: #fff !important;
     }
 
-    #main-menu .submenu__item a:hover {
+    #main-menu .submenu__item a:hover,
+    #main-menu .submenu__brand-toggle:hover {
         background: rgba(255, 255, 255, .1) !important;
     }
 }
@@ -339,11 +454,13 @@
         box-shadow: 0 4px 20px rgba(0, 0, 0, .1) !important;
     }
 
-    #main-menu .submenu__item a {
+    #main-menu .submenu__item a,
+    #main-menu .submenu__brand-toggle {
         color: #161616 !important;
     }
 
-    #main-menu .submenu__item a:hover {
+    #main-menu .submenu__item a:hover,
+    #main-menu .submenu__brand-toggle:hover {
         background: rgba(0, 0, 0, .05) !important;
     }
 }
@@ -358,14 +475,20 @@
     }
 
     [color-scheme=light] #main-menu .submenu__item a,
+    [color-scheme=light] #main-menu .submenu__brand-toggle,
     body.light-mode #main-menu .submenu__item a,
-    body[data-theme=light] #main-menu .submenu__item a {
+    body.light-mode #main-menu .submenu__brand-toggle,
+    body[data-theme=light] #main-menu .submenu__item a,
+    body[data-theme=light] #main-menu .submenu__brand-toggle {
         color: #161616 !important;
     }
 
     [color-scheme=light] #main-menu .submenu__item a:hover,
+    [color-scheme=light] #main-menu .submenu__brand-toggle:hover,
     body.light-mode #main-menu .submenu__item a:hover,
-    body[data-theme=light] #main-menu .submenu__item a:hover {
+    body.light-mode #main-menu .submenu__brand-toggle:hover,
+    body[data-theme=light] #main-menu .submenu__item a:hover,
+    body[data-theme=light] #main-menu .submenu__brand-toggle:hover {
         background: rgba(0, 0, 0, .05) !important;
     }
 
@@ -378,14 +501,20 @@
     }
 
     [color-scheme=dark] #main-menu .submenu__item a,
+    [color-scheme=dark] #main-menu .submenu__brand-toggle,
     body.dark-mode #main-menu .submenu__item a,
-    body[data-theme=dark] #main-menu .submenu__item a {
+    body.dark-mode #main-menu .submenu__brand-toggle,
+    body[data-theme=dark] #main-menu .submenu__item a,
+    body[data-theme=dark] #main-menu .submenu__brand-toggle {
         color: #fff !important;
     }
 
     [color-scheme=dark] #main-menu .submenu__item a:hover,
+    [color-scheme=dark] #main-menu .submenu__brand-toggle:hover,
     body.dark-mode #main-menu .submenu__item a:hover,
-    body[data-theme=dark] #main-menu .submenu__item a:hover {
+    body.dark-mode #main-menu .submenu__brand-toggle:hover,
+    body[data-theme=dark] #main-menu .submenu__item a:hover,
+    body[data-theme=dark] #main-menu .submenu__brand-toggle:hover {
         background: rgba(255, 255, 255, .1) !important;
     }
 }

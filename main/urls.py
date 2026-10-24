@@ -11,7 +11,6 @@ urlpatterns = [
     path('brand/<slug:slug>/', views.brand_detail, name='brand'),
     path('news/', views.news, name='news'),
     path('news/<slug:slug>/', views.news_detail, name='news_detail'),
-    path('test-utm/', TemplateView.as_view(template_name='test-utm.html'), name='test_utm'),
     # path('about/', views.about, name='about'),
     # path('become-a-dealer/', views.become_a_dealer, name='become_a_dealer'),
     # path('api/log-js-error/', views.log_js_error, name='log_js_error'),

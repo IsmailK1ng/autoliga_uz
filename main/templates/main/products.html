@@ -69,6 +69,52 @@
       background: var(--t-bright, #111);
       color: var(--base, #fff);
     }
+
+    /* Catalog hero H1: the theme's default size (up to 120px) ran the longer Task 4 text
+       under the car image (absolute, right 45% of the hero; hidden below 577px).
+       Smaller clamp() and at most half the row, so it wraps on the left; z-index works
+       once the H1 is positioned (faw_main-models.css gives it z-index: 2). Root is 10px:
+       3.6rem-8.8rem = 36-88px. This page only: faw_main-models.css is shared. */
+    .mxd-hero-06 h1.models_title {
+      position: relative;
+      max-width: 50%;
+      font-size: clamp(3.6rem, 4.6vw, 8.8rem);
+      line-height: 1.1;
+      overflow-wrap: break-word;
+    }
+
+    /* the tagline under it reached the car below 1200px (at 1200px+ the theme's
+       col-xl-8 already keeps it clear): keep it on the left half there */
+    @media (min-width: 577px) and (max-width: 1199px) {
+      .mxd-hero-06 .mxd-section-title__hrdescr {
+        max-width: 50%;
+      }
+    }
+
+    /* 577-768px: the hero was a fixed 38vh with the text pushed to its bottom, so a
+       wrapped tagline pushed the H1 up under the fixed 100px header. Start below the
+       header and keep the same bottom edge (margin 4rem + 38vh = 11rem + 38vh - 7rem),
+       growing only when the text needs more room. */
+    @media (min-width: 577px) and (max-width: 768px) {
+      .mxd-hero-06 .mxd-hero-06__content {
+        height: auto;
+        min-height: calc(38vh - 7rem);
+        margin-top: 11rem;
+      }
+    }
+
+    @media (max-width: 576px) {
+      .mxd-hero-06 h1.models_title {
+        max-width: none;
+      }
+
+      /* no car image here; the fixed 100px header covered the first H1 line
+         (hero was a fixed 27vh with the text pushed to its bottom) */
+      .mxd-hero-06 .mxd-hero-06__content {
+        height: auto;
+        margin-top: 11rem;
+      }
+    }
 </style>
 {% endblock productstyle %}
 

@@ -644,8 +644,11 @@ def products(request):
             url = reverse('brand', kwargs={'slug': category_slug})
             # Old brand slug (task 13): go straight to the brand's current page, one hop
             if not ProductCategory.objects.filter(slug=category_slug, is_active=True).exists():
-                url = find_redirect(request, url) or url
-                url = url.split('?')[0]
+                # Unknown brand (no redirect rule): a real 404 here, not a 301 to a 404 (task 15)
+                target = find_redirect(request, url)
+                if not target:
+                    raise Http404('Unknown brand')
+                url = target.split('?')[0]
             return HttpResponsePermanentRedirect(f"{url}?{params.urlencode()}" if params else url)
 
         if category_slug:

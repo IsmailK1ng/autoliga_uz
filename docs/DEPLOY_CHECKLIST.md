@@ -1,10 +1,73 @@
 # Deploy checklist — internal SEO TZ (tasks 1–16)
 
+## Before you start (both stages)
+
+Do all four before typing any deploy command.
+
+**(a) Take the DB dump and the site archive.** In cPanel → Terminal, paste the block below as it is.
+- The DB credentials are read from `/home/autolig1/site/.env` into a subshell. They are never printed, never typed on the command line and never kept in the shell history, and they disappear when the block ends.
+- Both files go to `~/backups/`, i.e. `/home/autolig1/backups`, which is outside `public_html` so it isn't reachable from the web.
+- They are readable only by you, which matters because the archive contains `.env`.
+
+```bash
+mkdir -p ~/backups && chmod 700 ~/backups
+STAMP=$(date +%F_%H%M)
+(
+  # read DB_* from .env literally (no shell expansion), strip CR and surrounding quotes
+  while IFS='=' read -r key value; do
+    value="${value%$'\r'}"; value="${value#[\"\']}"; value="${value%[\"\']}"
+    export "$key=$value"
+  done < <(grep -E '^DB_(NAME|USER|PASSWORD|HOST|PORT)=' /home/autolig1/site/.env)
+  PGPASSWORD="$DB_PASSWORD" pg_dump -h "${DB_HOST:-localhost}" -p "${DB_PORT:-5432}" -U "$DB_USER" \
+      --format=custom --no-owner --file="$HOME/backups/autoliga_db_$STAMP.dump" "$DB_NAME" \
+    && echo "dump OK" || echo "DUMP FAILED - stop here"
+)
+tar -czf ~/backups/autoliga_site_$STAMP.tar.gz -C /home/autolig1 site \
+    public_html/.htaccess public_html/static/.htaccess public_html/media/.htaccess 2>/dev/null; echo "archive exit code: $? (0 or 1 is fine; 1 = a .htaccess that does not exist yet)"
+chmod 600 ~/backups/autoliga_*_$STAMP.*
+```
+Check the size, and that the dump is readable:
+```bash
+ls -lh ~/backups/autoliga_*_$STAMP.*                       # neither file may be 0 bytes; the dump is usually several MB
+pg_restore --list ~/backups/autoliga_db_$STAMP.dump | grep -c "TABLE DATA"   # a number > 0 (one line per table); an error = bad dump
+tar -tzf ~/backups/autoliga_site_$STAMP.tar.gz | grep -c "site/manage.py"   # 1
+df -h ~ | tail -1                                           # enough free space left for the deploy
+```
+The media files (`public_html/media`) are not in the archive. The deploy never changes or deletes them: the WebP copies are new files in `media/_resp/`. cPanel's own backup covers them.
+
+**(b) Write down the commit that is live now.**
+```bash
+cd /home/autolig1/site && git log -1 --format="%h %ad %s" --date=iso | tee ~/backups/live_commit_$STAMP.txt
+git status --short | head                                   # must be empty; if not, someone edited files on the server: stop and find out why
+```
+Copy that line into the deploy notes as well; the rollback steps go back to this commit.
+Before Stage 1 it should be `c5bff24`; before Stage 2, `b6e1342`.
+
+**(c) Deploy window: a quiet time.**
+- Pick the lowest-traffic hour from cPanel → Metrics → *Awstats* / *Visitors*. Google Tag Manager is off at the moment, so there is no GA data.
+- Use a working day (Monday–Thursday) and **not** before a weekend, a holiday or a marketing campaign.
+- The developer should be free for **2 hours afterwards** to watch `logs/errors.log` and to roll back if needed.
+- The deploy itself takes about 15 minutes. The site is down only for the Passenger restart (a few seconds).
+- Deploy Stage 2 on a different day from Stage 1, after Stage 1 has run cleanly for at least a day.
+
+**(d) Who to call if something fails.** Fill this in before the deploy:
+
+| Role | Name | Phone / Telegram | When |
+|---|---|---|---|
+| Developer (deploys, rolls back) |  |  | anything in the checks fails |
+| Ahost support (server, nginx/Engintron, Passenger) |  | ticket in the Ahost client area | the site doesn't start after a restart; the cache problem in the Stage 2 check |
+| Marketing / site owner (decides on a rollback, informs sales) |  |  | the site was down or a rollback was done |
+| Sales (amoCRM leads) |  |  | leads stop arriving after the deploy |
+
+If any check fails and the cause isn't obvious within 15 minutes, **roll back first and investigate afterwards** (each stage has its own Rollback section).
+
+---
+
 Two stages, deployed separately, each with its own rollback.
 
 | Stage | Git | Contains | DB migrations | New packages |
 |---|---|---|---|---|
-| 1 | tag `deploy-stage1` (`b6e1342`) | tasks 1–13 | `main` 0016–0022, `thumbnail` 0001 | pytz, sorl-thumbnail, Unidecode |
+| 1 | tag `deploy-stage1` (`b6e1342`) | tasks 1–13, plus four early TZ 14/15 commits (hreflang URL fixes, custom 404, 404 for unknown news) | `main` 0016–0022, `thumbnail` 0001 | pytz, sorl-thumbnail, Unidecode |
 | 2 | last Task 14/15 commit (suggested tag `deploy-stage2`) | task 14 (languages), task 15 fixes | none | none |
 
 Production today is `origin/main` (`c5bff24`, migrations up to `main.0015`).
@@ -30,15 +93,12 @@ cPanel → *Setup Python App* → the autoliga.uz app shows the exact command at
 - Pick a quiet hour. Users won't notice anything; the only downtime is the Passenger restart.
 
 ### 1. Backup (server)
+Run **"Before you start" (a) and (b)** at the top of this file: the DB dump, the site archive, the size checks and the live commit. Then:
 ```bash
-mkdir -p ~/backups
 cd /home/autolig1/site
-git rev-parse HEAD > ~/backups/before_stage1_commit.txt   # code version to roll back to
-pg_dump -h <DB_HOST> -U <DB_USER> -Fc <DB_NAME> > ~/backups/autoliga_before_stage1_$(date +%F_%H%M).dump
-ls -lh ~/backups/                                          # the .dump must not be 0 bytes
+git rev-parse HEAD > ~/backups/before_stage1_commit.txt   # code version to roll back to (c5bff24)
 cp /home/autolig1/public_html/.htaccess ~/backups/public_html.htaccess.before_stage1
 ```
-`<DB_HOST>`, `<DB_USER>` and `<DB_NAME>` are the `DB_*` values in `/home/autolig1/site/.env`; `pg_dump` asks for `DB_PASSWORD`.
 Media files are not changed by the deploy: originals are never touched, and new WebP copies go to `media/_resp/`.
 
 ### 2. Code (server)
@@ -135,8 +195,8 @@ git checkout --detach $(cat ~/backups/before_stage1_commit.txt)
 touch /home/autolig1/site/tmp/restart.txt
 ```
 - **Step 1 is required before step 2.** Several new columns are NOT NULL, so the old code can't save News, Product or brand rows while they exist.
-- If step 1 fails, restore the dump instead:
-  `pg_restore -h <DB_HOST> -U <DB_USER> -d <DB_NAME> --clean --if-exists ~/backups/autoliga_before_stage1_<date>.dump`.
+- If step 1 fails, restore the dump instead. Use the same `.env` reading loop as in "Before you start" (a), with this command in place of `pg_dump`:
+  `PGPASSWORD="$DB_PASSWORD" pg_restore -h "${DB_HOST:-localhost}" -p "${DB_PORT:-5432}" -U "$DB_USER" -d "$DB_NAME" --clean --if-exists --no-owner ~/backups/autoliga_db_<STAMP>.dump`.
 - The `thumbnail_kvstore` table and the packages can stay; the old code ignores them.
 - Later, return `main` to the old commit on your computer, so the next `git pull` doesn't redeploy by accident.
 
@@ -156,10 +216,10 @@ What changes for visitors:
 - Until **2027-01-31**, a visitor with the old `django_language=ru|en` cookie gets one uncacheable 302 from an unprefixed page to `/ru/...` or `/en/...`. Bots never get it, and neither do `/api/`, `/admin/`, `/static/`, `/media/`, the sitemap or robots.
 
 ### 1. Backup (server)
+Run **"Before you start" (a) and (b)** again: a fresh dump and archive. Then:
 ```bash
 cd /home/autolig1/site
 git rev-parse HEAD > ~/backups/before_stage2_commit.txt      # should be b6e1342
-pg_dump -h <DB_HOST> -U <DB_USER> -Fc <DB_NAME> > ~/backups/autoliga_before_stage2_$(date +%F_%H%M).dump
 ```
 
 ### 2–6. Code, packages, migrations, static, restart

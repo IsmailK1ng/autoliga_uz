@@ -24,7 +24,7 @@ GEELY was **left exactly as it is**: no texts, models, redirects or brand data w
 - It is mentioned in the Organization description used for Google (item 9): "…JETOUR, SOUEAST, JAC va GEELY avtomobillari."
 
 Please decide:
-- Does Autoliga sell GEELY now? If yes, send the brand data (items 3 and 11). If no, we remove it from that description and the brand page stays inactive.
+- Does Autoliga sell GEELY now? If yes, send the brand data (items 3 and 4). If no, we remove it from that description and the brand page stays inactive.
 
 ## 2. Home page H1 — P1 (approve or replace)
 The home page now has one H1. The current wording is a working text; please approve it or send your own (under about 70 characters):
@@ -90,7 +90,7 @@ Admin → Dealers, for every branch:
 | Name (uz/ru/en) | e.g. "Autoliga Yunusobod" |
 | Address (uz/ru/en) | street, house, district, city |
 | Coordinates | latitude and longitude, e.g. 41.3111 / 69.2797 (needed for the map pin and Google) |
-| Phones | one or more, **comma-separated**: `+998 78 555 73 77, +998 90 123 45 67` |
+| Phones | one or more, **comma-separated**: `+998 78 555 73 77, +998 XX XXX XX XX` |
 | Working hours | exactly in the form **`Du-Yak 9:00 - 20:00`**. Only this form is passed to Google; other forms are shown on the page but not sent to Google. |
 | Photos and their captions (uz/ru/en) | the showroom from outside and inside |
 | Managers (inline) | full name and position (uz/ru/en), photo |

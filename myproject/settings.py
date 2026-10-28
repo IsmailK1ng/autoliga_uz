@@ -32,6 +32,12 @@ SITE_CONTACTS = {
 # Year used in model/brand titles and H1 ("Jetour T1 2026"); change once a year.
 SEO_YEAR = 2026
 
+# ============ ANALYTICS ============
+# Google Analytics 4 (gtag.js). Rendered only when DEBUG is False
+# (main.context_processors.seo -> main/includes/analytics.html).
+# GA_MEASUREMENT_ID= (empty) in .env switches it off.
+GA_MEASUREMENT_ID = config('GA_MEASUREMENT_ID', default='G-VHDEDRT6PE')
+
 
 
 # ============ ПРИЛОЖЕНИЯ ============

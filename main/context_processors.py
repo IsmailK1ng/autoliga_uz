@@ -1,6 +1,12 @@
+import re
+
 from django.conf import settings
 from django.db.models import Prefetch
 from django.utils.functional import SimpleLazyObject
+
+# A GA4 measurement ID is "G-" + letters/digits; anything else is not rendered,
+# so the ID can go into the gtag snippet as it is (no escaping needed).
+GA_ID_RE = re.compile(r'^G-[A-Z0-9]+$')
 
 
 def site_contacts(request):
@@ -9,8 +15,17 @@ def site_contacts(request):
 
 
 def seo(request):
-    """Expose SEO_YEAR (used in model and brand titles/H1) to all templates."""
-    return {'SEO_YEAR': settings.SEO_YEAR}
+    """Expose SEO_YEAR (used in model and brand titles/H1) and the analytics settings.
+
+    ANALYTICS_ENABLED is True only when DEBUG is False, so local runs never send
+    hits to Google Analytics.
+    """
+    ga_id = (settings.GA_MEASUREMENT_ID or '').strip()
+    return {
+        'SEO_YEAR': settings.SEO_YEAR,
+        'GA_MEASUREMENT_ID': ga_id if GA_ID_RE.match(ga_id) else '',
+        'ANALYTICS_ENABLED': not settings.DEBUG,
+    }
 
 
 def _menu_brands():

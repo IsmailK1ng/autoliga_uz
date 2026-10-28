@@ -37,6 +37,11 @@ SEO_YEAR = 2026
 # (main.context_processors.seo -> main/includes/analytics.html).
 # GA_MEASUREMENT_ID= (empty) in .env switches it off.
 GA_MEASUREMENT_ID = config('GA_MEASUREMENT_ID', default='G-VHDEDRT6PE')
+# GA_DIRECT_ENABLED=False turns off only the direct gtag.js snippet above (e.g. once
+# GA is configured inside GTM); GTM stays.
+GA_DIRECT_ENABLED = config('GA_DIRECT_ENABLED', default=True, cast=bool)
+# Google Tag Manager container (main/includes/gtm_head.html + gtm_body.html), same DEBUG rule.
+GTM_CONTAINER_ID = config('GTM_CONTAINER_ID', default='GTM-K2LCFZJG')
 
 
 

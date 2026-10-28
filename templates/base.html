@@ -5,6 +5,7 @@
 
 <head>
     <meta charset="UTF-8">
+    {% include 'main/includes/gtm_head.html' %}
     {% include 'main/includes/analytics.html' %}
 
     <script src="{% static 'js/utm-tracker.js' %}" defer></script>
@@ -167,6 +168,7 @@
 </head>
 
 <body>
+    {% include 'main/includes/gtm_body.html' %}
 
     {% block content %}{% endblock %}
 

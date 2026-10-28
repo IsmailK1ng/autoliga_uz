@@ -7,6 +7,7 @@ from django.utils.functional import SimpleLazyObject
 # A GA4 measurement ID is "G-" + letters/digits; anything else is not rendered,
 # so the ID can go into the gtag snippet as it is (no escaping needed).
 GA_ID_RE = re.compile(r'^G-[A-Z0-9]+$')
+GTM_ID_RE = re.compile(r'^GTM-[A-Z0-9]+$')
 
 
 def site_contacts(request):
@@ -18,12 +19,15 @@ def seo(request):
     """Expose SEO_YEAR (used in model and brand titles/H1) and the analytics settings.
 
     ANALYTICS_ENABLED is True only when DEBUG is False, so local runs never send
-    hits to Google Analytics.
+    hits to Google Analytics / Tag Manager. GA_DIRECT_ENABLED=False empties only
+    the direct gtag.js id; the GTM container keeps loading.
     """
     ga_id = (settings.GA_MEASUREMENT_ID or '').strip()
+    gtm_id = (settings.GTM_CONTAINER_ID or '').strip()
     return {
         'SEO_YEAR': settings.SEO_YEAR,
-        'GA_MEASUREMENT_ID': ga_id if GA_ID_RE.match(ga_id) else '',
+        'GA_MEASUREMENT_ID': ga_id if settings.GA_DIRECT_ENABLED and GA_ID_RE.match(ga_id) else '',
+        'GTM_CONTAINER_ID': gtm_id if GTM_ID_RE.match(gtm_id) else '',
         'ANALYTICS_ENABLED': not settings.DEBUG,
     }
 

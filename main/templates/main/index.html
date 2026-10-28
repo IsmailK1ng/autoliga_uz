@@ -24,6 +24,13 @@
 {% block structured_data %}
 {% endblock %}
 
+{% block extra_css %}
+{% if hero_xl.slides %}{# desktop hero slider: shown >= 1200px instead of the FAW slider; its stylesheet never applies below 1200px #}
+<style>.hero-xl{display:none}@media (min-width:1200px){.hero-xl{display:block}.hero-xl~.faw-slider-section{display:none}}</style>
+<link rel="stylesheet" href="{% static 'css/hero_xl.css' %}" media="(min-width: 1200px)">
+{% endif %}
+{% endblock %}
+
 {% block content %}
   {% include 'main/includes/header.html' %}
   <main id="mxd-page-content" class="mxd-page-content">
@@ -308,6 +315,7 @@
     </div>
     <!-- Секция — превью блога (конец) -->
 
+    {% include 'main/includes/hero_xl.html' %}
     <!-- Секция — слайдер FAW (начало) -->
     <div id="slider-data" style="display: none;">{{ slider_products|safe }}</div>
     <div
@@ -1443,6 +1451,7 @@ cards.forEach(function(card, i) {
   <script src="{% static 'js/libs.min.js' %}" defer></script>
   <script src="{% static 'js/app.js' %}" defer></script>
   <script src="{% static 'js/main-setting.js' %}" defer></script>
+  {% if hero_xl.slides %}<script src="{% static 'js/hero_xl.js' %}" defer></script>{% endif %}
 
   <!-- Мобильный фикс: надёжно отключаем инлайн-стили параллакса для маленьких экранов -->
   <script>

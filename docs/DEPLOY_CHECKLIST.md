@@ -300,6 +300,67 @@ Then point `main` back on your computer; locally use `git revert --no-commit dep
 
 ---
 
+## Hero slider desktop
+
+Two commits: `feat(home): data for the desktop hero slider` and `feat(home): redesigned hero slider for screens >= 1200px`.
+- **No migrations, no new packages.**
+- **`collectstatic` IS required:** there are new files `css/hero_xl.css` and `js/hero_xl.js`, and `js/main-setting.js` changed.
+- **What visitors see.**
+  - At 1200px and wider, the home page shows the new model slider instead of the old FAW slider.
+  - Below 1200px nothing changes.
+  - The slider lists the models ticked "Показывать на главной" (at most 12). With none ticked, the old slider stays at all widths.
+
+### 1. Backup (server)
+```bash
+cd /home/autolig1/site
+git rev-parse HEAD > ~/backups/before_hero_commit.txt
+```
+
+### 2. Code, static, restart (server)
+```bash
+git status && git pull --ff-only origin main && git log -2 --oneline      # the two commits above
+python manage.py migrate --plan                                          # "No planned migration operations."
+python manage.py collectstatic --noinput                                 # required; never --clear (it would delete static/.htaccess)
+touch /home/autolig1/site/tmp/restart.txt                                # or cPanel Restart
+tail -n 30 /home/autolig1/site/logs/errors.log
+```
+
+### 3. Checks (Windows CMD)
+```bat
+curl -s https://autoliga.uz/ | findstr /c:"class=\"hero-xl\"" /c:"css/hero_xl.css" /c:"js/hero_xl.js" /c:"family=Unbounded"
+:: 4 lines: the slider section, its stylesheet (media="(min-width: 1200px)"), its script (defer), the font link
+curl -s https://autoliga.uz/ | find /c "<h1"
+:: 1  (still exactly one H1; slide titles are h2)
+curl -s https://autoliga.uz/ | findstr /c:"id=\"slider-data\""
+:: 1 line: the old slider is still there for screens below 1200px
+curl -s https://autoliga.uz/en/ | findstr /c:"Get the price"
+:: the English button texts are there
+curl -s -o NUL -w "%{http_code} %{content_type}\n" https://autoliga.uz/static/css/hero_xl.css
+:: 200 text/css  (404 = collectstatic was not run)
+curl -s -o NUL -w "%{http_code} %{content_type}\n" https://autoliga.uz/static/js/hero_xl.js
+:: 200 and a javascript content type
+curl -s https://autoliga.uz/static/js/main-setting.js | find /c "hxOn"
+:: 1  (the new main-setting.js was collected; 0 = old file still served)
+```
+In a browser (private window):
+- at 1440px wide, the new slider appears below the news block, and autoplay moves every 6s while it is on screen;
+- at phone width, the old slider looks exactly as before;
+- the console shows no errors.
+
+Static files are cached for a day (`max-age=86400`), so a returning visitor can get the new page with yesterday's `main-setting.js`. The page still works, but on wide screens the hidden old slider also downloads its images until the cache expires. If the Engintron cache serves the old home page HTML, wait a few minutes or purge it.
+
+### 4. Rollback
+No database changes are involved, so code and static only:
+```bash
+cd /home/autolig1/site
+git checkout --detach $(cat ~/backups/before_hero_commit.txt)
+python manage.py collectstatic --noinput     # puts the previous main-setting.js back; the unused hero_xl.* files can stay
+touch /home/autolig1/site/tmp/restart.txt
+```
+Then point `main` back on your computer. Locally, revert both commits with `git revert <design commit> <data commit>` (design first).
+
+---
+
 ## After the deploy (manual steps)
 
 ### A. Soueast slug (after Stage 1 is live)

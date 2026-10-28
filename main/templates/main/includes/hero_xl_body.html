@@ -1,0 +1,86 @@
+{% comment %}Markup of the desktop hero slider; strings come from hero_xl.html. Images: <source media="(min-width: 1200px)"> + a 1x1
+data: <img>, so nothing is downloaded below 1200px. Only slide 1 has srcset; hero_xl.js fills data-srcset of the others.{% endcomment %}
+{% with total=hero_xl.slides|length %}
+<section class="hero-xl" aria-roledescription="carousel" aria-label="{{ t_label }}">
+  <div class="hx-bg" aria-hidden="true"><span class="hx-blob hx-blob--1"></span><span class="hx-blob hx-blob--2"></span><span class="hx-blob hx-blob--3"></span></div>
+  <div class="hx-inner">
+    <div class="hx-slides" id="hx-slides" aria-live="polite">
+      {% for s in hero_xl.slides %}
+      <div class="hx-slide{% if forloop.first %} is-active{% endif %}" id="hx-slide-{{ forloop.counter }}" role="group" aria-roledescription="slide" aria-label="{{ forloop.counter }} / {{ total }}" data-brand="{{ s.brand_slug }}"{% if not forloop.first %} aria-hidden="true" inert{% endif %}>
+        <div class="hx-slide__text">
+          {% if s.brand %}<p class="hx-chip hx-anim"><span class="hx-chip__dot" aria-hidden="true"></span>{{ s.brand }}</p>{% endif %}
+          <h2 class="hx-title hx-anim hx-d1{% if s.title|length > 14 %} hx-title--xl{% elif s.title|length > 9 %} hx-title--l{% endif %}">{{ s.title }}</h2>
+          {% if s.year %}<p class="hx-year hx-anim hx-d1">{{ s.year }} {{ t_year_suffix }}</p>{% endif %}
+          {% if s.power or s.fuel or s.year %}
+          <dl class="hx-specs hx-anim hx-d2">
+            {% if s.power %}<div class="hx-spec"><dt>{{ t_power }}</dt><dd>{{ s.power }}</dd></div>{% endif %}
+            {% if s.fuel %}<div class="hx-spec"><dt>{{ t_fuel }}</dt><dd>{{ s.fuel }}</dd></div>{% endif %}
+            {% if s.year %}<div class="hx-spec"><dt>{{ t_year }}</dt><dd>{{ s.year }}</dd></div>{% endif %}
+          </dl>
+          {% endif %}
+          <div class="hx-price hx-anim hx-d3">
+            <p class="hx-price__label">{{ t_price }}</p>
+            {% if s.min_price %}
+            <p class="hx-price__value"><span class="hx-price__unit">{{ t_from }}</span> <span class="hx-price__num">{{ s.min_price }}</span> <span class="hx-price__unit">{{ t_cur }}</span></p>
+            <ul class="hx-trims">
+              {% for trim in s.trims %}<li class="hx-trim"><span class="hx-trim__name">{{ trim.name }}</span> <span class="hx-trim__price">{{ trim.price }}</span></li>{% endfor %}
+            </ul>
+            {% elif s.price %}
+            <p class="hx-price__value"><span class="hx-price__num hx-price__num--text">{{ s.price }}</span></p>
+            {% else %}
+            <p class="hx-price__value hx-price__value--request">{{ t_on_request }}</p>
+            {% endif %}
+          </div>
+          <div class="hx-actions hx-anim hx-d4">
+            <a class="hx-btn hx-btn--primary" href="{{ s.url }}#narxlar">{{ t_ask_price }}<span class="hx-vh"> — {{ s.title }}</span></a>
+            <a class="hx-btn hx-btn--outline" href="{{ s.url }}">{{ t_details }}<span class="hx-vh"> — {{ s.title }}</span></a>
+            <a class="hx-link" href="{% url 'test_drive' %}?model={{ s.slug|urlencode }}">{{ t_test_drive }}<span class="hx-vh"> — {{ s.title }}</span></a>
+          </div>
+        </div>
+        <div class="hx-slide__car">
+          {% if s.image %}
+          <div class="hx-car"><div class="hx-car__float">
+            <picture>
+              {% if s.image.srcset %}<source media="(min-width: 1200px)" type="image/webp" {% if forloop.first %}srcset{% else %}data-srcset{% endif %}="{{ s.image.srcset }}" sizes="(min-width: 2560px) 1000px, 54vw">{% endif %}
+              <source media="(min-width: 1200px)" {% if forloop.first %}srcset{% else %}data-srcset{% endif %}="{{ s.image.url }}">
+              <img class="hx-car__img" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="{{ s.alt }}"{% if s.image.width and s.image.height %} width="{{ s.image.width }}" height="{{ s.image.height }}"{% endif %}{% if forloop.first %} fetchpriority="high"{% else %} loading="lazy"{% endif %} decoding="async">
+            </picture>
+          </div></div>
+          <span class="hx-shadow" aria-hidden="true"></span>
+          {% endif %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+    <div class="hx-rail">
+      <div class="hx-rail__top">
+        <div class="hx-tabs" role="group" aria-label="{{ t_brands }}">
+          <button type="button" class="hx-tab" data-brand="" aria-pressed="true">{{ t_all }} <span class="hx-tab__count">{{ total }}</span></button>
+          {% for brand in hero_xl.brands %}<button type="button" class="hx-tab" data-brand="{{ brand.slug }}" aria-pressed="false">{{ brand.name }} <span class="hx-tab__count">{{ brand.count }}</span></button>{% endfor %}
+        </div>
+        <div class="hx-nav">
+          <p class="hx-counter"><span class="hx-counter__cur">01</span> / <span class="hx-counter__total">{{ total|stringformat:"02d" }}</span></p>
+          <button type="button" class="hx-arrow hx-arrow--prev" aria-controls="hx-slides" aria-label="{{ t_prev }}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="15 18 9 12 15 6"></polyline></svg></button>
+          <button type="button" class="hx-arrow hx-arrow--next" aria-controls="hx-slides" aria-label="{{ t_next }}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><polyline points="9 18 15 12 9 6"></polyline></svg></button>
+        </div>
+      </div>
+      <ul class="hx-cards">
+        {% for s in hero_xl.slides %}
+        <li class="hx-cards__item" data-brand="{{ s.brand_slug }}">
+          <a class="hx-card" href="{{ s.url }}" data-index="{{ forloop.counter0 }}"{% if forloop.first %} aria-current="true"{% endif %}>
+            <span class="hx-card__progress" aria-hidden="true"></span>
+            <span class="hx-card__thumb">{% if s.thumb %}<picture><source media="(min-width: 1200px)" srcset="{{ s.thumb }}"><img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt=""{% if s.image.width and s.image.height %} width="{{ s.image.width }}" height="{{ s.image.height }}"{% endif %} loading="lazy" decoding="async"></picture>{% endif %}</span>
+            <span class="hx-card__body">
+              <span class="hx-card__name">{{ s.title }}</span>
+              {% if s.brand %}<span class="hx-card__brand">{{ s.brand }}</span>{% endif %}
+              <span class="hx-card__price">{% if s.min_price %}{{ t_from }} <span class="hx-nowrap">{{ s.min_price }}</span> {{ t_cur }}{% elif s.price %}{{ s.price }}{% else %}{{ t_on_request }}{% endif %}</span>
+            </span>
+          </a>
+        </li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+</section>
+{% endwith %}

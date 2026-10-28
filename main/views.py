@@ -47,6 +47,54 @@ def current_year(request):
 
 
 
+HERO_XL_LIMIT = 12
+
+
+def hero_xl_slides(lang):
+    """Desktop hero slider (>= 1200px): the same "show on home" models and order as the
+    old slider, with brand, active trims and image data; empty fields stay empty."""
+    from django.core.files.storage import default_storage
+    from .images import load_meta
+
+    products = (Product.objects.filter(is_active=True, is_featured=True)
+                .select_related('category')
+                .prefetch_related(Prefetch('trims', queryset=ProductTrim.objects.filter(is_active=True).order_by('order', 'name'),
+                                           to_attr='active_trims'))
+                .order_by('-slider_order', '-created_at')[:HERO_XL_LIMIT])
+    slides = []
+    for product in products:
+        localized = lambda field: (getattr(product, f'{field}_{lang}', None) or getattr(product, field, None) or '').strip()
+        trims = [trim for trim in product.active_trims if trim.price]
+        picture = product.slider_image or product.main_image
+        info = image_info(picture)
+        thumb = ''
+        if info:
+            meta = load_meta(picture.name)
+            small = (meta or {}).get('variants', {}).get('480')
+            thumb = default_storage.url(small) if small else info['medium']
+        slides.append({
+            'slug': product.slug,
+            'title': localized('title'),
+            'brand': product.category.name if product.category else '',
+            'brand_slug': product.category.slug if product.category else '',
+            'year': (product.slider_year or '').strip(),
+            'power': localized('slider_power'),
+            'fuel': localized('slider_fuel_consumption'),
+            'price': localized('slider_price'),
+            'trims': [{'name': trim.name, 'price': trim.formatted_price} for trim in trims],
+            'min_price': f"{min(trim.price for trim in trims):,}".replace(',', ' ') if trims else '',
+            'url': product.get_absolute_url(),
+            'image': info,
+            'thumb': thumb,
+            'alt': product.image_alt,
+        })
+    brands = {}
+    for slide in slides:
+        if slide['brand_slug']:
+            brands.setdefault(slide['brand_slug'], {'slug': slide['brand_slug'], 'name': slide['brand'], 'count': 0})['count'] += 1
+    return {'slides': slides, 'brands': list(brands.values())}
+
+
 def index(request):
     """Главная страница с динамическим слайдером"""
     try:
@@ -119,6 +167,7 @@ def index(request):
             'productCategory': productCategory,
             'RECAPTCHA_SITE_KEY': getattr(settings, 'RECAPTCHA_SITE_KEY', ''),
             'team_managers': team_managers,
+            'hero_xl': hero_xl_slides(current_lang),  # desktop hero slider (>= 1200px), separate from slider_products
         }
         
         return render(request, 'main/index.html', context)

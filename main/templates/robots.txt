@@ -3,8 +3,6 @@ Disallow: /admin/
 Disallow: /api/
 Disallow: /captcha/
 Disallow: /set-language/
-Disallow: /*?utm_
-Disallow: /*&utm_
 Allow: /
  
 Clean-param: utm_source&utm_medium&utm_campaign&utm_content&utm_term&fbclid&yclid&gclid

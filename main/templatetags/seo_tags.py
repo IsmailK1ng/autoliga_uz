@@ -173,6 +173,14 @@ def language_links(context):
     return links
 
 
+@register.simple_tag(takes_context=True)
+def home_title(context):
+    """Home page <title> / og:title with the brands of the menu (same SITE_MENU, no extra query)."""
+    from main.seo import home_title as build
+    names = [brand.name or brand.name_uz for brand in (context.get('SITE_MENU') or [])]
+    return build(names, _jsonld_language(context))
+
+
 # ---------------------------------------------------------------- JSON-LD (task 7)
 
 def _jsonld_language(context):

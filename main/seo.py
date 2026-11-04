@@ -149,6 +149,38 @@ def brand_seo(brand, products, language):
     }
 
 
+# Home page <title> and og:title: brands from the menu (active brands with active models).
+# (pattern, word before the last brand); ru/en follow the home page texts ("JETOUR, SOUEAST, JAC и GEELY").
+HOME_TITLE = {
+    'uz': ("{brands} rasmiy dileri Toshkentda | Autoliga", " va "),
+    'ru': ("Официальный дилер {brands} в Ташкенте | Autoliga", " и "),
+    'en': ("Official {brands} dealer in Tashkent | Autoliga", " and "),
+}
+# Without any brand: the previous home titles
+HOME_TITLE_NO_BRANDS = {
+    'uz': "AUTOLIGA - rasmiy dilerlik va xizmat ko’rsatish markazlari tarmog’i",
+    'ru': "AUTOLIGA - сеть официальных дилерских и сервисных центров",
+    'en': "AUTOLIGA - network of official dealership and service centers",
+}
+HOME_TITLE_MAX = 65
+
+
+def home_title(brand_names, language):
+    """"Jetour, Soueast, JAC va Geely rasmiy dileri Toshkentda | Autoliga".
+    Longer than HOME_TITLE_MAX -> brands are dropped from the end (at least one stays)."""
+    lang = language if language in HOME_TITLE else 'uz'
+    pattern, last_joiner = HOME_TITLE[lang]
+    names = [name for name in (clean(n) for n in brand_names) if name]
+    if not names:
+        return HOME_TITLE_NO_BRANDS[lang]
+    while True:
+        brands = names[0] if len(names) == 1 else ', '.join(names[:-1]) + last_joiner + names[-1]
+        title = pattern.format(brands=brands)
+        if len(title) <= HOME_TITLE_MAX or len(names) == 1:
+            return title
+        names = names[:-1]
+
+
 BLOCK_TAG_RE = re.compile(r'<(?:br|hr|/?(?:p|div|li|ul|ol|h[1-6]|tr|td|th|blockquote|table))\b[^>]*>', re.I)
 
 

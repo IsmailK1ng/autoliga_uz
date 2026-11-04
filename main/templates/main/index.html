@@ -4,17 +4,14 @@
 {% load seo_tags %}
 
 
-{% block title %}
-    {% if LANGUAGE_CODE == 'ru' %}AUTOLIGA - сеть официальных дилерских и сервисных центров{% elif LANGUAGE_CODE == 'en' %}AUTOLIGA - network of official dealership and service centers{% else %}AUTOLIGA - rasmiy dilerlik va xizmat ko’rsatish markazlari tarmog’i{% endif %}
-{% endblock %}
+{# title = og:title: brands of the menu (active brands with active models), max 65 characters (main/seo.py home_title) #}
+{% block title %}{% home_title %}{% endblock %}
 
 {% block meta_description %}
     {% if LANGUAGE_CODE == 'ru' %}Автомобили JETOUR, SOUEAST, JAC и GEELY — в AUTOLIGA. От выбора автомобиля до покупки, от техобслуживания до ремонта — мы рядом на каждом этапе.{% elif LANGUAGE_CODE == 'en' %}JETOUR, SOUEAST, JAC and GEELY cars at AUTOLIGA. From choosing a car to buying it, from maintenance to repair — we are with you at every step.{% else %}JETOUR, SOUEAST, JAC va GEELY avtomobillari — AUTOLIGA’da. Avtomobil tanlashdan xaridgacha, texnik xizmatdan ta’mirlashgacha — har bir bosqichda yoningizdamiz.{% endif %}
 {% endblock %}
 
-{% block og_title %}
-    {% if LANGUAGE_CODE == 'ru' %}AUTOLIGA — сеть официальных автосалонов и сервисов{% elif LANGUAGE_CODE == 'en' %}AUTOLIGA — network of official car dealerships and services{% else %}AUTOLIGA — rasmiy avtosalonlar va servislar tarmog‘i{% endif %}
-{% endblock %}
+{% block og_title %}{% home_title %}{% endblock %}
 
 {% block og_description %}
     {% if LANGUAGE_CODE == 'ru' %}Автомобили JETOUR, SOUEAST, JAC и GEELY — в AUTOLIGA. От выбора автомобиля до покупки, от техобслуживания до ремонта — мы рядом на каждом этапе.{% elif LANGUAGE_CODE == 'en' %}JETOUR, SOUEAST, JAC and GEELY cars at AUTOLIGA. From choosing a car to buying it, from maintenance to repair — we are with you at every step.{% else %}JETOUR, SOUEAST, JAC va GEELY avtomobillari — AUTOLIGA’da. Avtomobil tanlashdan xaridgacha, texnik xizmatdan ta’mirlashgacha — har bir bosqichda yoningizdamiz.{% endif %}

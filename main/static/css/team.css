@@ -261,6 +261,8 @@
 }
 
 .team-modal-name {
+    font-family: var(--_font-accent); /* was inherited from the global h2 rule (the element is a div now) */
+    letter-spacing: -.06rem;
     font-size: 1.6rem;
     font-weight: 700;
     color: #1a1a1a;

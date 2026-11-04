@@ -4400,6 +4400,8 @@ html, body {
   transition: opacity 0.3s;
 }
 .ht3d-name {
+  font-family: var(--_font-accent); /* was inherited from the global h3 rule (the element is a div now) */
+  line-height: 1.2;
   font-size: 2.8rem;
   font-weight: 700;
   color: #1a1a1a;

@@ -190,8 +190,11 @@ def _page_seo(context):
         # a brand-filtered catalog (/products/?category=...) keeps the brand's own SEO
         brand_filter = url_name == 'products' and (request.GET.get('brand') or request.GET.get('category'))
         if url_name in PAGE_SEO_KEYS and not brand_filter:
-            from seo.models import PageSEO
-            page = PageSEO.objects.filter(page_key=url_name, is_active=True).first()
+            from django.db.models import Prefetch
+            from seo.models import FAQItem, PageSEO
+            page = (PageSEO.objects.filter(page_key=url_name, is_active=True)
+                    .prefetch_related(Prefetch('faq_items', queryset=FAQItem.objects.filter(is_active=True)))
+                    .first())
         request._page_seo = page
     return request._page_seo
 
@@ -207,6 +210,26 @@ def page_seo(context):
     data = page.meta(_jsonld_language(context))
     data['og_image'] = context['request'].build_absolute_uri(page.og_image.url) if page.og_image else ''
     return data
+
+
+@register.simple_tag(takes_context=True)
+def page_faq(context):
+    """{% page_faq as faqs %}: visible FAQ entries of a model page (view's product_faqs) or of a
+    static page (its active PageSEO). Same list for the block and for page_faq_jsonld."""
+    if context.get('product_faqs') is not None:
+        return context['product_faqs']
+    page = _page_seo(context)
+    if page is None:
+        return []
+    from main.seo import visible_faqs
+    return visible_faqs(page.faq_items.all())
+
+
+@register.simple_tag(takes_context=True)
+def page_faq_jsonld(context):
+    """FAQPage of the same entries as the visible block (page_faq); nothing without entries."""
+    entries = page_faq(context)
+    return mark_safe(sd.to_script(sd.faq_page([(e['question'], e['answer_text']) for e in entries])))
 
 
 @register.simple_tag(takes_context=True)

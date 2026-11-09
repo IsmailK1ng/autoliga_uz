@@ -1,0 +1,12 @@
+{# FAQ block (brand page, static pages, model page). The file has no final newline on purpose: the brand page renders byte-identical to its inline version. heading_class: class of the h2. faqs: objects or dicts with question and answer (HTML). #}{% if faqs %}
+                <!-- FAQ (FAQPage schema in structured_data) -->
+                <h2 class="{{ heading_class }}">{% if LANGUAGE_CODE == 'ru' %}Вопросы и ответы{% elif LANGUAGE_CODE == 'en' %}Frequently asked questions{% else %}Ko‘p beriladigan savollar{% endif %}</h2>
+                <div class="brand-faq">
+                    {% for faq in faqs %}
+                    <details>
+                        <summary><h3>{{ faq.question }}</h3></summary>
+                        <div class="brand-faq__answer">{{ faq.answer|safe }}</div>
+                    </details>
+                    {% endfor %}
+                </div>
+                {% endif %}

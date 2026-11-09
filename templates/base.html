@@ -162,7 +162,7 @@
 
     {% block inline_styles %}{% endblock %}
     {# Organization + BreadcrumbList (task 7); page-specific JSON-LD goes in structured_data #}
-    {% site_jsonld %}
+    {% site_jsonld %}{% page_faq_jsonld %}
     {% block structured_data %}
     {% endblock structured_data %}
 </head>

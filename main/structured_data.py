@@ -10,7 +10,8 @@ empty in the admin is left out of the markup; nothing is filled in by hand.
     Car             model page; AggregateOffer only when a trim has a price
     AutoDealer      /dealers/, /contact/ (every active dealer), /dealers/<pk>/
     NewsArticle     /news/<slug>/
-    FAQPage         /brand/<slug>/ (built in views.brand_detail)
+    FAQPage         /brand/<slug>/ (views.brand_detail), static pages and model pages
+                    (seo.FAQItem, seo_tags.page_faq_jsonld): only with a visible FAQ block
 """
 
 import json
@@ -331,3 +332,21 @@ def news_article(request, news, language, description=None):
     if news.updated_at:
         data['dateModified'] = news.updated_at.isoformat(timespec='seconds')
     return data
+
+
+# --------------------------------------------------------------------- FAQPage
+
+def faq_page(pairs):
+    """FAQPage for (question, answer text) pairs, exactly the items shown in the visible
+    FAQ block of the page; {} without items (to_script then outputs nothing)."""
+    if not pairs:
+        return {}
+    return {
+        '@context': 'https://schema.org',
+        '@type': 'FAQPage',
+        'mainEntity': [{
+            '@type': 'Question',
+            'name': question,
+            'acceptedAnswer': {'@type': 'Answer', 'text': answer},
+        } for question, answer in pairs],
+    }

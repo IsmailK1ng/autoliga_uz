@@ -33,7 +33,8 @@ from .dealer_info import dealer_card, group_by_region, map_embed_url
 from .images import image_info
 from .language import object_languages
 from .redirects import find_redirect
-from .seo import brand_seo, news_body_text, news_description, price_label, product_seo
+from .seo import brand_seo, news_body_text, news_description, price_label, product_seo, visible_faqs
+from .structured_data import faq_page
 
 
 logger = logging.getLogger('django')
@@ -232,6 +233,8 @@ def product_detail(request, product_id):
         'product': product,                      # ← SEO uchun asosiy
         'related_products': related_products,    # ← internal linking
         'seo': seo,                              # ← title, description, h1
+        # FAQ of the model (seo.FAQItem) in this language: visible block + FAQPage JSON-LD
+        'product_faqs': visible_faqs(product.faq_items.filter(is_active=True)),
         # task 14: a model without a title in this language is noindex,follow here
         'page_translated': translation.get_language() in object_languages(product),
         'product_id': product_id,                # ← eski kod uchun (agar JS ishlatsa)
@@ -655,15 +658,10 @@ def brand_detail(request, slug):
     faqs = [f for f in brand.faqs.filter(is_active=True) if (f.question or '').strip() and (f.answer or '').strip()]
     faq_jsonld = ''
     if faqs:
-        faq_jsonld = json.dumps({
-            '@context': 'https://schema.org',
-            '@type': 'FAQPage',
-            'mainEntity': [{
-                '@type': 'Question',
-                'name': ' '.join(f.question.split()),
-                'acceptedAnswer': {'@type': 'Answer', 'text': ' '.join(strip_tags(f.answer).split())},
-            } for f in faqs],
-        }, ensure_ascii=False).replace('</', '<\\/')
+        # same serialization as before the shared builder: the brand page stays byte-identical
+        faq_jsonld = json.dumps(faq_page(
+            [(' '.join(f.question.split()), ' '.join(strip_tags(f.answer).split())) for f in faqs]
+        ), ensure_ascii=False).replace('</', '<\\/')
 
     return render(request, 'main/brand_detail.html', {
         'brand': brand,

@@ -34,7 +34,7 @@
     {% hreflang_tags %}
     <!-- JSON-LD (task 7): Organization + BreadcrumbList + Car -->
     {% site_jsonld %}
-    {% if product %}{% car_jsonld product %}{% endif %}
+    {% if product %}{% car_jsonld product %}{% page_faq_jsonld %}{% endif %}
     <!-- VIEWPORT VA FAVICON -->
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -598,7 +598,7 @@
             </div>
         </div>
     </div>
-    <!-- O‘xshash modellar va test-drayv -->
+    {% include 'main/includes/page_faq.html' %}<!-- O‘xshash modellar va test-drayv -->
     <section class="mxd-section padding-blog">
         <div class="grid-container">
             {% if related_products %}

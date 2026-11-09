@@ -1,0 +1,37 @@
+/* =================================
+   FAQ block of the static pages and the model pages (main/includes/page_faq.html).
+   The .brand-faq rules are the same as the brand page's own (brand_detail.html, inline).
+   Own section, no .mxd-section: main_site.css zeroes its padding-top at <= 450px.
+   ================================= */
+.faq-section {
+    padding: 6rem 0;
+}
+
+.faq-section__inner {
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 0 24px;
+}
+
+.faq-section__heading {
+    margin: 0 0 2.4rem;
+    font-size: clamp(1.9rem, 2.4vw, 3.2rem);
+    overflow-wrap: anywhere;
+    hyphens: auto;
+}
+
+.brand-faq details { border-bottom: 1px solid #d9d9d9; padding: 1.6rem 0; }
+.brand-faq summary { cursor: pointer; list-style: none; }
+.brand-faq summary::-webkit-details-marker { display: none; }
+.brand-faq summary h3 { display: inline; font-size: 2.2rem; }
+.brand-faq__answer { padding-top: 1.2rem; max-width: 90rem; }
+
+@media (max-width: 767px) {
+    .faq-section {
+        padding: 4rem 0;
+    }
+
+    .faq-section__inner {
+        padding: 0 16px;
+    }
+}

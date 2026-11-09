@@ -201,6 +201,18 @@ def news_body_text(blocks, language=None):
     ))
 
 
+def visible_faqs(items):
+    """FAQ items (seo.FAQItem, current language, no fallback) as shown on a page and in its
+    FAQPage JSON-LD: only items with a question and an answer that has text.
+    -> [{'question', 'answer' (HTML), 'answer_text'}]"""
+    entries = []
+    for item in items:
+        question, answer_text = clean(item.question), html_to_text(item.answer)
+        if question and answer_text:
+            entries.append({'question': question, 'answer': item.answer, 'answer_text': answer_text})
+    return entries
+
+
 def news_description(news, body_text):
     """Task 9: seo_description from the admin, else the first 155 characters of
     the body, else the card text (desc), else the title."""

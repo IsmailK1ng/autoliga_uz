@@ -1,0 +1,10 @@
+{% comment %}FAQ block of a static page (before the footer) or a model page (before "O‘xshash modellar"), with
+   page_faq_jsonld in <head> built from the same entries. Nothing without entries; no final newline,
+   so a page without FAQ renders byte-identical.{% endcomment %}{% load static seo_tags %}{% page_faq as faqs %}{% if faqs %}
+<link rel="stylesheet" href="{% static 'css/faq.css' %}">
+<section class="faq-section">
+    <div class="faq-section__inner">
+        {% include 'main/includes/faq.html' with heading_class='faq-section__heading' %}
+    </div>
+</section>
+{% endif %}

@@ -361,6 +361,70 @@ Then point `main` back on your computer. Locally, revert both commits with `git 
 
 ---
 
+## SEO admin
+
+Three commits: `feat(seo): SEO admin section with page meta-data and FAQ models`, `feat(seo): static pages take title/description/og:image from the SEO admin` and `feat(seo): FAQ block and FAQPage JSON-LD on static and model pages`.
+- **One migration, `seo.0001_initial`:** two new tables, `seo_pageseo` and `seo_faqitem`. No existing table or row is changed.
+- **`collectstatic` IS required:** there is a new file, `css/faq.css`.
+- **Migrate BEFORE the restart.** The new code reads `seo_pageseo` on the 7 static pages and `seo_faqitem` on model pages. Without the tables those pages return **500**. Run `git pull` and `migrate` in one command line: Passenger can start a process on the new code at any time.
+- **What visitors see.** Nothing changes until values are entered in the admin (*SEO → SEO — мета-данные страниц / FAQ — вопросы и ответы*). Without rows, every page renders byte-identical.
+
+### 1. Backup (server)
+Run **"Before you start" (a)** at the top of this file (the DB dump). Then:
+```bash
+cd /home/autolig1/site
+git rev-parse HEAD > ~/backups/before_seo_admin_commit.txt
+```
+
+### 2. Code, migration, static, restart (server)
+```bash
+git status                                                        # must be clean
+git pull --ff-only origin main && python manage.py migrate --plan # the plan must list ONLY seo.0001_initial (Create model PageSEO,
+                                                                  # Create model FAQItem, Create constraint seo_faqitem_exactly_one_target)
+python manage.py migrate                                          # right away; only if the plan above was exactly that
+python manage.py showmigrations seo                               # [X] 0001_initial
+python manage.py collectstatic --noinput                          # required; never --clear (it would delete static/.htaccess)
+touch /home/autolig1/site/tmp/restart.txt                         # or cPanel Restart, AFTER migrate
+python manage.py check --deploy 2>&1 | tail -3
+tail -n 30 /home/autolig1/site/logs/errors.log                    # no "seo_pageseo" / "seo_faqitem" errors
+```
+If the plan lists anything besides `seo.0001_initial`, stop and check before migrating.
+
+### 3. Checks (Windows CMD)
+```bat
+for %u in (/ /ru/products/ /en/dealers/ /news/ /ru/contact/ /team/ /test-drive/ /products/<model>/ /brand/<brand>/) do @curl -s -o NUL -w "%{http_code} %u\n" https://autoliga.uz%u
+:: 200 on every line (500 = migrate was not run)
+curl -s https://autoliga.uz/ru/ | findstr /c:"<title>"
+:: the automatic title "Официальный дилер … в Ташкенте | Autoliga" (no admin value yet)
+curl -s -o NUL -w "%{http_code} %{content_type}\n" https://autoliga.uz/static/css/faq.css
+:: 200 text/css  (404 = collectstatic was not run)
+curl -s -o NUL -w "%{http_code}\n" https://autoliga.uz/admin/seo/pageseo/
+:: 302 (to the admin login)
+```
+In the admin (superuser): the sidebar has a new **SEO** section. Optionally test with a real value:
+- add a page "Контакты" with a uz title of 30–65 characters;
+- run `curl -s https://autoliga.uz/contact/ | findstr /c:"<title>" /c:"og:title"`: both show the new title;
+- add one FAQ to it, then run `curl -s https://autoliga.uz/contact/ | findstr /c:"faq-section" /c:"FAQPage"`: 2 lines;
+- untick "Активна" and the page is back to its default title, with no FAQ.
+
+Restricted editors need these permissions, ticked under *Users and groups*: `seo | view/add/change pageseo`, `seo | view/add/change faqitem`; for the FAQ inline on a model also `main | view/change product`. The delete permissions are optional.
+
+### 4. Rollback
+Code and static only:
+```bash
+cd /home/autolig1/site
+git checkout --detach $(cat ~/backups/before_seo_admin_commit.txt)
+python manage.py collectstatic --noinput     # the unused css/faq.css can stay
+touch /home/autolig1/site/tmp/restart.txt
+```
+The `seo_pageseo` and `seo_faqitem` tables stay. The old code never reads them, and a later redeploy finds its data again.
+- **One exception.** `seo_faqitem.product_id` is a database foreign key to `main_product`. While the old code runs, deleting a **model that has FAQ items** fails with an IntegrityError. Before deleting such a model, remove its FAQ rows with `DELETE FROM seo_faqitem WHERE product_id = <id>;`.
+- To remove the tables completely instead, run `python manage.py migrate seo zero` **before** the `git checkout` above, while the new code is still in place. That deletes all SEO admin data.
+
+Then point `main` back on your computer.
+
+---
+
 ## After the deploy (manual steps)
 
 ### A. Soueast slug (after Stage 1 is live)

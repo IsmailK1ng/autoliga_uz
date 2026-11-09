@@ -139,6 +139,34 @@
     }
 }
 
+/* "O'xshash modellar": the bare .grid-container has no padding on this page; same padding as
+   .mxd-container.grid-container, and one image box for every card (photos of any shape fit whole) */
+.related-models .grid-container {
+    padding: 0 1.5rem;
+}
+
+@media only screen and (min-width: 768px) {
+    .related-models .grid-container {
+        padding: 0 4.5rem;
+    }
+}
+
+@media only screen and (min-width: 1600px) {
+    .related-models .grid-container {
+        padding: 0 7.5rem;
+    }
+}
+
+.related-models__img {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 16 / 10;
+    object-fit: contain;
+    padding: 16px;
+    box-sizing: border-box;
+}
+
     </style>
     <link rel="stylesheet" href="{% static 'css/large_screens.css' %}">
 </head>
@@ -600,7 +628,7 @@
         </div>
     </div>
     {% include 'main/includes/page_faq.html' %}<!-- O‘xshash modellar va test-drayv -->
-    <section class="mxd-section padding-blog">
+    <section class="mxd-section padding-blog related-models">
         <div class="grid-container">
             {% if related_products %}
                 <h2>
@@ -614,9 +642,9 @@
                             <a href="{{ related_product.get_absolute_url }}"
                                style="display:block;color:inherit;text-decoration:none;">
                                 {% if related_product.card_image %}
-                                    {% responsive_img related_product.card_image alt=related_product.image_alt sizes="(max-width: 768px) 92vw, 320px" style="width:100%;aspect-ratio:16/10;object-fit:cover;" %}
+                                    {% responsive_img related_product.card_image alt=related_product.image_alt sizes="(max-width: 768px) 92vw, 320px" class_="related-models__img" %}
                                 {% elif related_product.main_image %}
-                                    {% responsive_img related_product.main_image alt=related_product.image_alt sizes="(max-width: 768px) 92vw, 320px" style="width:100%;aspect-ratio:16/10;object-fit:cover;" %}
+                                    {% responsive_img related_product.main_image alt=related_product.image_alt sizes="(max-width: 768px) 92vw, 320px" class_="related-models__img" %}
                                 {% endif %}
                                 <div style="padding:18px;">
                                     <h3>{{ related_product.title }}</h3>

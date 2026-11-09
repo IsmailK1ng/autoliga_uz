@@ -92,6 +92,14 @@
         max-width: none;
     }
 
+    /* Footer column titles on one line: the card text room is cap/4 - 94.5px (346px from 2080, 386px at
+       1920) and "Социальные сети" needs 367px at 4.16rem, so the size follows the cap: 4.16rem up to
+       ~1990, 38.9px from 2080 (2px spare for the widest title); no jump at the breakpoint */
+    .footer-blocks__title-l {
+        font-size: min(4.16rem, calc(var(--site-cap) * 0.0283 - 10.95px));
+        white-space: nowrap;
+    }
+
     /* ---- header pill: content width, centered; 15px inside it once scrolled ---- */
     #header {
         max-width: var(--site-cap);

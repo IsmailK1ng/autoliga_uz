@@ -173,6 +173,42 @@ def language_links(context):
     return links
 
 
+# ---------------------------------------------------------------- admin meta-data of the static pages (seo.PageSEO)
+
+# The page keys are the URL names
+PAGE_SEO_KEYS = {'home', 'products', 'dealers', 'news', 'contact', 'team', 'test_drive'}
+
+
+def _page_seo(context):
+    """Active seo.PageSEO of this static page, or None. One query per request (cached on it)."""
+    request = context.get('request')
+    if request is None:
+        return None
+    if not hasattr(request, '_page_seo'):
+        page = None
+        url_name = request.resolver_match.url_name if request.resolver_match else None
+        # a brand-filtered catalog (/products/?category=...) keeps the brand's own SEO
+        brand_filter = url_name == 'products' and (request.GET.get('brand') or request.GET.get('category'))
+        if url_name in PAGE_SEO_KEYS and not brand_filter:
+            from seo.models import PageSEO
+            page = PageSEO.objects.filter(page_key=url_name, is_active=True).first()
+        request._page_seo = page
+    return request._page_seo
+
+
+@register.simple_tag(takes_context=True)
+def page_seo(context):
+    """{% page_seo as pseo %}: title / description / og_image (absolute URL) set in the admin for
+    this static page. Only values that pass the length rules; '' otherwise, so the template
+    default stays (on / that is home_title). robots, canonical and hreflang are not affected."""
+    page = _page_seo(context)
+    if page is None:
+        return {}
+    data = page.meta(_jsonld_language(context))
+    data['og_image'] = context['request'].build_absolute_uri(page.og_image.url) if page.og_image else ''
+    return data
+
+
 @register.simple_tag(takes_context=True)
 def home_title(context):
     """Home page <title> / og:title with the brands of the menu (same SITE_MENU, no extra query)."""

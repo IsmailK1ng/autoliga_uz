@@ -13,12 +13,12 @@
     <meta name="google-site-verification" content="8U0gm09f4g_DQmV00mUaZgV_M7i5M2pVK3YxgEJFccM">
     <meta name="yandex-verification" content="94b77cac54c4bd00">
 
-    <!-- Asosiy SEO -->
-    <title>{% block title %}AUTOLIGA — rasmiy avtosalonlar va servislar tarmog‘i{% endblock %}</title>
+    <!-- Asosiy SEO -->{# static pages: a valid admin value (seo.PageSEO) wins, else the page's own block below #}{% page_seo as pseo %}
+    <title>{% if pseo.title %}{{ pseo.title }}{% else %}{% block title %}AUTOLIGA — rasmiy avtosalonlar va servislar tarmog‘i{% endblock %}{% endif %}</title>
 
     <meta
         name="description"
-        content="{% block meta_description %}JETOUR, SOUEAST, JAC va GEELY avtomobillari — AUTOLIGA’da. Avtomobil tanlashdan xaridgacha, texnik xizmatdan ta’mirlashgacha — yoningizdamiz.{% endblock %}"
+        content="{% if pseo.description %}{{ pseo.description }}{% else %}{% block meta_description %}JETOUR, SOUEAST, JAC va GEELY avtomobillari — AUTOLIGA’da. Avtomobil tanlashdan xaridgacha, texnik xizmatdan ta’mirlashgacha — yoningizdamiz.{% endblock %}{% endif %}"
     >
 
     <!-- OpenGraph -->
@@ -28,15 +28,15 @@
     >
     <meta
         property="og:title"
-        content="{% block og_title %}AUTOLIGA — rasmiy avtosalonlar va servislar tarmog‘i{% endblock %}"
+        content="{% if pseo.title %}{{ pseo.title }}{% else %}{% block og_title %}AUTOLIGA — rasmiy avtosalonlar va servislar tarmog‘i{% endblock %}{% endif %}"
     >
     <meta
         property="og:description"
-        content="{% block og_description %}JETOUR, SOUEAST, JAC va GEELY avtomobillari — AUTOLIGA’da. Avtomobil tanlashdan xaridgacha, texnik xizmatdan ta’mirlashgacha — yoningizdamiz.{% endblock %}"
+        content="{% if pseo.description %}{{ pseo.description }}{% else %}{% block og_description %}JETOUR, SOUEAST, JAC va GEELY avtomobillari — AUTOLIGA’da. Avtomobil tanlashdan xaridgacha, texnik xizmatdan ta’mirlashgacha — yoningizdamiz.{% endblock %}{% endif %}"
     >
     <meta
         property="og:image"
-        content="{% block og_image %}{{ request.scheme }}://{{ request.get_host }}{% static 'images/logo/autoliga-logo.png' %}{% endblock %}"
+        content="{% if pseo.og_image %}{{ pseo.og_image }}{% else %}{% block og_image %}{{ request.scheme }}://{{ request.get_host }}{% static 'images/logo/autoliga-logo.png' %}{% endblock %}{% endif %}"
     >
     <meta
         property="og:url"

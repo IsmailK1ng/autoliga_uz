@@ -426,6 +426,69 @@ Then point `main` back on your computer.
 
 ---
 
+## Large screens
+
+Three commits on top of `7574a46`:
+- `feat(layout): one centered content width above 1920px`
+- `fix(model page): "O'xshash modellar" padding and uniform image boxes`
+- `fix(layout): footer column title stays on one line above 1920px`
+
+What the deploy involves:
+- **No migrations, no new packages.**
+- **`collectstatic` IS required.** There is a new file, `css/large_screens.css`, linked last in `<head>` of every page.
+- **What visitors see.**
+  - Wider than 1920px: the content (header, titles, cards, forms, footer columns) sits in one centered column, at most 1760px wide. Backgrounds, hero photos and marquees still span the screen.
+  - 1920px and narrower: nothing changes, except on model pages, where "O'xshash modellar" gets side padding and its images show whole, no longer cropped.
+
+### 1. Backup (server)
+```bash
+cd /home/autolig1/site
+git rev-parse HEAD > ~/backups/before_large_screens_commit.txt   # should be 7574a46...
+```
+
+### 2. Code, static, restart (server)
+```bash
+git status && git pull --ff-only origin main && git log -4 --oneline   # the three commits above, then 7574a46
+python manage.py migrate --plan                                       # "No planned migration operations."
+python manage.py collectstatic --noinput                              # required; never --clear (it would delete static/.htaccess)
+touch /home/autolig1/site/tmp/restart.txt                             # or cPanel Restart
+tail -n 30 /home/autolig1/site/logs/errors.log
+```
+
+### 3. Checks (Windows CMD)
+```bat
+curl -s -o NUL -w "%{http_code} %{content_type}\n" https://autoliga.uz/static/css/large_screens.css
+:: 200 text/css  (404 = collectstatic was not run)
+curl -s https://autoliga.uz/static/css/large_screens.css | find /c "footer-blocks__title-l"
+:: 1  (the latest file was collected; 0 = an older copy is still served)
+for %u in (/ /ru/products/ /en/dealers/ /news/ /contact/ /team/ /test-drive/ /privacy/ /products/<model>/ /brand/<brand>/) do @curl -s https://autoliga.uz%u | find /c "css/large_screens.css"
+:: 1 on every line (the stylesheet is linked once on each page, the model page included)
+curl -s https://autoliga.uz/products/<model>/ | find /c "related-models"
+:: 5 or more  (the class on the section, the model page's own rules and one per card image)
+```
+In a browser (private window):
+- **Wide screen.** On a screen wider than 1920px, or with the browser zoom at 67–75% on a 1920 monitor:
+  - the header, the titles, the hero_xl slider and the footer columns start at the same left edge;
+  - there is no horizontal scrollbar;
+  - "Ijtimoiy tarmoqlar" in the footer is on one line;
+  - once scrolled, the header pill stays inside the content.
+- **At 100% zoom on 1920 and on a phone:** the pages look exactly as before.
+- **A model page:** "O'xshash modellar" no longer touches the screen edge, and the card images are not cropped.
+
+Static files are cached for a day (`max-age=86400`). Until then, a returning visitor may get the new HTML without the stylesheet: wide screens then show the old layout, and nothing breaks. The model page's related-models change is in the HTML itself, so it shows at once. If the Engintron cache serves old HTML, wait a few minutes or purge it.
+
+### 4. Rollback
+No database changes are involved, so code and static only:
+```bash
+cd /home/autolig1/site
+git checkout --detach 7574a46        # = $(cat ~/backups/before_large_screens_commit.txt)
+python manage.py collectstatic --noinput     # nothing links the leftover css/large_screens.css any more; it can stay
+touch /home/autolig1/site/tmp/restart.txt
+```
+Then point `main` back on your computer. Locally, revert the three commits in reverse order with `git revert <footer commit> <related models commit> <layout commit>`.
+
+---
+
 ## After the deploy (manual steps)
 
 ### A. Soueast slug (after Stage 1 is live)

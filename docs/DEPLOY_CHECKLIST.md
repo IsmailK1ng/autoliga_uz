@@ -366,7 +366,8 @@ Then point `main` back on your computer. Locally, revert both commits with `git 
 Three commits: `feat(seo): SEO admin section with page meta-data and FAQ models`, `feat(seo): static pages take title/description/og:image from the SEO admin` and `feat(seo): FAQ block and FAQPage JSON-LD on static and model pages`.
 - **One migration, `seo.0001_initial`:** two new tables, `seo_pageseo` and `seo_faqitem`. No existing table or row is changed.
 - **`collectstatic` IS required:** there is a new file, `css/faq.css`.
-- **Migrate BEFORE the restart.** The new code reads `seo_pageseo` on the 7 static pages and `seo_faqitem` on model pages. Without the tables those pages return **500**. Run `git pull` and `migrate` in one command line: Passenger can start a process on the new code at any time.
+- **Migrate BEFORE the restart.** The new code reads `seo_pageseo` on the 7 static pages and `seo_faqitem` on model pages. Run `git pull` and `migrate` in one command line: Passenger can start a process on the new code at any time.
+- **Safety net, not a reason to skip the order.** If the tables are missing, these pages still render with their template defaults and no FAQ (`seo/fallback.py`). Each such request logs one warning, `seo tables not readable (is migrate seo applied?)`. It goes to the app's stderr log (cPanel *Setup Python App* → stderr log), not to `logs/errors.log`, which keeps only ERROR. Any other database error is still raised. Until `migrate` runs, the admin's SEO section and the FAQ inline on models do not work either.
 - **What visitors see.** Nothing changes until values are entered in the admin (*SEO → SEO — мета-данные страниц / FAQ — вопросы и ответы*). Without rows, every page renders byte-identical.
 
 ### 1. Backup (server)
@@ -393,7 +394,7 @@ If the plan lists anything besides `seo.0001_initial`, stop and check before mig
 ### 3. Checks (Windows CMD)
 ```bat
 for %u in (/ /ru/products/ /en/dealers/ /news/ /ru/contact/ /team/ /test-drive/ /products/<model>/ /brand/<brand>/) do @curl -s -o NUL -w "%{http_code} %u\n" https://autoliga.uz%u
-:: 200 on every line (500 = migrate was not run)
+:: 200 on every line (a 500 here is not the seo tables: the fallback covers them; check logs/errors.log)
 curl -s https://autoliga.uz/ru/ | findstr /c:"<title>"
 :: the automatic title "Официальный дилер … в Ташкенте | Autoliga" (no admin value yet)
 curl -s -o NUL -w "%{http_code} %{content_type}\n" https://autoliga.uz/static/css/faq.css

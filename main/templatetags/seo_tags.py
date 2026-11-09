@@ -180,7 +180,8 @@ PAGE_SEO_KEYS = {'home', 'products', 'dealers', 'news', 'contact', 'team', 'test
 
 
 def _page_seo(context):
-    """Active seo.PageSEO of this static page, or None. One query per request (cached on it)."""
+    """Active seo.PageSEO of this static page, or None. One query per request (cached on it,
+    a missing seo table included: None, so the template defaults stay)."""
     request = context.get('request')
     if request is None:
         return None
@@ -191,10 +192,13 @@ def _page_seo(context):
         brand_filter = url_name == 'products' and (request.GET.get('brand') or request.GET.get('category'))
         if url_name in PAGE_SEO_KEYS and not brand_filter:
             from django.db.models import Prefetch
+            from seo import fallback
             from seo.models import FAQItem, PageSEO
-            page = (PageSEO.objects.filter(page_key=url_name, is_active=True)
-                    .prefetch_related(Prefetch('faq_items', queryset=FAQItem.objects.filter(is_active=True)))
-                    .first())
+            page = fallback.read(lambda: (
+                PageSEO.objects.filter(page_key=url_name, is_active=True)
+                .prefetch_related(Prefetch('faq_items', queryset=FAQItem.objects.filter(is_active=True)))
+                .first()
+            ), None)
         request._page_seo = page
     return request._page_seo
 

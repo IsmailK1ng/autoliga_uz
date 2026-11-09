@@ -35,6 +35,7 @@ from .language import object_languages
 from .redirects import find_redirect
 from .seo import brand_seo, news_body_text, news_description, price_label, product_seo, visible_faqs
 from .structured_data import faq_page
+from seo import fallback as seo_fallback
 
 
 logger = logging.getLogger('django')
@@ -234,7 +235,7 @@ def product_detail(request, product_id):
         'related_products': related_products,    # ← internal linking
         'seo': seo,                              # ← title, description, h1
         # FAQ of the model (seo.FAQItem) in this language: visible block + FAQPage JSON-LD
-        'product_faqs': visible_faqs(product.faq_items.filter(is_active=True)),
+        'product_faqs': seo_fallback.read(lambda: visible_faqs(product.faq_items.filter(is_active=True)), []),
         # task 14: a model without a title in this language is noindex,follow here
         'page_translated': translation.get_language() in object_languages(product),
         'product_id': product_id,                # ← eski kod uchun (agar JS ishlatsa)

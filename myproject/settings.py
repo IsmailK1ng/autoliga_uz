@@ -67,7 +67,8 @@ INSTALLED_APPS = [
     'reversion',
     'sorl.thumbnail',
     # Приложения проектов
-    'main',  
+    'main',
+    'seo',                  # SEO section of the admin: page meta-data + FAQ
 
     'captcha', 
 
@@ -167,10 +168,15 @@ JAZZMIN_SETTINGS = {
         "main.Dealer": "fas fa-store",
         "main.DealerService": "fas fa-cogs",
         "main.Review": "fas fa-comments",
+
+        "seo": "fas fa-search",
+        "seo.PageSEO": "fas fa-file-alt",
+        "seo.FAQItem": "fas fa-question-circle",
     },
-    
+
     "order_with_respect_to": [
         "main",
+        "seo",
         "auth",
     ],
     

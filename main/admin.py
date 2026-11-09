@@ -28,6 +28,7 @@ from urllib.parse import unquote
 # ========== ЛОКАЛЬНЫЕ ИМПОРТЫ ==========
 from .models import *
 from main.services.amocrm.token_manager import TokenManager
+from seo.inlines import ProductFAQInline
 logger = logging.getLogger('django')
 
 # ========== НАСТРОЙКИ АДМИНКИ ==========
@@ -1004,6 +1005,7 @@ class ProductAdmin(ContentAdminMixin, CustomReversionMixin, VersionAdmin, Tabbed
     ProductFeatureInline,
     ProductCardSpecInline,
     ProductGalleryInline,
+    ProductFAQInline,
 ]
     
     def thumbnail(self, obj):

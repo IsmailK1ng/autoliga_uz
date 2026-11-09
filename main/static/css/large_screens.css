@@ -1,0 +1,105 @@
+/* =================================
+   LARGE SCREENS (> 1920px): one centered content width on every page.
+
+   Everything is inside min-width:1921px, so 1920 and below render exactly as before.
+   Linked last in <head> (base.html, product_detail.html), so these rules win over the page
+   sheets at equal specificity; the model trims (1440px, more specific) keep their width.
+
+   --site-cap is the content width: 1919px at 1921, --site-max from 2080 up, so the content
+   glides in (no jump at the breakpoint). Every block keeps the side offsets it has at 1920,
+   now measured from the --site-cap edges instead of the screen edges:
+     - blocks that span the screen at 1920: max-width --site-cap, centered (own padding kept);
+     - blocks with a side margin m at 1920: margin (100% - cap) / 2 + m;
+     - overlays positioned in % of the screen: the same px offset from the cap edge.
+   Full-bleed on purpose: section backgrounds, hero photos/video, the hero_xl mesh, the
+   marquees (news title, reviews), the footer's giant text.
+   ================================= */
+:root {
+    --site-max: 1760px;
+}
+
+@media only screen and (min-width: 1921px) {
+    :root {
+        --site-cap: max(var(--site-max), calc(3840px - 100vw));
+    }
+
+    /* ---- content blocks that span the screen at 1920 ---- */
+    .mxd-container:not(.fullwidth-container),       /* theme container: capped at 1920 but never centered */
+    :where(.mxd-section) > .grid-container,         /* catalog, model page sections, brand / contact / team / legal */
+    .mxd-section-filter,                            /* breadcrumbs */
+    .mxd-hero-06__headline,                         /* /products/ title; home: the round badge */
+    .mxd-card-grid,                                 /* /news/ cards (its 14rem padding stays) */
+    .mxd-block > .mxd-blog-pagination,              /* /news/ pagination */
+    .mxd-footer__footer-blocks,
+    .ht3d-wrapper {                                 /* home team carousel: its arrows sit 20px inside it */
+        max-width: var(--site-cap);
+        margin-inline: auto;
+    }
+
+    /* Home "Mijozlarimiz fikri" and "Bizning jamoa" headings: inline max-width:1200px, centered text */
+    .mxd-container[style*="max-width:1200px"] {
+        max-width: var(--site-cap) !important;
+    }
+
+    /* ---- blocks with a side margin at 1920 ---- */
+    main[data-product-ssr] .mxd-hero-06__top {      /* model page hero: 100px */
+        margin-inline: calc((100% - var(--site-cap)) / 2 + 100px);
+    }
+
+    .section-galery {                               /* model page gallery: 80px */
+        margin-inline: calc((100% - var(--site-cap)) / 2 + 80px);
+    }
+
+    .mxd-section > .mxd-blog-pagination {           /* /products/ pagination: 65px */
+        margin-inline: calc((100% - var(--site-cap)) / 2 + 65px);
+    }
+
+    /* /products/ cards: minmax(450px) needs 1860px for the 4 columns it has at 1920; inside the cap
+       the column minimum is the card's own max-width (420px), so the row keeps 4 cards */
+    .faw-truck-card-container {
+        grid-template-columns: repeat(auto-fit, minmax(min(420px, 100%), 1fr));
+    }
+
+    /* ---- home showroom hero: the photo stays full-bleed, its overlay follows the cap edge ---- */
+    .brand-sidebar {                                /* 4% of 1920 */
+        left: calc((100% - var(--site-cap)) / 2 + 76.8px);
+    }
+
+    .scroll-controls {                              /* 1% of 1920 */
+        left: calc((100% - var(--site-cap)) / 2 + 19.2px);
+    }
+
+    .model-panel {                                  /* 15% of 1920 */
+        left: calc((100% - var(--site-cap)) / 2 + 288px);
+    }
+
+    /* ---- hero_xl: 1600px at 1920 -> --site-max at 2080; the padding goes 76.8px (4vw) -> 7.5rem,
+       the .grid-container padding, so the slides and the rail start where the section titles do ---- */
+    .hx-inner {
+        max-width: clamp(1600px, calc(100vw - 320px), var(--site-max));
+        padding-inline: max(7.5rem, calc(98.4px - 1.125vw));
+    }
+
+    /* FAQ block: 1440px / 24px at 1920 -> the content width / the section title offset (7.5rem) at 2240,
+       no jump at the breakpoint. faq.css is linked in <body> (page_faq.html), hence the extra class. */
+    .faq-section > .faq-section__inner {
+        max-width: clamp(1440px, calc(100vw - 480px), var(--site-cap));
+        padding-inline: clamp(24px, calc(24px + (100vw - 1920px) * 0.159375), 7.5rem);
+    }
+
+    /* ---- footer: the giant AUTOLIGA text spans the screen, the columns follow the content ---- */
+    .mxd-footer {
+        max-width: none;
+    }
+
+    /* ---- header pill: content width, centered; 15px inside it once scrolled ---- */
+    #header {
+        max-width: var(--site-cap);
+        margin-inline: auto;
+    }
+
+    #header.scrolled {
+        max-width: calc(var(--site-cap) - 30px);
+        margin-inline: auto;
+    }
+}

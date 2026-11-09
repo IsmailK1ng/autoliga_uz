@@ -161,6 +161,7 @@
     </style>
 
     {% block inline_styles %}{% endblock %}
+    <link rel="stylesheet" href="{% static 'css/large_screens.css' %}">
     {# Organization + BreadcrumbList (task 7); page-specific JSON-LD goes in structured_data #}
     {% site_jsonld %}{% page_faq_jsonld %}
     {% block structured_data %}

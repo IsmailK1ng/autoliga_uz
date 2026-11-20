@@ -33,7 +33,7 @@ from .dealer_info import dealer_card, group_by_region, map_embed_url
 from .images import image_info
 from .language import object_languages
 from .redirects import find_redirect
-from .seo import brand_seo, news_body_text, news_description, price_label, product_seo, visible_faqs
+from .seo import brand_seo, min_trim_price, news_body_text, news_description, price_label, product_seo, visible_faqs
 from .structured_data import faq_page
 from seo import fallback as seo_fallback
 
@@ -236,6 +236,7 @@ def product_detail(request, product_id):
         'seo': seo,                              # ← title, description, h1
         # FAQ of the model (seo.FAQItem) in this language: visible block + FAQPage JSON-LD
         'product_faqs': seo_fallback.read(lambda: visible_faqs(product.faq_items.filter(is_active=True)), []),
+        'price_from': min_trim_price(product) or 0,  # view_model dataLayer event (UZS)
         # task 14: a model without a title in this language is noindex,follow here
         'page_translated': translation.get_language() in object_languages(product),
         'product_id': product_id,                # ← eski kod uchun (agar JS ishlatsa)

@@ -32,9 +32,9 @@ data: <img>, so nothing is downloaded below 1200px. Only slide 1 has srcset; her
             {% endif %}
           </div>
           <div class="hx-actions hx-anim hx-d4">
-            <a class="hx-btn hx-btn--primary" href="{{ s.url }}#narxlar">{{ t_ask_price }}<span class="hx-vh"> — {{ s.title }}</span></a>
+            <a class="hx-btn hx-btn--primary" href="{{ s.url }}#narxlar" data-track="price_button" data-model="{{ s.slug }}">{{ t_ask_price }}<span class="hx-vh"> — {{ s.title }}</span></a>
             <a class="hx-btn hx-btn--outline" href="{{ s.url }}">{{ t_details }}<span class="hx-vh"> — {{ s.title }}</span></a>
-            <a class="hx-link" href="{% url 'test_drive' %}?model={{ s.slug|urlencode }}">{{ t_test_drive }}<span class="hx-vh"> — {{ s.title }}</span></a>
+            <a class="hx-link" href="{% url 'test_drive' %}?model={{ s.slug|urlencode }}" data-track="test_drive_button" data-model="{{ s.slug }}">{{ t_test_drive }}<span class="hx-vh"> — {{ s.title }}</span></a>
           </div>
         </div>
         <div class="hx-slide__car">

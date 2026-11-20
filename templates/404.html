@@ -55,7 +55,7 @@
                     <li><a href="{% url 'home' %}">{% if LANGUAGE_CODE == 'ru' %}Главная{% elif LANGUAGE_CODE == 'en' %}Home{% else %}Bosh sahifa{% endif %}</a></li>
                     <li><a href="{% url 'products' %}">{% if LANGUAGE_CODE == 'ru' %}Каталог моделей{% elif LANGUAGE_CODE == 'en' %}Model catalog{% else %}Modellar katalogi{% endif %}</a></li>
                     <li><a href="{% url 'dealers' %}">{% if LANGUAGE_CODE == 'ru' %}Дилеры{% elif LANGUAGE_CODE == 'en' %}Dealers{% else %}Dilerlar{% endif %}</a></li>
-                    <li><a href="{% url 'test_drive' %}">{% if LANGUAGE_CODE == 'ru' %}Тест-драйв{% elif LANGUAGE_CODE == 'en' %}Test drive{% else %}Test-drayv{% endif %}</a></li>
+                    <li><a href="{% url 'test_drive' %}" data-track="test_drive_button">{% if LANGUAGE_CODE == 'ru' %}Тест-драйв{% elif LANGUAGE_CODE == 'en' %}Test drive{% else %}Test-drayv{% endif %}</a></li>
                     <li><a href="{% url 'news' %}">{% if LANGUAGE_CODE == 'ru' %}Новости{% elif LANGUAGE_CODE == 'en' %}News{% else %}Yangiliklar{% endif %}</a></li>
                     <li><a href="{% url 'contact' %}">{% if LANGUAGE_CODE == 'ru' %}Контакты{% elif LANGUAGE_CODE == 'en' %}Contacts{% else %}Aloqa{% endif %}</a></li>
                 </ul>

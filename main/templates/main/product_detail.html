@@ -7,6 +7,17 @@
     <meta charset="UTF-8">
     {# own <head> (does not extend base.html): the same single GTM + analytics includes #}
     {% include 'main/includes/gtm_head.html' %}
+    {% include 'main/includes/datalayer_events.html' %}
+    {# view_model for GTM (docs/GA4_DATALAYER_EVENTS.md); price_from: lowest active trim price in UZS, 0 when none #}
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        window.dataLayer.push({
+            event: 'view_model',
+            car_model: '{{ product.slug|escapejs }}',
+            car_brand: '{{ product.category.slug|default:""|escapejs }}',
+            price_from: {{ price_from|default:0|unlocalize }}
+        });
+    </script>
     {% include 'main/includes/analytics.html' %}
     <!-- META — AUTOLIGA SEO -->
     <title>{{ seo.title }}</title>
@@ -257,7 +268,8 @@
                                         </strong>
                                     </div>
                                     <a class="btn btn-anim btn-default btn-mobile-icon btn-outline slide-right-up mt-3"
-                                       href="#faw-main-contact-modal" aria-label="Narxini bilish">
+                                       href="#faw-main-contact-modal" aria-label="Narxini bilish"
+                                       data-track="price_button" data-model="{{ product.slug }}">
                                         <span class="btn-caption">
                                             {% if LANGUAGE_CODE == 'ru' %}Узнать цену
                                             {% elif LANGUAGE_CODE == 'en' %}Get a Quote
@@ -659,7 +671,8 @@
             {% endif %}
             <div style="margin-top:32px;">
                 <a class="btn btn-anim btn-default btn-outline slide-right-up"
-                   href="{% url 'test_drive' %}?model={{ product.slug|urlencode }}">
+                   href="{% url 'test_drive' %}?model={{ product.slug|urlencode }}"
+                   data-track="test_drive_button" data-model="{{ product.slug }}">
                     <span class="btn-caption">
                         {% if LANGUAGE_CODE == 'ru' %}Записаться на тест-драйв
                         {% elif LANGUAGE_CODE == 'en' %}Book a test drive
@@ -700,7 +713,7 @@
                 {% else %}Ma’lumotlaringizni qoldiring. AUTOLIGA mutaxassisi tanlagan avtomobilingiz bo‘yicha savollaringizga javob beradi.{% endif %}
             </p>
         </div>
-        <form class="faw-modal__form" id="faw-contact-form">
+        <form class="faw-modal__form" id="faw-contact-form" data-car-model="{{ product.slug }}" data-car-brand="{{ product.category.slug|default:'' }}">
             {% csrf_token %}
             <input type="hidden" name="project_name" value="autoliga.uz">
             <input type="hidden" name="admin_email" value="{{ SITE_CONTACTS.email }}">
@@ -856,6 +869,16 @@
         }
         const statusText = statusBlock.querySelector('.faw-form__status-text') || statusBlock;
 
+        // GTM dataLayer context ("Narxini bilish" form): slugs only, never what the visitor typed
+        const trackCtx = () => ({
+            form_type: 'price',
+            car_model: contactForm.dataset.carModel || '',
+            car_brand: contactForm.dataset.carBrand || '',
+            dealer: '',
+            page_type: 'product',
+        });
+        window.autoligaTrack?.watchFormStart(contactForm, trackCtx);
+
         function openModal() {
             modal.classList.add('active');
             document.body.style.overflow = 'hidden';
@@ -865,7 +888,9 @@
             }
             if (window.currentProductTitle && messageTextarea) {
                 messageTextarea.value = `Men ${window.currentProductTitle} modeliga qiziqaman.\n\nQo'shimcha savollar: `;
-                messageTextarea.focus();
+                // focus from script is not the visitor starting the form (form_start)
+                if (window.autoligaTrack) window.autoligaTrack.quietFocus(contactForm, messageTextarea);
+                else messageTextarea.focus();
                 messageTextarea.setSelectionRange(messageTextarea.value.length, messageTextarea.value.length);
             }
         }
@@ -948,9 +973,7 @@
                 } catch (_error) {}
 
                 if (response.ok) {
-                    (window.dataLayer = window.dataLayer || []).push({
-                        event: "lead_form_submitted"
-                    });
+                    window.autoligaTrack?.leadSubmit(trackCtx());
                     showStatus("✅ Xabar yuborildi! Tez orada siz bilan bog'lanamiz.", "success");
                     contactForm.reset();
 

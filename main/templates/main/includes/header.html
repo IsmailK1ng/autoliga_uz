@@ -92,7 +92,7 @@
                                     </a>
                                 </li>
                                 <li class="main-menu__item{% if request.resolver_match.url_name == 'test_drive' %} active{% endif %}">
-                                    <a class="main-menu__link btn" href="{% url 'test_drive' %}">
+                                    <a class="main-menu__link btn" href="{% url 'test_drive' %}" data-track="test_drive_button">
                                         <span class="btn-caption">{% if LANGUAGE_CODE == 'ru' %}Тест-драйв{% elif LANGUAGE_CODE == 'en' %}Test drive{% else %}Test-drayv{% endif %}</span>
                                     </a>
                                 </li>

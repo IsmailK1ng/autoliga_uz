@@ -291,6 +291,10 @@
             const currentLang = document.documentElement.lang || 'uz';
             const t = translations[currentLang] || translations['uz'];
 
+            // GTM dataLayer context: never what the visitor typed
+            const trackCtx = () => ({ form_type: "contact", car_model: "", car_brand: "", dealer: "", page_type: "contact" });
+            window.autoligaTrack?.watchFormStart(form, trackCtx);
+
             // Phone Mask
             phoneInput.addEventListener("input", (e) => {
                 let value = e.target.value.replace(/\D/g, "");
@@ -344,9 +348,7 @@
                     const data = await response.json();
 
                     if (response.ok) {
-                        (window.dataLayer = window.dataLayer || []).push({
-                            event: "lead_form_submitted"
-                        });
+                        window.autoligaTrack?.leadSubmit(trackCtx());
 
                         showStatus(t.success, "success");
                         form.reset();

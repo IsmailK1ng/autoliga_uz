@@ -776,6 +776,12 @@
         var submitBtn = document.getElementById('reviewSubmitBtn');
         var selectedRating = 0;
 
+        // GTM dataLayer context: never the name or review text
+        var reviewTrackCtx = function () {
+          return { form_type: 'review', car_model: '', car_brand: '', dealer: '', page_type: 'home' };
+        };
+        if (window.autoligaTrack) window.autoligaTrack.watchFormStart(reviewForm, reviewTrackCtx);
+
         openBtn.addEventListener('click', function () {
           successMsg.style.display = 'none';
           errorMsg.style.display = 'none';
@@ -870,6 +876,7 @@
                 return resp.json().then(function (err) { throw err; });
               })
               .then(function () {
+                if (window.autoligaTrack) window.autoligaTrack.leadSubmit(reviewTrackCtx());
                 successMsg.style.display = 'flex';
                 reviewForm.style.display = 'none';
                 resetStars();
@@ -1570,6 +1577,10 @@ cards.forEach(function(card, i) {
       const statusBlock = document.querySelector(".form-status");
       const statusText = statusBlock.querySelector(".form-status__text");
 
+      // GTM dataLayer context: never what the visitor typed
+      const trackCtx = () => ({ form_type: "contact", car_model: "", car_brand: "", dealer: "", page_type: "home" });
+      window.autoligaTrack?.watchFormStart(form, trackCtx);
+
       // Маска телефона
       phoneInput.addEventListener("input", (e) => {
         let value = e.target.value.replace(/\D/g, "");
@@ -1623,9 +1634,7 @@ cards.forEach(function(card, i) {
           const data = await response.json();
 
           if (response.ok) {
-            (window.dataLayer = window.dataLayer || []).push({
-              event: "lead_form_submitted"
-            });
+            window.autoligaTrack?.leadSubmit(trackCtx());
 
             showStatus("✅ Xabar yuborildi! Tez orada siz bilan bog'lanamiz.", "success");
             form.reset();

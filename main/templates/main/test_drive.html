@@ -100,7 +100,7 @@
                                 <div class="td-select-wrapper">
                                     <select name="dealer" id="tdDealer" required>
                                         <option value="" disabled selected>{% if LANGUAGE_CODE == 'uz' %}Diler markazni tanlang{% elif LANGUAGE_CODE == 'ru' %}Выберите дилерский центр{% else %}Select dealer center{% endif %}</option>
-                                        {% for dealer in dealers %}<option value="{{ dealer.id }}">{{ dealer.name }}{% if dealer.address %} — {{ dealer.address }}{% endif %}</option>
+                                        {% for dealer in dealers %}<option value="{{ dealer.id }}" data-slug="{{ dealer.slug }}">{{ dealer.name }}{% if dealer.address %} — {{ dealer.address }}{% endif %}</option>
                                         {% endfor %}
                                     </select>
                                 </div>
@@ -112,7 +112,7 @@
                                 <div class="td-select-wrapper">
                                     <select name="product" id="tdProduct" required>
                                         <option value="" disabled{% if not selected_model %} selected{% endif %}>{% if LANGUAGE_CODE == 'uz' %}Modelni tanlang{% elif LANGUAGE_CODE == 'ru' %}Выберите модель{% else %}Select model{% endif %}</option>
-                                        {% for product in products %}<option value="{{ product.id }}"{% if product.slug == selected_model %} selected{% endif %}>{{ product.title|default:product.title_uz }}</option>
+                                        {% for product in products %}<option value="{{ product.id }}" data-model="{{ product.slug }}" data-brand="{{ product.category.slug|default:'' }}"{% if product.slug == selected_model %} selected{% endif %}>{{ product.title|default:product.title_uz }}</option>
                                         {% endfor %}
                                     </select>
                                 </div>
@@ -264,6 +264,20 @@
         const dealerSelect = document.getElementById("tdDealer");
         const productSelect = document.getElementById("tdProduct");
 
+        // GTM dataLayer context: slugs only, never what the visitor typed
+        function trackCtx() {
+            const product = productSelect.selectedOptions[0];
+            const dealer = dealerSelect.selectedOptions[0];
+            return {
+                form_type: "test_drive",
+                car_model: (product && product.dataset.model) || "",
+                car_brand: (product && product.dataset.brand) || "",
+                dealer: (dealer && dealer.dataset.slug) || "",
+                page_type: "test_drive",
+            };
+        }
+        window.autoligaTrack?.watchFormStart(form, trackCtx);
+
         // === Маска телефона ===
         phoneInput.addEventListener("input", (e) => {
             let value = e.target.value.replace(/\D/g, "");
@@ -407,7 +421,7 @@
                 const data = await response.json();
 
                 if (response.ok && data.success) {
-                    (window.dataLayer = window.dataLayer || []).push({ event: "test_drive_submitted" });
+                    window.autoligaTrack?.leadSubmit(trackCtx());
                     showStatus(t.success, "success");
                     form.reset();
                     selectedDate = null;

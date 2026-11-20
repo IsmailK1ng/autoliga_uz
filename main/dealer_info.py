@@ -15,6 +15,9 @@ path('dealers/<int:pk>/', ...) dealer pages.
 import re
 from urllib.parse import urlencode
 
+from django.utils.text import slugify
+from unidecode import unidecode
+
 from .models import DEALER_REGION_CHOICES
 
 REGION_ORDER = [key for key, _label in DEALER_REGION_CHOICES]
@@ -91,6 +94,8 @@ def dealer_card(dealer, language):
     phones = phone_links(dealer.phone)
     return {
         'id': dealer.id,
+        # Dealer has no slug field: the base (uz) name, so the analytics value is the same in every language
+        'slug': slugify(unidecode(dealer.name or '')) or str(dealer.id),
         'name': translated(dealer, 'name'),
         'region': dealer.region,
         'region_label': region_label(dealer.region, language),

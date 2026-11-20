@@ -4,7 +4,7 @@ Disallow: /api/
 Disallow: /captcha/
 Disallow: /set-language/
 Allow: /
- 
+
 Clean-param: utm_source&utm_medium&utm_campaign&utm_content&utm_term&fbclid&yclid&gclid
- 
+
 Sitemap: https://autoliga.uz/sitemap.xml

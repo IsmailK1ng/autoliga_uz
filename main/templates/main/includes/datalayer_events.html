@@ -1,0 +1,46 @@
+{# dataLayer helpers for GTM events (docs/GA4_DATALAYER_EVENTS.md). Right after gtm_head: templates/base.html and product_detail.html. #}
+{# No analytics tags here (gtag, ym): GTM sends everything. Only these keys reach the dataLayer, so name/phone/message/region never do. #}
+<script>
+(function (w) {
+    w.dataLayer = w.dataLayer || [];
+    var KEYS = ['form_type', 'car_model', 'car_brand', 'dealer', 'page_type'];
+
+    function clean(ctx) {
+        var out = {};
+        KEYS.forEach(function (k) {
+            out[k] = ctx && ctx[k] != null ? String(ctx[k]) : '';
+        });
+        return out;
+    }
+
+    w.autoligaTrack = {
+        // Call only after the server answered 2xx, once per submission.
+        leadSubmit: function (ctx) {
+            var data = clean(ctx);
+            data.event = 'lead_submit';
+            w.dataLayer.push(data);
+        },
+        // form_start: once per page load, on the first focus or typing inside the form.
+        watchFormStart: function (form, getCtx) {
+            if (!form) return;
+            var sent = false;
+            function start(e) {
+                if (sent || (e.type === 'focusin' && form.dataset.trackQuietFocus === '1')) return;
+                sent = true;
+                form.removeEventListener('focusin', start);
+                form.removeEventListener('input', start);
+                var c = clean(getCtx ? getCtx() : {});
+                w.dataLayer.push({ event: 'form_start', form_type: c.form_type, car_model: c.car_model, page_type: c.page_type });
+            }
+            form.addEventListener('focusin', start);
+            form.addEventListener('input', start);
+        },
+        // Focus a field from script (e.g. when a modal opens) without counting it as form_start.
+        quietFocus: function (form, el) {
+            if (!form || !el) return;
+            form.dataset.trackQuietFocus = '1';
+            try { el.focus(); } finally { delete form.dataset.trackQuietFocus; }
+        }
+    };
+})(window);
+</script>
